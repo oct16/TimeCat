@@ -1,0 +1,40 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "dist",
+        "sourceMap": true,
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "Node",
+        "allowJs": false,
+        "noUnusedLocals": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "removeComments": false,
+        "jsx": "preserve",
+        "lib": [
+            "ESNext",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "types": [],
+        "rootDir": ".",
+        "paths": {
+            "@WebReplay/*": [
+                "packages/*/src"
+            ],
+            "WebReplay": [
+                "packages/wr/src"
+            ]
+        }
+    },
+    "include": [
+        "packages/global.d.ts",
+        "packages/*/src",
+        "packages/*/__tests__",
+    ]
+}

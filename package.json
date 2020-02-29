@@ -1,0 +1,33 @@
+{
+    "description": "WebReplay plugin",
+    "version": "1.0.0",
+    "workspaces": [
+        "packages/*"
+    ],
+    "devDependencies": {
+        "@rollup/plugin-html": "^0.1.1",
+        "@rollup/plugin-typescript": "^3.0.0",
+        "execa": "^4.0.0",
+        "fs-extra": "^8.1.0",
+        "minimist": "^1.2.0",
+        "rollup-plugin-browsersync": "^1.1.0",
+        "rollup-plugin-serve": "^1.0.1",
+        "tslib": "^1.11.1",
+        "typescript": "^3.8.3"
+    },
+    "scripts": {
+        "dev": "node scripts/dev.js",
+        "build": "node scripts/build.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/oct16/WebReplay.git"
+    },
+    "author": "oct16",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/oct16/WebReplay/issues"
+    },
+    "homepage": "https://github.com/oct16/WebReplay#readme",
+    "dependencies": {}
+}
