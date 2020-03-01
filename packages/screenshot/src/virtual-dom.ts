@@ -1,3 +1,0 @@
-function createVirtualDOM(dom: Document) {
-
-}

@@ -1,1 +1,1 @@
-export { screenshot } from './screenshot'
+export * from './screenshot'
