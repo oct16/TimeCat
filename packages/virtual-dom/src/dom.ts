@@ -1,15 +1,9 @@
 /**
+import { setAttribute } from '@/react-dom/dom';
  *
  * There are three types of methods for setting attribute
  */
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean): void {
-    // // If it starts with a world "on", we consider this attribute to be a method
-    // if (/^on[A-Z]\w+$/.test(name)) {
-    //     name = name.toLowerCase()
-    //     node.setAttribute(name, value.toString() || '')
-    //     return
-    // }
-
     // If it is a style syntax
     // Set a type string css or a object
     if (name === 'style') {

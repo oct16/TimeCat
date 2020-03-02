@@ -103,7 +103,14 @@ function diffAttributes(vNode: VNode, node: Element): void {
  *
  */
 function createNode(vNode: VNode, node: Element | null): Element {
-    const output = document.createElement(vNode.tag as string)
+    const { isSVG } = vNode.extra
+    let output: Element
+
+    if (isSVG) {
+        output = document.createElementNS('http://www.w3.org/2000/svg', vNode.tag as string)
+    } else {
+        output = document.createElement(vNode.tag as string)
+    }
     if (node) {
         const childNodes = Array.from(node.childNodes)
         childNodes.forEach(childNode => output.appendChild(childNode))

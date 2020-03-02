@@ -3,12 +3,14 @@ import { VNode } from './types'
 let id = 1
 const getId = () => id++
 
-const getVNodeByEl = (el: Element): VNode => {
+const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
+    const tagName = el.tagName.toLocaleLowerCase().trim()
     return {
         id: getId(),
         attrs: getAttr(el.attributes),
-        tag: el.tagName,
-        children: [] as any[]
+        tag: tagName,
+        children: [] as VNode[],
+        extra: { isSVG: isSVG || tagName === 'svg' }
     }
 }
 
@@ -26,19 +28,19 @@ const extraAttr = (attr: Attr) => {
     let { name, value } = attr
     if (name === 'href' || name === 'src') {
         if (/^\/(?!\/)/.test(value)) {
-            const host = `https://www.v2ex.com`
+            const host = `https://github.com`
             value = host + value
         }
     }
     return [name, value]
 }
 
-const createElement = (el: Element): any => {
-    const vNode = getVNodeByEl(el)
-
+const createElement = (el: Element, inheritSVG?: boolean): any => {
+    const vNode = getVNodeByEl(el, inheritSVG)
+    inheritSVG = inheritSVG || vNode.extra.isSVG
     el.childNodes.forEach((node: Element) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
-            const child = createElement(node)
+            const child = createElement(node, inheritSVG)
             vNode.children.push(child)
         } else if (node.nodeType === Node.TEXT_NODE) {
             if (node.nodeValue) {
@@ -54,7 +56,10 @@ const createElement = (el: Element): any => {
 }
 
 const trimNodeText = (nodeValue: string) => {
-    return nodeValue.replace(/\r\n/g, '').replace(/\n/g, '')
+    return nodeValue
+        .replace(/\r\n/g, '')
+        .replace(/\n/g, '')
+        .replace(/\r/g, '')
 }
 
 const convertHTML = (doc: Document) => {
@@ -62,7 +67,8 @@ const convertHTML = (doc: Document) => {
         id: getId(),
         tag: 'HTML',
         attrs: {},
-        children: [createElement(doc.head), createElement(doc.body)]
+        children: [createElement(doc.head), createElement(doc.body)],
+        extra: { isSVG: false }
     }
 }
 

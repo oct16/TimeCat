@@ -3,4 +3,7 @@ export interface VNode {
     children: (VNode | string)[]
     tag: string
     id: number
+    extra: {
+        isSVG: boolean
+    }
 }
