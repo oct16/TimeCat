@@ -14,7 +14,7 @@ function DOMSnapshot() {
     return document.cloneNode(true) as Document
 }
 
-export const screenshot = {
+export const snapshot = {
     windowSnapshot,
     DOMSnapshot
 }
