@@ -8,7 +8,5 @@
     },
     "author": "",
     "license": "ISC",
-    "dependencies": {
-        "snabbdom": "^0.7.4"
-    }
+    "dependencies": {}
 }

@@ -59,13 +59,12 @@ const trimNodeText = (nodeValue: string) => {
     return nodeValue
         .replace(/\r\n/g, '')
         .replace(/\n/g, '')
-        .replace(/\r/g, '')
 }
 
 const convertHTML = (doc: Document) => {
     return {
         id: getId(),
-        tag: 'HTML',
+        tag: 'html',
         attrs: {},
         children: [createElement(doc.head), createElement(doc.body)],
         extra: { isSVG: false }

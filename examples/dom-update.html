@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+    <style>
+        label {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+        <h2>Dom Update:</h2>
+
+        <h5>Update Text</h5>
+        <button
+            onclick="document.querySelector('#number').innerHTML = 1 + Number(document.querySelector('#number').innerHTML)">plus</button>
+
+        <span style="margin-left: 10px">
+            Number:
+        </span>
+        <number id="number">0</number>
+
+        <h5>Update Node</h5>
+        <button onclick="moveItem()">plus</button>
+
+        <ul id="list">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+
+        <hr>
+
+        <h2>Form:</h2>
+        <br>
+        <label for="name">Name</label>
+        <input type="text" id="name" />
+        <label for="age">Age</label>
+        <input type="text" id="age" />
+        <label for="location">Location</label>
+        <select id="location">
+            <option value="shanghai">Shanghai</option>
+            <option value="beijing">Beijing</option>
+            <option value="guangdong">Guangdong</option>
+            <option value="shenzheng">Shenzheng</option>
+        </select>
+    </div>
+
+    <script>
+        let i = 0
+        function moveItem() {
+            var list = document.querySelector('#list')
+            var items = list.querySelectorAll('li')
+
+            var sign =
+                items.forEach(function (item, index) {
+                    if (index === i) {
+                        item.innerText = '😀 😁 😂 🤣 '
+                    } else {
+                        item.innerText = ''
+                    }
+                })
+
+            if (i++ === items.length) {
+                i = 0
+            }
+        }
+
+    </script>
+
+    <script src="bundle.js"></script>
+</body>
+
+</html>

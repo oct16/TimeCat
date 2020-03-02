@@ -11,12 +11,7 @@ function windowSnapshot() {
 }
 
 function DOMSnapshot() {
-    const domParser = new window.DOMParser()
-    return domParser.parseFromString(
-        `
-        `,
-        'text/html'
-    )
+    return document.cloneNode(true) as Document
 }
 
 export const screenshot = {
