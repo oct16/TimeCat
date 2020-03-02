@@ -13,7 +13,7 @@ export default {
     input: resolve(entryFile),
     output: {
         file: 'dist/bundle.js',
-        format: 'es'
+        format: 'umd'
     },
     plugins: [
         ts(),

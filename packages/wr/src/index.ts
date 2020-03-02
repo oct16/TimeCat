@@ -1,9 +1,5 @@
-import { snapshot } from '@WebReplay/snapshot'
-import { virtualDOM } from '@WebReplay/virtual-dom'
-// import { convertBackNodeByVNode } from '@WebReplay/player'
+import { record } from '@WebReplay/record'
 
-const html = snapshot.DOMSnapshot()
-
-const VHTML = virtualDOM.convertHTML(html)
-
-console.log(VHTML)
+record({
+    emitter: e => console.log(e)
+})
