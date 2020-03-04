@@ -6,13 +6,9 @@ export const record = ({ emitter }: RecordOptions = {}) => {
 }
 
 function recordAll(emitter?: (e: RecordEvent) => void) {
-    const recordTasks: Function[] = [snapshot.windowSnapshot, snapshot.DOMSnapshot, snapshot.listenMouse]
+    const recordTasks: Function[] = [...Object.values(snapshot)]
 
     recordTasks.forEach(task => {
         task(emitter)
     })
 }
-
-// function transformToRecordData() {
-
-// }

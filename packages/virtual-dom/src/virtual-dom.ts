@@ -1,12 +1,10 @@
 import { VNode } from './types'
-
-let id = 1
-const getId = () => id++
+import { nodeStore } from '@WebReplay/snapshot'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
     const tagName = el.tagName.toLocaleLowerCase().trim()
     return {
-        id: getId(),
+        id: nodeStore.createNodeId(),
         attrs: getAttr(el.attributes),
         tag: tagName,
         children: [] as VNode[],
@@ -37,6 +35,8 @@ const extraAttr = (attr: Attr) => {
 
 const createElement = (el: Element, inheritSVG?: boolean): any => {
     const vNode = getVNodeByEl(el, inheritSVG)
+    const { id } = vNode
+    nodeStore.addNode(el, id)
     inheritSVG = inheritSVG || vNode.extra.isSVG
     el.childNodes.forEach((node: Element) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
@@ -51,19 +51,16 @@ const createElement = (el: Element, inheritSVG?: boolean): any => {
             }
         }
     })
-
     return vNode
 }
 
 const trimNodeText = (nodeValue: string) => {
-    return nodeValue
-        .replace(/\r\n/g, '')
-        .replace(/\n/g, '')
+    return nodeValue.replace(/\r\n/g, '').replace(/\n/g, '')
 }
 
 const convertHTML = (doc: Document) => {
     return {
-        id: getId(),
+        id: nodeStore.createNodeId(),
         tag: 'html',
         attrs: {},
         children: [createElement(doc.head), createElement(doc.body)],

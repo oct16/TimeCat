@@ -41,17 +41,25 @@
 
         <h2>Form:</h2>
         <br>
-        <label for="name">Name</label>
-        <input type="text" id="name" />
-        <label for="age">Age</label>
-        <input type="text" id="age" />
-        <label for="location">Location</label>
-        <select id="location">
-            <option value="shanghai">Shanghai</option>
-            <option value="beijing">Beijing</option>
-            <option value="guangdong">Guangdong</option>
-            <option value="shenzheng">Shenzheng</option>
-        </select>
+        <form action="">
+
+            <label for="name">Name</label>
+            <input type="text" id="name" />
+            <label for="age">Age</label>
+            <input type="text" id="age" />
+            <label for="location">Location</label>
+            <select id="location">
+                <option value="shanghai">Shanghai</option>
+                <option value="beijing">Beijing</option>
+                <option value="guangdong">Guangdong</option>
+                <option value="shenzheng">Shenzheng</option>
+            </select>
+            <br>
+            <br>
+            <label for="other">Other</label>
+            <textarea style="vertical-align: top;" name="" id="other" cols="30" rows="4"></textarea>
+        </form>
+
     </div>
 
     <script>
@@ -63,7 +71,7 @@
             var sign =
                 items.forEach(function (item, index) {
                     if (index === i) {
-                        item.innerText = '😀 😁 😂 🤣 '
+                        item.innerHTML = `<span>😀 😁 😂 🤣</span>`
                     } else {
                         item.innerText = ''
                     }

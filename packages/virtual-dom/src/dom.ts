@@ -1,5 +1,4 @@
 /**
-import { setAttribute } from '@/react-dom/dom';
  *
  * There are three types of methods for setting attribute
  */
