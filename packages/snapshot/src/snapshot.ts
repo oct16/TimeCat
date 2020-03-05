@@ -52,7 +52,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
                 time: Date.now().toString()
             })
         }
-        document.addEventListener('mousemove', throttle(evt, 500))
+        document.addEventListener('mousemove', throttle(evt, 250))
     }
 
     function mouseClick() {
@@ -69,7 +69,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
             })
         }
 
-        document.addEventListener('click', throttle(evt, 500))
+        document.addEventListener('click', throttle(evt, 250))
     }
 
     mouseMove()

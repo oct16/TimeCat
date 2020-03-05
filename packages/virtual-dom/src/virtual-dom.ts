@@ -34,6 +34,7 @@ const extraAttr = (attr: Attr) => {
 }
 
 const createElement = (el: Element, inheritSVG?: boolean): any => {
+    if (el.tagName === 'SCRIPT') return
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)

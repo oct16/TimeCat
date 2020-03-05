@@ -15,7 +15,6 @@ __DEV__=false yarn dev
 const execa = require('execa')
 const args = require('minimist')(process.argv.slice(2))
 const formats = args.formats || args.f
-const sourceMap = args.sourcemap || args.s
 const commit = execa.sync('git', ['rev-parse', 'HEAD']).stdout.slice(0, 7)
 
 const target = 'wr'
@@ -24,7 +23,7 @@ execa(
     [
         '-wc',
         '--environment',
-        [`COMMIT:${commit}`, `TARGET:${target}`, `FORMATS:${formats || 'global'}`, sourceMap ? 'SOURCE_MAP:true' : '']
+        [`COMMIT:${commit}`, `TARGET:${target}`, `FORMATS:${formats || 'global'}`, 'SOURCE_MAP:true']
             .filter(Boolean)
             .join(',')
     ],

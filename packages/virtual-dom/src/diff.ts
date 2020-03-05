@@ -105,11 +105,11 @@ function diffAttributes(vNode: VNode, node: Element): void {
 function createNode(vNode: VNode, node: Element | null): Element {
     const { isSVG } = vNode.extra
     let output: Element
-
+    const tagName = transformTagName(vNode.tag)
     if (isSVG) {
-        output = document.createElementNS('http://www.w3.org/2000/svg', vNode.tag as string)
+        output = document.createElementNS('http://www.w3.org/2000/svg', tagName)
     } else {
-        output = document.createElement(vNode.tag as string)
+        output = document.createElement(tagName)
     }
     if (node) {
         const childNodes = Array.from(node.childNodes)
@@ -117,6 +117,14 @@ function createNode(vNode: VNode, node: Element | null): Element {
         replaceNode(node, output)
     }
     return output
+}
+
+function transformTagName(tag: string) {
+    const tagMap: { [key: string]: string } = {
+        script: 'noscript'
+    }
+    const tagName = tagMap[tag] || tag
+    return tagName
 }
 
 /**
