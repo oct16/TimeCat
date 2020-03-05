@@ -1,13 +1,13 @@
-import { SnapshotData, SnapshotType, WindowSnapshotData, MouseSnapshotData, MouseEventType } from '@WebReplay/snapshot'
-import { Container } from './container'
-import { DOMSnapshotData } from '../../snapshot/src/types'
+import { Pointer } from './pointer'
+import { SnapshotData, SnapshotType, MouseSnapshotData, MouseEventType } from '@WebReplay/snapshot'
 
-class Player {
+export class Player {
     data: SnapshotData[]
     isPause = false
     index = 0
     requestID: number
     startTime: number
+    pointer = new Pointer('wr-player')
     constructor(data: SnapshotData[]) {
         this.data = data
     }
@@ -26,7 +26,7 @@ class Player {
                 return this.stop()
             }
 
-            requestAnimationFrame(loop.bind(this))
+            this.requestID = requestAnimationFrame(loop.bind(this))
         }
 
         this.requestID = window.requestAnimationFrame(loop.bind(this))
@@ -41,17 +41,22 @@ class Player {
         this.index = 0
     }
 
+    setSpeed(speed: number) {
+        console.log('Set Speed', speed)
+    }
+
     execFrame(snapshot: SnapshotData) {
         const { type, data } = snapshot
-
         switch (type) {
             case SnapshotType.MOUSE:
                 const { x, y, type } = data as MouseSnapshotData
                 if (type === MouseEventType.MOVE) {
                     console.log(x, y)
+                    this.pointer.move(x, y)
                 } else if (type === MouseEventType.CLICK) {
+                    console.log('click', x, y)
+                    this.pointer.click(x, y)
                 }
-
                 break
             case SnapshotType.DOM_UPDATE:
                 break
@@ -59,24 +64,4 @@ class Player {
                 break
         }
     }
-}
-
-export function replay(data: SnapshotData[]) {
-    // const [window, _vNode] = data.splice(0, 2)
-
-    // const { width, height } = window.data as WindowSnapshotData
-    // const { vNode } = _vNode.data as DOMSnapshotData
-
-    const [{ width, height }, { vNode }] = data.splice(0, 2).map(_ => _.data) as [WindowSnapshotData, DOMSnapshotData]
-
-    document.documentElement.innerHTML = ''
-    new Container({
-        vNode,
-        width,
-        height
-    })
-
-    const player = new Player(data)
-
-    player.play()
 }

@@ -52,6 +52,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
                 time: Date.now().toString()
             })
         }
+        // document.addEventListener('mousemove', throttle(evt, 25))
         document.addEventListener('mousemove', throttle(evt, 250))
     }
 

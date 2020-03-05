@@ -23,9 +23,9 @@ export default {
         }),
         string({
             // Required to be specified
-            include: '**/*.html',
+            include: ['**/*.html', '**/*.css'],
             // Undefined by default
-            exclude: ['**/index.html']
+            exclude: ['**/index.html', '**/index.css']
         }),
         browsersync({ server: 'dist', port: 4321, notify: false })
     ]

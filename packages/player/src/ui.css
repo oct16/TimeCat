@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+}
+
+.wr-controller {
+    height: 20px
+}
+
+.wr-container {
+    background: grey;
+}
+
+#wr-sandbox {
+    background: white;
+}
+
+#wr-player {
+    margin: 10px;
+    position: relative;
+}
+
+#wr-pointer {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    transition: all 1s
+}
+
+#wr-pointer[active] svg {
+    fill: red;
+    transform: scale3d(1.2, 1.2, 1.2);
+}
