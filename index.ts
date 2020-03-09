@@ -1,12 +1,10 @@
 import { record } from '@WebReplay/record'
 import { replay } from '@WebReplay/player'
-import { DataStore, SnapshotData } from '@WebReplay/snapshot'
+import { dbPromise, SnapshotData } from '@WebReplay/snapshot'
 
-new Promise(resolve => {
-    const indexDB = new DataStore('wr_db', 1, 'wr_data', () => {
-        resolve(indexDB)
-    })
-}).then((indexDB: DataStore) => {
+async function start() {
+    const indexDB = await dbPromise
+
     record({
         emitter: data => {
             indexDB.add(data)
@@ -20,4 +18,6 @@ new Promise(resolve => {
             })
         }
     }
-})
+}
+
+start()

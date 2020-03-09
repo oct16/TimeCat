@@ -1,6 +1,6 @@
 import { SnapshotData } from '@WebReplay/snapshot'
 
-export class DataStore {
+export class IndexDBOperator {
     db: IDBDatabase
     DBName: string
     version: number
@@ -59,3 +59,9 @@ export class DataStore {
         }
     }
 }
+
+export const dbPromise: Promise<IndexDBOperator> = new Promise(resolve => {
+    const indexDB = new IndexDBOperator('wr_db', 1, 'wr_data', () => {
+        resolve(indexDB)
+    })
+})
