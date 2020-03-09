@@ -23,7 +23,7 @@ body {
     width: 10px;
     height: 10px;
     position: absolute;
-    transition: all 1s
+    transition: all .2s
 }
 
 #wr-pointer[active] svg {

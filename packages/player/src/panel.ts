@@ -14,6 +14,9 @@ export class Panel {
     control = {
         play: () => {
             this.event.emit('command', 'play')
+        },
+        reload: () => {
+            this.event.emit('command', 'reload')
         }
     }
 

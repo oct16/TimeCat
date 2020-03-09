@@ -5,7 +5,7 @@ import { Pointer } from './pointer'
 
 export class Container {
     container: HTMLElement
-    snapshotHTML: string
+    convertHTMLElement: HTMLElement
     sandBox: HTMLIFrameElement
     pointer: Pointer
 
@@ -30,7 +30,9 @@ export class Container {
         this.sandBox = this.container.querySelector('#wr-sandbox') as HTMLIFrameElement
         this.sandBox.style.width = this.width - 20 + 'px'
         this.sandBox.style.height = this.height - 44 + 'px'
-        ;(this.sandBox.contentWindow as Window).document.documentElement.innerHTML = this.snapshotHTML
+        const sandBoxDoc = (this.sandBox.contentWindow as Window).document
+        
+        sandBoxDoc.replaceChild(this.convertHTMLElement, sandBoxDoc.documentElement)
         const sandboxBody = (this.sandBox.contentWindow as Window).document.documentElement.getElementsByTagName(
             'body'
         )[0]
@@ -63,7 +65,7 @@ export class Container {
     renderHTML() {
         const html = this.convertBack()
         if (html) {
-            this.snapshotHTML = html.innerHTML
+            this.convertHTMLElement = html as HTMLElement
         }
     }
 }

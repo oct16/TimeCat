@@ -51,11 +51,18 @@ export interface MouseSnapshotData {
 }
 export interface DOMObserve {
     type: SnapshotType.DOM_UPDATE
-    data: {
-        mutations: any[]
-    }
+    data: DOMObserveData
     time: string
 }
+export interface DOMObserveData {
+    mutations: DOMObserveMutations[]
+}
+export interface DOMObserveMutations {
+    type: 'add' | 'delete' | 'move'
+    parentId: number
+    nodeId: number
+}
+
 export interface FormElementObserve {
     type: SnapshotType.FORM_EL_UPDATE
     data: FormElementObserveData

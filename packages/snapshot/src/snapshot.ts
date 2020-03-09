@@ -10,7 +10,7 @@ import {
     FormElementEvent,
     MouseEventType
 } from './types'
-import { throttle } from './utils'
+import { throttle } from 'lodash-es'
 import { nodeStore } from './store/node'
 
 function windowSnapshot(emit: SnapshotEvent<WindowSnapshot>) {
@@ -52,8 +52,13 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
                 time: Date.now().toString()
             })
         }
-        // document.addEventListener('mousemove', throttle(evt, 25))
-        document.addEventListener('mousemove', throttle(evt, 100))
+
+        document.addEventListener(
+            'mousemove',
+            throttle(evt, 500, {
+                trailing: true
+            })
+        )
     }
 
     function mouseClick() {

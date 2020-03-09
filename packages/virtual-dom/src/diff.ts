@@ -1,5 +1,6 @@
 import { VNode } from './types'
 import { replaceNode, setAttribute } from './dom'
+import { nodeStore } from '@WebReplay/snapshot'
 
 /**
  *
@@ -103,7 +104,8 @@ function diffAttributes(vNode: VNode, node: Element): void {
  *
  */
 function createNode(vNode: VNode, node: Element | null): Element {
-    const { isSVG } = vNode.extra
+    const { id, extra } = vNode
+    const { isSVG } = extra
     let output: Element
     const tagName = transformTagName(vNode.tag)
     if (isSVG) {
@@ -111,6 +113,9 @@ function createNode(vNode: VNode, node: Element | null): Element {
     } else {
         output = document.createElement(tagName)
     }
+
+    nodeStore.updateNode(id, output)
+
     if (node) {
         const childNodes = Array.from(node.childNodes)
         childNodes.forEach(childNode => output.appendChild(childNode))

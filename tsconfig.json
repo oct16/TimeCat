@@ -37,6 +37,7 @@
         "global.d.ts",
         "packages/*/src",
         "index.ts",
+        "examples/*",
         "packages/*/__tests__"
     ]
 }
