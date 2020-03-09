@@ -7,9 +7,10 @@ export class Player {
     index = 0
     requestID: number
     startTime: number
-    pointer = new Pointer('wr-player')
-    constructor(data: SnapshotData[]) {
+    pointer: Pointer
+    constructor(data: SnapshotData[], pointer: Pointer) {
         this.data = data
+        this.pointer = pointer
     }
 
     play() {
@@ -30,6 +31,28 @@ export class Player {
         }
 
         this.requestID = window.requestAnimationFrame(loop.bind(this))
+    }
+
+    command(c: string) {
+        switch (c) {
+            case 'play':
+                this.play()
+                break
+            case 'pause':
+                this.pause()
+                break
+            case 'x1':
+                this.setSpeed(1)
+                break
+            case 'x4':
+                this.setSpeed(4)
+                break
+            case 'x8':
+                this.setSpeed(8)
+                break
+            default:
+                break
+        }
     }
 
     pause() {

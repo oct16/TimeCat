@@ -53,7 +53,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
             })
         }
         // document.addEventListener('mousemove', throttle(evt, 25))
-        document.addEventListener('mousemove', throttle(evt, 250))
+        document.addEventListener('mousemove', throttle(evt, 100))
     }
 
     function mouseClick() {

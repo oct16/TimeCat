@@ -1,13 +1,28 @@
-import { SnapshotData, WindowSnapshotData, DOMSnapshotData } from '@WebReplay/snapshot'
+import { dbPromise } from '@WebReplay/snapshot'
 import { Container } from './container'
+import { Player } from './player'
+import { Pointer } from './pointer'
+import { Panel } from './panel'
 
-export function replay(data: SnapshotData[]) {
-    const [{ width, height }, { vNode }] = data.splice(0, 2).map(_ => _.data) as [WindowSnapshotData, DOMSnapshotData]
+export async function replay() {
+    const indexDB = await dbPromise
+    const { width, height, vNode, data } = await indexDB.getData()
+
     document.documentElement.innerHTML = ''
-    new Container({
+
+    const contain = new Container({
         vNode,
         width,
-        height,
-        data
+        height
     })
+
+    const panel = new Panel(contain.container)
+
+    const player = new Player(data, new Pointer())
+    panel.listenCommand(command => {
+        panel.command(command)
+        player.command(command)
+    })
+
+    panel.control.play()
 }

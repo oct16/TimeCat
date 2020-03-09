@@ -24,7 +24,7 @@ declare module '*.css' {
 
 
 declare interface  EventTarget {
-  result: IDBDatabase;
+  result: any;
   transaction: IDBTransaction
 
 }

@@ -1,6 +1,6 @@
 import { record } from '@WebReplay/record'
 import { replay } from '@WebReplay/player'
-import { dbPromise, SnapshotData } from '@WebReplay/snapshot'
+import { dbPromise } from '@WebReplay/snapshot'
 
 async function start() {
     const indexDB = await dbPromise
@@ -10,12 +10,11 @@ async function start() {
             indexDB.add(data)
         }
     })
+
     const replayButton = document.getElementById('replay')
     if (replayButton) {
         replayButton.onclick = () => {
-            indexDB.readAll((data: SnapshotData[]) => {
-                replay(data)
-            })
+            replay()
         }
     }
 }

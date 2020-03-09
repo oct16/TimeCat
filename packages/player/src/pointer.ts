@@ -2,30 +2,11 @@ export class Pointer {
     x: number = 0
     y: number = 0
 
-    container: HTMLElement
     pointer: HTMLElement
-    constructor(container: string | HTMLElement) {
-        this.initContainer(container)
-        this.init()
-    }
-
-    init() {
+    constructor() {
         this.initPointer()
     }
 
-    initContainer(container: string | HTMLElement) {
-        if (typeof container === 'string') {
-            const c = document.getElementById(container)
-            if (c) {
-                this.container = c
-            }
-        } else {
-            this.container = container
-        }
-        if (!this.container) {
-            throw new Error('Pointer container is not define!')
-        }
-    }
 
     initPointer() {
         this.pointer = document.getElementById('wr-pointer') as HTMLElement
