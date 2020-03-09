@@ -1,11 +1,11 @@
-import { snapshot } from '@WebReplay/snapshot'
-import { RecordOptions, RecordEvent } from './types'
+import { snapshot, SnapshotData } from '@WebReplay/snapshot'
+import { RecordOptions } from './types'
 
 export const record = ({ emitter }: RecordOptions = {}) => {
     recordAll(emitter)
 }
 
-function recordAll(emitter?: (e: RecordEvent) => void) {
+function recordAll(emitter?: (e: SnapshotData) => void) {
     const recordTasks: Function[] = [...Object.values(snapshot)]
 
     recordTasks.forEach(task => {

@@ -21,3 +21,15 @@ declare module '*.css' {
     const value: string
     export default value
 }
+
+
+declare interface  EventTarget {
+  result: IDBDatabase;
+  transaction: IDBTransaction
+
+}
+  
+declare interface IDBDatabase {
+    continue: Function
+    value: any;
+};

@@ -7,7 +7,7 @@
         "module": "esnext",
         "moduleResolution": "Node",
         "allowJs": false,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
         "strictNullChecks": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
@@ -16,6 +16,7 @@
         "esModuleInterop": true,
         "removeComments": false,
         "jsx": "preserve",
+        "skipLibCheck": true,
         "lib": [
             "ESNext",
             "DOM",
@@ -33,8 +34,9 @@
         }
     },
     "include": [
-        "packages/global.d.ts",
+        "global.d.ts",
         "packages/*/src",
+        "index.ts",
         "packages/*/__tests__"
     ]
 }

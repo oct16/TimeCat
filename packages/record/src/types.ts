@@ -1,8 +1,5 @@
-export interface RecordOptions {
-    emitter?: (e: RecordEvent) => void
-}
+import { SnapshotData } from '@WebReplay/snapshot'
 
-export interface RecordEvent {
-    type: any
-    data: any
+export interface RecordOptions {
+    emitter?: (e: SnapshotData) => void
 }
