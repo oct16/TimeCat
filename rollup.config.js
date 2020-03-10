@@ -30,6 +30,6 @@ export default {
             // Undefined by default
             exclude: ['**/index.html', '**/index.css']
         }),
-        browsersync({ server: 'dist', port: 4321, notify: false })
+        browsersync({ server: 'dist', port: 4321, notify: false, open: false })
     ]
 }

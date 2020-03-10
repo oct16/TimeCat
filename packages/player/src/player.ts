@@ -23,6 +23,9 @@ export class Player {
 
     play() {
         function loop(this: Player, timeStamp: DOMHighResTimeStamp) {
+            if (!this.data[this.index]) {
+                return
+            }
             if (!this.startTime) {
                 this.startTime = Number(this.data[this.index].time) - timeStamp
             }

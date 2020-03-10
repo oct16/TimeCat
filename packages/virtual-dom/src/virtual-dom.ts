@@ -20,6 +20,7 @@ const getAttr = (attrs: NamedNodeMap) => {
             return ret
         }, {})
     }
+    return {}
 }
 
 const extraAttr = (attr: Attr) => {
