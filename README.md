@@ -168,7 +168,9 @@ function listenInputElement() {
 
 ##### 在客户端进行的Gzip压缩
 
-在客户端可以进行基于 `Gzip` 的数据包压缩，Gzip是基于哈夫曼二叉树的，具体原来可以看看这里[How gzip uses Huffman coding](https://jvns.ca/blog/2015/02/22/how-gzip-uses-huffman-coding/)
+在客户端可以进行基于 `Gzip` 的数据包压缩，Gzip是基于哈夫曼二叉树的，具体[How gzip uses Huffman coding](https://jvns.ca/blog/2015/02/22/how-gzip-uses-huffman-coding/)
+
+待续  // TODO
 
 ##### 播放、跳转与快进
 
