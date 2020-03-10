@@ -8,7 +8,11 @@ import {
     DOMObserve,
     FormElementObserve,
     FormElementEvent,
-    MouseEventType
+    MouseEventType,
+    AttributesUpdateData,
+    CharacterDataUpdateData,
+    DOMObserveMutations,
+    ChildListUpdateData
 } from './types'
 import { throttle } from 'lodash-es'
 import { nodeStore } from './store/node'
@@ -83,60 +87,91 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 }
 
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
-    function domUpdate() {
-        const callback: MutationCallback = (records: MutationRecord[]) => {
-            const mutations: any[] = []
-            records.forEach(record => {
-                const { target, addedNodes, removedNodes } = record
+    const callback: MutationCallback = (records: MutationRecord[]) => {
+        const mutations: DOMObserveMutations[] = []
+        records.forEach((record: MutationRecord) => {
+            const {
+                target,
+                addedNodes,
+                removedNodes,
+                type,
+                // previousSibling,
+                nextSibling,
+                attributeName
+                // attributeNamespace,
+                // oldValue
+            } = record
 
-                if (addedNodes.length) {
-                    addedNodes.forEach(node => {
-                        const nodeId = nodeStore.addNode(node)
+            switch (type) {
+                case 'attributes':
+                case 'characterData':
+                    if (attributeName) {
+                        const curAttrValue = (target as Element).getAttribute(attributeName)
                         mutations.push({
-                            type: 'add',
-                            parentId: nodeStore.getNodeId(target),
-                            nodeId
+                            mType: type,
+                            data: {
+                                nodeId: nodeStore.getNodeId(target),
+                                value: curAttrValue,
+                                attr: attributeName
+                            } as AttributesUpdateData & CharacterDataUpdateData
                         })
-                    })
-                }
-
-                if (removedNodes.length) {
-                    removedNodes.forEach(node => {
-                        mutations.push({
-                            type: 'delete',
-                            parentId: nodeStore.getNodeId(target),
-                            nodeId: nodeStore.getNodeId(node)
+                    }
+                    break
+                case 'childList':
+                    if (addedNodes.length) {
+                        addedNodes.forEach(node => {
+                            mutations.push({
+                                mType: type,
+                                data: {
+                                    type: 'add',
+                                    parentId: nodeStore.getNodeId(target),
+                                    nodeId: nodeStore.addNode(node),
+                                    pos: nextSibling ? nodeStore.getNodeId(nextSibling) : null
+                                } as ChildListUpdateData
+                            })
                         })
-                    })
-                }
-            })
-
-            if (mutations.length) {
-                emit({
-                    type: SnapshotType.DOM_UPDATE,
-                    data: {
-                        mutations
-                    },
-                    time: Date.now().toString()
-                })
+                    }
+                    if (removedNodes.length) {
+                        removedNodes.forEach(node => {
+                            mutations.push({
+                                mType: type,
+                                data: {
+                                    type: 'delete',
+                                    parentId: nodeStore.getNodeId(target) as number,
+                                    nodeId: nodeStore.addNode(node)
+                                } as ChildListUpdateData
+                            })
+                        })
+                    }
+                    break
+                default:
+                    break
             }
-        }
-
-        const observer = new MutationObserver(callback)
-        observer.observe(document.body, {
-            attributeOldValue: true,
-            attributes: true,
-            characterData: true,
-            characterDataOldValue: true,
-            childList: true,
-            subtree: true
         })
+
+        if (mutations.length) {
+            emit({
+                type: SnapshotType.DOM_UPDATE,
+                data: {
+                    mutations
+                },
+                time: Date.now().toString()
+            })
+        }
     }
 
-    domUpdate()
+    const observer = new MutationObserver(callback)
+    observer.observe(document.body, {
+        attributeOldValue: true,
+        attributes: true,
+        characterData: true,
+        characterDataOldValue: true,
+        childList: true,
+        subtree: true
+    })
 }
 
-function FormElementObserve(emit: SnapshotEvent<FormElementObserve>) {
+function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {
     const els = nodeStore.getAllInputs()
 
     listenInputInteractive() // for sys write in input
@@ -199,5 +234,5 @@ export const snapshot = {
     DOMSnapshot,
     mouseObserve,
     DOMObserve,
-    FormElementObserve
+    formElementObserve
 }

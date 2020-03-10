@@ -41,7 +41,7 @@ function diffTree(vNode: VNode, node: Element): void {
 }
 
 function diffAttributes(vNode: VNode, node: Element): void {
-    const attrs = vNode.attrs
+    const { attrs } = vNode
     for (const [name, val] of Object.entries(attrs)) {
         setAttribute(node as HTMLElement, name, val)
     }

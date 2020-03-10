@@ -33,10 +33,6 @@ export class Container {
         const sandBoxDoc = (this.sandBox.contentWindow as Window).document
         
         sandBoxDoc.replaceChild(this.convertHTMLElement, sandBoxDoc.documentElement)
-        const sandboxBody = (this.sandBox.contentWindow as Window).document.documentElement.getElementsByTagName(
-            'body'
-        )[0]
-        sandboxBody.style.margin = '10px'
     }
 
     convertBack() {

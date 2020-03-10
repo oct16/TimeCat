@@ -1,14 +1,6 @@
 import { Pointer } from './pointer'
-import {
-    SnapshotData,
-    SnapshotType,
-    MouseSnapshotData,
-    MouseEventType,
-    DOMObserveData,
-    nodeStore,
-    FormElementObserveData
-} from '@WebReplay/snapshot'
-
+import { SnapshotData } from '@WebReplay/snapshot'
+import { execFrame } from './dom'
 export class Player {
     data: SnapshotData[]
     isPause = false
@@ -32,7 +24,7 @@ export class Player {
             const currTime = this.startTime + timeStamp
             const nextTime = Number(this.data[this.index].time)
             if (currTime >= nextTime) {
-                this.execFrame(this.data[this.index])
+                execFrame.call(this, this.data[this.index])
                 this.index++
             } else if (this.index === this.data.length - 1) {
                 return this.stop()
@@ -77,45 +69,5 @@ export class Player {
 
     setSpeed(speed: number) {
         console.log('Set Speed', speed)
-    }
-
-    execFrame(snapshot: SnapshotData) {
-        const { type, data } = snapshot
-        switch (type) {
-            case SnapshotType.MOUSE:
-                const { x, y, type } = data as MouseSnapshotData
-                if (type === MouseEventType.MOVE) {
-                    this.pointer.move(x, y)
-                } else if (type === MouseEventType.CLICK) {
-                    this.pointer.click(x, y)
-                }
-                break
-            case SnapshotType.DOM_UPDATE:
-                const { mutations } = data as DOMObserveData
-                mutations
-                    .sort((a, b) => (a.type as any) - (b.type as any))
-                    .forEach(mutate => {
-                        const parentNode = nodeStore.getNode(mutate.parentId) as HTMLElement
-                        const targetNode = nodeStore.getNode(mutate.nodeId) as Element
-                        if (mutate.type === 'delete') {
-                            parentNode!.removeChild(parentNode.firstChild!)
-                        } else if (mutate.type === 'add') {
-                            parentNode!.appendChild(targetNode!)
-                        }
-                    })
-
-                break
-            case SnapshotType.FORM_EL_UPDATE:
-                const { id, type: formType, value } = data as FormElementObserveData
-                const node = nodeStore.getNode(id) as HTMLFormElement
-                if (formType === 'INPUT') {
-                    node.value = value
-                } else if (formType === 'FOCUS') {
-                    node.focus()
-                } else if (formType === 'BLUR') {
-                    node.blur()
-                }
-                break
-        }
     }
 }

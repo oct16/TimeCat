@@ -58,9 +58,27 @@ export interface DOMObserveData {
     mutations: DOMObserveMutations[]
 }
 export interface DOMObserveMutations {
+    mType: 'attributes' | 'characterData' | 'childList'
+    data: ChildListUpdateData | CharacterDataUpdateData & AttributesUpdateData
+}
+
+export interface AttributesUpdateData {
+    nodeId: number
+    value: string
+    attr: string
+}
+
+export interface CharacterDataUpdateData {
+    nodeId: number
+    value: string
+    attr: string
+}
+
+export interface ChildListUpdateData {
     type: 'add' | 'delete' | 'move'
     parentId: number
     nodeId: number
+    pos?: number
 }
 
 export interface FormElementObserve {
