@@ -56,7 +56,7 @@ Web录屏器其实也借鉴这样的一种思路，工程上一般称之为Opera
 
 ##### 对DOM进行快照
 
-通过DOM的API可以很轻易的拿到页面的节点数据，但是对于我们的需求而言，显而HTMLElement提供的数据太冗余了，这一步可以参考VirtualDom的设计，把信息精简一下
+通过DOM的API可以很轻易的拿到页面的节点数据，但是对于我们的需求而言，显而DOM Node提供的数据太冗余了，这一步通过参考VirtualDom的设计，把信息精简一下
 
 ```ts
 interface VNode{
