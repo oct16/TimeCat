@@ -27,9 +27,6 @@
         "paths": {
             "@WebReplay/*": [
                 "packages/*/src"
-            ],
-            "WebReplay": [
-                "packages/wr/src"
             ]
         }
     },

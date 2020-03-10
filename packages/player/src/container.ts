@@ -1,4 +1,4 @@
-import { VNode, diffNode } from '@WebReplay/virtual-dom'
+import { VNode, convertVNode } from '@WebReplay/virtual-dom'
 import HTML from './ui.html'
 import STYLE from './ui.css'
 import { Pointer } from './pointer'
@@ -31,12 +31,12 @@ export class Container {
         this.sandBox.style.width = this.width - 20 + 'px'
         this.sandBox.style.height = this.height - 44 + 'px'
         const sandBoxDoc = (this.sandBox.contentWindow as Window).document
-        
+
         sandBoxDoc.replaceChild(this.convertHTMLElement, sandBoxDoc.documentElement)
     }
 
     convertBack() {
-        return diffNode(this.vNode, null)
+        return convertVNode(this.vNode, null)
     }
 
     initTemplate() {

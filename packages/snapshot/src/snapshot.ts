@@ -89,58 +89,57 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
     const callback: MutationCallback = (records: MutationRecord[]) => {
         const mutations: DOMObserveMutations[] = []
+
+        function addMutation(mType: 'attributes' | 'characterData' | 'childList') {
+            return function(data: any) {
+                mutations.push({
+                    mType,
+                    data
+                })
+            }
+        }
         records.forEach((record: MutationRecord) => {
-            const {
-                target,
-                addedNodes,
-                removedNodes,
-                type,
-                // previousSibling,
-                nextSibling,
-                attributeName
-                // attributeNamespace,
-                // oldValue
-            } = record
+            const { target, addedNodes, removedNodes, type, nextSibling, attributeName } = record
+
+            const joinData = addMutation(type)
 
             switch (type) {
                 case 'attributes':
-                case 'characterData':
                     if (attributeName) {
                         const curAttrValue = (target as Element).getAttribute(attributeName)
-                        mutations.push({
-                            mType: type,
-                            data: {
-                                nodeId: nodeStore.getNodeId(target),
-                                value: curAttrValue,
-                                attr: attributeName
-                            } as AttributesUpdateData & CharacterDataUpdateData
-                        })
+                        joinData({
+                            nodeId: nodeStore.getNodeId(target),
+                            value: curAttrValue,
+                            attr: attributeName
+                        } as AttributesUpdateData)
                     }
+                    break
+                case 'characterData':
+                    const parent = target.parentNode!
+                    joinData({
+                        parentId: nodeStore.getNodeId(parent),
+                        value: target.nodeValue,
+                        pos: parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(target as ChildNode) : null
+                    } as CharacterDataUpdateData)
                     break
                 case 'childList':
                     if (addedNodes.length) {
                         addedNodes.forEach(node => {
-                            mutations.push({
-                                mType: type,
-                                data: {
-                                    type: 'add',
-                                    parentId: nodeStore.getNodeId(target),
-                                    nodeId: nodeStore.addNode(node),
-                                    pos: nextSibling ? nodeStore.getNodeId(nextSibling) : null
-                                } as ChildListUpdateData
-                            })
+                            joinData({
+                                type: 'add',
+                                parentId: nodeStore.getNodeId(target),
+                                nodeId: nodeStore.addNode(node),
+                                pos: nextSibling ? nodeStore.getNodeId(nextSibling) : null
+                            } as ChildListUpdateData)
                         })
                     }
                     if (removedNodes.length) {
                         removedNodes.forEach(node => {
-                            mutations.push({
-                                mType: type,
-                                data: {
-                                    type: 'delete',
-                                    parentId: nodeStore.getNodeId(target) as number,
-                                    nodeId: nodeStore.addNode(node)
-                                } as ChildListUpdateData
-                            })
+                            joinData({
+                                type: 'delete',
+                                parentId: nodeStore.getNodeId(target) as number,
+                                nodeId: nodeStore.addNode(node)
+                            } as ChildListUpdateData)
                         })
                     }
                     break
@@ -213,6 +212,7 @@ function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {
 
 function listenInputInteractive() {
     const inputProto = HTMLInputElement.prototype
+    const original = Object.getOwnPropertyDescriptor(inputProto, 'value')!
     Object.defineProperty(inputProto, 'value', {
         set: function(value) {
             var newValue = arguments.length ? value : this.value
@@ -225,6 +225,7 @@ function listenInputInteractive() {
                     this.dispatchEvent(event)
                 }
             }
+            Object.defineProperty(inputProto, 'value', original)
         }
     })
 }

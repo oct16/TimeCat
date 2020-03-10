@@ -1,3 +1,3 @@
 export * from './types'
 export * from './virtual-dom'
-export * from './diff'
+export * from './dom-generator'

@@ -1,57 +1,41 @@
-import { VNode } from './types'
 import { replaceNode, setAttribute } from './dom'
 import { nodeStore } from '@WebReplay/snapshot'
+import { VNode } from './types'
 
-/**
- *
- * Diff self and all children
- *
- */
-export function diffNode(vNode: VNode | string | null, node: Element | null): Element | null {
+export function convertVNode(vNode: VNode | string | null, node: Element | null): Element | null {
     if (vNode === null || vNode === undefined) {
         return null
     }
-    if (typeof vNode === 'string' || typeof vNode === 'number') {
-        return diffText(vNode, node)
+    if (typeof vNode === 'string') {
+        return createText(vNode, node)
     }
     const output = createNode(vNode)
     if ((vNode.children && vNode.children.length) || (output.childNodes && output.childNodes.length)) {
-        diffTree(vNode, output)
+        travel(vNode, output)
     }
-    diffAttributes(vNode, output)
+    createAttributes(vNode, output)
     return output
 }
 
-/**
- *
- * Diff all child nodes by recursive
- * Update dom in the final
- *
- */
-function diffTree(vNode: VNode, node: Element): void {
+function travel(vNode: VNode, node: Element): void {
     const nodeChildren: Element[] = []
     const vNodeChildren = vNode.children.slice()
     vNodeChildren.forEach(vChild => {
         let child = nodeChildren.pop() as Element | null
-        child = diffNode(vChild, child)
+        child = convertVNode(vChild, child)
         if (child) {
             node.appendChild(child)
         }
     })
 }
 
-function diffAttributes(vNode: VNode, node: Element): void {
+function createAttributes(vNode: VNode, node: Element): void {
     const { attrs } = vNode
     for (const [name, val] of Object.entries(attrs)) {
         setAttribute(node as HTMLElement, name, val)
     }
 }
 
-/**
- *
- * create a node by vNode and copy children
- *
- */
 function createNode(vNode: VNode): Element {
     const { id, extra } = vNode
     const { isSVG } = extra
@@ -75,24 +59,8 @@ function transformTagName(tag: string) {
     return tagName
 }
 
-/**
- *
- * NodeType: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
- *
- */
-function diffText(textNode: string, node: Element | null | null): Element | null {
+function createText(textNode: string, node: Element | null | null): Element | null {
     let output: Element | Node
-    // node is plain text
-    if (node && node.nodeType === Node.TEXT_NODE) {
-        // when text value is difference, replace
-        if (node.textContent !== String(textNode)) {
-            node.textContent = textNode
-        }
-        output = node
-    } else {
-        // hard replace node
-        output = document.createTextNode(textNode)
-        replaceNode(node, output)
-    }
+    output = document.createTextNode(textNode)
     return output as Element
 }
