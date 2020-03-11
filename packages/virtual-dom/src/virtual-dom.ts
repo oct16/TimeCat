@@ -34,16 +34,19 @@ const extraAttr = (attr: Attr) => {
     return [name, value]
 }
 
-const createElement = (el: Element, inheritSVG?: boolean): any => {
-    if (el.tagName === 'SCRIPT') return
+export const createElement = (el: Element, inheritSVG?: boolean): VNode | null => {
+    if (el.tagName === 'SCRIPT') return null
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)
+    el.setAttribute('vid', id.toString())
     inheritSVG = inheritSVG || vNode.extra.isSVG
     el.childNodes.forEach((node: Element) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
             const child = createElement(node, inheritSVG)
-            vNode.children.push(child)
+            if (child) {
+                vNode.children.push(child)
+            }
         } else if (node.nodeType === Node.TEXT_NODE) {
             if (node.nodeValue) {
                 const text = trimNodeText(node.nodeValue)

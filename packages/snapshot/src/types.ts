@@ -9,6 +9,7 @@ export enum SnapshotType {
 }
 
 export enum FormElementEvent {
+    'ATTR' = 'ATTR',
     'INPUT' = 'INPUT',
     'FOCUS' = 'FOCUS',
     'BLUR' = 'BLUR'
@@ -89,6 +90,7 @@ export interface FormElementObserve {
 export interface FormElementObserveData {
     type: FormElementEvent
     id: number
+    key?: string
     value?: string
 }
 
