@@ -102,26 +102,30 @@ observer.observe(target, options)
     1. 截流的间隔中可能会丢失关键的鼠标坐标数据
     2. 即时通过截流在移动距离足够长的时候任然会产生巨大的数据量，更好的办法是通过 `Spline Curves(样条曲线)` 函数来计算，就能很轻易的生成了一条曲线用来控制鼠标的移动
 
-Input的变换我们可以通过`Node.addEventListener` 的 `input` `blur` `focus` 事件进行监听，但是这只对用户的行为发射事件，如果是通过JavaScript对Input标签进行赋值，我们是监听不到数据的变化的，这时我们可以通过`Object.defineProperty`来对InputElement对象的`value`属性进行劫持，在不影响目标赋值的情况下，把value新值转发到`input`事件中，统一处理Input状态变化
+Input的变换我们可以通过`Node.addEventListener` 的 `input` `blur` `focus` 事件监听，不过这只能监听到用户的行为，如果是通过JavaScript对标签进行赋值，我们是监听不到数据的变化的，这时我们可以通过`Object.defineProperty`来对一些表单对象的特殊属性进行劫持，在不影响目标赋值的情况下，把value新值转发到自定的handle上，统一处理状态变化
 
 ```ts
-function listenInputElement() {
-    const inputProto = HTMLInputElement.prototype
-    Object.defineProperty(inputProto, 'value', {
-        set: function(value) {
-            var newValue = arguments.length ? value : this.value
-            var node = this.attributes.value
-            if (!node || newValue !== node.value) {
-                var event = document.createEvent('Event')
-                event.initEvent('input', true, true)
-                this.setAttribute('value', newValue)
-                if (document.documentElement.contains(this)) {
-                    this.dispatchEvent(event)
+const elementList: [HTMLElement, string][] = [
+        [HTMLInputElement.prototype, 'value'],
+        [HTMLInputElement.prototype, 'checked'],
+        [HTMLSelectElement.prototype, 'value'],
+        [HTMLTextAreaElement.prototype, 'value']
+    ]
+
+    elementList.forEach(item => {
+        const [target, key] = item
+        const original = Object.getOwnPropertyDescriptor(target, key)
+        Object.defineProperty(target, key, {
+            set: function(value: string | boolean) {
+                setTimeout(() => {
+                    handleEvent.call(this, key, value)
+                })
+                if (original && original.set) {
+                    original.set.call(this, value)
                 }
             }
-        }
+        })
     })
-}
 ```
 
 ##### 通过样条曲线模拟鼠标轨迹

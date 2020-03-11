@@ -174,7 +174,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
 function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {
     const els = nodeStore.getAllInputs()
 
-    listenInputObserve(emit) // for sys write in input
+    listenInput(emit) // for sys write in input
 
     els.forEach(el => {
         el.addEventListener('input', (e: InputEvent) => {
@@ -211,7 +211,7 @@ function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {
     })
 }
 
-function listenInputObserve(emit: SnapshotEvent<FormElementObserve>) {
+function listenInput(emit: SnapshotEvent<FormElementObserve>) {
     const elementList: [HTMLElement, string][] = [
         [HTMLInputElement.prototype, 'value'],
         [HTMLInputElement.prototype, 'checked'],
@@ -224,13 +224,9 @@ function listenInputObserve(emit: SnapshotEvent<FormElementObserve>) {
         const original = Object.getOwnPropertyDescriptor(target, key)
         Object.defineProperty(target, key, {
             set: function(value: string | boolean) {
-                // const currentValue = this[key]
-                // console.log(this, currentValue, value)
-                // if (currentValue != value) {
                 setTimeout(() => {
                     handleEvent.call(this, key, value)
                 })
-                // }
                 if (original && original.set) {
                     original.set.call(this, value)
                 }
