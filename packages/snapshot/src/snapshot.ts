@@ -15,7 +15,7 @@ import {
     ChildListUpdateData
 } from './types'
 import { throttle } from 'lodash-es'
-import { nodeStore } from './store/node'
+import { nodeStore } from '../../utils/src/store/node'
 import { VNode } from '../../virtual-dom/src/types'
 
 function windowSnapshot(emit: SnapshotEvent<WindowSnapshot>) {

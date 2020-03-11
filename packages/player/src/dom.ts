@@ -1,5 +1,4 @@
 import {
-    nodeStore,
     SnapshotData,
     MouseSnapshotData,
     DOMObserveData,
@@ -13,6 +12,7 @@ import {
     FormElementEvent
 } from '@WebReplay/snapshot'
 import { Player } from './player'
+import { nodeStore } from '@WebReplay/utils'
 
 export function execFrame(this: Player, snapshot: SnapshotData) {
     const { type, data } = snapshot

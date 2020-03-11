@@ -1,11 +1,11 @@
-import { dbPromise } from '@WebReplay/snapshot'
+import { DBPromise } from '@WebReplay/utils'
 import { Container } from './container'
 import { Player } from './player'
 import { Pointer } from './pointer'
 import { Panel } from './panel'
 
 export async function replay() {
-    const indexDB = await dbPromise
+    const indexDB = await DBPromise
     const { width, height, vNode, data } = await indexDB.getData()
 
     document.documentElement.innerHTML = ''

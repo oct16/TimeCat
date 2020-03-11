@@ -77,7 +77,7 @@ export class IndexDBOperator {
     }
 }
 
-export const dbPromise: Promise<IndexDBOperator> = new Promise(resolve => {
+export const DBPromise: Promise<IndexDBOperator> = new Promise(resolve => {
     const indexDB = new IndexDBOperator('wr_db', 1, 'wr_data', () => {
         resolve(indexDB)
     })

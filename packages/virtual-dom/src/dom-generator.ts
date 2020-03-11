@@ -1,5 +1,5 @@
-import { replaceNode, setAttribute } from './dom'
-import { nodeStore } from '@WebReplay/snapshot'
+import { setAttribute } from './dom'
+import { nodeStore } from '@WebReplay/utils'
 import { VNode } from './types'
 
 export function convertVNode(vNode: VNode | string | null, node: Element | null): Element | null {

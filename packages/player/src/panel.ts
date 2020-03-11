@@ -1,4 +1,4 @@
-import { EventBus } from './eventbus'
+import { EventBus } from '@WebReplay/utils'
 
 export class Panel {
     container: HTMLElement

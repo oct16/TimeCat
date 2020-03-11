@@ -1,9 +1,9 @@
 import { record } from '@WebReplay/record'
 import { replay } from '@WebReplay/player'
-import { dbPromise } from '@WebReplay/snapshot'
+import { DBPromise } from '@WebReplay/utils'
 
 async function start() {
-    const indexDB = await dbPromise
+    const indexDB = await DBPromise
 
     record({
         emitter: data => {
