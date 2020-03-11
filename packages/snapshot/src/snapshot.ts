@@ -15,8 +15,8 @@ import {
     ChildListUpdateData
 } from './types'
 import { throttle } from 'lodash-es'
-import { nodeStore } from '../../utils/src/store/node'
-import { VNode } from '../../virtual-dom/src/types'
+import { nodeStore } from '@WebReplay/utils'
+import { VNode } from '@WebReplay/virtual-dom'
 
 function windowSnapshot(emit: SnapshotEvent<WindowSnapshot>) {
     const href = window.location.href
@@ -99,7 +99,6 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
             }
         }
         records.forEach((record: MutationRecord) => {
-            // console.log(record);
             const { target, addedNodes, removedNodes, type, nextSibling, attributeName } = record
 
             const joinData = addMutation(type)
@@ -127,16 +126,16 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 case 'childList':
                     if (addedNodes.length) {
                         addedNodes.forEach(node => {
-
                             // remake element for remove reference
                             const vNode = createElement(node as HTMLElement)
                             convertVNode(vNode, null)
 
+                            const parent = target.parentNode!
                             joinData({
                                 type: 'add',
                                 parentId: nodeStore.getNodeId(target),
                                 nodeId: vNode!.id,
-                                pos: nextSibling ? nodeStore.getNodeId(nextSibling) : null
+                                pos: parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(target as ChildNode) : null
                             } as ChildListUpdateData)
                         })
                     }
@@ -145,7 +144,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                             joinData({
                                 type: 'delete',
                                 parentId: nodeStore.getNodeId(target) as number,
-                                nodeId: nodeStore.addNode(node)
+                                nodeId: nodeStore.getNodeId(node)
                             } as ChildListUpdateData)
                         })
                     }
@@ -252,24 +251,6 @@ function listenInput(emit: SnapshotEvent<FormElementObserve>) {
             time: Date.now().toString()
         })
     }
-
-    // const inputProto = HTMLInputElement.prototype
-    // const original = Object.getOwnPropertyDescriptor(inputProto, 'value')!
-    // Object.defineProperty(inputProto, 'value', {
-    //     set: function(value) {
-    //         var newValue = arguments.length ? value : this.value
-    //         var node = this.attributes.value
-    //         if (!node || newValue !== node.value) {
-    //             var event = document.createEvent('Event')
-    //             event.initEvent('input', true, true)
-    //             this.setAttribute('value', newValue)
-    //             if (document.documentElement.contains(this)) {
-    //                 this.dispatchEvent(event)
-    //             }
-    //         }
-    //         Object.defineProperty(inputProto, 'value', original)
-    //     }
-    // })
 }
 
 export const snapshot = {

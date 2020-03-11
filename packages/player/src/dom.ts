@@ -49,7 +49,7 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
                         const parentNode = nodeStore.getNode(parentId) as HTMLElement
                         const targetNode = nodeStore.getNode(nodeId) as Element
                         if (type === 'delete') {
-                            parentNode!.removeChild(parentNode.firstChild!)
+                            parentNode!.removeChild(targetNode)
                         } else if (type === 'add') {
                             parentNode!.appendChild(targetNode!)
                         }
