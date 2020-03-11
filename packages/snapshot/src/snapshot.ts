@@ -239,7 +239,6 @@ function listenInputObserve(emit: SnapshotEvent<FormElementObserve>) {
     })
 
     function handleEvent(this: HTMLElement, key: string, value: string) {
-        console.log(this, nodeStore.getNodeId(this))
         emit({
             type: SnapshotType.FORM_EL_UPDATE,
             data: {
