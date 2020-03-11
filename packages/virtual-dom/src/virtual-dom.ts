@@ -47,7 +47,6 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)
-    el.setAttribute('vid', id.toString())
     inheritSVG = inheritSVG || vNode.extra.isSVG
     el.childNodes.forEach((node: Element) => {
         if (node.nodeType === Node.ELEMENT_NODE) {

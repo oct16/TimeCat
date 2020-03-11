@@ -99,6 +99,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
             }
         }
         records.forEach((record: MutationRecord) => {
+            // console.log(record);
             const { target, addedNodes, removedNodes, type, nextSibling, attributeName } = record
 
             const joinData = addMutation(type)

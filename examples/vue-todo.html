@@ -9,12 +9,20 @@
         [v-cloak] {
             display: none;
         }
+
+        #replay {
+            border: 1px solid grey;
+            padding: 2px 10px;
+            margin: 10px;
+            color: black;
+            cursor: pointer;
+        }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css@2.2.0/index.css">
 </head>
 
 <body>
-
+    <button id="replay">Replay</button>
     <section class="todoapp">
         <header class="header">
             <h1>todos</h1>
@@ -57,7 +65,6 @@
         <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
     </footer>
 
-    <button id="replay">Replay</button>
     <script src="https://unpkg.com/vue@latest/dist/vue.js"></script>
     <script>
         // Full spec-compliant TodoMVC with localStorage persistence
