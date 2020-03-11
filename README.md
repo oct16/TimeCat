@@ -1,4 +1,4 @@
-### HTML5录屏器的黑魔法
+### 不可思议的HTML5录屏器
 
 如果你爱打游戏，一定打过魔兽争霸3（暴露年纪🤣），你也许会游戏导出的录像文件感到好奇，明明打了一个小时游戏，为什么录像才几百KB而已。不过很快你又发现另一个问题，在每次导入录像的时候需要重新加载一次地图，否则就不能播放。
 
@@ -67,7 +67,7 @@ interface VNode{
 }
 ```
 
-对DOM进行深度遍历后，DOM被映射成了VNode类型节点，需要记录的 Node 主要是三种类型 ``ELEMENT_NODE``，`COMMENT_NODE`和 ``TEXT_NODE``，之后在播放时，只需要对VNode进行解析，就很轻松的还原成记录时的状态了
+对DOM进行深度遍历后，DOM被映射成了VNode类型节点，需要记录的 Node 主要是三种类型 ``ELEMENT_NODE``，`COMMENT_NODE`和 ``TEXT_NODE``，之后在播放时，只需要对VNode进行解析，就可以还原成记录时的状态了
 
 在这过程中，有一些节点和属性需要特殊处理，例如
 
@@ -135,7 +135,7 @@ const elementList: [HTMLElement, string][] = [
 假如我在页面上用鼠标划过一个💖的轨迹，可能会得到下图这样的坐标点
 ![heart1](./heart1.png)
 
-但是对于录像这个业务场景来说，大部分场合我们并不要求100%还原精确的鼠标轨迹，我门只会关心两种情况：
+但是对于录屏这个业务场景来说，大部分场合我们并不要求100%还原精确的鼠标轨迹，我门只会关心两种情况：
 ```
 1. 鼠标在哪里点击?
 2. 鼠标在哪里停留?
@@ -173,6 +173,10 @@ const elementList: [HTMLElement, string][] = [
 ##### 在客户端进行的Gzip压缩
 
 在客户端可以进行基于 `Gzip` 的数据包压缩，Gzip是基于哈夫曼二叉树的，具体[How gzip uses Huffman coding](https://jvns.ca/blog/2015/02/22/how-gzip-uses-huffman-coding/)
+
+待续  // TODO
+
+##### 基于视频GOT算法的压缩技术
 
 待续  // TODO
 
