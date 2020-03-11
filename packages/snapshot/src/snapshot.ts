@@ -1,4 +1,4 @@
-import { virtualDOM, createElement } from '@WebReplay/virtual-dom'
+import { virtualDOM, createElement, convertVNode } from '@WebReplay/virtual-dom'
 import {
     SnapshotType,
     WindowSnapshot,
@@ -117,6 +117,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     break
                 case 'characterData':
                     const parent = target.parentNode!
+
                     joinData({
                         parentId: nodeStore.getNodeId(parent),
                         value: target.nodeValue,
@@ -126,7 +127,11 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 case 'childList':
                     if (addedNodes.length) {
                         addedNodes.forEach(node => {
+
+                            // remake element for remove reference
                             const vNode = createElement(node as HTMLElement)
+                            convertVNode(vNode, null)
+
                             joinData({
                                 type: 'add',
                                 parentId: nodeStore.getNodeId(target),
