@@ -77,8 +77,9 @@ export interface CharacterDataUpdateData {
 export interface ChildListUpdateData {
     type: 'add' | 'delete' | 'move'
     parentId: number
-    nodeId: number
-    pos?: number
+    nodeId?: number
+    value?: string
+    pos: number
 }
 
 export interface FormElementObserve {

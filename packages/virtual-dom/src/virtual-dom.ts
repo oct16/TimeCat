@@ -1,5 +1,6 @@
 import { VNode } from './types'
 import { nodeStore } from '@WebReplay/utils'
+import { setAttribute } from './dom'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
     const tagName = el.tagName.toLocaleLowerCase().trim()
@@ -43,7 +44,12 @@ const getAttr = (el: HTMLElement & { checked: boolean }) => {
 // }
 
 export const createElement = (el: Element, inheritSVG?: boolean): VNode | null => {
-    if (el.tagName === 'SCRIPT') return null
+    if (el.nodeType === Node.TEXT_NODE) {
+        return null
+    }
+    if (el.tagName === 'SCRIPT') {
+        return null
+    }
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)

@@ -20,6 +20,7 @@ export function convertVNode(vNode: VNode | string | null, node: Element | null)
 function travel(vNode: VNode, node: Element): void {
     const nodeChildren: Element[] = []
     const vNodeChildren = vNode.children.slice()
+    node.setAttribute('vid', vNode.id.toString())
     vNodeChildren.forEach(vChild => {
         let child = nodeChildren.pop() as Element | null
         child = convertVNode(vChild, child)

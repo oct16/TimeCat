@@ -49,9 +49,20 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
                         const parentNode = nodeStore.getNode(parentId) as HTMLElement
                         const targetNode = nodeStore.getNode(nodeId) as Element
                         if (type === 'delete') {
-                            parentNode!.removeChild(targetNode)
+                            if (targetNode) {
+                                parentNode!.removeChild(targetNode)
+                            }
                         } else if (type === 'add') {
-                            parentNode!.appendChild(targetNode!)
+                            if (value) {
+                                const textNode = document.createTextNode(value)
+                                if (parentNode.childNodes.length) {
+                                    parentNode.replaceChild(textNode, parentNode.childNodes[pos])
+                                } else {
+                                    parentNode!.appendChild(textNode)
+                                }
+                            } else {
+                                parentNode!.appendChild(targetNode!)
+                            }
                         }
                         break
                 }

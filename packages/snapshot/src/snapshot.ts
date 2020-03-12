@@ -60,7 +60,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 
         document.addEventListener(
             'mousemove',
-            throttle(evt, 500, {
+            throttle(evt, 100, {
                 trailing: true
             })
         )
@@ -126,17 +126,34 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 case 'childList':
                     if (addedNodes.length) {
                         addedNodes.forEach(node => {
-                            // remake element for remove reference
-                            const vNode = createElement(node as HTMLElement)
-                            convertVNode(vNode, null)
+                            let text
+                            let vNode: any
 
-                            const parent = target.parentNode!
-                            joinData({
-                                type: 'add',
-                                parentId: nodeStore.getNodeId(target),
-                                nodeId: vNode!.id,
-                                pos: parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(target as ChildNode) : null
-                            } as ChildListUpdateData)
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                text = node.nodeValue
+                                const pos = Array.from(node.parentNode!.childNodes).indexOf(node as ChildNode)
+                                joinData({
+                                    type: 'add',
+                                    parentId: nodeStore.getNodeId(node.parentNode!),
+                                    value: node.textContent,
+                                    pos
+                                } as ChildListUpdateData)
+                            } else {
+                                // reset element for remove reference
+                                vNode = createElement(node as HTMLElement)
+                                convertVNode(vNode, null)
+
+                                const parent = target.parentNode!
+                                joinData({
+                                    type: 'add',
+                                    parentId: nodeStore.getNodeId(target),
+                                    nodeId: vNode && vNode.id,
+                                    pos:
+                                        parent.childNodes.length > 0
+                                            ? [...parent.childNodes].indexOf(target as ChildNode)
+                                            : null
+                                } as ChildListUpdateData)
+                            }
                         })
                     }
                     if (removedNodes.length) {
@@ -144,7 +161,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                             joinData({
                                 type: 'delete',
                                 parentId: nodeStore.getNodeId(target) as number,
-                                nodeId: nodeStore.getNodeId(node)
+                                nodeId: nodeStore.getNodeId(node) || null
                             } as ChildListUpdateData)
                         })
                     }

@@ -100,7 +100,7 @@ observer.observe(target, options)
 
 对于 `mouseMove` 事件，在移动的过程中会频繁的触发，产生很容冗余的数据，这样的数据会浪费很多的空间，因此对于鼠标的轨迹，我们只采集少量的关键点，最简单的办法是使用节流来减小事件产生的数据量，但是也有一些缺点：
     1. 截流的间隔中可能会丢失关键的鼠标坐标数据
-    2. 即时通过截流在移动距离足够长的时候任然会产生巨大的数据量，更好的办法是通过 `Spline Curves(样条曲线)` 函数来计算，就能很轻易的生成了一条曲线用来控制鼠标的移动
+    2. 即时通过截流在移动距离足够长的时候任然会产生巨大的数据量，更好的办法是通过 `Spline Curves(样条曲线)` 函数来计算得出移动轨迹、抖动、加速度等生成一条路径曲线用来控制鼠标的移动
 
 Input的变换我们可以通过`Node.addEventListener` 的 `input` `blur` `focus` 事件监听，不过这只能监听到用户的行为，如果是通过JavaScript对标签进行赋值，我们是监听不到数据的变化的，这时我们可以通过`Object.defineProperty`来对一些表单对象的特殊属性进行劫持，在不影响目标赋值的情况下，把value新值转发到自定的handle上，统一处理状态变化
 
@@ -145,6 +145,8 @@ const elementList: [HTMLElement, string][] = [
 
 ![heart2](./heart2.png)
 
+// TODO DETAIL
+
 ##### 通过鼠标数据生成热力图
 
 之前已经通过鼠标事件记录了完整的坐标信息，通过[heatmap.js](https://www.patrick-wied.at/static/heatmapjs/)可以很方便的生成热力图，用于对用户的行为数据进行分析。
@@ -172,13 +174,14 @@ const elementList: [HTMLElement, string][] = [
 
 ##### 在客户端进行的Gzip压缩
 
-在客户端可以进行基于 `Gzip` 的数据包压缩，Gzip是基于哈夫曼二叉树的，具体[How gzip uses Huffman coding](https://jvns.ca/blog/2015/02/22/how-gzip-uses-huffman-coding/)
+在客户端可以进行基于 `Gzip` 的数据包压缩，Gzip是基于哈夫曼二叉树的
+> 相关文章：[How gzip uses Huffman coding](https://jvns.ca/blog/2015/02/22/how-gzip-uses-huffman-coding/)
 
-待续  // TODO
+// TODO DETAIL
 
-##### 基于视频GOT算法的压缩技术
+##### 基于视频GOP(I/B/P帧)算法的压缩技术
 
-待续  // TODO
+// TODO DETAIL
 
 ##### 播放、跳转与快进
 

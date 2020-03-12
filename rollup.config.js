@@ -21,8 +21,8 @@ export default {
         }),
         sourcemaps(),
         html({
-            template: () => fs.readFileSync('examples/vue-todo.html')
-            // template: () => fs.readFileSync('examples/dom-update.html')
+            // template: () => fs.readFileSync('examples/test.html')
+            template: () => fs.readFileSync('examples/todo.html')
         }),
         string({
             // Required to be specified
