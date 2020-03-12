@@ -1,40 +1,19 @@
-const path = require('path')
-const fs = require('fs-extra')
-const args = require('minimist')(process.argv.slice(2))
 const execa = require('execa')
-const commit = execa.sync('git', ['rev-parse', 'HEAD']).stdout.slice(0, 7)
-const devOnly = args.devOnly || args.d
-const formats = args.formats || args.f
+;(async function build() {
+    const env = 'production'
 
-build()
-async function build(target) {
-    if (!target) {
-        target = 'wr'
-    }
-    const pkgDir = path.resolve(`packages/${target}`)
-    const pkg = require(`${pkgDir}/package.json`)
-
-    await fs.remove(`${pkgDir}/dist`)
-
-    const env = (pkg.buildOptions && pkg.buildOptions.env) || (devOnly ? 'development' : 'production')
     await execa(
         'rollup',
         [
             '-c',
+            'rollup.config.prod.js',
             '--environment',
-            [
-                `COMMIT:${commit}`,
-                `NODE_ENV:${env}`,
-                `TARGET:${target}`,
-                formats ? `FORMATS:${formats}` : '',
-                'TYPES:true',
-                'PROD_ONLY:true',
-                'LEAN:true',
-                'SOURCE_MAP:true'
-            ]
+            [`NODE_ENV:${env}`, 'formats:umd', 'SOURCE_MAP:true', 'PROD_ONLY:true', 'TYPES:true', 'LEAN:true']
                 .filter(Boolean)
                 .join(',')
         ],
-        { stdio: 'inherit' }
+        {
+            stdio: 'inherit'
+        }
     )
-}
+})()
