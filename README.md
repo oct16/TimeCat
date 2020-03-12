@@ -1,4 +1,4 @@
-### 不可思议的HTML5录屏器
+### 不可思议的HTML5录屏器 [DEMO](https://oct16.github.io/WebReplay)
 
 如果你爱打游戏，一定打过魔兽争霸3（暴露年纪🤣），你也许会游戏导出的录像文件感到好奇，明明打了一个小时游戏，为什么录像才几百KB而已。不过很快你又发现另一个问题，在每次导入录像的时候需要重新加载一次地图，否则就不能播放。
 
@@ -79,7 +79,7 @@ interface VNode{
 
 ##### 记录影响页面元素变化的Action
 
-DOM的变化可以使用`MutationObserver`
+DOM的变化可以使用`MutationObserver`, 监听到`attributes` `characterData` `childList` 三种类型的变化
 ```ts
 const observer = new MutationObserver((mutationRecords, observer) => {
     // Record the data
@@ -87,7 +87,7 @@ const observer = new MutationObserver((mutationRecords, observer) => {
 observer.observe(target, options)
 ```
 
-通过它可以监听到一系列的操作
+再借助`Location` `document.addEventListener` 等的能力组合，就可以监听到页面一系列的操作事件了
 ```
 - Add Node Action
 - Delete Node Action
@@ -96,7 +96,8 @@ observer.observe(target, options)
 - Change Location Action
 ...
 ```
-通过`document.addEventListener` 的 `mouseMove` 和 `click` 事件记录鼠标动作 
+
+通过 `mouseMove` 和 `click` 事件记录鼠标动作 
 
 对于 `mouseMove` 事件，在移动的过程中会频繁的触发，产生很容冗余的数据，这样的数据会浪费很多的空间，因此对于鼠标的轨迹，我们只采集少量的关键点，最简单的办法是使用节流来减小事件产生的数据量，但是也有一些缺点：
     1. 截流的间隔中可能会丢失关键的鼠标坐标数据
