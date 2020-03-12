@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebReplay🖥-Vue-TODO</title>
+    <title>WebReplay-VUE-TODO</title>
     <style>
         [v-cloak] {
             display: none;
@@ -21,6 +21,15 @@
             -webkit-animation-delay: 8s;
         }
 
+        #red-point {
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background: red;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
         .todo-list li .destroy {
             display: block !important;
         }
@@ -35,7 +44,7 @@
 </head>
 
 <body>
-    <button id="replay">Replay</button>
+    <button id="replay"><i id="red-point"></i>Replay</button>
     <section class="todoapp">
         <header class="header">
             <h1>todos</h1>
@@ -78,7 +87,7 @@
         <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
     </footer>
 
-    <script src="https://unpkg.com/vue@latest/dist/vue.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.11/vue.min.js"></script>
     <script>
         // Full spec-compliant TodoMVC with localStorage persistence
         // and hash-based routing in ~120 effective lines of JavaScript.

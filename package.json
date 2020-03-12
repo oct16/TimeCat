@@ -17,7 +17,8 @@
         "rollup-plugin-sourcemaps": "^0.5.0",
         "rollup-plugin-string": "^3.0.0",
         "tslib": "^1.11.1",
-        "typescript": "^3.8.3"
+        "typescript": "^3.8.3",
+        "@types/lodash-es": "^4.17.3"
     },
     "scripts": {
         "dev": "node scripts/dev.js",

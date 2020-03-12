@@ -4,11 +4,18 @@
             <iframe id="wr-sandbox" sandbox="allow-same-origin allow-scripts"></iframe>
         </div>
         <div class="wr-panel">
-            <button type="button" class="pause" command="pause">Pause</button>
-            <button type="button" class="play" command="play" disabled>Play</button>
-            <button type="button" class="speed" disabled command="x1">1x</button>
-            <button type="button" class="speed" command="x4">4x</button>
-            <button type="button" class="speed" command="x8">8x</button>
+            <div class="wr-keyboard">
+                <button type="button" class="pause" speed="0">Pause</button>
+                <button type="button" class="play" speed="1" disabled>Play</button>
+                <button type="button" class="speed" disabled speed="1">1x</button>
+                <button type="button" class="speed" speed="4">4x</button>
+                <button type="button" class="speed" speed="8">8x</button>
+            </div>
+            <div class="wr-progress">
+                <div class="wr-slider-bar">
+                    <div class="wr-thumb"></div>
+                </div>
+            </div>
         </div>
         <div id="wr-pointer">
             <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" width="16px" height="16px">

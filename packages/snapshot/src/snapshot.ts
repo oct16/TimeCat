@@ -15,7 +15,7 @@ import {
     ChildListUpdateData
 } from './types'
 import { throttle } from 'lodash-es'
-import { nodeStore } from '@WebReplay/utils'
+import { nodeStore, listenerStore } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
 function windowSnapshot(emit: SnapshotEvent<WindowSnapshot>) {
@@ -57,13 +57,12 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
                 time: Date.now().toString()
             })
         }
-
-        document.addEventListener(
-            'mousemove',
-            throttle(evt, 100, {
-                trailing: true
-            })
-        )
+        const name = 'mousemove'
+        const listenerHandle = throttle(evt, 100, {
+            trailing: true
+        })
+        listenerStore.set(name, listenerHandle)
+        document.addEventListener(name, listenerHandle)
     }
 
     function mouseClick() {
@@ -80,7 +79,10 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
             })
         }
 
-        document.addEventListener('click', throttle(evt, 250))
+        const name = 'click'
+        const listenerHandle = throttle(evt, 250)
+        listenerStore.set(name, listenerHandle)
+        document.addEventListener(name, listenerHandle)
     }
 
     mouseMove()

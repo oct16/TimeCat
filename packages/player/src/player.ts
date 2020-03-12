@@ -1,6 +1,8 @@
 import { Pointer } from './pointer'
 import { SnapshotData } from '@WebReplay/snapshot'
 import { execFrame } from './dom'
+import { Redux } from '@WebReplay/utils'
+
 export class Player {
     data: SnapshotData[]
     isPause = false
@@ -8,12 +10,22 @@ export class Player {
     requestID: number
     startTime: number
     pointer: Pointer
+
     constructor(data: SnapshotData[], pointer: Pointer) {
         this.data = data
         this.pointer = pointer
+
+        Redux.subscribe(state => {
+            const speed = state.speed
+            if (speed > 0) {
+                this.play(speed)
+            } else {
+                this.pause()
+            }
+        })
     }
 
-    play() {
+    play(speed: number = 1) {
         function loop(this: Player, timeStamp: DOMHighResTimeStamp) {
             if (!this.data[this.index]) {
                 return
@@ -21,45 +33,30 @@ export class Player {
             if (!this.startTime) {
                 this.startTime = Number(this.data[this.index].time) - timeStamp
             }
-            const currTime = this.startTime + timeStamp
+            const currTime = this.startTime + timeStamp * speed
             const nextTime = Number(this.data[this.index].time)
-            if (currTime >= nextTime) {
+            if (this.index >= this.data.length - 1) {
+                return this.stop()
+            } else if (currTime >= nextTime) {
                 execFrame.call(this, this.data[this.index])
                 this.index++
-            } else if (this.index === this.data.length - 1) {
-                return this.stop()
             }
 
             this.requestID = requestAnimationFrame(loop.bind(this))
         }
 
-        this.requestID = window.requestAnimationFrame(loop.bind(this))
-    }
-
-    command(c: string) {
-        switch (c) {
-            case 'play':
-                this.play()
-                break
-            case 'pause':
-                this.pause()
-                break
-            case 'x1':
-                this.setSpeed(1)
-                break
-            case 'x4':
-                this.setSpeed(4)
-                break
-            case 'x8':
-                this.setSpeed(8)
-                break
-            default:
-                break
-        }
+        this.requestID = requestAnimationFrame(loop.bind(this))
     }
 
     pause() {
         cancelAnimationFrame(this.requestID)
+        this.startTime = 0
+        Redux.dispatch({
+            type: 'PLAY',
+            data: {
+                speed: 0
+            }
+        })
     }
 
     stop() {

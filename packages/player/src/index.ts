@@ -1,7 +1,5 @@
-import { DBPromise } from '@WebReplay/utils'
+import { DBPromise, listenerStore, Redux } from '@WebReplay/utils'
 import { Container } from './container'
-import { Player } from './player'
-import { Pointer } from './pointer'
 import { Panel } from './panel'
 
 export async function replay() {
@@ -10,19 +8,22 @@ export async function replay() {
 
     document.documentElement.innerHTML = ''
 
+    Array.from(listenerStore.entries()).forEach(([name, handle]) => {
+        document.removeEventListener(name, handle)
+    })
+
     const contain = new Container({
         vNode,
         width,
         height
     })
 
-    const panel = new Panel(contain.container)
+    new Panel(contain.container, data)
 
-    const player = new Player(data, new Pointer())
-    panel.listenCommand(command => {
-        panel.command(command)
-        player.command(command)
+    Redux.dispatch({
+        type: 'PLAY',
+        data: {
+            speed: 1
+        }
     })
-
-    panel.control.play()
 }
