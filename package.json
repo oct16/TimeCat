@@ -5,8 +5,10 @@
         "packages/*"
     ],
     "devDependencies": {
+        "@oct16/code-formatter": "^1.0.9",
         "@rollup/plugin-html": "^0.1.1",
         "@rollup/plugin-typescript": "^3.0.0",
+        "@types/lodash-es": "^4.17.3",
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "lodash-es": "^4.17.15",
@@ -17,12 +19,12 @@
         "rollup-plugin-sourcemaps": "^0.5.0",
         "rollup-plugin-string": "^3.0.0",
         "tslib": "^1.11.1",
-        "typescript": "^3.8.3",
-        "@types/lodash-es": "^4.17.3"
+        "typescript": "^3.8.3"
     },
     "scripts": {
         "dev": "node scripts/dev.js",
-        "build": "node scripts/build.js"
+        "build": "node scripts/build.js",
+        "f": "npx code-formatter"
     },
     "repository": {
         "type": "git",
