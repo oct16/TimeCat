@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vue</title>
+    <title>WebReplay🖥-Vue-TODO</title>
     <style>
         [v-cloak] {
             display: none;
@@ -16,10 +16,19 @@
             margin: 10px;
             color: black;
             cursor: pointer;
+            animation: blink 1s infinite steps(1);
+            animation-delay: 8s;
+            -webkit-animation-delay: 8s;
         }
 
         .todo-list li .destroy {
-            display: block!important;
+            display: block !important;
+        }
+
+        @keyframes blink {
+            50% {
+                color: transparent;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css@2.2.0/index.css">
@@ -162,7 +171,7 @@
                     if (!value) {
                         return
                     }
-                    this.todos.push({
+                    this.todos.unshift({
                         id: todoStorage.uid++,
                         title: value,
                         completed: false

@@ -28,15 +28,10 @@ export class Container {
 
     initSandbox() {
         this.sandBox = this.container.querySelector('#wr-sandbox') as HTMLIFrameElement
-        this.sandBox.style.width = this.width - 20 + 'px'
-        this.sandBox.style.height = this.height - 44 + 'px'
+        this.sandBox.style.width = this.width + 'px'
+        this.sandBox.style.height = this.height + 'px'
         const sandBoxDoc = (this.sandBox.contentWindow as Window).document
-
         sandBoxDoc.replaceChild(this.convertHTMLElement, sandBoxDoc.documentElement)
-    }
-
-    convertBack() {
-        return convertVNode(this.vNode, null)
     }
 
     initTemplate() {
@@ -59,7 +54,7 @@ export class Container {
     }
 
     renderHTML() {
-        const html = this.convertBack()
+        const html = convertVNode(this.vNode, null)
         if (html) {
             this.convertHTMLElement = html as HTMLElement
         }

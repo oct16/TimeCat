@@ -3,7 +3,11 @@ body {
 }
 
 .wr-panel {
-    height: 20px
+    padding: 20px;
+    height: 20px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }
 
 .wr-container {
@@ -12,10 +16,11 @@ body {
 
 #wr-sandbox {
     background: white;
+    vertical-align: top;
+    border: 0;
 }
 
 #wr-player {
-    margin: 10px;
     position: relative;
 }
 

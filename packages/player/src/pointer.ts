@@ -1,12 +1,11 @@
 export class Pointer {
-    x: number = 0
-    y: number = 0
+    x = 0
+    y = 0
 
     pointer: HTMLElement
     constructor() {
         this.initPointer()
     }
-
 
     initPointer() {
         this.pointer = document.getElementById('wr-pointer') as HTMLElement
@@ -16,8 +15,8 @@ export class Pointer {
     move(x: number, y: number) {
         this.x = x
         this.y = y
-        this.pointer.style.left = this.x + 10 + 'px'
-        this.pointer.style.top = this.y + 30 + 'px'
+        this.pointer.style.left = this.x + 'px'
+        this.pointer.style.top = this.y + 'px'
     }
 
     click(x: number, y: number) {
@@ -25,6 +24,6 @@ export class Pointer {
         this.pointer.setAttribute('active', '')
         setTimeout(() => {
             this.pointer.removeAttribute('active')
-        }, 100)
+        }, 20)
     }
 }
