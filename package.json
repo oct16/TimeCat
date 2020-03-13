@@ -24,7 +24,8 @@
     "scripts": {
         "dev": "node scripts/dev.js",
         "build": "node scripts/build.js",
-        "f": "npx code-formatter"
+        "f": "npx code-formatter",
+        "gh": "npm run build && git push -f origin gh-pages:gh-pages"
     },
     "repository": {
         "type": "git",
