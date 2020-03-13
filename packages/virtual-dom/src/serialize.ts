@@ -76,11 +76,12 @@ const trimNodeText = (nodeValue: string) => {
 }
 
 const convertHTML = (doc: Document) => {
+    const { head, body } = doc
     return {
         id: nodeStore.createNodeId(),
         tag: 'html',
         attrs: {},
-        children: [createElement(doc.head), createElement(doc.body)],
+        children: [createElement(head), createElement(body)],
         extra: { isSVG: false }
     }
 }

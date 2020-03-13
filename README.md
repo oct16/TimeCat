@@ -74,12 +74,12 @@ interface VNode{
 - `InputElement`等类型的Value是从DOM无法获取的，需要从节点中对象中获取
 - `script`标签的内容由于之后不会去执行，所以可以直接`skip`或者标记为`noscript`
 - `SVG`可以直接获取，但是它本身以及它的子元素重新转换为DOM的时候需要使用`createElementNS("http://www.w3.org/2000/svg", tagName)`的方法创建元素
-- `src`或`href`属性如果是相对轨迹，需要把他们转换为绝对轨迹
+- `src`或`href`属性如果是相对路径，需要把他们转换为绝对路径
 ...
 
 ##### 记录影响页面元素变化的Action
 
-DOM的变化可以使用`MutationObserver`, 监听到`attributes` `characterData` `childList` 三种类型的变化
+DOM的变化可以使用`MutationObserver`, 监听到`attributes`,`characterData`,`childList` 三种类型的变化
 ```ts
 const observer = new MutationObserver((mutationRecords, observer) => {
     // Record the data
