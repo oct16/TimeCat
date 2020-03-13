@@ -16,7 +16,7 @@ export default {
     plugins: [
         ts(),
         node({
-            jsnext: true
+            mainFields: ['module', 'main']
         }),
         sourcemaps(),
         html({
