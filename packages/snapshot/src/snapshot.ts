@@ -97,7 +97,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 }
 
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
-    const callback: MutationCallback = (records: MutationRecord[]) => {
+    const mutationCallback: MutationCallback = (records: MutationRecord[]) => {
         const mutations: DOMObserveMutations[] = []
         function addMutation(mType: 'attributes' | 'characterData' | 'childList') {
             return function(data: any) {
@@ -136,7 +136,6 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                         addedNodes.forEach(node => {
                             let text
                             let vNode: any
-
                             if (node.nodeType === Node.TEXT_NODE) {
                                 text = node.nodeValue
                                 const pos = Array.from(node.parentNode!.childNodes).indexOf(node as ChildNode)
@@ -149,12 +148,12 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                             } else {
                                 // reset element for remove reference
                                 vNode = createElement(node as HTMLElement)
-                                convertVNode(vNode, null)
+                                // convertVNode(vNode, null)
                                 const parent = node.parentNode!
                                 joinData({
                                     type: ChildListUpdateDataType.ADD,
                                     parentId: nodeStore.getNodeId(target),
-                                    nodeId: vNode && vNode.id,
+                                    vNode,
                                     pos:
                                         parent.childNodes.length > 0
                                             ? [...parent.childNodes].indexOf(node as ChildNode)
@@ -189,7 +188,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
         }
     }
 
-    const observer = new MutationObserver(callback)
+    const observer = new MutationObserver(mutationCallback)
     observer.observe(document.body, {
         attributeOldValue: true,
         attributes: true,
@@ -213,10 +212,8 @@ function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
     const eventTypes = ['input', 'change', 'focus', 'blur']
 
     eventTypes
-        .map(type => {
-            return (fn: (e: InputEvent) => void) => {
-                document.addEventListener(type, fn, { passive: true, capture: true, once: false })
-            }
+        .map(type => (fn: (e: InputEvent) => void) => {
+            document.addEventListener(type, fn, { once: false, passive: true, capture: true })
         })
         .forEach(handle => handle(handleFn))
 

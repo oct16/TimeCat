@@ -42,6 +42,7 @@ export class Container {
         const element = parser.parseFromString(HTML, 'text/html').body.firstChild as HTMLElement
         element.style.width = this.width + 'px'
         element.style.height = this.height + 'px'
+        element.style.margin = '0 auto'
         return (this.container = element)
     }
 

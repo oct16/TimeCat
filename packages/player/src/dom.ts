@@ -14,6 +14,7 @@ import {
 } from '@WebReplay/snapshot'
 import { Player } from './player'
 import { nodeStore } from '@WebReplay/utils'
+import { convertVNode } from '@WebReplay/virtual-dom';
 
 export function execFrame(this: Player, snapshot: SnapshotData) {
     const { type, data } = snapshot
@@ -30,7 +31,7 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
             const { mutations } = data as DOMObserveData
             mutations.forEach((mutate: DOMObserveMutations) => {
                 const { mType, data } = mutate
-                const { value, attr, type, parentId, pos, nodeId } = data as ChildListUpdateData &
+                const { value, attr, type, parentId, pos, nodeId, vNode } = data as ChildListUpdateData &
                     (CharacterDataUpdateData & AttributesUpdateData)
                 switch (mType) {
                     case 'attributes':
@@ -48,7 +49,7 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
                         break
                     case 'childList':
                         const parentNode = nodeStore.getNode(parentId) as HTMLElement
-                        const targetNode = nodeStore.getNode(nodeId) as Element
+                        const targetNode = nodeStore.getNode(nodeId) as Element || convertVNode(vNode, null)
                         if (type === ChildListUpdateDataType.DELETE) {
                             if (targetNode) {
                                 parentNode!.removeChild(targetNode)
@@ -63,6 +64,7 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
                                     parentNode!.appendChild(textNode)
                                 }
                             } else {
+                                // it's a ElementNode
                                 parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
                             }
                         }

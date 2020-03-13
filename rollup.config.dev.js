@@ -20,7 +20,7 @@ export default {
         node(),
         sourcemaps(),
         html({
-            template: () => fs.readFileSync('examples/test.html')
+            template: () => fs.readFileSync('examples/todo.html')
         }),
         html({
             fileName: 'replay.html',

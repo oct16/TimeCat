@@ -10,8 +10,9 @@ import { string } from 'rollup-plugin-string'
 export default {
     input: 'index.ts',
     output: {
+        name: 'wr',
+        format: 'esm',
         file: 'dist/web-replay.js',
-        format: 'umd',
         sourcemap: true
     },
     plugins: [

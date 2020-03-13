@@ -78,9 +78,10 @@ export interface CharacterDataUpdateData {
 export interface ChildListUpdateData {
     type: ChildListUpdateDataType
     parentId: number
-    nodeId?: number
-    value?: string
+    nodeId: number
     pos: number
+    value?: string
+    vNode: VNode
 }
 export enum ChildListUpdateDataType {
     'ADD' = 'ADD',

@@ -63,8 +63,4 @@ export class Player {
         this.pause()
         this.index = 0
     }
-
-    setSpeed(speed: number) {
-        console.log('Set Speed', speed)
-    }
 }

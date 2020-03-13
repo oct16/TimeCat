@@ -255,7 +255,27 @@
         app.$mount('.todoapp')
 
     </script>
-    <script type="module" src="web-replay.js"></script>
+
+    <script type="module">
+        import { record, DB } from './web-replay.js'
+        DB.then(db => {
+            db.clear()
+            const ctr = record({
+                emitter: data => {
+                    db.add(data)
+                }
+            })
+
+            const replayButton = document.getElementById('replay')
+            if (replayButton) {
+                replayButton.onclick = () => {
+                    ctr.uninstall()
+                    window.open('/replay.html')
+                }
+            }
+        })
+
+    </script>
 </body>
 
 </html>
