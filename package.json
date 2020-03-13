@@ -26,7 +26,8 @@
         "dev": "node scripts/dev.js",
         "build": "node scripts/build.js",
         "f": "npx code-formatter",
-        "gh": "npm run build && git push -f origin gh-pages:gh-pages"
+        "deploy-gh": "git subtree split --prefix dist -b gh-pages && git push -f origin gh-pages:gh-pages",
+        "gh": "npm run build && npm run deploy-gh"
     },
     "repository": {
         "type": "git",
