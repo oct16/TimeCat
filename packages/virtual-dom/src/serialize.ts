@@ -1,6 +1,5 @@
 import { VNode } from './types'
 import { nodeStore } from '@WebReplay/utils'
-import { setAttribute } from './dom'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
     const tagName = el.tagName.toLocaleLowerCase().trim()

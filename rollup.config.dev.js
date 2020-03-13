@@ -10,7 +10,7 @@ import { string } from 'rollup-plugin-string'
 export default {
     input: 'index.ts',
     output: {
-        file: 'dist/bundle.js',
+        file: 'dist/web-replay.js',
         format: 'umd',
         sourcemap: true
     },
@@ -25,9 +25,7 @@ export default {
             template: () => fs.readFileSync('examples/todo.html')
         }),
         string({
-            // Required to be specified
             include: ['**/*.html', '**/*.css'],
-            // Undefined by default
             exclude: ['**/index.html', '**/index.css']
         }),
         browsersync({ server: 'dist', port: 4321, notify: false, open: false })
