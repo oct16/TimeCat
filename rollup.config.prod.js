@@ -1,4 +1,4 @@
-import ts from '@rollup/plugin-typescript'
+import ts from 'rollup-plugin-typescript2'
 import html from '@rollup/plugin-html'
 import node from 'rollup-plugin-node-resolve'
 import sourcemaps from 'rollup-plugin-sourcemaps'
@@ -9,12 +9,20 @@ import { string } from 'rollup-plugin-string'
 
 export default {
     input: 'index.ts',
-    output: {
-        name: 'wr',
-        format: 'esm',
-        file: 'dist/web-replay.js',
-        sourcemap: true
-    },
+    output: [
+        {
+            name: 'wr',
+            format: 'cjs',
+            file: 'dist/replay.cjs.js',
+            sourcemap: true
+        },
+        {
+            name: 'wr',
+            format: 'esm',
+            file: 'dist/replay.esm.js',
+            sourcemap: true
+        }
+    ],
     plugins: [
         ts(),
         node({

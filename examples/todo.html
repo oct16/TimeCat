@@ -257,7 +257,7 @@
     </script>
 
     <script type="module">
-        import { record, DB } from './web-replay.js'
+        import { record, DB } from './replay.js'
         DB.then(db => {
             db.clear()
             const ctr = record({

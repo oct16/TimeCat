@@ -1,4 +1,4 @@
-import ts from '@rollup/plugin-typescript'
+import ts from 'rollup-plugin-typescript2'
 import html from '@rollup/plugin-html'
 import node from 'rollup-plugin-node-resolve'
 import sourcemaps from 'rollup-plugin-sourcemaps'
