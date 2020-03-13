@@ -9,7 +9,8 @@ import {
     ChildListUpdateData,
     CharacterDataUpdateData,
     AttributesUpdateData,
-    FormElementEvent
+    FormElementEvent,
+    ChildListUpdateDataType
 } from '@WebReplay/snapshot'
 import { Player } from './player'
 import { nodeStore } from '@WebReplay/utils'
@@ -48,12 +49,13 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
                     case 'childList':
                         const parentNode = nodeStore.getNode(parentId) as HTMLElement
                         const targetNode = nodeStore.getNode(nodeId) as Element
-                        if (type === 'delete') {
+                        if (type === ChildListUpdateDataType.DELETE) {
                             if (targetNode) {
                                 parentNode!.removeChild(targetNode)
                             }
-                        } else if (type === 'add') {
+                        } else if (ChildListUpdateDataType.ADD) {
                             if (value) {
+                                // it's a TextNode
                                 const textNode = document.createTextNode(value)
                                 if (parentNode.childNodes.length) {
                                     parentNode.replaceChild(textNode, parentNode.childNodes[pos])
@@ -61,7 +63,7 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
                                     parentNode!.appendChild(textNode)
                                 }
                             } else {
-                                parentNode!.appendChild(targetNode!)
+                                parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
                             }
                         }
                         break

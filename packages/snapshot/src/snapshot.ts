@@ -12,7 +12,8 @@ import {
     AttributesUpdateData,
     CharacterDataUpdateData,
     DOMObserveMutations,
-    ChildListUpdateData
+    ChildListUpdateData,
+    ChildListUpdateDataType
 } from './types'
 import { throttle } from 'lodash-es'
 import { nodeStore, listenerStore } from '@WebReplay/utils'
@@ -135,7 +136,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                                 text = node.nodeValue
                                 const pos = Array.from(node.parentNode!.childNodes).indexOf(node as ChildNode)
                                 joinData({
-                                    type: 'add',
+                                    type: ChildListUpdateDataType.ADD,
                                     parentId: nodeStore.getNodeId(node.parentNode!),
                                     value: node.textContent,
                                     pos
@@ -144,15 +145,14 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                                 // reset element for remove reference
                                 vNode = createElement(node as HTMLElement)
                                 convertVNode(vNode, null)
-
-                                const parent = target.parentNode!
+                                const parent = node.parentNode!
                                 joinData({
-                                    type: 'add',
+                                    type: ChildListUpdateDataType.ADD,
                                     parentId: nodeStore.getNodeId(target),
                                     nodeId: vNode && vNode.id,
                                     pos:
                                         parent.childNodes.length > 0
-                                            ? [...parent.childNodes].indexOf(target as ChildNode)
+                                            ? [...parent.childNodes].indexOf(node as ChildNode)
                                             : null
                                 } as ChildListUpdateData)
                             }
@@ -161,7 +161,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     if (removedNodes.length) {
                         removedNodes.forEach(node => {
                             joinData({
-                                type: 'delete',
+                                type: ChildListUpdateDataType.DELETE,
                                 parentId: nodeStore.getNodeId(target) as number,
                                 nodeId: nodeStore.getNodeId(node) || null
                             } as ChildListUpdateData)

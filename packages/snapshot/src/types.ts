@@ -75,11 +75,16 @@ export interface CharacterDataUpdateData {
 }
 
 export interface ChildListUpdateData {
-    type: 'add' | 'delete' | 'move'
+    type: ChildListUpdateDataType
     parentId: number
     nodeId?: number
     value?: string
     pos: number
+}
+export enum ChildListUpdateDataType {
+    'ADD' = 'ADD',
+    'DELETE' = 'DELETE',
+    'MOVE' = 'MOVE'
 }
 
 export interface FormElementObserve {

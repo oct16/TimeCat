@@ -1,6 +1,6 @@
 import { record } from '@WebReplay/record'
 import { replay } from '@WebReplay/player'
-import { DBPromise } from '@WebReplay/utils'
+import { DBPromise, nodeStore } from '@WebReplay/utils'
 
 async function start() {
     const indexDB = await DBPromise
