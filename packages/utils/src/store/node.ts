@@ -24,12 +24,6 @@ class NodeStore {
         return this.idMap.get(node)
     }
 
-    public getAllInputs() { // TODO IMPROVE
-        return [...this.nodeMap.values()].filter((node: Element) =>
-            ['INPUT', 'SELECT', 'TEXTAREA'].includes(node.tagName)
-        )
-    }
-
     public updateNode(id: number, node: Node) {
         this.idMap.set(node, id)
         this.nodeMap.set(id, node)

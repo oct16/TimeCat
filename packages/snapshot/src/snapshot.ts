@@ -62,8 +62,12 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
         const listenerHandle = throttle(evt, 100, {
             trailing: true
         })
-        listenerStore.set(name, listenerHandle)
+
         document.addEventListener(name, listenerHandle)
+
+        listenerStore.add(() => {
+            document.removeEventListener(name, listenerHandle)
+        })
     }
 
     function mouseClick() {
@@ -82,7 +86,9 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 
         const name = 'click'
         const listenerHandle = throttle(evt, 250)
-        listenerStore.set(name, listenerHandle)
+        listenerStore.add(() => {
+            document.removeEventListener(name, listenerHandle)
+        })
         document.addEventListener(name, listenerHandle)
     }
 
@@ -119,7 +125,6 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     break
                 case 'characterData':
                     const parent = target.parentNode!
-
                     joinData({
                         parentId: nodeStore.getNodeId(parent),
                         value: target.nodeValue,
@@ -193,49 +198,77 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
         childList: true,
         subtree: true
     })
-}
 
-function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {
-    const els = nodeStore.getAllInputs()
-
-    listenInput(emit) // for sys write in input
-
-    els.forEach(el => {
-        el.addEventListener('input', (e: InputEvent) => {
-            emit({
-                type: SnapshotType.FORM_EL_UPDATE,
-                data: {
-                    type: FormElementEvent.INPUT,
-                    id: nodeStore.getNodeId(e.target as Node)!,
-                    value: (e.target as HTMLInputElement).value
-                },
-                time: Date.now().toString()
-            })
-        })
-        el.addEventListener('focus', (e: InputEvent) => {
-            emit({
-                type: SnapshotType.FORM_EL_UPDATE,
-                data: {
-                    type: FormElementEvent.FOCUS,
-                    id: nodeStore.getNodeId(e.target as Node)!
-                },
-                time: Date.now().toString()
-            })
-        })
-        el.addEventListener('blur', (e: InputEvent) => {
-            emit({
-                type: SnapshotType.FORM_EL_UPDATE,
-                data: {
-                    type: FormElementEvent.BLUR,
-                    id: nodeStore.getNodeId(e.target as Node)!
-                },
-                time: Date.now().toString()
-            })
-        })
+    listenerStore.add(() => {
+        observer.disconnect()
     })
 }
 
-function listenInput(emit: SnapshotEvent<FormElementObserve>) {
+function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {
+    listenInputs(emit)
+    kidnapInputs(emit) // for sys write in input
+}
+
+function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
+    const eventTypes = ['input', 'change', 'focus', 'blur']
+
+    eventTypes
+        .map(type => {
+            return (fn: (e: InputEvent) => void) => {
+                document.addEventListener(type, fn, { passive: true, capture: true, once: false })
+            }
+        })
+        .forEach(handle => handle(handleFn))
+
+    listenerStore.add(() => {
+        eventTypes.forEach(type => {
+            document.removeEventListener(type, handleFn)
+        })
+    })
+
+    function handleFn(e: InputEvent) {
+        const eventType = e.type
+
+        switch (eventType) {
+            case 'input':
+            case 'change':
+                emit({
+                    type: SnapshotType.FORM_EL_UPDATE,
+                    data: {
+                        type: FormElementEvent.INPUT,
+                        id: nodeStore.getNodeId(e.target as Node)!,
+                        value: (e.target as HTMLInputElement).value
+                    },
+                    time: Date.now().toString()
+                })
+                break
+            case 'focus':
+                emit({
+                    type: SnapshotType.FORM_EL_UPDATE,
+                    data: {
+                        type: FormElementEvent.FOCUS,
+                        id: nodeStore.getNodeId(e.target as Node)!
+                    },
+                    time: Date.now().toString()
+                })
+                break
+            case 'blur':
+                emit({
+                    type: SnapshotType.FORM_EL_UPDATE,
+                    data: {
+                        type: FormElementEvent.BLUR,
+                        id: nodeStore.getNodeId(e.target as Node)!
+                    },
+                    time: Date.now().toString()
+                })
+                break
+            default:
+                break
+        }
+    }
+}
+
+function kidnapInputs(emit: SnapshotEvent<FormElementObserve>) {
     const elementList: [HTMLElement, string][] = [
         [HTMLInputElement.prototype, 'value'],
         [HTMLInputElement.prototype, 'checked'],
@@ -243,20 +276,24 @@ function listenInput(emit: SnapshotEvent<FormElementObserve>) {
         [HTMLTextAreaElement.prototype, 'value']
     ]
 
-    elementList.forEach(item => {
-        const [target, key] = item
-        const original = Object.getOwnPropertyDescriptor(target, key)
-        Object.defineProperty(target, key, {
-            set: function(value: string | boolean) {
-                setTimeout(() => {
-                    handleEvent.call(this, key, value)
-                })
-                if (original && original.set) {
-                    original.set.call(this, value)
+    const handles = elementList.map(item => {
+        return () => {
+            const [target, key] = item
+            const original = Object.getOwnPropertyDescriptor(target, key)
+            Object.defineProperty(target, key, {
+                set: function(value: string | boolean) {
+                    setTimeout(() => {
+                        handleEvent.call(this, key, value)
+                    })
+                    if (original && original.set) {
+                        original.set.call(this, value)
+                    }
                 }
-            }
-        })
+            })
+        }
     })
+
+    handles.concat([]).forEach(handle => handle())
 
     function handleEvent(this: HTMLElement, key: string, value: string) {
         emit({
@@ -272,7 +309,7 @@ function listenInput(emit: SnapshotEvent<FormElementObserve>) {
     }
 }
 
-export const snapshot = {
+export const snapshots = {
     windowSnapshot,
     DOMSnapshot,
     mouseObserve,

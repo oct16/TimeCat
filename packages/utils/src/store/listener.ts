@@ -1,1 +1,1 @@
-export const listenerStore = new Map<string, EventListenerOrEventListenerObject>()
+export const listenerStore = new Set<Function>()

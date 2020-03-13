@@ -10,19 +10,21 @@ import { string } from 'rollup-plugin-string'
 export default {
     input: 'index.ts',
     output: {
+        name: 'wr',
+        format: 'esm',
         file: 'dist/web-replay.js',
-        format: 'umd',
         sourcemap: true
     },
     plugins: [
         ts(),
-        node({
-            jsnext: true
-        }),
+        node(),
         sourcemaps(),
         html({
-            // template: () => fs.readFileSync('examples/test.html')
-            template: () => fs.readFileSync('examples/todo.html')
+            template: () => fs.readFileSync('examples/test.html')
+        }),
+        html({
+            fileName: 'replay.html',
+            template: () => fs.readFileSync('assets/template.html')
         }),
         string({
             include: ['**/*.html', '**/*.css'],

@@ -11,6 +11,7 @@ export enum SnapshotType {
 export enum FormElementEvent {
     'ATTR' = 'ATTR',
     'INPUT' = 'INPUT',
+    'CHANGE' = 'CHANGE',
     'FOCUS' = 'FOCUS',
     'BLUR' = 'BLUR'
 }

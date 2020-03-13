@@ -21,8 +21,11 @@ export default {
         }),
         sourcemaps(),
         html({
-            // template: () => fs.readFileSync('examples/test.html')
             template: () => fs.readFileSync('examples/todo.html')
+        }),
+        html({
+            fileName: 'replay.html',
+            template: () => fs.readFileSync('assets/template.html')
         }),
         string({
             include: ['**/*.html', '**/*.css'],

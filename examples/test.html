@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebReplay</title>
-
-
     <style>
         label {
             margin-left: 10px;
@@ -83,10 +81,27 @@
                 i = 0
             }
         }
+    </script>
+    <script type="module">
+        import { record, DB } from './web-replay.js'
+        DB.then(db => {
+            db.clear()
+            const ctr = record({
+                emitter: data => {
+                    db.add(data)
+                }
+            })
+
+            const replayButton = document.getElementById('replay')
+            if (replayButton) {
+                replayButton.onclick = () => {
+                    window.open('/replay.html')
+                    ctr.uninstall()
+                }
+            }
+        })
 
     </script>
-
-    <script src="web-replay.js"></script>
 </body>
 
 </html>

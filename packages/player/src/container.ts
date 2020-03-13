@@ -5,7 +5,6 @@ import { Pointer } from './pointer'
 
 export class Container {
     container: HTMLElement
-    convertHTMLElement: HTMLElement
     sandBox: HTMLIFrameElement
     pointer: Pointer
 
@@ -21,7 +20,6 @@ export class Container {
     }
 
     init() {
-        this.renderHTML()
         this.initTemplate()
         this.initSandbox()
     }
@@ -31,7 +29,7 @@ export class Container {
         this.sandBox.style.width = this.width + 'px'
         this.sandBox.style.height = this.height + 'px'
         const sandBoxDoc = (this.sandBox.contentWindow as Window).document
-        sandBoxDoc.replaceChild(this.convertHTMLElement, sandBoxDoc.documentElement)
+        sandBoxDoc.replaceChild(convertVNode(this.vNode, null)!, sandBoxDoc.documentElement)
     }
 
     initTemplate() {
@@ -51,12 +49,5 @@ export class Container {
         const parser = new DOMParser()
         const style = parser.parseFromString(`<style>${STYLE}</style>`, 'text/html').head.firstChild as HTMLElement
         return style
-    }
-
-    renderHTML() {
-        const html = convertVNode(this.vNode, null)
-        if (html) {
-            this.convertHTMLElement = html as HTMLElement
-        }
     }
 }

@@ -6,12 +6,6 @@ export async function replay() {
     const indexDB = await DBPromise
     const { width, height, vNode, data } = await indexDB.getData()
 
-    document.documentElement.innerHTML = ''
-
-    Array.from(listenerStore.entries()).forEach(([name, handle]) => {
-        document.removeEventListener(name, handle)
-    })
-
     const contain = new Container({
         vNode,
         width,

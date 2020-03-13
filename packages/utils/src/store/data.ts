@@ -19,7 +19,7 @@ export class IndexDBOperator {
         request.onsuccess = e => {
             this.db = request.result
 
-            this.clear()
+            // this.clear()
 
             callback(this.db)
         }
