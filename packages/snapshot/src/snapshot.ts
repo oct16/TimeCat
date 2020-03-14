@@ -287,6 +287,12 @@ function kidnapInputs(emit: SnapshotEvent<FormElementObserve>) {
                     }
                 }
             })
+
+            listenerStore.add(() => {
+                if (original) {
+                    Object.defineProperty(target, key, original)
+                }
+            })
         }
     })
 

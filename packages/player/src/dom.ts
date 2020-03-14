@@ -12,11 +12,11 @@ import {
     FormElementEvent,
     ChildListUpdateDataType
 } from '@WebReplay/snapshot'
-import { Player } from './player'
+import { PlayerComponent } from './player'
 import { nodeStore } from '@WebReplay/utils'
-import { convertVNode } from '@WebReplay/virtual-dom';
+import { convertVNode } from '@WebReplay/virtual-dom'
 
-export function execFrame(this: Player, snapshot: SnapshotData) {
+export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
     const { type, data } = snapshot
     switch (type) {
         case SnapshotType.MOUSE:
@@ -49,7 +49,7 @@ export function execFrame(this: Player, snapshot: SnapshotData) {
                         break
                     case 'childList':
                         const parentNode = nodeStore.getNode(parentId) as HTMLElement
-                        const targetNode = nodeStore.getNode(nodeId) as Element || convertVNode(vNode, null)
+                        const targetNode = (nodeStore.getNode(nodeId) as Element) || convertVNode(vNode, null)
                         if (type === ChildListUpdateDataType.DELETE) {
                             if (targetNode) {
                                 parentNode!.removeChild(targetNode)

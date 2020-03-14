@@ -1,14 +1,17 @@
-import { Keyboard } from './keyboard'
-import { Player } from './player'
-import { Pointer } from './pointer'
+import { KeyboardComponent } from './keyboard'
+import { PlayerComponent } from './player'
+import { PointerComponent } from './pointer'
 import { SnapshotData } from '@WebReplay/snapshot'
+import { ProgressComponent } from './progress'
 
 export class Panel {
     container: HTMLElement
     data: SnapshotData[]
 
-    keyboard: Keyboard
-    player: Player
+    keyboard: KeyboardComponent
+    progress: ProgressComponent
+    pointer: PointerComponent
+    player: PlayerComponent
 
     constructor(container: HTMLElement, data: SnapshotData[]) {
         this.container = container
@@ -17,7 +20,9 @@ export class Panel {
     }
 
     initComponent() {
-        this.keyboard = new Keyboard(this.container)
-        this.player = new Player(this.data, new Pointer())
+        this.keyboard = new KeyboardComponent(this.container)
+        this.progress = new ProgressComponent(this.container)
+        this.pointer = new PointerComponent()
+        this.player = new PlayerComponent(this.data, this.pointer, this.progress)
     }
 }

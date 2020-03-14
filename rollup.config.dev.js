@@ -12,7 +12,7 @@ export default {
     output: {
         name: 'wr',
         format: 'esm',
-        file: 'dist/web-replay.js',
+        file: 'dist/replay.esm.js',
         sourcemap: true
     },
     plugins: [
@@ -30,6 +30,6 @@ export default {
             include: ['**/*.html', '**/*.css'],
             exclude: ['**/index.html', '**/index.css']
         }),
-        browsersync({ server: 'dist', port: 4321, notify: false, open: false })
+        browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
     ]
 }

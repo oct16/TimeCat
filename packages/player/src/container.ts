@@ -1,12 +1,10 @@
 import { VNode, convertVNode } from '@WebReplay/virtual-dom'
 import HTML from './ui.html'
 import STYLE from './ui.css'
-import { Pointer } from './pointer'
 
 export class Container {
     container: HTMLElement
     sandBox: HTMLIFrameElement
-    pointer: Pointer
 
     vNode: VNode
     width: number
@@ -42,6 +40,7 @@ export class Container {
         const element = parser.parseFromString(HTML, 'text/html').body.firstChild as HTMLElement
         element.style.width = this.width + 'px'
         element.style.height = this.height + 'px'
+        element.style.position = 'relative'
         element.style.margin = '0 auto'
         return (this.container = element)
     }

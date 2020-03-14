@@ -1,4 +1,4 @@
-export class Pointer {
+export class PointerComponent {
     x = 0
     y = 0
 

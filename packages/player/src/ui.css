@@ -10,6 +10,7 @@ body {
 
 #wr-player {
     position: relative;
+    pointer-events: none;
 }
 
 #wr-pointer {
@@ -29,7 +30,7 @@ body {
 }
 
 .wr-panel {
-    width: 100vw;
+    width: 100%;
     box-sizing: border-box;
     padding: 10px;
     height: 40px;
@@ -73,4 +74,5 @@ body {
     left: 0%;
     transform: translateY(-3px);
     z-index: 10;
+    /* transition: left .1s linear; */
 }
