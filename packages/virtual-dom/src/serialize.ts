@@ -15,32 +15,34 @@ const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
 const getAttr = (el: HTMLElement & { checked: boolean }) => {
     const resAttr: { [key: string]: string } = {}
     const attrs = el.attributes
-
     if (el.checked) {
         resAttr.checked = 'true'
     }
 
     if (attrs && attrs.length) {
         return Object.values(attrs).reduce((ret: any, attr) => {
-            // const [name, value] = extraAttr(attr)
-            const { name, value } = attr
-            ret[name] = value
+            const [name, value] = extraAttr(attr)
+            if (name) {
+                ret[name] = value
+            }
             return ret
         }, resAttr)
     }
     return resAttr
 }
 
-// const extraAttr = (attr: Attr) => {
-//     let { name, value } = attr
-//     if (name === 'href' || name === 'src') {
-//         if (/^\/(?!\/)/.test(value)) {
-//             const host = `https://github.com`
-//             value = host + value
-//         }
-//     }
-//     return [name, value]
-// }
+const extraAttr = (attr: Attr) => {
+    let { name, value } = attr
+    if (name === 'href' || name === 'src') {
+        if (/^\/(?!\/)/.test(value)) {
+            const origin = location.origin
+            value = origin + value
+        } else if (value.startsWith('#/')) {
+            return []
+        }
+    }
+    return [name, value]
+}
 
 export const createElement = (el: Element, inheritSVG?: boolean): VNode | null => {
     if (el.nodeType === Node.TEXT_NODE) {

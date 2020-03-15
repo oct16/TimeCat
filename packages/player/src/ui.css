@@ -10,7 +10,6 @@ body {
 
 #wr-player {
     position: relative;
-    pointer-events: none;
 }
 
 #wr-pointer {

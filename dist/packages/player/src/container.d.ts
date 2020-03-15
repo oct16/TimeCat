@@ -14,5 +14,5 @@ export declare class Container {
     initSandbox(): void;
     initTemplate(): void;
     createContainer(): HTMLElement;
-    createStyle(): HTMLElement;
+    createStyle(s: string): HTMLElement;
 }

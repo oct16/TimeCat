@@ -1,6 +1,7 @@
 import { VNode, convertVNode } from '@WebReplay/virtual-dom'
 import HTML from './ui.html'
 import STYLE from './ui.css'
+import FIXED from './fixed.css'
 
 export class Container {
     container: HTMLElement
@@ -27,11 +28,19 @@ export class Container {
         this.sandBox.style.width = this.width + 'px'
         this.sandBox.style.height = this.height + 'px'
         const sandBoxDoc = (this.sandBox.contentWindow as Window).document
-        sandBoxDoc.replaceChild(convertVNode(this.vNode, null)!, sandBoxDoc.documentElement)
+
+        const child = convertVNode(this.vNode, null)
+        if (child) {
+            const head = child.firstChild
+            if (head) {
+                head.appendChild(this.createStyle(FIXED))
+            }
+            sandBoxDoc.replaceChild(child, sandBoxDoc.documentElement)
+        }
     }
 
     initTemplate() {
-        document.head.appendChild(this.createStyle())
+        document.head.appendChild(this.createStyle(STYLE))
         document.body.appendChild(this.createContainer())
     }
 
@@ -45,9 +54,9 @@ export class Container {
         return (this.container = element)
     }
 
-    createStyle() {
+    createStyle(s: string) {
         const parser = new DOMParser()
-        const style = parser.parseFromString(`<style>${STYLE}</style>`, 'text/html').head.firstChild as HTMLElement
+        const style = parser.parseFromString(`<style>${s}</style>`, 'text/html').head.firstChild as HTMLElement
         return style
     }
 }
