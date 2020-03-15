@@ -3,9 +3,10 @@ import HTML from './ui.html'
 import STYLE from './ui.css'
 import FIXED from './fixed.css'
 
-export class Container {
+export class ContainerComponent {
     container: HTMLElement
     sandBox: HTMLIFrameElement
+    sandBoxDoc: Document
 
     vNode: VNode
     width: number
@@ -27,15 +28,19 @@ export class Container {
         this.sandBox = this.container.querySelector('#wr-sandbox') as HTMLIFrameElement
         this.sandBox.style.width = this.width + 'px'
         this.sandBox.style.height = this.height + 'px'
-        const sandBoxDoc = (this.sandBox.contentWindow as Window).document
+        this.sandBoxDoc = (this.sandBox.contentWindow as Window).document
 
+        this.setViewState()
+    }
+
+    setViewState() {
         const child = convertVNode(this.vNode, null)
         if (child) {
             const head = child.firstChild
             if (head) {
                 head.appendChild(this.createStyle(FIXED))
             }
-            sandBoxDoc.replaceChild(child, sandBoxDoc.documentElement)
+            this.sandBoxDoc.replaceChild(child, this.sandBoxDoc.documentElement)
         }
     }
 

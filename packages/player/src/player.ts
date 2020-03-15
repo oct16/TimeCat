@@ -3,6 +3,7 @@ import { SnapshotData } from '@WebReplay/snapshot'
 import { updateDom } from './dom'
 import { reduxStore, PlayerTypes, ProgressState } from '@WebReplay/utils'
 import { ProgressComponent } from './progress'
+import { ContainerComponent } from './container'
 
 export class PlayerComponent {
     data: SnapshotData[]
@@ -13,12 +14,14 @@ export class PlayerComponent {
     frames: number[]
     requestID: number
     startTime: number
+    c: ContainerComponent
     pointer: PointerComponent
     progress: ProgressComponent
     progressState: ProgressState
 
-    constructor(data: SnapshotData[], pointer: PointerComponent, progress: ProgressComponent) {
+    constructor(data: SnapshotData[], c: ContainerComponent, pointer: PointerComponent, progress: ProgressComponent) {
         this.data = data
+        this.c = c
         this.pointer = pointer
         this.progress = progress
 
@@ -27,7 +30,7 @@ export class PlayerComponent {
             const speed = state.speed
             this.speed = speed
             if (speed > 0) {
-                this.play(speed)
+                this.play()
             } else {
                 this.pause()
             }
@@ -35,7 +38,11 @@ export class PlayerComponent {
         })
     }
 
-    play(speed: number) {
+    play() {
+        if (this.index === 0) {
+            this.c.setViewState()
+        }
+
         cancelAnimationFrame(this.requestID)
         this.requestID = requestAnimationFrame(loop.bind(this))
 
@@ -52,7 +59,7 @@ export class PlayerComponent {
                 this.startTime = Number(this.frames[this.frameIndex])
             }
 
-            const currTime = this.startTime + timeStamp * speed
+            const currTime = this.startTime + timeStamp * this.speed
             const nextTime = Number(this.frames[this.frameIndex + 1])
 
             if (currTime >= nextTime) {
@@ -86,7 +93,10 @@ export class PlayerComponent {
     }
 
     stop() {
+        this.speed = 0
         this.index = 0
+        this.frameIndex = 0
+        this.lastPercentage = 0
         this.pause()
     }
 

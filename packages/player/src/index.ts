@@ -1,13 +1,13 @@
 import { DBPromise, ProgressTypes, PlayerTypes, reduxStore } from '@WebReplay/utils'
-import { Container } from './container'
+import { ContainerComponent } from './container'
 import { Panel } from './panel'
 
 export async function replay() {
     const indexDB = await DBPromise
     const { width, height, vNode, data } = await indexDB.getData()
 
-    const c = new Container({ vNode, width, height })
-    new Panel(c.container, data)
+    const container = new ContainerComponent({ vNode, width, height })
+    new Panel(container, data)
 
     reduxStore.dispatch({
         type: ProgressTypes.INFO,
