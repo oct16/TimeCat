@@ -17,6 +17,6 @@ export class ProgressComponent {
     }
 
     updateProgress(percentage: number) {
-        this.thumb.style.left = percentage - 0.5 + '%'
+        this.thumb.style.left = percentage + '%'
     }
 }

@@ -55,7 +55,8 @@ export class KeyboardComponent {
         ;[...speedNodes].forEach(node => {
             node.removeAttribute('disabled')
         })
-        const index = speed === 1 ? 0 : speed === 2 ? 1 : speed === 4 ? 2 : -1
+
+        const index = speed === 1 ? 0 : speed === 8 ? 1 : speed === 16 ? 2 : -1
         if (index > -1) {
             speedNodes[index].setAttribute('disabled', '')
         }
