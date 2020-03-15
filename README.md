@@ -198,3 +198,7 @@ const elementList: [HTMLElement, string][] = [
 
 对于客户端的数据，可以利用浏览器提供的IndexDB进行存储，毕竟IndexDB会比LocalStorage容量大得多，一般来说不少于 250MB，甚至没有上限，此外它使用object store存储，而且支持transaction，另外很重要的一点它是异步的，意味着不会阻塞录屏器的运行
 之后数据可以通过WebSocket或其他方式持续上传到OSS服务器中，由于数据是分块进行传输的，在同步之后还可以增加数据校验码来保证一致性避免错误
+
+##### 感谢
+
+感谢阿里D2的XREPLAY的启发与RRWEB的技术的分享
