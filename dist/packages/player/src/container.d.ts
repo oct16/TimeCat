@@ -1,7 +1,8 @@
 import { VNode } from '@WebReplay/virtual-dom';
-export declare class Container {
+export declare class ContainerComponent {
     container: HTMLElement;
     sandBox: HTMLIFrameElement;
+    sandBoxDoc: Document;
     vNode: VNode;
     width: number;
     height: number;
@@ -12,6 +13,7 @@ export declare class Container {
     });
     init(): void;
     initSandbox(): void;
+    setViewState(): void;
     initTemplate(): void;
     createContainer(): HTMLElement;
     createStyle(s: string): HTMLElement;
