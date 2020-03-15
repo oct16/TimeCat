@@ -219,7 +219,7 @@ function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            document.removeEventListener(type, handleFn)
+            document.removeEventListener(type, handleFn, true)
         })
     })
 
