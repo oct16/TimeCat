@@ -7,6 +7,7 @@ import { ContainerComponent } from './container'
 
 export class PlayerComponent {
     data: SnapshotData[]
+    delayTime = 5000
     speed = 0
     index = 0
     frameIndex = 0
@@ -67,7 +68,7 @@ export class PlayerComponent {
             if (currTime >= nextTime) {
                 this.frameIndex++
 
-                this.progress.updateTimer((endTime - nextTime) / 1000 + 1)
+                this.progress.updateTimer((endTime - nextTime + this.delayTime) / 1000)
                 const progress = (this.frameIndex / this.frames.length) * 100
 
                 if (progress - this.lastPercentage > this.getPercentInterval()) {
@@ -117,9 +118,8 @@ export class PlayerComponent {
         this.progressState = reduxStore.getState()['progress']
         const { startTime, endTime } = this.progressState
 
-        const delay = 500
         const s = +startTime
-        const e = +endTime + delay
+        const e = +endTime + this.delayTime
 
         const result: number[] = []
 
