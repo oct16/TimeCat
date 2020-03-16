@@ -37,18 +37,19 @@ body {
     left: 0;
     bottom: 0;
     background: darkgray;
+    display: flex;
 }
 
 .wr-keyboard {
-    float: left;
-    width: 200px;
+    min-width: 200px;
+    
 }
 
 .wr-progress {
-    margin-left: 200px;
+    width: 100%;
     height: 20px;
     overflow: hidden;
-    width: calc(100% - 200px);
+
 }
 
 .wr-slider-bar {
