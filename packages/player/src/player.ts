@@ -49,6 +49,8 @@ export class PlayerComponent {
         const initTime = Date.now()
         this.startTime = 0
 
+        const { endTime } = this.progressState
+
         function loop(this: PlayerComponent) {
             const timeStamp = Date.now() - initTime
             if (this.frameIndex > 0 && !this.frames[this.frameIndex + 1]) {
@@ -65,6 +67,7 @@ export class PlayerComponent {
             if (currTime >= nextTime) {
                 this.frameIndex++
 
+                this.progress.updateTimer((endTime - nextTime) / 1000 + 1)
                 const progress = (this.frameIndex / this.frames.length) * 100
 
                 if (progress - this.lastPercentage > this.getPercentInterval()) {

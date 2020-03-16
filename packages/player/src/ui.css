@@ -41,8 +41,7 @@ body {
 }
 
 .wr-keyboard {
-    min-width: 200px;
-    
+    white-space: nowrap;
 }
 
 .wr-progress {
@@ -75,4 +74,13 @@ body {
     transform: translateY(-3px);
     z-index: 10;
     transition: left .01s linear;
+}
+
+.wr-timer {
+    margin: 0 10px;
+    color: white;
+    font-size: 12px;
+    line-height: 20px;
+    font-family: Helvetica;
+    vertical-align: middle;
 }
