@@ -28,8 +28,7 @@ export class ContainerComponent {
         this.sandBox = this.container.querySelector('#wr-sandbox') as HTMLIFrameElement
         this.sandBox.style.width = this.width + 'px'
         this.sandBox.style.height = this.height + 'px'
-        this.sandBoxDoc = (this.sandBox.contentWindow as Window).document
-
+        this.sandBoxDoc = this.sandBox.contentDocument!
         this.setViewState()
     }
 
