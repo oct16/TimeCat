@@ -40,9 +40,9 @@ export class PlayerComponent {
 
     play() {
         if (this.index === 0) {
+            this.progress.resetThumb()
             this.c.setViewState()
         }
-
         cancelAnimationFrame(this.requestID)
         this.requestID = requestAnimationFrame(loop.bind(this))
 
@@ -113,7 +113,7 @@ export class PlayerComponent {
         return this.speed * k + b
     }
 
-    getAccuratelyFrame(interval = 50) {
+    getAccuratelyFrame(interval = 100) {
         this.progressState = reduxStore.getState()['progress']
         const { startTime, endTime } = this.progressState
 

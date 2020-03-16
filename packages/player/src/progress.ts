@@ -1,5 +1,6 @@
 import { ProgressState, secondToDate } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
+import { throttle } from 'lodash-es'
 
 export class ProgressComponent {
     progress: HTMLElement
@@ -12,6 +13,14 @@ export class ProgressComponent {
     progressState: ProgressState
 
     totalDistance = 0
+
+    throttleTimer = throttle(
+        percentage => {
+            this.setThumb(percentage)
+        },
+        100,
+        { trailing: true }
+    )
     constructor(c: ContainerComponent) {
         this.progress = c.container.querySelector('.wr-progress')! as HTMLElement
         this.timer = c.container.querySelector('.wr-timer') as HTMLElement
@@ -20,7 +29,7 @@ export class ProgressComponent {
     }
 
     updateProgress(percentage: number) {
-        this.thumb.style.left = percentage + '%'
+        this.throttleTimer(percentage)
     }
 
     updateTimer(second: number) {
@@ -28,5 +37,16 @@ export class ProgressComponent {
         if (t) {
             this.timer.innerHTML = t
         }
+    }
+
+    setThumb(percentage: number) {
+        this.thumb.style.left = percentage + '%'
+    }
+
+    resetThumb() {
+        const thumb = this.thumb.cloneNode(true) as HTMLElement
+        this.thumb.parentNode!.replaceChild(thumb, this.thumb)
+        thumb.style.left = '0%'
+        this.thumb = thumb as HTMLElement
     }
 }

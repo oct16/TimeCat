@@ -73,7 +73,7 @@ body {
     left: 0%;
     transform: translateY(-3px);
     z-index: 10;
-    transition: left .01s linear;
+    transition: left .1s linear;
 }
 
 .wr-timer {
