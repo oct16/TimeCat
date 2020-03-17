@@ -5,7 +5,6 @@ import { ProgressComponent } from './progress';
 import { ContainerComponent } from './container';
 export declare class PlayerComponent {
     data: SnapshotData[];
-    delayTime: number;
     speed: number;
     index: number;
     frameIndex: number;
