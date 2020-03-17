@@ -71,8 +71,8 @@ export class PlayerComponent {
     }
 
     renderEachFrame(time: number) {
-        const { endTime } = this.progressState
-        this.progress.updateTimer((endTime - time) / 1000)
+        const { startTime } = this.progressState
+        this.progress.updateTimer((time - startTime) / 1000)
         const progress = (this.frameIndex / (this.frames.length - 1)) * 100
         this.progress.updateProgress(progress)
 
