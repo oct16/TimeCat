@@ -16,7 +16,7 @@ import {
     ChildListUpdateDataType
 } from './types'
 import { throttle } from 'lodash-es'
-import { nodeStore, listenerStore } from '@WebReplay/utils'
+import { nodeStore, listenerStore, getTime } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
 function windowSnapshot(emit: SnapshotEvent<WindowSnapshot>) {
@@ -31,7 +31,7 @@ function windowSnapshot(emit: SnapshotEvent<WindowSnapshot>) {
             height,
             href
         },
-        time: Date.now().toString()
+        time: getTime().toString()
     })
 }
 
@@ -41,7 +41,7 @@ function DOMSnapshot(emit: SnapshotEvent<DOMSnapshot>) {
         data: {
             vNode: virtualDOM.convertHTML(document) as VNode
         },
-        time: Date.now().toString()
+        time: getTime().toString()
     })
 }
 
@@ -55,7 +55,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
                     x: e.x,
                     y: e.y
                 },
-                time: Date.now().toString()
+                time: getTime().toString()
             })
         }
         const name = 'mousemove'
@@ -80,7 +80,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
                     x: e.x,
                     y: e.y
                 },
-                time: Date.now().toString()
+                time: getTime().toString()
             })
         }
 
@@ -183,7 +183,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 data: {
                     mutations
                 },
-                time: Date.now().toString()
+                time: getTime().toString()
             })
         }
     }
@@ -236,7 +236,7 @@ function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
                         id: nodeStore.getNodeId(e.target as Node)!,
                         value: (e.target as HTMLInputElement).value
                     },
-                    time: Date.now().toString()
+                    time: getTime().toString()
                 })
                 break
             case 'focus':
@@ -246,7 +246,7 @@ function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
                         type: FormElementEvent.FOCUS,
                         id: nodeStore.getNodeId(e.target as Node)!
                     },
-                    time: Date.now().toString()
+                    time: getTime().toString()
                 })
                 break
             case 'blur':
@@ -256,7 +256,7 @@ function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
                         type: FormElementEvent.BLUR,
                         id: nodeStore.getNodeId(e.target as Node)!
                     },
-                    time: Date.now().toString()
+                    time: getTime().toString()
                 })
                 break
             default:
@@ -307,7 +307,7 @@ function kidnapInputs(emit: SnapshotEvent<FormElementObserve>) {
                 key,
                 value
             },
-            time: Date.now().toString()
+            time: getTime().toString()
         })
     }
 }

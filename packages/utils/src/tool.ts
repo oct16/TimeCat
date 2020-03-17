@@ -8,3 +8,7 @@ export function secondToDate(ms: number) {
 
     return timeStr.replace(/^00\:/, '')
 }
+
+export function getTime() {
+    return performance.timing.navigationStart + performance.now()
+}

@@ -1,7 +1,7 @@
 import { PointerComponent } from './pointer'
 import { SnapshotData } from '@WebReplay/snapshot'
 import { updateDom } from './dom'
-import { reduxStore, PlayerTypes, ProgressState } from '@WebReplay/utils'
+import { reduxStore, PlayerTypes, ProgressState, getTime } from '@WebReplay/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 
@@ -47,13 +47,13 @@ export class PlayerComponent {
         cancelAnimationFrame(this.requestID)
         this.requestID = requestAnimationFrame(loop.bind(this))
 
-        const initTime = Date.now()
+        const initTime = getTime()
         this.startTime = 0
 
         const { endTime } = this.progressState
 
         function loop(this: PlayerComponent) {
-            const timeStamp = Date.now() - initTime
+            const timeStamp = getTime() - initTime
             if (this.frameIndex > 0 && !this.frames[this.frameIndex + 1]) {
                 this.stop()
                 return
