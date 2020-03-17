@@ -3,7 +3,7 @@ import { PlayerComponent } from './player'
 import { PointerComponent } from './pointer'
 import { SnapshotData } from '@WebReplay/snapshot'
 import { ProgressComponent } from './progress'
-import { ContainerComponent } from './container';
+import { ContainerComponent } from './container'
 
 export class Panel {
     data: SnapshotData[]
