@@ -18,6 +18,7 @@ export declare class PlayerComponent {
     progressState: ProgressState;
     constructor(data: SnapshotData[], c: ContainerComponent, pointer: PointerComponent, progress: ProgressComponent);
     play(): void;
+    renderEachFrame(time: number): void;
     pause(): void;
     stop(): void;
     execFrame(this: PlayerComponent, snapshot: SnapshotData): void;
