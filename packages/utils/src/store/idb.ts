@@ -1,6 +1,6 @@
 import { SnapshotData, WindowSnapshotData, DOMSnapshotData } from '@WebReplay/snapshot'
 
-export class IndexDBOperator {
+export class IndexedDBOperator {
     db: IDBDatabase
     DBName: string
     version: number
@@ -13,7 +13,7 @@ export class IndexDBOperator {
 
         const request = window.indexedDB.open(DBName, version)
         request.onerror = e => {
-            console.error('open IndexDB on error')
+            console.error('open indexedDB on error')
         }
 
         request.onsuccess = e => {
@@ -43,7 +43,7 @@ export class IndexDBOperator {
             .add(data)
 
         request.onerror = e => {
-            throw new Error('write IndexDB on error')
+            throw new Error('write indexedDB on error')
         }
     }
 
@@ -77,8 +77,8 @@ export class IndexDBOperator {
     }
 }
 
-export const DBPromise: Promise<IndexDBOperator> = new Promise(resolve => {
-    const indexDB = new IndexDBOperator('wr_db', 1, 'wr_data', () => {
-        resolve(indexDB)
+export const DBPromise: Promise<IndexedDBOperator> = new Promise(resolve => {
+    const indexedDB = new IndexedDBOperator('wr_db', 1, 'wr_data', () => {
+        resolve(indexedDB)
     })
 })

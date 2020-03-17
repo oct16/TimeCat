@@ -194,7 +194,7 @@ const elementList: [HTMLElement, string][] = [
 
 Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的数据不一定只存在数据库里，可能会有三种储存方式
 1. 服务器存储 TCP => DB
-2. 本地储存 localStorage、indexDB、web SQL
+2. 本地储存 localStorage、indexedDB、web SQL
 3. 保存为本地文件，例如直接导出可运行的HTML文件
 
 利用客户端的运算能力，在进行导出或者传输之前，可以对数据进行压缩，极大程度的减小体积
@@ -205,7 +205,7 @@ Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的�
 
 ##### 数据上传
 
-对于客户端的数据，可以利用浏览器提供的IndexDB进行存储，毕竟IndexDB会比LocalStorage容量大得多，一般来说不少于 250MB，甚至没有上限，此外它使用object store存储，而且支持transaction，另外很重要的一点它是异步的，意味着不会阻塞录屏器的运行
+对于客户端的数据，可以利用浏览器提供的indexedDB进行存储，毕竟indexedDB会比LocalStorage容量大得多，一般来说不少于 250MB，甚至没有上限，此外它使用object store存储，而且支持transaction，另外很重要的一点它是异步的，意味着不会阻塞录屏器的运行
 之后数据可以通过WebSocket或其他方式持续上传到OSS服务器中，由于数据是分块进行传输的，在同步之后还可以增加数据校验码来保证一致性避免错误
 
 

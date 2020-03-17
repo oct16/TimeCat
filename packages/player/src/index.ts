@@ -3,8 +3,8 @@ import { ContainerComponent } from './container'
 import { Panel } from './panel'
 
 export async function replay() {
-    const indexDB = await DBPromise
-    const { width, height, vNode, data } = await indexDB.getData()
+    const indexedDB = await DBPromise
+    const { width, height, vNode, data } = await indexedDB.getData()
 
     const container = new ContainerComponent({ vNode, width, height })
     new Panel(container, data)
