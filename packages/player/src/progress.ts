@@ -18,7 +18,7 @@ export class ProgressComponent {
         percentage => {
             this.setThumb(percentage)
         },
-        100,
+        250,
         { trailing: true }
     )
     constructor(c: ContainerComponent) {

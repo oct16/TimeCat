@@ -56,7 +56,7 @@ body {
     padding: 0 5px;
     width: calc(100% - 22px);
     height: 5px;
-    margin: 7.5px 0;
+    margin: 7.5px 5px;
     background: white;
     border-radius: 2.5px;
 }
@@ -71,9 +71,9 @@ body {
     cursor: pointer;
     position: absolute;
     left: 0%;
-    transform: translateY(-3px);
+    transform: translate3d(-5px, -3px, 0);
     z-index: 10;
-    transition: left .1s linear;
+    transition: left .25s linear;
 }
 
 .wr-timer {

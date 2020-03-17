@@ -49,11 +49,9 @@ export class PlayerComponent {
         const initTime = getTime()
         this.startTime = 0
 
-        const { endTime } = this.progressState
-
         function loop(this: PlayerComponent) {
             const timeStamp = getTime() - initTime
-            if (this.frameIndex > 0 && !this.frames[this.frameIndex + 1]) {
+            if (this.frameIndex > 0 && !this.frames[this.frameIndex]) {
                 this.stop()
                 return
             }
@@ -62,29 +60,30 @@ export class PlayerComponent {
             }
 
             const currTime = this.startTime + timeStamp * this.speed
-            const nextTime = Number(this.frames[this.frameIndex + 1])
+            const nextTime = Number(this.frames[this.frameIndex])
 
             if (currTime >= nextTime) {
-                this.progress.updateTimer((endTime - nextTime) / 1000)
-                const progress = (this.frameIndex / this.frames.length) * 100
-
-                if (progress - this.lastPercentage > this.getPercentInterval()) {
-                    this.progress.updateProgress(progress)
-                    this.lastPercentage = progress
-                }
-
-                if (this.data[this.index] && currTime > +this.data[this.index].time) {
-                    while (+this.data[this.index].time <= this.frames[this.frameIndex]) {
-                        this.execFrame.call(this, this.data[this.index])
-                        this.index++
-                    }
-
-                    this.frameIndex++
-                }
+                this.renderEachFrame(currTime)
             }
 
             this.requestID = requestAnimationFrame(loop.bind(this))
         }
+    }
+
+    renderEachFrame(time: number) {
+        const { endTime } = this.progressState
+        this.progress.updateTimer((endTime - time) / 1000)
+        const progress = (this.frameIndex / (this.frames.length - 1)) * 100
+        this.progress.updateProgress(progress)
+
+        while (+this.data[this.index].time <= this.frames[this.frameIndex]) {
+            this.execFrame.call(this, this.data[this.index])
+            this.index++
+            if (this.index === this.data.length) {
+                break
+            }
+        }
+        this.frameIndex++
     }
 
     pause() {
@@ -115,7 +114,7 @@ export class PlayerComponent {
         return this.speed * k + b
     }
 
-    getAccuratelyFrame(interval = 100) {
+    getAccuratelyFrame(interval = 250) {
         this.progressState = reduxStore.getState()['progress']
         const { startTime, endTime } = this.progressState
 
