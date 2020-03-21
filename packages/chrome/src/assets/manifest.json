@@ -3,9 +3,29 @@
     "name": "WebReplay-Chrome",
     "description": "",
     "version": "1.0",
-    "permissions": [],
+    "permissions": [
+        "activeTab"
+    ],
     "browser_action": {
-        "default_icon": "icon.ico",
-        "default_popup": "replay-chrome.html"
-    }
+        "default_icon": "icon.png",
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "scripts": [
+            "replay-chrome-background.js"
+        ],
+        "persistent": false
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "replay.min.js",
+                "replay-chrome-content.js"
+            ]
+        }
+    ]
 }

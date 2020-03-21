@@ -8,15 +8,23 @@ import copy from 'rollup-plugin-copy'
 import fs from 'fs'
 import { string } from 'rollup-plugin-string'
 
+const notDeclarationTS = [
+    ts({
+        tsconfigOverride: { compilerOptions: { declaration: false } }
+    })
+]
+
 export default [
     {
         input: 'index.ts',
-        output: {
-            name: 'wr',
-            format: 'esm',
-            file: 'dist/replay.esm.js',
-            sourcemap: true
-        },
+        output: [
+            {
+                name: 'wr',
+                format: 'esm',
+                file: 'dist/replay.esm.js',
+                sourcemap: true
+            }
+        ],
         plugins: [
             del({ targets: 'dist/*' }),
             ts(),
@@ -37,17 +45,41 @@ export default [
         ]
     },
     {
-        input: 'packages/chrome/src/index.ts',
+        input: 'index.ts',
         output: {
+            name: 'wr',
             format: 'iife',
-            moduleName: 'wr',
-            file: 'dist/chrome/replay-chrome.js'
+            file: 'dist/chrome/replay.min.js',
+            sourcemap: true,
+            globals: {}
         },
         plugins: [
-            html({
-                fileName: 'replay-chrome.html',
-                template: () => fs.readFileSync('packages/chrome/src/replay-chrome.html')
+            node(),
+            string({
+                include: ['**/*.html', '**/*.css'],
+                exclude: ['**/index.html', '**/index.css']
             }),
+            ...notDeclarationTS
+        ]
+    },
+    {
+        input: 'packages/chrome/src/background.ts',
+        output: {
+            format: 'iife',
+            moduleName: 'wr-background',
+            file: 'dist/chrome/replay-chrome-background.js'
+        },
+        plugins: [...notDeclarationTS]
+    },
+    {
+        input: 'packages/chrome/src/content.ts',
+        output: {
+            format: 'iife',
+            moduleName: 'wr-content',
+            file: 'dist/chrome/replay-chrome-content.js'
+        },
+        plugins: [
+            ...notDeclarationTS,
             copy({
                 targets: [{ src: 'packages/chrome/src/assets/*', dest: 'dist/chrome/' }]
             })
