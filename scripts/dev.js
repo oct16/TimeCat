@@ -1,9 +1,6 @@
 const execa = require('execa')
+const env = 'development'
 
-execa(
-    'rollup',
-    ['-c', 'rollup.config.dev.js', '-w', '--environment', ['FORMATS:umd', 'SOURCE_MAP:true'].filter(Boolean).join(',')],
-    {
-        stdio: 'inherit'
-    }
-)
+execa('rollup', ['-c', 'rollup.config.dev.js', '-w', '--environment', [`NODE_ENV:${env}`].filter(Boolean).join(',')], {
+    stdio: 'inherit'
+})

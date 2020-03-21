@@ -2,6 +2,7 @@ import ts from 'rollup-plugin-typescript2'
 import html from '@rollup/plugin-html'
 import node from 'rollup-plugin-node-resolve'
 import sourcemaps from 'rollup-plugin-sourcemaps'
+import replace from '@rollup/plugin-replace'
 
 import browsersync from 'rollup-plugin-browsersync'
 import fs from 'fs'
@@ -38,6 +39,9 @@ export default {
         string({
             include: ['**/*.html', '**/*.css'],
             exclude: ['**/index.html', '**/index.css']
+        }),
+        replace({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
         }),
         browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
     ]

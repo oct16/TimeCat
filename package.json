@@ -7,6 +7,7 @@
     "devDependencies": {
         "@oct16/code-formatter": "^1.0.9",
         "@rollup/plugin-html": "^0.1.1",
+        "@rollup/plugin-replace": "^2.3.1",
         "@types/lodash-es": "^4.17.3",
         "@types/node": "^13.9.2",
         "execa": "^4.0.0",
