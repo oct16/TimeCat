@@ -36,6 +36,6 @@
         "packages/*/src",
         "index.ts",
         "examples/*",
-        "packages/*/__tests__"
+        "packages/*/__tests__", "packages/chrome/assets/ctrl.js"
     ]
 }

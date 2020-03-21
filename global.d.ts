@@ -22,14 +22,12 @@ declare module '*.css' {
     export default value
 }
 
-
-declare interface  EventTarget {
-  result: any;
-  transaction: IDBTransaction
-
+declare interface EventTarget {
+    result: any
+    transaction: IDBTransaction
 }
-  
+
 declare interface IDBDatabase {
     continue: Function
-    value: any;
-};
+    value: any
+}
