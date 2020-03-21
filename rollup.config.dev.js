@@ -2,9 +2,9 @@ import ts from 'rollup-plugin-typescript2'
 import html from '@rollup/plugin-html'
 import node from 'rollup-plugin-node-resolve'
 import sourcemaps from 'rollup-plugin-sourcemaps'
-
+import del from 'rollup-plugin-delete'
 import browsersync from 'rollup-plugin-browsersync'
-import copy from 'rollup-plugin-copy-assets'
+import copy from 'rollup-plugin-copy'
 import fs from 'fs'
 import { string } from 'rollup-plugin-string'
 
@@ -18,6 +18,7 @@ export default [
             sourcemap: true
         },
         plugins: [
+            del({ targets: 'dist/*' }),
             ts(),
             node(),
             sourcemaps(),
@@ -39,11 +40,12 @@ export default [
         input: 'packages/chrome/src/index.ts',
         output: {
             format: 'iife',
-            moduleName: 'wr'
+            moduleName: 'wr',
+            file: 'dist/replay-chrome.js'
         },
         plugins: [
             copy({
-                assets: ['packages/chrome/assets']
+                targets: [{ src: 'packages/chrome/src/assets/*', dest: 'dist/chrome/' }]
             })
         ]
     }

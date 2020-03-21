@@ -31,11 +31,15 @@
             ]
         }
     },
+    "exclude": [
+        "packages/chrome"
+    ],
     "include": [
         "global.d.ts",
         "packages/*/src",
         "index.ts",
         "examples/*",
-        "packages/*/__tests__", "packages/chrome/assets/ctrl.js"
+        "packages/*/__tests__",
+        "packages/chrome/src/assets/ctrl.js"
     ]
 }
