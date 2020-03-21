@@ -2,6 +2,7 @@ import { VNode, convertVNode } from '@WebReplay/virtual-dom'
 import HTML from './ui.html'
 import STYLE from './ui.css'
 import FIXED from './fixed.css'
+import { filteringTemplate } from '@WebReplay/utils'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -50,7 +51,7 @@ export class ContainerComponent {
 
     createContainer() {
         const parser = new DOMParser()
-        const element = parser.parseFromString(HTML, 'text/html').body.firstChild as HTMLElement
+        const element = parser.parseFromString(filteringTemplate(HTML), 'text/html').body.firstChild as HTMLElement
         element.style.width = this.width + 'px'
         element.style.height = this.height + 'px'
         element.style.position = 'relative'

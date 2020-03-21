@@ -23,7 +23,9 @@
             "DOM",
             "DOM.Iterable"
         ],
-        "types": [],
+        "types": [
+            "@types/node"
+        ],
         "rootDir": ".",
         "paths": {
             "@WebReplay/*": [

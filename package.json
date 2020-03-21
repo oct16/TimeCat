@@ -8,6 +8,7 @@
         "@oct16/code-formatter": "^1.0.9",
         "@rollup/plugin-html": "^0.1.1",
         "@types/lodash-es": "^4.17.3",
+        "@types/node": "^13.9.2",
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "lodash-es": "^4.17.15",

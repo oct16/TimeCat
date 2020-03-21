@@ -7,6 +7,15 @@ import browsersync from 'rollup-plugin-browsersync'
 import fs from 'fs'
 import { string } from 'rollup-plugin-string'
 
+function filteringTemplate(tpl) {
+    const reg = /<!--env-->[\s\S]*<!--env-->/g
+    const isProd = process.env.NODE_ENV === 'production'
+    if (!isProd) {
+        tpl = tpl.replace(reg, '')
+    }
+    return tpl
+}
+
 export default {
     input: 'index.ts',
     output: {
@@ -20,7 +29,7 @@ export default {
         node(),
         sourcemaps(),
         html({
-            template: () => fs.readFileSync('examples/todo.html')
+            template: () => filteringTemplate(fs.readFileSync('examples/todo.html', 'utf8'))
         }),
         html({
             fileName: 'replay.html',
