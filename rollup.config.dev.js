@@ -41,9 +41,13 @@ export default [
         output: {
             format: 'iife',
             moduleName: 'wr',
-            file: 'dist/replay-chrome.js'
+            file: 'dist/chrome/replay-chrome.js'
         },
         plugins: [
+            html({
+                fileName: 'replay-chrome.html',
+                template: () => fs.readFileSync('packages/chrome/src/replay-chrome.html')
+            }),
             copy({
                 targets: [{ src: 'packages/chrome/src/assets/*', dest: 'dist/chrome/' }]
             })

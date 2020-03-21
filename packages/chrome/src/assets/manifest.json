@@ -1,13 +1,11 @@
 {
     "manifest_version": 2,
-    "name": "One-click Kittens",
-    "description": "This extension demonstrates a browser action with kittens.",
+    "name": "WebReplay-Chrome",
+    "description": "",
     "version": "1.0",
-    "permissions": [
-        "https://secure.flickr.com/"
-    ],
+    "permissions": [],
     "browser_action": {
-        "default_icon": "icon.png",
-        "default_popup": "ctrl.html"
+        "default_icon": "icon.ico",
+        "default_popup": "replay-chrome.html"
     }
 }

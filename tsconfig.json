@@ -31,9 +31,6 @@
             ]
         }
     },
-    "exclude": [
-        "packages/chrome"
-    ],
     "include": [
         "global.d.ts",
         "packages/*/src",
