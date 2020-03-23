@@ -1,5 +1,3 @@
-console.log('load content')
-
 const wr = (window as any).wr
 let ctr: any
 

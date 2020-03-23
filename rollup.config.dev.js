@@ -4,7 +4,7 @@ import node from 'rollup-plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
 
 import browsersync from 'rollup-plugin-browsersync'
-import copy from 'rollup-plugin-copy'
+// import copy from 'rollup-plugin-copy'
 import fs from 'fs'
 import { string } from 'rollup-plugin-string'
 
@@ -26,6 +26,12 @@ export default [
                 format: 'iife',
                 file: 'dist/replay.min.js',
                 sourcemap: true
+            },
+            {
+                name: 'wr',
+                format: 'iife',
+                file: 'dist/chrome/replay.min.js',
+                sourcemap: true
             }
         ],
         plugins: [
@@ -45,9 +51,9 @@ export default [
             replace({
                 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
             }),
-            copy({
-                targets: [{ src: 'dist/replay.min.js', dest: 'dist/chrome/' }]
-            }),
+            // copy({
+            //     targets: [{ src: 'dist/replay.min.js', dest: 'dist/chrome/' }]
+            // }),
             browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
         ]
     }

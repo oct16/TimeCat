@@ -37,6 +37,7 @@ body {
     left: 0;
     bottom: 0;
     background: darkgray;
+    opacity: 0.9;
     display: flex;
 }
 

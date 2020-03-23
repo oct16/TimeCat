@@ -37,6 +37,8 @@ const extraAttr = (attr: Attr) => {
         if (/^\/(?!\/)/.test(value)) {
             const origin = location.origin
             value = origin + value
+        } else if (value.startsWith('//')) {
+            return [name, location.protocol + value]
         } else if (value.startsWith('#/')) {
             return []
         }
