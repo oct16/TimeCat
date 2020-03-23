@@ -1,11 +1,10 @@
-import tpl from '../../../tpls/replay.html'
-import { DBPromise as DB, filteringScriptTag } from '@WebReplay/utils'
-export async function exportHTML() {
+import replayTpl from '../../../tpls/replay.html'
+import { DBPromise as DB } from './store/idb'
+import { filteringScriptTag } from './tool'
+export async function exportReplay(opt?: { injectScripts: string[] }) {
     const parser = new DOMParser()
-
-    const html = parser.parseFromString(tpl, 'text/html')
-
-    await makeExternalToInline(html)
+    const html = parser.parseFromString(replayTpl, 'text/html')
+    await makeExternalToInline(html, opt && opt.injectScripts)
     await joinData(html)
 
     createAndDownloadFile(`Replay-${Date.now()}`, html.documentElement.outerHTML)
@@ -13,28 +12,43 @@ export async function exportHTML() {
 
 function createAndDownloadFile(fileName: string, content: string) {
     var aTag = document.createElement('a')
-    var blob = new Blob([content], {type: 'text/html'})
+    var blob = new Blob([content], { type: 'text/html' })
     aTag.download = fileName + '.html'
     aTag.href = URL.createObjectURL(blob)
     aTag.click()
     URL.revokeObjectURL(blob as any)
 }
 
-async function makeExternalToInline(doc: Document) {
-    const scripts = doc.getElementsByTagName('script')
+async function makeExternalToInline(html: Document, injectScripts?: string[]) {
+    const scripts = html.getElementsByTagName('script')
 
-    if (scripts) {
+    if (injectScripts) {
+        for (let src of injectScripts) {
+            const scriptContent = await getScript(src)
+            const inlineScript = document.createElement('script')
+            inlineScript.innerHTML = scriptContent
+            const firstChild = html.body.firstChild
+
+            if (firstChild) {
+                html.body.insertBefore(inlineScript, firstChild)
+            } else {
+                html.body.appendChild(inlineScript)
+            }
+        }
+    } else if (scripts) {
         for (let script of scripts) {
             if (script.hasAttribute('src')) {
                 const src = script.src
-                const tag = script.outerHTML
-                const comment = document.createComment(`convert to inline ${tag}`)
-                doc.body.replaceChild(comment, script)
-
                 const scriptContent = await getScript(src)
-                const inlineScript = document.createElement('script')
-                inlineScript.innerHTML = scriptContent
-                doc.body.insertBefore(inlineScript, comment)
+                if (scriptContent) {
+                    const tag = script.outerHTML
+                    const comment = document.createComment(`convert to inline ${tag}`)
+                    html.body.replaceChild(comment, script)
+
+                    const inlineScript = document.createElement('script')
+                    inlineScript.innerHTML = scriptContent
+                    html.body.insertBefore(inlineScript, comment)
+                }
             }
         }
     }
@@ -52,5 +66,3 @@ async function joinData(doc: Document) {
     dataScript.innerText = scriptContent
     doc.body.insertBefore(dataScript, doc.body.firstChild)
 }
-
-

@@ -4,6 +4,7 @@ import node from 'rollup-plugin-node-resolve'
 import sourcemaps from 'rollup-plugin-sourcemaps'
 import { terser } from 'rollup-plugin-terser'
 import replace from '@rollup/plugin-replace'
+import copy from 'rollup-plugin-copy'
 
 import fs from 'fs'
 import { string } from 'rollup-plugin-string'
@@ -14,7 +15,7 @@ export default {
         {
             name: 'wr',
             format: 'iife',
-            file: 'dist/replay.js',
+            file: 'dist/replay.min.js',
             sourcemap: true
         },
         {
@@ -46,6 +47,9 @@ export default {
         string({
             include: ['**/*.html', '**/*.css'],
             exclude: ['**/index.html', '**/index.css']
+        }),
+        copy({
+            targets: [{ src: 'dist/replay.min.js', dest: 'dist/chrome/' }]
         }),
         replace({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)

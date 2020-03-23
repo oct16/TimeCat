@@ -29,6 +29,7 @@
     "scripts": {
         "dev": "node scripts/dev.js",
         "build": "node scripts/build.js",
+        "chrome": "node scripts/chrome.js",
         "f": "npx code-formatter --path packages",
         "deploy-gh": "git subtree split --prefix dist -b gh-pages && git push -f origin gh-pages:gh-pages",
         "gh": "npm run build && git push origin `git subtree split --prefix dist master`:gh-pages --force"

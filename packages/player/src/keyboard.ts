@@ -3,7 +3,7 @@
 import { reduxStore } from '@WebReplay/utils'
 import { PlayerTypes } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
-import { exportHTML } from '../../utils/src/output';
+import { exportReplay } from '../../utils/src/output';
 
 export class KeyboardComponent {
     c: ContainerComponent
@@ -68,7 +68,6 @@ export class KeyboardComponent {
     }
 
     export() {
-        exportHTML()
-        // do export
+        exportReplay()
     }
 }
