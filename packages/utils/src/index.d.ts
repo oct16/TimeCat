@@ -1,5 +1,5 @@
 export * from './store/listener';
 export * from './store/node';
-export * from './store/data';
+export * from './store/idb';
 export * from './redux';
 export * from './tool';

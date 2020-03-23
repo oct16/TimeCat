@@ -16,5 +16,5 @@ export declare class ContainerComponent {
     setViewState(): void;
     initTemplate(): void;
     createContainer(): HTMLElement;
-    createStyle(s: string): HTMLElement;
+    createStyle(s: string): HTMLStyleElement;
 }
