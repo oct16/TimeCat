@@ -3,6 +3,8 @@ import html from '@rollup/plugin-html'
 import node from 'rollup-plugin-node-resolve'
 import sourcemaps from 'rollup-plugin-sourcemaps'
 import del from 'rollup-plugin-delete'
+import replace from '@rollup/plugin-replace'
+
 import browsersync from 'rollup-plugin-browsersync'
 import copy from 'rollup-plugin-copy'
 import fs from 'fs'
@@ -13,6 +15,14 @@ const notDeclarationTS = [
         tsconfigOverride: { compilerOptions: { declaration: false } }
     })
 ]
+function filteringTemplate(tpl) {
+    const reg = /<!--env-->[\s\S]*<!--env-->/g
+    const isProd = process.env.NODE_ENV === 'production'
+    if (!isProd) {
+        tpl = tpl.replace(reg, '')
+    }
+    return tpl
+}
 
 export default [
     {
@@ -23,6 +33,12 @@ export default [
                 format: 'esm',
                 file: 'dist/replay.esm.js',
                 sourcemap: true
+            },
+            {
+                name: 'wr',
+                format: 'iife',
+                file: 'dist/replay.js',
+                sourcemap: true
             }
         ],
         plugins: [
@@ -31,15 +47,18 @@ export default [
             node(),
             sourcemaps(),
             html({
-                template: () => fs.readFileSync('examples/todo.html')
+                template: () => filteringTemplate(fs.readFileSync('tpls/todo.html', 'utf8'))
             }),
             html({
                 fileName: 'replay.html',
-                template: () => fs.readFileSync('assets/template.html')
+                template: () => fs.readFileSync('tpls/replay.html')
             }),
             string({
                 include: ['**/*.html', '**/*.css'],
                 exclude: ['**/index.html', '**/index.css']
+            }),
+            replace({
+                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
             }),
             browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
         ]

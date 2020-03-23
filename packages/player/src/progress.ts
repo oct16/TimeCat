@@ -1,6 +1,6 @@
 import { ProgressState, secondToDate } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
-import { throttle } from 'lodash-es'
+import throttle from 'lodash-es/throttle'
 
 export class ProgressComponent {
     progress: HTMLElement

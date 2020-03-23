@@ -24,7 +24,8 @@
             "DOM.Iterable"
         ],
         "types": [
-            "@types/chrome"
+            "@types/chrome",
+            "@types/node"
         ],
         "rootDir": ".",
         "paths": {

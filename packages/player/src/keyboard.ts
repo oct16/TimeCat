@@ -3,6 +3,7 @@
 import { reduxStore } from '@WebReplay/utils'
 import { PlayerTypes } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
+import { exportHTML } from '../../utils/src/output';
 
 export class KeyboardComponent {
     c: ContainerComponent
@@ -10,6 +11,7 @@ export class KeyboardComponent {
 
     pauseBtn: HTMLElement
     playBtn: HTMLElement
+    exportBtn: HTMLElement
 
     speed: number
 
@@ -21,7 +23,9 @@ export class KeyboardComponent {
     init() {
         this.controller = this.c.container.querySelector('.wr-keyboard') as HTMLElement
         this.pauseBtn = this.controller.querySelector('.pause') as HTMLButtonElement
+        this.exportBtn = this.c.container.querySelector('.wr-export') as HTMLButtonElement
         this.playBtn = this.controller.querySelector('.play') as HTMLButtonElement
+        this.exportBtn.addEventListener('click', this.export)
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
                 const speed = Number((e.target as HTMLElement).getAttribute('speed'))
@@ -61,5 +65,10 @@ export class KeyboardComponent {
         if (index > -1) {
             speedNodes[index].setAttribute('disabled', '')
         }
+    }
+
+    export() {
+        exportHTML()
+        // do export
     }
 }
