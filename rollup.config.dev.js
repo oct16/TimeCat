@@ -17,32 +17,34 @@ function filteringTemplate(tpl) {
     return tpl
 }
 
-export default {
-    input: 'index.ts',
-    output: {
-        name: 'wr',
-        format: 'esm',
-        file: 'dist/replay.esm.js',
-        sourcemap: true
-    },
-    plugins: [
-        ts(),
-        node(),
-        sourcemaps(),
-        html({
-            template: () => filteringTemplate(fs.readFileSync('examples/todo.html', 'utf8'))
-        }),
-        html({
-            fileName: 'replay.html',
-            template: () => fs.readFileSync('assets/template.html')
-        }),
-        string({
-            include: ['**/*.html', '**/*.css'],
-            exclude: ['**/index.html', '**/index.css']
-        }),
-        replace({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-        }),
-        browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
-    ]
-}
+export default [
+    {
+        input: 'index.ts',
+        output: {
+            name: 'wr',
+            format: 'iife',
+            file: 'dist/replay.js',
+            sourcemap: true
+        },
+        plugins: [
+            ts(),
+            node(),
+            sourcemaps(),
+            html({
+                template: () => filteringTemplate(fs.readFileSync('tpls/todo.html', 'utf8'))
+            }),
+            html({
+                fileName: 'replay.html',
+                template: () => fs.readFileSync('tpls/replay.html')
+            }),
+            string({
+                include: ['**/*.html', '**/*.css'],
+                exclude: ['**/index.html', '**/index.css']
+            }),
+            replace({
+                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+            }),
+            browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
+        ]
+    }
+]

@@ -19,3 +19,8 @@ export function filteringTemplate(tpl: string) {
     }
     return tpl
 }
+
+export function filteringScriptTag(str: string) {
+    const reg = /<\/script>/g
+    return str.replace(reg, '<\\/script>')
+}

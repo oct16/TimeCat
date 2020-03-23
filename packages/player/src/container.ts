@@ -60,8 +60,8 @@ export class ContainerComponent {
     }
 
     createStyle(s: string) {
-        const parser = new DOMParser()
-        const style = parser.parseFromString(`<style>${s}</style>`, 'text/html').head.firstChild as HTMLElement
+        const style = document.createElement('style')
+        style.innerHTML = s
         return style
     }
 }

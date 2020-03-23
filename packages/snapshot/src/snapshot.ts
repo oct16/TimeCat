@@ -15,7 +15,7 @@ import {
     ChildListUpdateData,
     ChildListUpdateDataType
 } from './types'
-import { throttle } from 'lodash-es'
+import throttle from 'lodash-es/throttle'
 import { nodeStore, listenerStore, getTime } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
@@ -135,7 +135,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     if (addedNodes.length) {
                         addedNodes.forEach(node => {
                             let text
-                            let vNode: any
+                            let vNode: VNode
                             if (node.nodeType === Node.TEXT_NODE) {
                                 text = node.nodeValue
                                 const pos = Array.from(node.parentNode!.childNodes).indexOf(node as ChildNode)
@@ -147,7 +147,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                                 } as ChildListUpdateData)
                             } else {
                                 // reset element for remove reference
-                                vNode = createElement(node as HTMLElement)
+                                vNode = createElement(node as HTMLElement) as VNode
                                 // convertVNode(vNode, null)
                                 const parent = node.parentNode!
                                 joinData({

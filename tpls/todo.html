@@ -249,8 +249,10 @@
 
     </script>
 
-    <script type="module">
-        import { record, DB } from './replay.esm.js'
+    <script src="./replay.js"></script>
+
+    <script>
+        const { record, DB } = wr
         DB.then(db => {
             db.clear()
             const ctr = record({
@@ -258,13 +260,11 @@
                     db.add(data)
                 }
             })
-
             const replayButton = document.getElementById('replay')
             if (replayButton) {
                 setTimeout(() => {
                     replayButton.className = ''
                 }, 8000);
-
                 replayButton.onclick = () => {
                     if (replayButton.className) {
                         return
@@ -275,7 +275,6 @@
                 }
             }
         })
-
     </script>
     <!--env-->
     <!-- Global site tag (gtag.js) - Google Analytics -->

@@ -52,7 +52,7 @@ export class IndexedDBOperator {
         objectStore.clear()
     }
 
-    async readAll(): Promise<SnapshotData[]> {
+    async readAll(): Promise<(SnapshotData)[]> {
         const objectStore = this.db.transaction([`${this.storeName}`], 'readwrite').objectStore(`${this.storeName}`)
         return new Promise(resolve => {
             objectStore.getAll().onsuccess = event => {

@@ -1,6 +1,6 @@
 import { PlayerTypes } from './reducers/player'
 import { ProgressTypes } from './reducers/progress'
-import { isEqual } from 'lodash-es'
+import isEqual from 'lodash-es/isEqual'
 
 export type State = { [key: string]: any }
 

@@ -30,11 +30,11 @@ export default {
         }),
         sourcemaps(),
         html({
-            template: () => fs.readFileSync('examples/todo.html')
+            template: () => fs.readFileSync('tpls/todo.html')
         }),
         html({
             fileName: 'replay.html',
-            template: () => fs.readFileSync('assets/template.html')
+            template: () => fs.readFileSync('tpls/replay.html')
         }),
         string({
             include: ['**/*.html', '**/*.css'],

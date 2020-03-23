@@ -71,16 +71,25 @@ body {
     cursor: pointer;
     position: absolute;
     left: 0%;
-    transform: translate3d(-5px, -3px, 0);
+    transform: translate3d(-5px, -4px, 0);
     z-index: 10;
     transition: left .25s linear;
 }
 
 .wr-timer {
-    margin: 0 10px;
+    margin: 0 8px;
     color: white;
     font-size: 12px;
     line-height: 20px;
     font-family: Helvetica;
     vertical-align: middle;
+}
+
+.wr-export button {
+    margin-left: 8px;
+}
+
+.wr-export img {
+    height: 13px;
+    vertical-align: bottom;
 }
