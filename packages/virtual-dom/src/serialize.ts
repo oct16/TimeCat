@@ -34,13 +34,13 @@ const getAttr = (el: HTMLElement & { checked: boolean }) => {
 const extraAttr = (attr: Attr) => {
     let { name, value } = attr
     if (name === 'href' || name === 'src') {
-        if (/^\/(?!\/)/.test(value)) {
+        if (value.startsWith('#/')) {
+            return []
+        } else if (/^\/(?!\/)/.test(value)) {
             const origin = location.origin
             value = origin + value
         } else if (value.startsWith('//')) {
             return [name, location.protocol + value]
-        } else if (value.startsWith('#/')) {
-            return []
         }
     }
     return [name, value]

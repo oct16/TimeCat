@@ -15,6 +15,9 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     if (/^on\w+$/.test(name)) {
         return
     }
+    if (!/[\w\d]+/.test(name)) {
+        return
+    }
 
     return node.setAttribute(name, value === true ? '' : String(value))
 }

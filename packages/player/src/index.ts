@@ -5,10 +5,10 @@ import { Panel } from './panel'
 export async function replay() {
     const indexedDB = await DBPromise
     const { width, height, vNode, data } = (window as any).__ReplayData__ || (await indexedDB.getData())
-    const container = new ContainerComponent({ vNode, width, height })
+    const c = new ContainerComponent({ vNode, width, height })
 
     if (data.length) {
-        new Panel(container, data)
+        new Panel(c, data)
         reduxStore.dispatch({
             type: ProgressTypes.INFO,
             data: {
@@ -20,9 +20,11 @@ export async function replay() {
             }
         })
 
-        reduxStore.dispatch({
-            type: PlayerTypes.SPEED,
-            data: { speed: 1 }
-        })
+        setTimeout(() => {
+            reduxStore.dispatch({
+                type: PlayerTypes.SPEED,
+                data: { speed: 1 }
+            })
+        }, 500)
     }
 }

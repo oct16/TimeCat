@@ -38,7 +38,7 @@ export class ContainerComponent {
         if (child) {
             const head = child.firstChild
             if (head) {
-                head.appendChild(this.createStyle(FIXED))
+                head.insertBefore(this.createStyle(FIXED), head.firstChild)
             }
             this.sandBoxDoc.replaceChild(child, this.sandBoxDoc.documentElement)
         }

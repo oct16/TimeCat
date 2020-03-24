@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(request => {
             record()
             break
         case 'finish':
-            exportReplay()
+            replay()
             break
     }
 })
@@ -26,11 +26,12 @@ function record() {
     })
 }
 
-function exportReplay() {
+function replay() {
     const scriptUrl = chrome.runtime.getURL('replay.min.js')
     if (ctr) {
         wr.exportReplay({
-            injectScripts: [scriptUrl]
+            scripts: [scriptUrl],
+            autoPlay: true
         })
         ctr.uninstall()
     }
