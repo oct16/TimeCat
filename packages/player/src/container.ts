@@ -40,7 +40,7 @@ export class ContainerComponent {
             if (head) {
                 head.insertBefore(this.createStyle(FIXED), head.firstChild)
             }
-            this.sandBoxDoc.replaceChild(child, this.sandBoxDoc.documentElement)
+            this.sandBoxDoc.documentElement.innerHTML = `<!DOCTYPE html>` + child.outerHTML
         }
     }
 

@@ -1,5 +1,5 @@
 import { VNode } from './types'
-import { nodeStore } from '@WebReplay/utils'
+import { nodeStore, completionCssHref, completionAttrHref } from '@WebReplay/utils'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
     const tagName = el.tagName.toLocaleLowerCase().trim()
@@ -36,12 +36,11 @@ const extraAttr = (attr: Attr) => {
     if (name === 'href' || name === 'src') {
         if (value.startsWith('#/')) {
             return []
-        } else if (/^\/(?!\/)/.test(value)) {
-            const origin = location.origin
-            value = origin + value
-        } else if (value.startsWith('//')) {
-            return [name, location.protocol + value]
         }
+        return [name, completionAttrHref(value)]
+    }
+    if (name === 'style') {
+        return [name, completionCssHref(value)]
     }
     return [name, value]
 }
@@ -65,7 +64,8 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
             }
         } else if (node.nodeType === Node.TEXT_NODE) {
             if (node.nodeValue) {
-                const text = trimNodeText(node.nodeValue)
+                // const text = trimNodeText(node.nodeValue)
+                const text = completionCssHref(node.nodeValue)
                 if (text) {
                     vNode.children.push(text)
                 }

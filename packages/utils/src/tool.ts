@@ -24,3 +24,36 @@ export function filteringScriptTag(str: string) {
     const reg = /<\/script>/g
     return str.replace(reg, '<\\/script>')
 }
+
+function startsWithSlash(str: string) {
+    return /^\/(?!\/)/.test(str)
+}
+function startsWithDoubleSlash(str: string) {
+    return /^\/\//.test(str)
+}
+
+export function completionCssHref(str: string) {
+    const reg = /(?<=url\()(\/{1,2}[^'"]*?)(?=\))/g
+    return str.replace(reg, str => {
+        if (startsWithSlash(str)) {
+            return location.origin + str
+        }
+        if (startsWithDoubleSlash(str)) {
+            return location.protocol + str
+        }
+        return str
+    })
+}
+
+export function completionAttrHref(str: string) {
+    const reg = /^(\/{1,2}.*)/g
+    return str.replace(reg, str => {
+        if (startsWithSlash(str)) {
+            return location.origin + str
+        }
+        if (startsWithDoubleSlash(str)) {
+            return location.protocol + str
+        }
+        return str
+    })
+}
