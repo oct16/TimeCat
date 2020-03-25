@@ -249,7 +249,7 @@
 
     </script>
 
-    <script src="./replay.js"></script>
+    <script src="./replay.min.js"></script>
 
     <script>
         const { record, DB } = wr
@@ -264,7 +264,7 @@
             if (replayButton) {
                 setTimeout(() => {
                     replayButton.className = ''
-                }, 8000);
+                }, 5000);
                 replayButton.onclick = () => {
                     if (replayButton.className) {
                         return
