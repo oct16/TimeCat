@@ -20,14 +20,16 @@ export enum MouseEventType {
     'CLICK' = 'click'
 }
 
-export interface WindowSnapshot {
+export interface WindowObserve {
     type: SnapshotType.WINDOW
-    data: WindowSnapshotData
+    data: WindowObserveData
     time: string
 }
-export interface WindowSnapshotData {
+export interface WindowObserveData {
     width: number
     height: number
+    scrollTop: number
+    scrollLeft: number
     href: string
 }
 
@@ -66,7 +68,7 @@ export interface DOMObserveMutations {
 
 export interface AttributesUpdateData {
     nodeId: number
-    value: string
+    value: string | boolean
     attr: string
 }
 
@@ -104,4 +106,4 @@ export interface FormElementObserveData {
 
 export type SnapshotEvent<T> = (e: T) => void
 
-export type SnapshotData = FormElementObserve | DOMObserve | MouseSnapshot | DOMSnapshot | WindowSnapshot
+export type SnapshotData = FormElementObserve | DOMObserve | MouseSnapshot | DOMSnapshot | WindowObserve

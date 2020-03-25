@@ -27,7 +27,11 @@ function record() {
 }
 
 function replay() {
-    const scriptUrl = chrome.runtime.getURL('replay.min.js')
+    const scriptUrl =
+        process.env.NODE_ENV === 'production'
+            ? chrome.runtime.getURL('replay.min.js')
+            : 'http://localhost:4321/replay.min.js'
+
     if (ctr) {
         wr.exportReplay({
             scripts: [scriptUrl],

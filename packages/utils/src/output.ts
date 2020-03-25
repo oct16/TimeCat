@@ -36,13 +36,17 @@ async function injectScripts(scripts?: string[]) {
     if (scripts) {
         for (let source of scripts) {
             let scriptContent: string = source
+            const script = document.createElement('script')
             if (/:\/\//.test(source)) {
                 const src = source
-                scriptContent = await getScript(src)
+                if (process.env.NODE_ENV === 'production') {
+                    scriptContent = await getScript(src)
+                } else {
+                    script.src = src
+                }
             }
-            const inlineScript = document.createElement('script')
-            inlineScript.text = scriptContent
-            html.body.appendChild(inlineScript)
+            script.text = scriptContent
+            html.body.appendChild(script)
         }
     }
 }

@@ -49,9 +49,9 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
     if (el.nodeType === Node.TEXT_NODE) {
         return null
     }
-    if (el.tagName === 'SCRIPT') {
-        return null
-    }
+    // if (el.tagName === 'SCRIPT') {
+    //     return null
+    // }
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)

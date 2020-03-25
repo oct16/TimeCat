@@ -1,7 +1,7 @@
 import { virtualDOM, createElement, convertVNode } from '@WebReplay/virtual-dom'
 import {
     SnapshotType,
-    WindowSnapshot,
+    WindowObserve,
     DOMSnapshot,
     SnapshotEvent,
     MouseSnapshot,
@@ -19,20 +19,48 @@ import throttle from 'lodash-es/throttle'
 import { nodeStore, listenerStore, getTime } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
-function windowSnapshot(emit: SnapshotEvent<WindowSnapshot>) {
-    const href = window.location.href
-    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+function windowObserve(emit: SnapshotEvent<WindowObserve>) {
+    const href = () => window.location.href
+    const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
+    const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+    const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+    const scrollLeft = () => window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft
 
-    emit({
-        type: SnapshotType.WINDOW,
-        data: {
-            width,
-            height,
-            href
-        },
-        time: getTime().toString()
+    function emitData() {
+        emit({
+            type: SnapshotType.WINDOW,
+            data: {
+                width: width(),
+                height: height(),
+                scrollTop: scrollTop(),
+                scrollLeft: scrollLeft(),
+                href: href()
+            },
+            time: getTime().toString()
+        })
+    }
+
+    emitData()
+
+    const eventTypes = ['scroll']
+    eventTypes
+        .map(type => (fn: (e: Event) => void) => {
+            document.addEventListener(type, fn, { once: false, passive: true, capture: true })
+        })
+        .forEach(handle => handle(handleFn))
+
+    listenerStore.add(() => {
+        eventTypes.forEach(type => {
+            document.removeEventListener(type, handleFn, true)
+        })
     })
+
+    function handleFn(e: Event) {
+        const { type } = e
+        if (type === 'scroll') {
+            emitData()
+        }
+    }
 }
 
 function DOMSnapshot(emit: SnapshotEvent<DOMSnapshot>) {
@@ -107,20 +135,40 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 })
             }
         }
+
+        function getPosition(node: Node, previousSibling: Node | null, nextSibling: Node | null) {
+            let pos: number | null = null
+            if (previousSibling) {
+                const parent = previousSibling.parentNode!
+                pos = parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(node as ChildNode) + 1 : null
+            } else if (nextSibling) {
+                const parent = nextSibling.parentNode!
+                pos = parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(node as ChildNode) : null
+            } else {
+                pos = 0
+            }
+            return pos
+        }
+
         records.forEach((record: MutationRecord) => {
-            const { target, addedNodes, removedNodes, type, nextSibling, attributeName } = record
+            const { target, addedNodes, removedNodes, type, previousSibling, nextSibling, attributeName } = record
 
             const joinData = addMutation(type)
 
             switch (type) {
                 case 'attributes':
                     if (attributeName) {
-                        const curAttrValue = (target as Element).getAttribute(attributeName)
-                        joinData({
-                            nodeId: nodeStore.getNodeId(target),
-                            value: curAttrValue,
-                            attr: attributeName
-                        } as AttributesUpdateData)
+                        const nodeId = nodeStore.getNodeId(target)
+                        if (nodeId) {
+                            const curAttrValue = (target as Element).getAttribute(attributeName)
+                            joinData({
+                                nodeId,
+                                value: curAttrValue,
+                                attr: attributeName
+                            } as AttributesUpdateData)
+                        } else {
+                            console.warn(record, 'target not id')
+                        }
                     }
                     break
                 case 'characterData':
@@ -138,26 +186,20 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                             let vNode: VNode
                             if (node.nodeType === Node.TEXT_NODE) {
                                 text = node.nodeValue
-                                const pos = Array.from(node.parentNode!.childNodes).indexOf(node as ChildNode)
                                 joinData({
                                     type: ChildListUpdateDataType.ADD,
                                     parentId: nodeStore.getNodeId(node.parentNode!),
                                     value: node.textContent,
-                                    pos
+                                    pos: getPosition(node, previousSibling, nextSibling)
                                 } as ChildListUpdateData)
                             } else {
                                 // reset element for remove reference
                                 vNode = createElement(node as HTMLElement) as VNode
-                                // convertVNode(vNode, null)
-                                const parent = node.parentNode!
                                 joinData({
                                     type: ChildListUpdateDataType.ADD,
                                     parentId: nodeStore.getNodeId(target),
                                     vNode,
-                                    pos:
-                                        parent.childNodes.length > 0
-                                            ? [...parent.childNodes].indexOf(node as ChildNode)
-                                            : null
+                                    pos: getPosition(node, previousSibling, nextSibling)
                                 } as ChildListUpdateData)
                             }
                         })
@@ -313,7 +355,7 @@ function kidnapInputs(emit: SnapshotEvent<FormElementObserve>) {
 }
 
 export const snapshots = {
-    windowSnapshot,
+    windowObserve,
     DOMSnapshot,
     mouseObserve,
     DOMObserve,

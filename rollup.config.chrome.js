@@ -1,5 +1,6 @@
 import ts from 'rollup-plugin-typescript2'
 import copy from 'rollup-plugin-copy'
+import replace from '@rollup/plugin-replace'
 
 const notDeclarationTS = [
     ts({
@@ -26,6 +27,9 @@ export default [
         },
         plugins: [
             ...notDeclarationTS,
+            replace({
+                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+            }),
             copy({
                 targets: [{ src: 'packages/chrome/src/assets/*', dest: 'dist/chrome/' }]
             })

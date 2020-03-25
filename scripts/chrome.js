@@ -1,5 +1,5 @@
 const execa = require('execa')
-const env = 'production'
+const env = 'development'
 
 execa(
     'rollup',

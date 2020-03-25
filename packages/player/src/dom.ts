@@ -10,7 +10,8 @@ import {
     CharacterDataUpdateData,
     AttributesUpdateData,
     FormElementEvent,
-    ChildListUpdateDataType
+    ChildListUpdateDataType,
+    WindowObserveData
 } from '@WebReplay/snapshot'
 import { PlayerComponent } from './player'
 import { nodeStore } from '@WebReplay/utils'
@@ -19,6 +20,10 @@ import { convertVNode } from '@WebReplay/virtual-dom'
 export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
     const { type, data } = snapshot
     switch (type) {
+        case SnapshotType.WINDOW:
+            const { scrollLeft, scrollTop } = data as WindowObserveData
+            this.c.sandBoxDoc.documentElement.scrollTo(scrollLeft, scrollTop)
+            break
         case SnapshotType.MOUSE:
             const { x, y, type } = data as MouseSnapshotData
             if (type === MouseEventType.MOVE) {
@@ -36,7 +41,10 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                 switch (mType) {
                     case 'attributes':
                         const targetEl = nodeStore.getNode(nodeId) as HTMLElement
-                        targetEl.setAttribute(attr, value)
+                        if (targetEl) {
+                            targetEl.setAttribute(attr, value ? value : '')
+                        }
+
                         break
                     case 'characterData':
                         const parentEl = nodeStore.getNode(parentId) as HTMLElement
@@ -55,7 +63,7 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                                 parentNode!.removeChild(targetNode)
                             }
                         } else if (ChildListUpdateDataType.ADD) {
-                            if (value) {
+                            if (typeof value === 'string') {
                                 // it's a TextNode
                                 const textNode = document.createTextNode(value)
                                 if (parentNode.childNodes.length) {
@@ -65,7 +73,11 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                                 }
                             } else {
                                 // it's a ElementNode
-                                parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
+                                if (parentNode && targetNode) {
+                                    parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
+                                } else {
+                                    console.warn('insert error', data)
+                                }
                             }
                         }
                         break

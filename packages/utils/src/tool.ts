@@ -46,8 +46,12 @@ export function completionCssHref(str: string) {
 }
 
 export function completionAttrHref(str: string) {
+    if (str.startsWith('data')) {
+        return str
+    }
+
     const reg = /^(\/{1,2}.*)/g
-    return str.replace(reg, str => {
+    str = str.replace(reg, str => {
         if (startsWithSlash(str)) {
             return location.origin + str
         }
@@ -56,4 +60,10 @@ export function completionAttrHref(str: string) {
         }
         return str
     })
+
+    if (!/^http/.test(str)) {
+        return location.origin + '/' + str
+    }
+
+    return str
 }
