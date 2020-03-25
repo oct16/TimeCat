@@ -1,10 +1,10 @@
-import replayTpl from '../../../tpls/replay.html'
+import TPL from '../../../tpls/tpl.html'
 import { DBPromise as DB } from './store/idb'
 import { filteringScriptTag } from './tool'
 
 type Opts = { scripts?: string[]; autoPlay?: boolean }
 const parser = new DOMParser()
-const html = parser.parseFromString(replayTpl, 'text/html')
+const html = parser.parseFromString(TPL, 'text/html')
 
 export async function exportReplay(opts: Opts = {}) {
     await injectData()
@@ -45,25 +45,6 @@ async function injectScripts(scripts?: string[]) {
             html.body.appendChild(inlineScript)
         }
     }
-
-    // const scripts = html.getElementsByTagName('script')
-    // else if (scripts) {
-    // for (let script of scripts) {
-    //     if (script.hasAttribute('src')) {
-    //         const src = script.src
-    //         const scriptContent = await getScript(src)
-    //         if (scriptContent) {
-    //             const tag = script.outerHTML
-    //             const comment = document.createComment(`convert to inline ${tag}`)
-    //             html.body.replaceChild(comment, script)
-
-    //             const inlineScript = document.createElement('script')
-    //             inlineScript.innerHTML = scriptContent
-    //             html.body.insertBefore(inlineScript, comment)
-    //         }
-    //     }
-    // }
-    // }
 }
 
 async function getScript(src: string) {

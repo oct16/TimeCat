@@ -30,6 +30,13 @@ export class ContainerComponent {
         this.sandBox.style.width = this.width + 'px'
         this.sandBox.style.height = this.height + 'px'
         this.sandBoxDoc = this.sandBox.contentDocument!
+        this.sandBoxDoc.open()
+        this.sandBoxDoc.write('<!DOCTYPE html>')
+        this.sandBoxDoc.write('<html>')
+        this.sandBoxDoc.write('<head></head>')
+        this.sandBoxDoc.write('<body></body>')
+        this.sandBoxDoc.write('</html>')
+        this.sandBoxDoc.close()
         this.setViewState()
     }
 
@@ -40,7 +47,9 @@ export class ContainerComponent {
             if (head) {
                 head.insertBefore(this.createStyle(FIXED), head.firstChild)
             }
-            this.sandBoxDoc.documentElement.innerHTML = `<!DOCTYPE html>` + child.outerHTML
+            const documentElement = this.sandBoxDoc.documentElement
+            documentElement.replaceChild(child.firstChild!, documentElement.firstChild!)
+            documentElement.replaceChild(child.lastChild!, documentElement.lastChild!)
         }
     }
 
