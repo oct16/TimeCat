@@ -2,9 +2,12 @@ import ts from 'rollup-plugin-typescript2'
 import copy from 'rollup-plugin-copy'
 import replace from '@rollup/plugin-replace'
 
-const notDeclarationTS = [
+const defaultPlugin = [
     ts({
         tsconfigOverride: { compilerOptions: { declaration: false } }
+    }),
+    replace({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     })
 ]
 
@@ -16,7 +19,16 @@ export default [
             moduleName: 'wr-background',
             file: 'dist/chrome/replay-chrome-background.js'
         },
-        plugins: [...notDeclarationTS]
+        plugins: [...defaultPlugin]
+    },
+    {
+        input: 'packages/chrome/src/page.ts',
+        output: {
+            format: 'iife',
+            moduleName: 'wr-page',
+            file: 'dist/chrome/replay-chrome-page.js'
+        },
+        plugins: [...defaultPlugin]
     },
     {
         input: 'packages/chrome/src/content.ts',
@@ -26,10 +38,7 @@ export default [
             file: 'dist/chrome/replay-chrome-content.js'
         },
         plugins: [
-            ...notDeclarationTS,
-            replace({
-                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-            }),
+            ...defaultPlugin,
             copy({
                 targets: [{ src: 'packages/chrome/src/assets/*', dest: 'dist/chrome/' }]
             })

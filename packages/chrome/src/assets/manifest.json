@@ -23,12 +23,12 @@
                 "https://*/*"
             ],
             "js": [
-                "replay.min.js",
                 "replay-chrome-content.js"
             ]
         }
     ],
     "web_accessible_resources": [
-        "replay.min.js"
+        "replay.min.js",
+        "replay-chrome-page.js"
     ]
 }

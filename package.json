@@ -10,6 +10,7 @@
         "@rollup/plugin-replace": "^2.3.1",
         "@types/lodash-es": "^4.17.3",
         "@types/node": "^13.9.2",
+        "@types/chrome": "0.0.101",
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "lodash-es": "^4.17.15",
@@ -43,8 +44,5 @@
     "bugs": {
         "url": "https://github.com/oct16/WebReplay/issues"
     },
-    "homepage": "https://github.com/oct16/WebReplay#readme",
-    "dependencies": {
-        "@types/chrome": "0.0.101"
-    }
+    "homepage": "https://github.com/oct16/WebReplay#readme"
 }
