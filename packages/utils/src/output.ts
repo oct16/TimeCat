@@ -1,7 +1,7 @@
 import TPL from '../../../tpls/tpl.html'
 import { DBPromise as DB } from './store/idb'
 import { filteringScriptTag } from './tool'
-import { isDev } from '@WebReplay/utils'
+import { isDev } from './tool'
 
 type Opts = { scripts?: string[]; autoPlay?: boolean }
 const parser = new DOMParser()
