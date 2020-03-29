@@ -20,6 +20,12 @@ export default {
         },
         {
             name: 'wr',
+            format: 'iife',
+            file: 'dist/chrome/replay.min.js',
+            sourcemap: true
+        },
+        {
+            name: 'wr',
             format: 'cjs',
             file: 'dist/replay.cjs.js',
             sourcemap: true
