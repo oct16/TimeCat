@@ -12,7 +12,7 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         return
     }
 
-    if (name === 'background') {
+    if (name === 'background' || name === 'src' || name === 'href') {
         value = completionAttrHref(String(value))
     }
 
@@ -27,5 +27,11 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         return node.removeAttribute(name)
     }
 
-    return node.setAttribute(name, value === true ? '' : String(value))
+    value = String(value)
+
+    if (value.startsWith('/')) {
+        value = completionAttrHref(value)
+    }
+
+    return node.setAttribute(name, value)
 }

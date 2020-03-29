@@ -28,7 +28,6 @@ function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
 
 function windowObserve(emit: SnapshotEvent<WindowObserve>) {
     const origin = () => window.location.href
-    const protocol = () => window.location.protocol
     const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
     const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
@@ -273,6 +272,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
     }
 
     const observer = new MutationObserver(mutationCallback)
+
     observer.observe(document.body, {
         attributeOldValue: true,
         attributes: true,

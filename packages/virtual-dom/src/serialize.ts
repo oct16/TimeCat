@@ -64,8 +64,10 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
             }
         } else if (node.nodeType === Node.TEXT_NODE) {
             if (node.nodeValue) {
-                // const text = trimNodeText(node.nodeValue)
-                const text = completionCssHref(node.nodeValue)
+                let text = node.nodeValue
+                if (el.tagName === 'STYLE') {
+                    text = completionCssHref(node.nodeValue)
+                }
                 if (text) {
                     vNode.children.push(text)
                 }
@@ -73,10 +75,6 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
         }
     })
     return vNode
-}
-
-const trimNodeText = (nodeValue: string) => {
-    return nodeValue.replace(/\r\n/g, '').replace(/\n/g, '')
 }
 
 const convertHTML = (doc: Document) => {
