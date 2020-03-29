@@ -1,4 +1,6 @@
-export function setAttribute(node: HTMLElement, name: string, value: string | boolean): void {
+import { completionAttrHref } from '@WebReplay/utils'
+
+export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null): void {
     if (name === 'style') {
         if (value) {
             if (typeof value === 'string') {
@@ -12,11 +14,19 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         return
     }
 
+    if (name === 'background') {
+        value = completionAttrHref(String(value))
+    }
+
     if (/^on\w+$/.test(name)) {
         return
     }
     if (!/[\w\d]+/.test(name)) {
         return
+    }
+
+    if (value === null) {
+        return node.removeAttribute(name)
     }
 
     return node.setAttribute(name, value === true ? '' : String(value))

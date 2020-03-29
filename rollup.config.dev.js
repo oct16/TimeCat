@@ -41,6 +41,10 @@ export default [
                 template: () => filteringTemplate(fs.readFileSync('tpls/todo.html', 'utf8'))
             }),
             html({
+                fileName: 'test.html',
+                template: () => fs.readFileSync('tpls/test.html')
+            }),
+            html({
                 fileName: 'replay.html',
                 template: () => fs.readFileSync('tpls/replay.html')
             }),

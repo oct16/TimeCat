@@ -8,15 +8,15 @@ const ctrl = {
     }
 }
 
-export const record = ({ emitter }: RecordOptions = {}) => {
-    recordAll(emitter)
-    return ctrl
-}
-
 function recordAll(emitter?: (e: SnapshotData) => void) {
     const recordTasks: Function[] = [...Object.values(snapshots)]
 
     recordTasks.forEach(task => {
         task(emitter)
     })
+}
+
+export const record = ({ emitter }: RecordOptions = {}) => {
+    recordAll(emitter)
+    return ctrl
 }

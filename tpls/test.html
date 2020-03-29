@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebReplay</title>
+    <style>
+        label {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+
+        <button id="replay">Replay</button>
+        <h2>Dom Update:</h2>
+
+        <h5>Update Text</h5>
+        <button onclick="plus()">plus</button>
+
+        <span style="margin-left: 10px">
+            Number:
+        </span>
+        <number id="number">1</number>
+
+        <h5>Update Node</h5>
+        <button onclick="moveItem()">plus</button>
+
+        <ul id="list">
+            <li><span>123456</span>999999</li>
+            <li></li>
+            <li></li>
+        </ul>
+
+        <hr>
+
+        <h2>Form:</h2>
+        <br>
+        <form action="">
+
+            <label for="name">Name</label>
+            <input type="text" id="name" />
+            <label for="age">Age</label>
+            <input type="text" id="age" />
+            <label for="location">Location</label>
+            <select id="location">
+                <option value="shanghai">Shanghai</option>
+                <option value="beijing">Beijing</option>
+                <option value="guangdong">Guangdong</option>
+                <option value="shenzheng">Shenzheng</option>
+            </select>
+            <br>
+            <br>
+            <label for="other">Other</label>
+            <textarea style="vertical-align: top;" name="" id="other" cols="30" rows="4"></textarea>
+        </form>
+
+    </div>
+
+    <script>
+        let i = 0
+        function moveItem() {
+            var list = document.querySelector('#list')
+            var items = list.querySelectorAll('li')
+
+            var sign =
+                items.forEach(function (item, index) {
+                    if (index === i) {
+
+                        item.replaceChild(document.createElement('br'), item.childNodes[1])
+
+                        item.innerHTML += `???<span>😀 😁 😂 🤣</span>`
+                        item.innerHTML += `<span>xxxxx</span>`
+                        item.setAttribute('v-test-a', 'aaa')
+                        item.setAttribute('v-test-a', 'aaa222')
+                        item.setAttribute('v-test-a', 'aaa333')
+                        item.setAttribute('v-test-a', 'aaa444')
+                        item.setAttribute('v-test-bba', 'bba')
+                        item.setAttribute('v-test-a', 'aaa555')
+                        item.querySelector('span').appendChild(document.createElement('b'))
+                        plus()
+                        document.body.querySelector('ul').style.background = 'red'
+
+                    } else {
+                        item.innerText = ''
+                        item.removeAttribute('v-test-a', 'aaa111')
+                    }
+                })
+
+            if (i++ === items.length) {
+                i = 0
+            }
+        }
+
+        function plus() {
+            document.querySelector('#number').innerText = Math.random().toFixed(2)
+        }
+    </script>
+
+</body>
+
+</html>

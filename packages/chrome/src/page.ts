@@ -1,12 +1,14 @@
-let ctr: any
+import { dispatchEvent } from './common'
 
-function record() {
+let ctrl: any
+
+function record(e: Event) {
     const wr = (window as any).wr
     const { DB, record } = wr
 
     DB.then((db: any) => {
         db.clear()
-        ctr = record({
+        ctrl = record({
             emitter: (data: any) => {
                 db.add(data)
             }
@@ -14,21 +16,31 @@ function record() {
     })
 }
 
-function replay() {
+function replay(e: Event & { detail: any }) {
     const wr = (window as any).wr
-    const scriptUrl =
-        process.env.NODE_ENV === 'production'
-            ? chrome.runtime.getURL('replay.min.js')
-            : 'http://localhost:4321/replay.min.js'
-
-    if (ctr) {
+    if (ctrl) {
+        const { scripts } = e.detail
         wr.exportReplay({
-            scripts: [scriptUrl],
+            scripts,
             autoPlay: true
         })
-        ctr.uninstall()
+        ctrl.uninstall()
     }
 }
 
-window.addEventListener('CHROME_RECORD_START', () => record(), false)
-window.addEventListener('CHROME_RECORD_FINISH', () => replay(), false)
+function setWarn(handle?: () => void) {
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState == 'hidden') {
+            if (ctrl) {
+                ctrl.uninstall()
+                ctrl = null
+            }
+            dispatchEvent('CHROME_RECORD_CANCEL')
+        }
+    })
+}
+
+window.addEventListener('CHROME_RECORD_START', record, false)
+window.addEventListener('CHROME_RECORD_FINISH', replay, false)
+
+setWarn()

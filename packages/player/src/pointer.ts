@@ -1,3 +1,5 @@
+import { setAttribute } from '@WebReplay/virtual-dom'
+
 export class PointerComponent {
     x = 0
     y = 0
@@ -21,9 +23,9 @@ export class PointerComponent {
 
     click(x: number, y: number) {
         this.move(x, y)
-        this.pointer.setAttribute('active', '')
+        setAttribute(this.pointer, 'active', '')
         setTimeout(() => {
-            this.pointer.removeAttribute('active')
+            setAttribute(this.pointer, 'active', null)
         }, 20)
     }
 }

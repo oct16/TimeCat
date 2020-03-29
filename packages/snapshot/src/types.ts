@@ -30,7 +30,7 @@ export interface WindowObserveData {
     height: number
     scrollTop: number
     scrollLeft: number
-    href: string
+    origin: string
 }
 
 export interface DOMSnapshot {
@@ -69,21 +69,25 @@ export interface DOMObserveMutations {
 export interface AttributesUpdateData {
     nodeId: number
     value: string | boolean
-    attr: string
+    name: string
 }
 
 export interface CharacterDataUpdateData {
     parentId: number
     value: string
+    pos: number
 }
 
 export interface ChildListUpdateData {
-    type: ChildListUpdateDataType
-    parentId: number
-    nodeId: number
-    pos: number
-    value?: string
-    vNode: VNode
+    addedNodes: {
+        vNode: VNode
+        pos: number
+    }[]
+    removeIds: number[]
+    attributes: {
+        value: string
+        name: string
+    }[]
 }
 export enum ChildListUpdateDataType {
     'ADD' = 'ADD',
@@ -107,3 +111,5 @@ export interface FormElementObserveData {
 export type SnapshotEvent<T> = (e: T) => void
 
 export type SnapshotData = FormElementObserve | DOMObserve | MouseSnapshot | DOMSnapshot | WindowObserve
+
+export type MutationGroups<T = any> = { [key: string]: { [key: string]: T[] } }

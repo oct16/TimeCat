@@ -1,4 +1,4 @@
-import { virtualDOM, createElement, convertVNode } from '@WebReplay/virtual-dom'
+import { virtualDOM, createElement } from '@WebReplay/virtual-dom'
 import {
     SnapshotType,
     WindowObserve,
@@ -12,29 +12,37 @@ import {
     AttributesUpdateData,
     CharacterDataUpdateData,
     DOMObserveMutations,
-    ChildListUpdateData,
-    ChildListUpdateDataType
+    SnapshotData,
+    MutationGroups
 } from './types'
 import throttle from 'lodash-es/throttle'
-import { nodeStore, listenerStore, getTime } from '@WebReplay/utils'
+import { logger, isDev, nodeStore, listenerStore, getTime } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
+function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
+    if (isDev) {
+        // logger(data)
+    }
+    emit(data)
+}
+
 function windowObserve(emit: SnapshotEvent<WindowObserve>) {
-    const href = () => window.location.href
+    const origin = () => window.location.href
+    const protocol = () => window.location.protocol
     const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
     const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
     const scrollLeft = () => window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft
 
     function emitData() {
-        emit({
+        emitterHook(emit, {
             type: SnapshotType.WINDOW,
             data: {
                 width: width(),
                 height: height(),
                 scrollTop: scrollTop(),
                 scrollLeft: scrollLeft(),
-                href: href()
+                origin: origin()
             },
             time: getTime().toString()
         })
@@ -64,7 +72,7 @@ function windowObserve(emit: SnapshotEvent<WindowObserve>) {
 }
 
 function DOMSnapshot(emit: SnapshotEvent<DOMSnapshot>) {
-    emit({
+    emitterHook(emit, {
         type: SnapshotType.DOM,
         data: {
             vNode: virtualDOM.convertHTML(document) as VNode
@@ -76,15 +84,19 @@ function DOMSnapshot(emit: SnapshotEvent<DOMSnapshot>) {
 function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
     function mouseMove() {
         const evt = (e: MouseEvent) => {
-            emit({
-                type: SnapshotType.MOUSE,
-                data: {
-                    type: MouseEventType.MOVE,
-                    x: e.x,
-                    y: e.y
-                },
-                time: getTime().toString()
-            })
+            emitterHook(
+                emit,
+
+                {
+                    type: SnapshotType.MOUSE,
+                    data: {
+                        type: MouseEventType.MOVE,
+                        x: e.x,
+                        y: e.y
+                    },
+                    time: getTime().toString()
+                }
+            )
         }
         const name = 'mousemove'
         const listenerHandle = throttle(evt, 100, {
@@ -100,7 +112,7 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 
     function mouseClick() {
         const evt = (e: MouseEvent) => {
-            emit({
+            emitterHook(emit, {
                 type: SnapshotType.MOUSE,
                 data: {
                     type: MouseEventType.CLICK,
@@ -124,10 +136,14 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
     mouseClick()
 }
 
+type MutationTypes = 'attributes' | 'characterData' | 'childList'
+
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
     const mutationCallback: MutationCallback = (records: MutationRecord[]) => {
+        const mGroup = {} as MutationGroups
         const mutations: DOMObserveMutations[] = []
-        function addMutation(mType: 'attributes' | 'characterData' | 'childList') {
+
+        function addMutation(mType: MutationTypes) {
             return function(data: any) {
                 mutations.push({
                     mType,
@@ -136,22 +152,10 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
             }
         }
 
-        function getPosition(node: Node, previousSibling: Node | null, nextSibling: Node | null) {
-            let pos: number | null = null
-            if (previousSibling) {
-                const parent = previousSibling.parentNode!
-                pos = parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(node as ChildNode) + 1 : null
-            } else if (nextSibling) {
-                const parent = nextSibling.parentNode!
-                pos = parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(node as ChildNode) : null
-            } else {
-                pos = 0
-            }
-            return pos
-        }
+        const attrMutations: any = []
 
         records.forEach((record: MutationRecord) => {
-            const { target, addedNodes, removedNodes, type, previousSibling, nextSibling, attributeName } = record
+            const { target, addedNodes, removedNodes, type, attributeName } = record
 
             const joinData = addMutation(type)
 
@@ -159,16 +163,12 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 case 'attributes':
                     if (attributeName) {
                         const nodeId = nodeStore.getNodeId(target)
-                        if (nodeId) {
-                            const curAttrValue = (target as Element).getAttribute(attributeName)
-                            joinData({
-                                nodeId,
-                                value: curAttrValue,
-                                attr: attributeName
-                            } as AttributesUpdateData)
-                        } else {
-                            console.warn(record, 'target not id')
-                        }
+                        const curAttrValue = (target as Element).getAttribute(attributeName)
+                        attrMutations.push({
+                            nodeId,
+                            value: curAttrValue,
+                            name: attributeName
+                        } as AttributesUpdateData)
                     }
                     break
                 case 'characterData':
@@ -180,47 +180,89 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     } as CharacterDataUpdateData)
                     break
                 case 'childList':
-                    if (addedNodes.length) {
-                        addedNodes.forEach(node => {
-                            let text
-                            let vNode: VNode
-                            if (node.nodeType === Node.TEXT_NODE) {
-                                text = node.nodeValue
-                                joinData({
-                                    type: ChildListUpdateDataType.ADD,
-                                    parentId: nodeStore.getNodeId(node.parentNode!),
-                                    value: node.textContent,
-                                    pos: getPosition(node, previousSibling, nextSibling)
-                                } as ChildListUpdateData)
-                            } else {
-                                // reset element for remove reference
-                                vNode = createElement(node as HTMLElement) as VNode
-                                joinData({
-                                    type: ChildListUpdateDataType.ADD,
-                                    parentId: nodeStore.getNodeId(target),
-                                    vNode,
-                                    pos: getPosition(node, previousSibling, nextSibling)
-                                } as ChildListUpdateData)
-                            }
-                        })
+                    const targetId = nodeStore.getNodeId(target)
+                    const addedNodesArray = [] as Node[]
+                    const removedNodesArray = [] as Node[]
+                    // group by targetId
+                    addedNodes.forEach(node => addedNodesArray.push(node))
+                    removedNodes.forEach(node => removedNodesArray.push(node))
+                    if (!targetId) break
+                    if (!mGroup[targetId]) {
+                        mGroup[targetId] = {
+                            addedNodes: [],
+                            removedNodes: []
+                        }
                     }
-                    if (removedNodes.length) {
-                        removedNodes.forEach(node => {
-                            joinData({
-                                type: ChildListUpdateDataType.DELETE,
-                                parentId: nodeStore.getNodeId(target) as number,
-                                nodeId: nodeStore.getNodeId(node) || null
-                            } as ChildListUpdateData)
-                        })
-                    }
+                    const { addedNodes: a, removedNodes: r } = mGroup[targetId]
+                    a.push(...addedNodesArray)
+                    r.push(...removedNodesArray)
                     break
                 default:
                     break
             }
         })
 
+        const createGroupObj = (
+            addedNodes: {
+                vNode: VNode
+                pos: number
+            }[] = [],
+            removeIds: number[] = [],
+            attributes: { name: string; value: string }[] = []
+        ) => {
+            return {
+                addedNodes,
+                removeIds,
+                attributes
+            }
+        }
+
+        const mutationsGroupResult = Object.keys(mGroup).reduce((result, targetId) => {
+            const { addedNodes, removedNodes } = mGroup[targetId]
+            result[targetId] = createGroupObj(
+                addedNodes
+                    .filter(x => !removedNodes.includes(x))
+                    .map((n: Element) => {
+                        return {
+                            vNode: n.nodeType === Node.ELEMENT_NODE ? createElement(n) : n.textContent,
+                            pos: [].indexOf.call(n.parentNode!.childNodes, n)
+                        }
+                    }) as { vNode: VNode; pos: number }[],
+                removedNodes
+                    .filter(x => !addedNodes.includes(x))
+                    .map((n: Element) => nodeStore.getNodeId(n)!)
+                    .filter(Boolean)
+            )
+            return result
+        }, {} as MutationGroups)
+
+        attrMutations.forEach((m: AttributesUpdateData) => {
+            const { nodeId, ..._m } = m
+            if (nodeId) {
+                const target = mutationsGroupResult[nodeId]
+                if (target) {
+                    const attrs = target['attributes']
+                    const names = attrs.map(item => item.name)
+                    const index = names.indexOf(_m.name)
+                    if (!~index) {
+                        target['attributes'].push(_m)
+                    } else {
+                        target['attributes'][index] = _m
+                    }
+                } else {
+                    mutationsGroupResult[nodeId] = createGroupObj(undefined, undefined, [
+                        _m as { name: string; value: string }
+                    ])
+                }
+            }
+        })
+
+        const joinChildList = addMutation('childList')
+
+        joinChildList(mutationsGroupResult)
+
         if (mutations.length) {
-            emit({
+            emitterHook(emit, {
                 type: SnapshotType.DOM_UPDATE,
                 data: {
                     mutations
@@ -267,11 +309,11 @@ function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
 
     function handleFn(e: InputEvent) {
         const eventType = e.type
-
+        let data!: FormElementObserve
         switch (eventType) {
             case 'input':
             case 'change':
-                emit({
+                data = {
                     type: SnapshotType.FORM_EL_UPDATE,
                     data: {
                         type: FormElementEvent.INPUT,
@@ -279,31 +321,33 @@ function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
                         value: (e.target as HTMLInputElement).value
                     },
                     time: getTime().toString()
-                })
+                }
                 break
             case 'focus':
-                emit({
+                data = {
                     type: SnapshotType.FORM_EL_UPDATE,
                     data: {
                         type: FormElementEvent.FOCUS,
                         id: nodeStore.getNodeId(e.target as Node)!
                     },
                     time: getTime().toString()
-                })
+                }
                 break
             case 'blur':
-                emit({
+                data = {
                     type: SnapshotType.FORM_EL_UPDATE,
                     data: {
                         type: FormElementEvent.BLUR,
                         id: nodeStore.getNodeId(e.target as Node)!
                     },
                     time: getTime().toString()
-                })
+                }
                 break
             default:
                 break
         }
+
+        emitterHook(emit, data)
     }
 }
 

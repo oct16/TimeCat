@@ -1,5 +1,5 @@
 import { setAttribute } from './dom'
-import { nodeStore } from '@WebReplay/utils'
+import { nodeStore, isDev } from '@WebReplay/utils'
 import { VNode } from './types'
 
 export function convertVNode(vNode: VNode | string | null, node: Element | null): Element | null {
@@ -45,6 +45,10 @@ function createNode(vNode: VNode): Element {
         output = document.createElementNS('http://www.w3.org/2000/svg', tagName)
     } else {
         output = document.createElement(tagName)
+    }
+
+    if (isDev) {
+        setAttribute(output as HTMLElement, 'vid', id.toString())
     }
 
     nodeStore.updateNode(id, output)

@@ -41,7 +41,6 @@ export class IndexedDBOperator {
             .transaction([`${this.storeName}`], 'readwrite')
             .objectStore(`${this.storeName}`)
             .add(data)
-
         request.onerror = e => {
             throw new Error('write indexedDB on error')
         }
@@ -52,7 +51,7 @@ export class IndexedDBOperator {
         objectStore.clear()
     }
 
-    async readAll(): Promise<(SnapshotData)[]> {
+    async readAll(): Promise<SnapshotData[]> {
         const objectStore = this.db.transaction([`${this.storeName}`], 'readwrite').objectStore(`${this.storeName}`)
         return new Promise(resolve => {
             objectStore.getAll().onsuccess = event => {
@@ -66,11 +65,12 @@ export class IndexedDBOperator {
         const all = await this.readAll()
 
         const [window, virtualNode, ...data] = all
-        const [{ width, height }, { vNode }] = [window.data, virtualNode.data] as [WindowObserveData, DOMSnapshotData]
+        const [{ width, height, origin }, { vNode }] = [window.data, virtualNode.data] as [WindowObserveData, DOMSnapshotData]
 
         return {
             width,
             height,
+            origin,
             vNode,
             data
         }

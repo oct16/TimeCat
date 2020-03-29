@@ -1,6 +1,7 @@
 import TPL from '../../../tpls/tpl.html'
 import { DBPromise as DB } from './store/idb'
 import { filteringScriptTag } from './tool'
+import { isDev } from '@WebReplay/utils'
 
 type Opts = { scripts?: string[]; autoPlay?: boolean }
 const parser = new DOMParser()
@@ -39,10 +40,11 @@ async function injectScripts(scripts?: string[]) {
             const script = document.createElement('script')
             if (/:\/\//.test(source)) {
                 const src = source
-                if (process.env.NODE_ENV === 'production') {
-                    scriptContent = await getScript(src)
-                } else {
+
+                if (isDev) {
                     script.src = src
+                } else {
+                    scriptContent = await getScript(src)
                 }
             }
             script.text = scriptContent
@@ -61,7 +63,7 @@ async function injectData() {
     const data = await (await DB).getData()
     const jsonData = JSON.stringify(data)
     const dataScript = document.createElement('script')
-    const scriptContent = `var __ReplayData__ = ${jsonData}`
+    const scriptContent = `var __ReplayData__ = ${filteringScriptTag(jsonData)}`
     dataScript.innerText = scriptContent
     html.body.insertBefore(dataScript, html.body.firstChild)
 }

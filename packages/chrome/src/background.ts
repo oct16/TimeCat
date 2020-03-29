@@ -1,20 +1,24 @@
 let time = 0
 let timer: NodeJS.Timeout
+let running = false
 
-function updateIcon() {
-    if (!time) {
+function fire(status: boolean) {
+    running = !status
+
+    if (!running) {
         chrome.browserAction.setIcon({ path: getIconPath('red') })
-        sendMessageToContentScript({ type: 'start' })
+        sendMessageToContentScript({ type: 'START' })
+        timeHandle()
+        timer = setInterval(timeHandle, 1000)
+        running = true
     } else {
         time = 0
         clearInterval(timer)
         chrome.browserAction.setIcon({ path: getIconPath('black') })
         chrome.browserAction.setBadgeText({ text: '' })
-        sendMessageToContentScript({ type: 'finish' })
-        return
+        sendMessageToContentScript({ type: 'FINISH' })
+        running = false
     }
-    timer = setInterval(timeHandle, 1000)
-    timeHandle()
 }
 
 function timeHandle() {
@@ -23,7 +27,14 @@ function timeHandle() {
     time++
 }
 
-chrome.browserAction.onClicked.addListener(updateIcon)
+chrome.runtime.onMessage.addListener(request => {
+    const { type } = request
+    if (type === 'RECORD_CANCEL') {
+        fire(false)
+    }
+})
+
+chrome.browserAction.onClicked.addListener(() => fire(!running))
 
 function getIconPath(iconName: string) {
     return 'record-icon-' + iconName + '.png'

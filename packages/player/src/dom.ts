@@ -10,12 +10,12 @@ import {
     CharacterDataUpdateData,
     AttributesUpdateData,
     FormElementEvent,
-    ChildListUpdateDataType,
     WindowObserveData
 } from '@WebReplay/snapshot'
 import { PlayerComponent } from './player'
 import { nodeStore } from '@WebReplay/utils'
-import { convertVNode } from '@WebReplay/virtual-dom'
+import { convertVNode, VNode } from '@WebReplay/virtual-dom'
+import { setAttribute } from '../../virtual-dom/src/dom'
 
 export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
     const { type, data } = snapshot
@@ -36,51 +36,55 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             const { mutations } = data as DOMObserveData
             mutations.forEach((mutate: DOMObserveMutations) => {
                 const { mType, data } = mutate
-                const { value, attr, type, parentId, pos, nodeId, vNode } = data as ChildListUpdateData &
-                    (CharacterDataUpdateData & AttributesUpdateData)
                 switch (mType) {
-                    case 'attributes':
+                    case 'attributes': {
+                        const { value, name, nodeId } = data as AttributesUpdateData
                         const targetEl = nodeStore.getNode(nodeId) as HTMLElement
                         if (targetEl) {
-                            targetEl.setAttribute(attr, value ? value : '')
+                            targetEl.setAttribute(name, value ? value.toString() : '')
                         }
-
                         break
+                    }
                     case 'characterData':
-                        const parentEl = nodeStore.getNode(parentId) as HTMLElement
-                        if (pos !== null) {
-                            const target = parentEl.childNodes[pos as number]
-                            parentEl.replaceChild(document.createTextNode(value), target)
-                        } else {
-                            parentEl.innerText = value
-                        }
-                        break
-                    case 'childList':
-                        const parentNode = nodeStore.getNode(parentId) as HTMLElement
-                        const targetNode = (nodeStore.getNode(nodeId) as Element) || convertVNode(vNode, null)
-                        if (type === ChildListUpdateDataType.DELETE) {
-                            if (targetNode) {
-                                parentNode!.removeChild(targetNode)
-                            }
-                        } else if (ChildListUpdateDataType.ADD) {
-                            if (typeof value === 'string') {
-                                // it's a TextNode
-                                const textNode = document.createTextNode(value)
-                                if (parentNode.childNodes.length) {
-                                    parentNode.replaceChild(textNode, parentNode.childNodes[pos])
-                                } else {
-                                    parentNode!.appendChild(textNode)
-                                }
+                        {
+                            const { pos, value, parentId } = data as CharacterDataUpdateData
+                            const parentEl = nodeStore.getNode(parentId) as HTMLElement
+                            if (pos !== null) {
+                                const target = parentEl.childNodes[pos as number]
+                                parentEl.replaceChild(document.createTextNode(value), target)
                             } else {
-                                // it's a ElementNode
-                                if (parentNode && targetNode) {
-                                    parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
-                                } else {
-                                    console.warn('insert error', data)
-                                }
+                                parentEl.innerText = value
                             }
                         }
                         break
+                    case 'childList': {
+                        Object.entries(data as ChildListUpdateData).forEach(obj => {
+                            const [id, item] = obj
+                            const parentNode = nodeStore.getNode(+id)
+                            if (parentNode) {
+                                const { addedNodes, removeIds, attributes } = item
+                                addedNodes.forEach((item: any) => {
+                                    const { vNode, pos } = item
+                                    const targetNode = convertVNode(vNode, null)
+                                    if (targetNode) {
+                                        parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
+                                    }
+                                })
+                                removeIds.forEach((removeNodeId: number) => {
+                                    try {
+                                        parentNode.removeChild(nodeStore.getNode(removeNodeId) as Node)
+                                    } catch (e) {
+                                        console.log(e)
+                                    }
+                                })
+
+                                attributes.forEach((attr: any) => {
+                                    const { name, value } = attr
+                                    setAttribute(parentNode as HTMLElement, name, value)
+                                })
+                            }
+                        })
+                    }
                 }
             })
 
@@ -95,7 +99,13 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             } else if (formType === FormElementEvent.BLUR) {
                 node.blur()
             } else if (formType === FormElementEvent.ATTR) {
-                node[key!] = value
+                if (key) {
+                    try {
+                        node[key] = value
+                    } catch (e) {
+                        console.log(e)
+                    }
+                }
             }
             break
     }
