@@ -37,7 +37,7 @@ function startsWithDoubleSlash(str: string) {
 }
 
 export function completionCssHref(str: string) {
-    return str.replace(/(?<=url\()(.*)(?=\))/g, url => {
+    return str.replace(/(?=url\()(.*)(?=\))/g, url => {
         return url.replace(/(\/{1,2})/, s => {
             if (startsWithDoubleSlash(s)) {
                 return protocol + s
