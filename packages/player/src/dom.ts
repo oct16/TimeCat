@@ -63,18 +63,20 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                             const parentNode = nodeStore.getNode(+id)
                             if (parentNode) {
                                 const { addedNodes, removeIds, attributes } = item
+
+                                removeIds.forEach((removeNodeId: number) => {
+                                    if (removeNodeId === 0) {
+                                        ;(parentNode as Element).innerHTML = ''
+                                    } else {
+                                        parentNode.removeChild(nodeStore.getNode(removeNodeId) as Node)
+                                    }
+                                })
+
                                 addedNodes.forEach((item: any) => {
                                     const { vNode, pos } = item
                                     const targetNode = convertVNode(vNode, null)
                                     if (targetNode) {
                                         parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
-                                    }
-                                })
-                                removeIds.forEach((removeNodeId: number) => {
-                                    try {
-                                        parentNode.removeChild(nodeStore.getNode(removeNodeId) as Node)
-                                    } catch (e) {
-                                        console.log(e)
                                     }
                                 })
 

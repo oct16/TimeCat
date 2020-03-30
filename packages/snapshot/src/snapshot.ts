@@ -218,20 +218,27 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
 
         const mutationsGroupResult = Object.keys(mGroup).reduce((result, targetId) => {
             const { addedNodes, removedNodes } = mGroup[targetId]
-            result[targetId] = createGroupObj(
-                addedNodes
-                    .filter(x => !removedNodes.includes(x))
-                    .map((n: Element) => {
-                        return {
-                            vNode: n.nodeType === Node.ELEMENT_NODE ? createElement(n) : n.textContent,
-                            pos: [].indexOf.call(n.parentNode!.childNodes, n)
-                        }
-                    }) as { vNode: VNode; pos: number }[],
-                removedNodes
-                    .filter(x => !addedNodes.includes(x))
-                    .map((n: Element) => nodeStore.getNodeId(n)!)
-                    .filter(Boolean)
-            )
+
+            const intersection = addedNodes
+                .filter(x => !removedNodes.includes(x))
+                .map((n: Element | Text) => {
+                    return {
+                        vNode: n.nodeType === Node.ELEMENT_NODE ? createElement(n as Element) : n.textContent,
+                        pos: [].indexOf.call(n.parentNode!.childNodes, n)
+                    }
+                }) as { vNode: VNode; pos: number }[]
+
+            const difference = removedNodes
+                .filter(x => !addedNodes.includes(x))
+                .map((n: Element | Text) => {
+                    if (n.nodeType === Node.ELEMENT_NODE) {
+                        return nodeStore.getNodeId(n as Node)!
+                    }
+                    return 0
+                })
+
+            // if exist Text node, we need to replace innerHTML, 0 means that will replace
+            result[targetId] = createGroupObj(intersection, difference.includes(0) ? [0] : difference)
             return result
         }, {} as MutationGroups)
 

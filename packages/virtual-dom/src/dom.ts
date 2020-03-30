@@ -1,9 +1,9 @@
-import { completionAttrHref } from '@WebReplay/utils'
+import { completionAttrHref, completionCssHref } from '@WebReplay/utils'
 
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null): void {
     if (name === 'style') {
         if (typeof value === 'string') {
-            node.style.cssText = value
+            node.style.cssText = completionCssHref(value)
         } else if (value !== null && typeof value === 'object') {
             for (const [k, v] of Object.entries(value)) {
                 node.style[k as any] = v as any

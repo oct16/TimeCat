@@ -37,18 +37,31 @@ function startsWithDoubleSlash(str: string) {
 }
 
 export function completionCssHref(str: string) {
-    return str.replace(/(?=url\()(.*)(?=\))/g, url => {
-        return url.replace(/(\/{1,2})/, s => {
-            if (startsWithDoubleSlash(s)) {
-                return protocol + s
-            }
-
-            if (startsWithSlash(s)) {
-                return origin
-            }
-            return s
-        })
+    return str.replace(/(url\()['"]?((\/{1,2})[^'"]*?)(?=\))/g, (a, b, c) => {
+        let url: string = ''
+        if (startsWithDoubleSlash(c)) {
+            url = protocol + c.substring(2)
+        } else if (startsWithSlash(c)) {
+            url = origin + c.substring(1)
+        }
+        if (url) {
+            return a.replace(c, url)
+        }
+        return a
     })
+
+    // return str.replace(/(?=url\()(.*?)(?=\))/g, url => {
+    //     return url.replace(/(\/{1,2})/, s => {
+    //         if (startsWithDoubleSlash(str)) {
+    //             return protocol + str.substring(2)
+    //         }
+
+    //         if (startsWithSlash(str)) {
+    //             return origin + str.substring(1)
+    //         }
+    //         return str
+    //     })
+    // })
 }
 
 export function completionAttrHref(str: string) {
@@ -58,11 +71,12 @@ export function completionAttrHref(str: string) {
 
     const reg = /^(\/{1,2}.*)/g
     str = str.replace(reg, str => {
-        if (startsWithSlash(str)) {
-            return origin
-        }
         if (startsWithDoubleSlash(str)) {
-            return protocol + str
+            return protocol + str.substring(2)
+        }
+
+        if (startsWithSlash(str)) {
+            return origin + str.substring(1)
         }
         return str
     })

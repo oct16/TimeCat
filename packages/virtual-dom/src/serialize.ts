@@ -37,10 +37,10 @@ const extraAttr = (attr: Attr) => {
         if (value.startsWith('#/')) {
             return []
         }
-        return [name, completionAttrHref(value)]
+        return [name, value]
     }
     if (name === 'style') {
-        return [name, completionCssHref(value)]
+        return [name, value]
     }
     return [name, value]
 }
