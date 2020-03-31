@@ -49,25 +49,30 @@ function windowObserve(emit: SnapshotEvent<WindowObserve>) {
 
     emitData()
 
-    const eventTypes = ['scroll']
-    eventTypes
-        .map(type => (fn: (e: Event) => void) => {
-            document.addEventListener(type, fn, { once: false, passive: true, capture: true })
-        })
-        .forEach(handle => handle(handleFn))
-
-    listenerStore.add(() => {
-        eventTypes.forEach(type => {
-            document.removeEventListener(type, handleFn, true)
-        })
-    })
-
     function handleFn(e: Event) {
         const { type } = e
         if (type === 'scroll') {
             emitData()
         }
     }
+
+    const listenerHandle = throttle(handleFn, 500, {
+        trailing: true
+    })
+
+    const eventTypes = ['scroll']
+
+    eventTypes
+        .map(type => (fn: (e: Event) => void) => {
+            document.addEventListener(type, fn, { once: false, passive: true, capture: true })
+        })
+        .forEach(handle => handle(listenerHandle))
+
+    listenerStore.add(() => {
+        eventTypes.forEach(type => {
+            document.removeEventListener(type, listenerHandle, true)
+        })
+    })
 }
 
 function DOMSnapshot(emit: SnapshotEvent<DOMSnapshot>) {
@@ -280,7 +285,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
 
     const observer = new MutationObserver(mutationCallback)
 
-    observer.observe(document.body, {
+    observer.observe(document.documentElement, {
         attributeOldValue: true,
         attributes: true,
         characterData: true,
@@ -289,9 +294,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
         subtree: true
     })
 
-    listenerStore.add(() => {
-        observer.disconnect()
-    })
+    listenerStore.add(() => observer.disconnect())
 }
 
 function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {

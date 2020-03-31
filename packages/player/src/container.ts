@@ -2,7 +2,7 @@ import { VNode, convertVNode } from '@WebReplay/virtual-dom'
 import HTML from './ui.html'
 import STYLE from './ui.css'
 import FIXED from './fixed.css'
-import { filteringTemplate } from '@WebReplay/utils'
+import { filteringTemplate, disableScrolling } from '@WebReplay/utils'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -31,12 +31,9 @@ export class ContainerComponent {
         this.sandBox.style.height = this.height + 'px'
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.sandBoxDoc.open()
-        this.sandBoxDoc.write('<!DOCTYPE html>')
-        this.sandBoxDoc.write('<html>')
-        this.sandBoxDoc.write('<head></head>')
-        this.sandBoxDoc.write('<body></body>')
-        this.sandBoxDoc.write('</html>')
+        this.sandBoxDoc.write('<!DOCTYPE html><html><head></head><body></body></html>')
         this.sandBoxDoc.close()
+        disableScrolling(this.sandBox.contentWindow!)
         this.setViewState()
     }
 
