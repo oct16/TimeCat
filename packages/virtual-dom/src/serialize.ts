@@ -1,5 +1,5 @@
 import { VNode } from './types'
-import { nodeStore, completionCssHref, completionAttrHref } from '@WebReplay/utils'
+import { nodeStore, completionCssHref, completionAttrHref, createCommentText } from '@WebReplay/utils'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
     const tagName = el.tagName.toLocaleLowerCase().trim()
@@ -71,6 +71,12 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
                 if (text) {
                     vNode.children.push(text)
                 }
+            }
+        } else if (node.nodeType === Node.COMMENT_NODE) {
+            let data = node.nodeValue
+            if (data) {
+                const comment = createCommentText(data)
+                vNode.children.push(comment)
             }
         }
     })

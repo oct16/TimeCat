@@ -14,8 +14,7 @@ import {
 } from '@WebReplay/snapshot'
 import { PlayerComponent } from './player'
 import { nodeStore } from '@WebReplay/utils'
-import { convertVNode, VNode } from '@WebReplay/virtual-dom'
-import { setAttribute } from '../../virtual-dom/src/dom'
+import { convertVNode, setAttribute, VNode } from '@WebReplay/virtual-dom'
 
 export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
     const { type, data } = snapshot
@@ -70,7 +69,11 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                                     } else {
                                         const removeNode = nodeStore.getNode(removeNodeId)
                                         if (removeNode) {
-                                            parentNode.removeChild(removeNode as Node)
+                                            try {
+                                                parentNode.removeChild(removeNode as Node)
+                                            } catch (error) {
+                                                console.error(error)
+                                            }
                                         }
                                     }
                                 })

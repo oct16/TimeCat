@@ -1,5 +1,5 @@
 import { setAttribute } from './dom'
-import { nodeStore, isDev } from '@WebReplay/utils'
+import { nodeStore, isDev, isComment } from '@WebReplay/utils'
 import { VNode } from './types'
 
 export function convertVNode(vNode: VNode | string | null, node: Element | null): Element | null {
@@ -7,6 +7,9 @@ export function convertVNode(vNode: VNode | string | null, node: Element | null)
         return null
     }
     if (typeof vNode === 'string') {
+        if (isComment(vNode)) {
+            return createComment(vNode)
+        }
         return createText(vNode, node)
     }
     const output = createNode(vNode)
@@ -66,5 +69,11 @@ function transformTagName(tag: string) {
 function createText(textNode: string, node: Element | null | null): Element | null {
     let output: Element | Node
     output = document.createTextNode(textNode)
+    return output as Element
+}
+
+function createComment(text: string) {    
+    let output: Element | Node
+    output = document.createComment(text.substring(4, text.length - 3))
     return output as Element
 }

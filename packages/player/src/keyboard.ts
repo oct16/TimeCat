@@ -1,9 +1,7 @@
 // import { Redux } from '@WebReplay/utils'
 
-import { reduxStore } from '@WebReplay/utils'
-import { PlayerTypes } from '@WebReplay/utils'
+import { PlayerTypes, reduxStore, exportReplay } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
-import { exportReplay } from '../../utils/src/output'
 
 export class KeyboardComponent {
     c: ContainerComponent

@@ -16,7 +16,17 @@ import {
     MutationGroups
 } from './types'
 import throttle from 'lodash-es/throttle'
-import { logger, isDev, nodeStore, listenerStore, getTime } from '@WebReplay/utils'
+import {
+    logger,
+    isTextNode,
+    isComment,
+    isDev,
+    nodeStore,
+    listenerStore,
+    getTime,
+    isElementNode,
+    createCommentText
+} from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
 function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
@@ -227,8 +237,18 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
             const intersection = addedNodes
                 .filter(x => !removedNodes.includes(x))
                 .map((n: Element | Text) => {
+                    let output: any
+                    if (isElementNode(n)) {
+                        output = createElement(n as Element)
+                    } else if (isTextNode(n)) {
+                        const text = n.textContent!
+                        output = text
+                        if (isComment(text)) {
+                            output = createCommentText(text)
+                        }
+                    }
                     return {
-                        vNode: n.nodeType === Node.ELEMENT_NODE ? createElement(n as Element) : n.textContent,
+                        vNode: output,
                         pos: [].indexOf.call(n.parentNode!.childNodes, n)
                     }
                 }) as { vNode: VNode; pos: number }[]
@@ -268,9 +288,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
             }
         })
 
-        const joinChildList = addMutation('childList')
-
-        joinChildList(mutationsGroupResult)
+        addMutation('childList')(mutationsGroupResult)
 
         if (mutations.length) {
             emitterHook(emit, {

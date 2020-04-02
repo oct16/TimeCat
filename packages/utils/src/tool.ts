@@ -24,6 +24,22 @@ export function filteringTemplate(tpl: string) {
     return tpl
 }
 
+export function isComment(str: string) {
+    return str.startsWith('<!--') && str.endsWith('-->')
+}
+
+export function isElementNode(node: Node) {
+    return node.nodeType === Node.ELEMENT_NODE
+}
+
+export function isTextNode(node: Node) {
+    return node.nodeType === Node.TEXT_NODE
+}
+
+export function createCommentText(str: string) {
+    return `<!--` + str + `-->`
+}
+
 export function filteringScriptTag(str: string) {
     const reg = /<\/script>/g
     return str.replace(reg, '<\\/script>')
