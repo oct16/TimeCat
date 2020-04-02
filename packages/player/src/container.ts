@@ -47,6 +47,8 @@ export class ContainerComponent {
             const documentElement = this.sandBoxDoc.documentElement
             documentElement.replaceChild(child.firstChild!, documentElement.firstChild!)
             documentElement.replaceChild(child.lastChild!, documentElement.lastChild!)
+            documentElement.scrollLeft = window.__ReplayData__.scrollLeft
+            documentElement.scrollTop = window.__ReplayData__.scrollTop
         }
     }
 

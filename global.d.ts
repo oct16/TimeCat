@@ -31,3 +31,14 @@ declare interface IDBDatabase {
     continue: Function
     value: any
 }
+
+interface Window {
+    __ReplayData__: {
+        [key: string]: any
+        width: number
+        height: number
+        scrollTop: number
+        scrollLeft: number
+        origin: string
+    }
+}

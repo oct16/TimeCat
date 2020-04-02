@@ -65,12 +65,13 @@ export class IndexedDBOperator {
         const all = await this.readAll()
 
         const [window, virtualNode, ...data] = all
-        const [{ width, height, origin }, { vNode }] = [window.data, virtualNode.data] as [WindowObserveData, DOMSnapshotData]
+        const [WindowData, { vNode }] = [window.data, virtualNode.data] as [
+            WindowObserveData,
+            DOMSnapshotData
+        ]
 
         return {
-            width,
-            height,
-            origin,
+            ...WindowData,
             vNode,
             data
         }

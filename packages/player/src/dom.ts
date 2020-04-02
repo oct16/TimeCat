@@ -68,7 +68,10 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                                     if (removeNodeId === 0) {
                                         ;(parentNode as Element).innerHTML = ''
                                     } else {
-                                        parentNode.removeChild(nodeStore.getNode(removeNodeId) as Node)
+                                        const removeNode = nodeStore.getNode(removeNodeId)
+                                        if (removeNode) {
+                                            parentNode.removeChild(removeNode as Node)
+                                        }
                                     }
                                 })
 
