@@ -167,11 +167,20 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
         }
 
         const attrMutations: any = []
+        const characterMutations: any = []
 
         records.forEach((record: MutationRecord) => {
             const { target, addedNodes, removedNodes, type, attributeName } = record
 
-            const joinData = addMutation(type)
+            function createGroupIndex(targetId: number) {
+                if (!mGroup[targetId]) {
+                    mGroup[targetId] = {
+                        addedNodes: [] as Node[],
+                        removedNodes: [] as Node[]
+                    }
+                }
+                return mGroup[targetId] as { addedNodes: Node[]; removedNodes: Node[] }
+            }
 
             switch (type) {
                 case 'attributes':
@@ -186,30 +195,15 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     }
                     break
                 case 'characterData':
-                    const parent = target.parentNode!
-                    joinData({
-                        parentId: nodeStore.getNodeId(parent),
-                        value: target.nodeValue,
-                        pos: parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(target as ChildNode) : null
-                    } as CharacterDataUpdateData)
+                    characterMutations.push(target)
                     break
                 case 'childList':
                     const targetId = nodeStore.getNodeId(target)
-                    const addedNodesArray = [] as Node[]
-                    const removedNodesArray = [] as Node[]
                     // group by targetId
-                    addedNodes.forEach(node => addedNodesArray.push(node))
-                    removedNodes.forEach(node => removedNodesArray.push(node))
                     if (!targetId) break
-                    if (!mGroup[targetId]) {
-                        mGroup[targetId] = {
-                            addedNodes: [],
-                            removedNodes: []
-                        }
-                    }
-                    const { addedNodes: a, removedNodes: r } = mGroup[targetId]
-                    a.push(...addedNodesArray)
-                    r.push(...removedNodesArray)
+                    const { addedNodes: a, removedNodes: r } = createGroupIndex(targetId)
+                    a.push(...addedNodes)
+                    r.push(...removedNodes)
                     break
                 default:
                     break
@@ -289,6 +283,20 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
         })
 
         addMutation('childList')(mutationsGroupResult)
+
+        characterMutations.forEach((textNode: Text) => {
+            const parent = textNode.parentNode
+            if (parent) {
+                const parentId = nodeStore.getNodeId(parent)
+                if (parentId) {
+                    addMutation('characterData')({
+                        parentId: parentId,
+                        value: textNode.nodeValue,
+                        pos: parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(textNode as ChildNode) : null
+                    } as CharacterDataUpdateData)
+                }
+            }
+        })
 
         if (mutations.length) {
             emitterHook(emit, {

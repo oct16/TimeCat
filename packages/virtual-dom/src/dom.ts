@@ -19,7 +19,7 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     if (/^on\w+$/.test(name)) {
         return
     }
-    if (!/[\w\d]+/.test(name)) {
+    if (!/^[\w\d]+$/.test(name)) {
         return
     }
 
