@@ -1,4 +1,4 @@
-import { virtualDOM, createElement } from '@WebReplay/virtual-dom'
+import { createElement } from '@WebReplay/virtual-dom'
 import {
     SnapshotType,
     WindowObserve,
@@ -9,23 +9,22 @@ import {
     FormElementObserve,
     FormElementEvent,
     MouseEventType,
-    AttributesUpdateData,
-    CharacterDataUpdateData,
-    DOMObserveMutations,
     SnapshotData,
-    MutationGroups
+    removedUpdateData,
+    movedUpdateData
 } from './types'
 import throttle from 'lodash-es/throttle'
 import {
     logger,
     isTextNode,
-    isComment,
     isDev,
     nodeStore,
     listenerStore,
     getTime,
     isElementNode,
-    createCommentText
+    removeItem,
+    isCommentNode,
+    getPos
 } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
@@ -37,7 +36,7 @@ function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
 }
 
 function windowObserve(emit: SnapshotEvent<WindowObserve>) {
-    const origin = () => window.location.href
+    const origin = () => window.location.origin
     const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
     const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
@@ -89,7 +88,7 @@ function DOMSnapshot(emit: SnapshotEvent<DOMSnapshot>) {
     emitterHook(emit, {
         type: SnapshotType.DOM,
         data: {
-            vNode: virtualDOM.convertHTML(document) as VNode
+            vNode: createElement(document.documentElement) as VNode
         },
         time: getTime().toString()
     })
@@ -150,160 +149,167 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
     mouseClick()
 }
 
-type MutationTypes = 'attributes' | 'characterData' | 'childList'
-
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
     const mutationCallback: MutationCallback = (records: MutationRecord[]) => {
-        const mGroup = {} as MutationGroups
-        const mutations: DOMObserveMutations[] = []
+        console.log(records)
 
-        function addMutation(mType: MutationTypes) {
-            return function(data: any) {
-                mutations.push({
-                    mType,
-                    data
-                })
-            }
-        }
-
-        const attrMutations: any = []
-        const characterMutations: any = []
+        // debugger
+        const attrNodesMap: Map<Node, string | null> = new Map()
+        const addNodesSet: Set<Node> = new Set()
+        const textNodesSet: Set<Node> = new Set()
+        const removeNodesSet: Set<Node> = new Set()
+        const nMap = new Map()
+        const moveNodesSet: Set<Node> = new Set()
+        const newNodes: Node[] = []
 
         records.forEach((record: MutationRecord) => {
             const { target, addedNodes, removedNodes, type, attributeName } = record
 
-            function createGroupIndex(targetId: number) {
-                if (!mGroup[targetId]) {
-                    mGroup[targetId] = {
-                        addedNodes: [] as Node[],
-                        removedNodes: [] as Node[]
-                    }
-                }
-                return mGroup[targetId] as { addedNodes: Node[]; removedNodes: Node[] }
-            }
-
             switch (type) {
                 case 'attributes':
-                    if (attributeName) {
-                        const nodeId = nodeStore.getNodeId(target)
-                        const curAttrValue = (target as Element).getAttribute(attributeName)
-                        attrMutations.push({
-                            nodeId,
-                            value: curAttrValue,
-                            name: attributeName
-                        } as AttributesUpdateData)
-                    }
+                    attrNodesMap.set(target, attributeName)
                     break
                 case 'characterData':
-                    characterMutations.push(target)
+                    textNodesSet.add(target)
                     break
                 case 'childList':
-                    const targetId = nodeStore.getNodeId(target)
-                    // group by targetId
-                    if (!targetId) break
-                    const { addedNodes: a, removedNodes: r } = createGroupIndex(targetId)
-                    a.push(...addedNodes)
-                    r.push(...removedNodes)
+                    removedNodes.forEach(node => {
+                        removeNodesSet.add(node)
+                        nMap.set(node, nodeStore.getNodeId(target))
+                    })
+                    addedNodes.forEach(node => addNodesSet.add(node))
+                    addNodesSet.forEach(node => {
+                        if (!removeNodesSet.has(node)) {
+                            newNodes.push(node)
+                        } else {
+                            moveNodesSet.add(node)
+                        }
+                    })
                     break
                 default:
                     break
             }
         })
 
-        const createGroupObj = (
-            addedNodes: {
-                vNode: VNode
-                pos: number
-            }[] = [],
-            removeIds: number[] = [],
-            attributes: { name: string; value: string }[] = []
-        ) => {
-            return {
-                addedNodes,
-                removeIds,
-                attributes
+        function getAllChildNodes(nodes: Node[], resultSet: Set<Node> = new Set()) {
+            if (!nodes || !nodes.length) {
+                return resultSet
             }
+            nodes.forEach(node => {
+                resultSet.add(node)
+                if (node.childNodes) {
+                    getAllChildNodes([...node.childNodes], resultSet)
+                }
+            })
+            return resultSet
         }
 
-        const mutationsGroupResult = Object.keys(mGroup).reduce((result, targetId) => {
-            const { addedNodes, removedNodes } = mGroup[targetId]
+        const removeNodes: Node[] = [...removeNodesSet].filter(node => !document.documentElement.contains(node))
 
-            const intersection = addedNodes
-                .filter(x => !removedNodes.includes(x))
-                .map((n: Element | Text) => {
-                    let output: any
-                    if (isElementNode(n)) {
-                        output = createElement(n as Element)
-                    } else if (isTextNode(n)) {
-                        const text = n.textContent!
-                        output = text
-                        if (isComment(text)) {
-                            output = createCommentText(text)
+        const removeNodeChildNodesSet: Set<Node> = getAllChildNodes([...removeNodesSet])!
+
+        const addNodes: Node[] = [
+            ...new Set(
+                newNodes.filter(node => {
+                    if (!removeNodeChildNodesSet.has(node)) {
+                        return true
+                    } else {
+                        removeItem(removeNodes, node)
+                    }
+                })
+            )
+        ]
+
+        const moveNodes: Node[] = [...moveNodesSet].filter(
+            node => !newNodes.includes(node) && !removeNodes.includes(node)
+        )
+
+        const removedNodesMutation: removedUpdateData[] = []
+        const removedAllIds: number[] = []
+
+        removeNodes
+            .sort((a: Node) => {
+                return a.nodeType === Node.TEXT_NODE ? -1 : 1
+            })
+            .forEach(node => {
+                const parentId = nMap.get(node)
+                if (!removedAllIds.includes(parentId)) {
+                    // if exist text_node, means to set innerHtml or set innerText to remove all childNodes
+                    if (isTextNode(node)) {
+                        removedAllIds.push(parentId)
+                    } else if (isElementNode(node)) {
+                        const inAddNodesIndex = addNodes.indexOf(node)
+                        if (inAddNodesIndex === -1) {
+                            removedNodesMutation.push({
+                                parentId,
+                                id: nodeStore.getNodeId(node)!
+                            })
+                        } else {
+                            addNodes.splice(inAddNodesIndex, 1)
                         }
                     }
-                    return {
-                        vNode: output,
-                        pos: [].indexOf.call(n.parentNode!.childNodes, n)
-                    }
-                }) as { vNode: VNode; pos: number }[]
+                }
+            })
 
-            const difference = removedNodes
-                .filter(x => !addedNodes.includes(x))
-                .map((n: Element | Text) => {
-                    if (n.nodeType === Node.ELEMENT_NODE) {
-                        return nodeStore.getNodeId(n as Node)!
-                    }
-                    return 0
-                })
-
-            // if exist Text node, we need to replace innerHTML, 0 means that will replace
-            result[targetId] = createGroupObj(intersection, difference.includes(0) ? [0] : difference)
-            return result
-        }, {} as MutationGroups)
-
-        attrMutations.forEach((m: AttributesUpdateData) => {
-            const { nodeId, ..._m } = m
-            if (nodeId) {
-                const target = mutationsGroupResult[nodeId]
-                if (target) {
-                    const attrs = target['attributes']
-                    const names = attrs.map(item => item.name)
-                    const index = names.indexOf(_m.name)
-                    if (!~index) {
-                        target['attributes'].push(_m)
-                    } else {
-                        target['attributes'][index] = _m
-                    }
+        const data = {
+            addedList: addNodes.map(node => {
+                let vNode: any
+                if (isElementNode(node)) {
+                    vNode = createElement(node as Element)
+                } else if (isCommentNode(node)) {
+                    vNode = `<!--${node.textContent}-->`
                 } else {
-                    mutationsGroupResult[nodeId] = createGroupObj(undefined, undefined, [
-                        _m as { name: string; value: string }
-                    ])
+                    vNode = node.textContent
                 }
-            }
-        })
-
-        addMutation('childList')(mutationsGroupResult)
-
-        characterMutations.forEach((textNode: Text) => {
-            const parent = textNode.parentNode
-            if (parent) {
-                const parentId = nodeStore.getNodeId(parent)
-                if (parentId) {
-                    addMutation('characterData')({
-                        parentId: parentId,
-                        value: textNode.nodeValue,
-                        pos: parent.childNodes.length > 0 ? [...parent.childNodes].indexOf(textNode as ChildNode) : null
-                    } as CharacterDataUpdateData)
+                return {
+                    parentId: nodeStore.getNodeId(node.parentNode as Element),
+                    vNode,
+                    pos: getPos(node)
                 }
-            }
-        })
+            }),
+            removedList: removedNodesMutation,
+            removedAllList: removedAllIds,
+            movedList: moveNodes.map(node => {
+                const pos = getPos(node)
+                const parentId = nodeStore.getNodeId(node.parentNode as Element)
+                return {
+                    id: nodeStore.getNodeId(node),
+                    parentId,
+                    pos
+                }
+            }),
+            attrs: [...attrNodesMap.entries()]
+                .map(data => {
+                    const [node, key] = data
+                    if (document.documentElement.contains(node as Element)) {
+                        return {
+                            id: nodeStore.getNodeId(node),
+                            key,
+                            value: key ? (node as Element).getAttribute(key) : ''
+                        }
+                    }
+                })
+                .filter(Boolean),
+            texts: [...textNodesSet]
+                .map(textNode => {
+                    if (
+                        document.documentElement.contains(textNode as Node) &&
+                        document.documentElement.contains(textNode.parentNode)
+                    ) {
+                        return {
+                            parentId: nodeStore.getNodeId(textNode.parentNode as Element),
+                            value: textNode.textContent,
+                            pos: getPos(textNode)
+                        }
+                    }
+                })
+                .filter(Boolean)
+        }
 
-        if (mutations.length) {
+        if (Object.values(data).some(item => item.length)) {
             emitterHook(emit, {
                 type: SnapshotType.DOM_UPDATE,
-                data: {
-                    mutations
-                },
+                data,
                 time: getTime().toString()
             })
         }

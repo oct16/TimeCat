@@ -24,8 +24,12 @@ export function filteringTemplate(tpl: string) {
     return tpl
 }
 
-export function isComment(str: string) {
+export function isCommentStr(str: string) {
     return str.startsWith('<!--') && str.endsWith('-->')
+}
+
+export function isCommentNode(node: Node) {
+    return node.nodeType === Node.COMMENT_NODE
 }
 
 export function isElementNode(node: Node) {
@@ -38,6 +42,10 @@ export function isTextNode(node: Node) {
 
 export function createCommentText(str: string) {
     return `<!--` + str + `-->`
+}
+
+export function getPos(node: Node) {
+    return [...node.parentNode!.childNodes].indexOf(node as Element)
 }
 
 export function filteringScriptTag(str: string) {
@@ -79,7 +87,7 @@ export function completionAttrHref(str: string) {
         }
 
         if (startsWithSlash(str)) {
-            return origin + str.substring(1)
+            return origin + str
         }
         return str
     })
@@ -92,5 +100,33 @@ export function completionAttrHref(str: string) {
 }
 
 export function logger(data: any) {
-    console.info('record', data)
+    console.log('record', data)
+}
+
+export function removeItem(array: any[], item: any) {
+    if (!Array.isArray(array)) {
+        return
+    }
+    const index = array.indexOf(item)
+    if (~index) {
+        array.splice(index, 1)
+    }
+}
+
+export function swapNode(nodeA: Node, nodeB: Node) {
+    if (nodeA && nodeB) {
+        const parentNodeA = nodeA.parentNode!
+        const tempA = document.createElement('span')
+        parentNodeA.insertBefore(tempA, nodeA)
+
+        const parentNodeB = nodeB.parentNode!
+        const tempB = document.createElement('span')
+        parentNodeB.insertBefore(tempB, nodeB)
+
+        parentNodeA.insertBefore(nodeB, tempA)
+        parentNodeB.insertBefore(nodeA, tempB)
+
+        parentNodeA.removeChild(tempA)
+        parentNodeB.removeChild(tempB)
+    }
 }

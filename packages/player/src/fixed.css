@@ -1,8 +1,13 @@
-
 html {
     scroll-behavior: smooth;
 }
 
 input[type="checkbox"] {
     pointer-events: none;
+}
+
+a,
+input:focus,
+textarea:focus {
+    outline: none;
 }

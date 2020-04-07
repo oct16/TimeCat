@@ -12,14 +12,16 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         return
     }
 
-    if (name === 'background' || name === 'src' || name === 'href') {
-        value = completionAttrHref(String(value))
+    // for disabled js prefetch
+    if (value && typeof value === 'string' && /\.js$/.test(value)) {
+        return
+    }
+
+    if (!/^[\w\-\d]+$/.test(name)) {
+        return
     }
 
     if (/^on\w+$/.test(name)) {
-        return
-    }
-    if (!/^[\w\-\d]+$/.test(name)) {
         return
     }
 
@@ -28,6 +30,10 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     }
 
     value = String(value)
+
+    if (name === 'background' || name === 'src' || name === 'href') {
+        value = completionAttrHref(String(value))
+    }
 
     if (value.startsWith('/')) {
         value = completionAttrHref(value)

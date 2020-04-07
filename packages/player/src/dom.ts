@@ -1,20 +1,21 @@
 import {
     SnapshotData,
     MouseSnapshotData,
-    DOMObserveData,
     FormElementObserveData,
     SnapshotType,
     MouseEventType,
-    DOMObserveMutations,
-    ChildListUpdateData,
     CharacterDataUpdateData,
     AttributesUpdateData,
     FormElementEvent,
-    WindowObserveData
+    WindowObserveData,
+    AddedUpdateData,
+    removedUpdateData,
+    DOMUpdateDataType
 } from '@WebReplay/snapshot'
 import { PlayerComponent } from './player'
-import { nodeStore } from '@WebReplay/utils'
-import { convertVNode, setAttribute, VNode } from '@WebReplay/virtual-dom'
+import { nodeStore, isCommentStr, swapNode, getPos } from '@WebReplay/utils'
+import { convertVNode, setAttribute } from '@WebReplay/virtual-dom'
+import { movedUpdateData } from '../../snapshot/src/types'
 
 export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
     const { type, data } = snapshot
@@ -32,66 +33,79 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             }
             break
         case SnapshotType.DOM_UPDATE:
-            const { mutations } = data as DOMObserveData
-            mutations.forEach((mutate: DOMObserveMutations) => {
-                const { mType, data } = mutate
-                switch (mType) {
-                    case 'attributes': {
-                        const { value, name, nodeId } = data as AttributesUpdateData
-                        const targetEl = nodeStore.getNode(nodeId) as HTMLElement
-                        if (targetEl) {
-                            targetEl.setAttribute(name, value ? value.toString() : '')
+            const { addedList, removedList, removedAllList, movedList, attrs, texts } = data as DOMUpdateDataType
+
+            removedList.forEach((item: removedUpdateData) => {
+                const { parentId, id } = item
+                const parentNode = nodeStore.getNode(parentId)
+                const node = nodeStore.getNode(id)
+                if (node && parentNode) {
+                    parentNode.removeChild(node as Node)
+                }
+            })
+
+            removedAllList.forEach(id => {
+                const node = nodeStore.getNode(id) as HTMLElement
+                if (node) {
+                    node.innerHTML = ''
+                }
+            })
+
+            addedList.forEach((item: AddedUpdateData) => {
+                const { parentId, vNode, pos } = item
+                const parentNode = nodeStore.getNode(parentId)
+                if (parentNode) {
+                    let node: Node
+                    if (typeof vNode === 'string') {
+                        const text = vNode as string
+                        if (isCommentStr(vNode)) {
+                            node = document.createComment(text.substring(4, text.length - 3))
+                        } else {
+                            node = document.createTextNode(text)
                         }
-                        break
+                    } else {
+                        node = convertVNode(vNode, null) as Node
                     }
-                    case 'characterData':
-                        {
-                            const { pos, value, parentId } = data as CharacterDataUpdateData
-                            const parentEl = nodeStore.getNode(parentId) as HTMLElement
-                            if (pos !== null) {
-                                const target = parentEl.childNodes[pos as number]
-                                parentEl.replaceChild(document.createTextNode(value), target)
-                            } else {
-                                parentEl.innerText = value
-                            }
-                        }
-                        break
-                    case 'childList': {
-                        Object.entries(data as ChildListUpdateData).forEach(obj => {
-                            const [id, item] = obj
-                            const parentNode = nodeStore.getNode(+id)
-                            if (parentNode) {
-                                const { addedNodes, removeIds, attributes } = item
 
-                                removeIds.forEach((removeNodeId: number) => {
-                                    if (removeNodeId === 0) {
-                                        ;(parentNode as Element).innerHTML = ''
-                                    } else {
-                                        const removeNode = nodeStore.getNode(removeNodeId)
-                                        if (removeNode) {
-                                            try {
-                                                parentNode.removeChild(removeNode as Node)
-                                            } catch (error) {
-                                                console.error(error)
-                                            }
-                                        }
-                                    }
-                                })
+                    if (node) {
+                        parentNode.insertBefore(node, parentNode.childNodes[pos])
+                    }
+                }
+            })
 
-                                addedNodes.forEach((item: any) => {
-                                    const { vNode, pos } = item
-                                    const targetNode = convertVNode(vNode, null)
-                                    if (targetNode) {
-                                        parentNode.insertBefore(targetNode, parentNode.childNodes[pos])
-                                    }
-                                })
+            movedList.forEach((moved: movedUpdateData) => {
+                const { id, parentId, pos } = moved
+                if (id && parentId) {
+                    const node = nodeStore.getNode(id)!
+                    const curPos = getPos(node)
 
-                                attributes.forEach((attr: any) => {
-                                    const { name, value } = attr
-                                    setAttribute(parentNode as HTMLElement, name, value)
-                                })
-                            }
-                        })
+                    if (curPos !== pos) {
+                        const parentNode = nodeStore.getNode(parentId)!
+                        const shouldSwapNode = parentNode.childNodes[pos]
+                        swapNode(node, shouldSwapNode)
+                    }
+                }
+            })
+
+            attrs.forEach((attr: AttributesUpdateData) => {
+                const { id, key, value } = attr
+                const node = nodeStore.getNode(id) as HTMLElement
+
+                if (node) {
+                    setAttribute(node as HTMLElement, key, value)
+                }
+            })
+
+            texts.forEach((text: CharacterDataUpdateData) => {
+                const { pos, value, parentId } = text
+                const parentEl = nodeStore.getNode(parentId) as HTMLElement
+
+                if (parentEl) {
+                    if (pos !== null) {
+                        const target = parentEl.childNodes[pos as number]
+                        parentEl.replaceChild(document.createTextNode(value), target)
+                    } else {
+                        parentEl.innerText = value
                     }
                 }
             })
@@ -108,11 +122,7 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                 node.blur()
             } else if (formType === FormElementEvent.ATTR) {
                 if (key) {
-                    try {
-                        node[key] = value
-                    } catch (e) {
-                        console.log(e)
-                    }
+                    node[key] = value
                 }
             }
             break

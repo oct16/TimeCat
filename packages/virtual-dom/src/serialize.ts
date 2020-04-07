@@ -73,28 +73,14 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
                 }
             }
         } else if (node.nodeType === Node.COMMENT_NODE) {
-            let data = node.nodeValue
-            if (data) {
-                const comment = createCommentText(data)
-                vNode.children.push(comment)
-            }
+            let data = node.nodeValue!
+            const comment = createCommentText(data)
+            vNode.children.push(comment)
         }
     })
     return vNode
 }
 
-const convertHTML = (doc: Document) => {
-    const { head, body } = doc
-    return {
-        id: nodeStore.createNodeId(),
-        tag: 'html',
-        attrs: {},
-        children: [createElement(head), createElement(body)],
-        extra: { isSVG: false }
-    }
-}
-
 export const virtualDOM = {
-    createElement,
-    convertHTML
+    createElement
 }

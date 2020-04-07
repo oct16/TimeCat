@@ -75,10 +75,11 @@ export class PlayerComponent {
         this.progress.updateTimer((time - startTime) / 1000)
         const progress = (this.frameIndex / (this.frames.length - 1)) * 100
         this.progress.updateProgress(progress)
-
-        while (+this.data[this.index].time <= this.frames[this.frameIndex]) {
-            this.execFrame.call(this, this.data[this.index])
+        let data: SnapshotData
+        while (+(data = this.data[this.index]).time <= this.frames[this.frameIndex]) {
+            this.execFrame.call(this, data)
             this.index++
+
             if (this.index === this.data.length) {
                 break
             }

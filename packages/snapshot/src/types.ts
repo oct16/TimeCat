@@ -58,18 +58,12 @@ export interface DOMObserve {
     data: DOMObserveData
     time: string
 }
-export interface DOMObserveData {
-    mutations: DOMObserveMutations[]
-}
-export interface DOMObserveMutations {
-    mType: 'attributes' | 'characterData' | 'childList'
-    data: ChildListUpdateData | CharacterDataUpdateData | AttributesUpdateData
-}
+export interface DOMObserveData extends DOMUpdateDataType {}
 
 export interface AttributesUpdateData {
-    nodeId: number
+    id: number
     value: string | boolean
-    name: string
+    key: string
 }
 
 export interface CharacterDataUpdateData {
@@ -78,21 +72,29 @@ export interface CharacterDataUpdateData {
     pos: number
 }
 
-export interface ChildListUpdateData {
-    addedNodes: {
-        vNode: VNode
-        pos: number
-    }[]
-    removeIds: number[]
-    attributes: {
-        value: string
-        name: string
-    }[]
+export interface AddedUpdateData {
+    parentId: number
+    vNode: VNode
+    pos: number
 }
-export enum ChildListUpdateDataType {
-    'ADD' = 'ADD',
-    'DELETE' = 'DELETE',
-    'MOVE' = 'MOVE'
+export interface removedUpdateData {
+    id: number
+    parentId: number
+}
+export type removedAllUpdateData = number
+export interface movedUpdateData {
+    id: number
+    pos: number,
+    parentId: number
+}
+
+export interface DOMUpdateDataType {
+    addedList: AddedUpdateData[]
+    removedList: removedUpdateData[]
+    removedAllList: removedAllUpdateData[]
+    movedList: movedUpdateData[]
+    attrs: AttributesUpdateData[]
+    texts: CharacterDataUpdateData[]
 }
 
 export interface FormElementObserve {
@@ -111,5 +113,3 @@ export interface FormElementObserveData {
 export type SnapshotEvent<T> = (e: T) => void
 
 export type SnapshotData = FormElementObserve | DOMObserve | MouseSnapshot | DOMSnapshot | WindowObserve
-
-export type MutationGroups<T = any> = { [key: string]: { [key: string]: T[] } }
