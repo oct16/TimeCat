@@ -14,7 +14,7 @@
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "lodash-es": "^4.17.15",
-        "minimist": "^1.2.2",
+        "minimist": "^1.2.3",
         "mutationobserver-shim": "^0.3.3",
         "rollup": "^1.32.0",
         "rollup-plugin-browsersync": "^1.1.0",
