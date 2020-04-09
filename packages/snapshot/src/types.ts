@@ -84,7 +84,7 @@ export interface removedUpdateData {
 export type removedAllUpdateData = number
 export interface movedUpdateData {
     id: number
-    pos: number,
+    pos: number
     parentId: number
 }
 

@@ -48,7 +48,5 @@ export function disableScrolling(target: Window) {
         target.removeEventListener('keydown', preventDefaultForScrollKeys, false)
     }
 
-
-
     disableScroll()
 }
