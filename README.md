@@ -181,10 +181,6 @@ const elementList: [HTMLElement, string][] = [
 - 不能执行自动播放的tricky. 比如: autofocused, autoplay
 ```
 
-##### 基于视频GOP(I/B/P帧)算法的压缩技术
-
-// TODO
-
 ##### 播放、跳转与快进
 
 播放：播放器会内置一个精确的计时器，动作的数据存储在一个栈中，栈中的每一个对象就是一帧，通过RAF(requestAnimationFrame) 对数据帧的时间戳进行扫描从而得知下一帧在什么时间发生
