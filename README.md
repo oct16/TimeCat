@@ -3,7 +3,7 @@
 
 03.31 Add Chrome Plugin 
 
-### 不可思议的HTML5录屏器
+### 不可思议的Web录屏器
 
 [🖥 DEMO](https://oct16.github.io/WebReplay) 用浏览器打开吧
 
