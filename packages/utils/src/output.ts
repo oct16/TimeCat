@@ -3,7 +3,8 @@ import { DBPromise as DB } from './store/idb'
 import { filteringScriptTag } from './tool'
 import { isDev } from './tool'
 
-type Opts = { scripts?: string[]; autoPlay?: boolean }
+type ScriptItem = { name: string; src: string }
+type Opts = { scripts?: ScriptItem[]; autoPlay?: boolean }
 const parser = new DOMParser()
 const html = parser.parseFromString(TPL, 'text/html')
 
@@ -25,22 +26,26 @@ function createAndDownloadFile(fileName: string, content: string) {
 async function initOptions(opts: Opts) {
     const { autoPlay, scripts } = opts
 
-    const sList = scripts || []
+    const scriptList = scripts || ([] as ScriptItem[])
     if (autoPlay) {
-        sList.push(`wr.replay()`)
+        scriptList.push({
+            name: 'webReplayInit',
+            src: `wr.replay()`
+        })
     }
-
-    await injectScripts(sList)
+    await injectScripts(scriptList)
 }
 
-async function injectScripts(scripts?: string[]) {
+async function injectScripts(scripts?: ScriptItem[]) {
     if (scripts) {
-        for (let source of scripts) {
-            let scriptContent: string = source
+        for (let scriptItem of scripts) {
+            const { src, name } = scriptItem
+            let scriptContent = src
             const script = document.createElement('script')
-            if (/:\/\//.test(source)) {
-                const src = source
-
+            script.id = name
+            const isUrlReg = /:\/\//
+            // is a link or script text
+            if (isUrlReg.test(src)) {
                 if (isDev) {
                     script.src = src
                 } else {

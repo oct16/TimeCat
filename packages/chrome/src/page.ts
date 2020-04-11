@@ -16,7 +16,7 @@ function record(e: Event) {
     })
 }
 
-function replay(e: Event & { detail: any }) {
+function replay(e: Event & { detail: { scripts: { name: string; src: string }[] } }) {
     const wr = (window as any).wr
     if (ctrl) {
         const { scripts } = e.detail

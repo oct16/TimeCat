@@ -66,6 +66,8 @@ export class KeyboardComponent {
     }
 
     export() {
-        exportReplay()
+        exportReplay({
+            // scripts: 
+        })
     }
 }

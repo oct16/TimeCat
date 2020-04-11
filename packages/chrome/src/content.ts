@@ -11,7 +11,12 @@ chrome.runtime.onMessage.addListener(request => {
             break
         case 'FINISH':
             dispatchEvent('CHROME_RECORD_FINISH', {
-                scripts: [script]
+                scripts: [
+                    {
+                        name: 'webReplay',
+                        src: script
+                    }
+                ]
             })
             break
         case 'TAB_CHANGE':
