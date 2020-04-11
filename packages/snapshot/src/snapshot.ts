@@ -11,7 +11,11 @@ import {
     MouseEventType,
     SnapshotData,
     removedUpdateData,
-    movedUpdateData
+    movedUpdateData,
+    AddedUpdateData,
+    AttributesUpdateData,
+    CharacterDataUpdateData,
+    DOMUpdateDataType
 } from './types'
 import throttle from 'lodash-es/throttle'
 import {
@@ -24,7 +28,8 @@ import {
     isElementNode,
     removeItem,
     isCommentNode,
-    getPos
+    getPos,
+    getAllChildNodes
 } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
 
@@ -97,19 +102,15 @@ function DOMSnapshot(emit: SnapshotEvent<DOMSnapshot>) {
 function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
     function mouseMove() {
         const evt = (e: MouseEvent) => {
-            emitterHook(
-                emit,
-
-                {
-                    type: SnapshotType.MOUSE,
-                    data: {
-                        type: MouseEventType.MOVE,
-                        x: e.x,
-                        y: e.y
-                    },
-                    time: getTime().toString()
-                }
-            )
+            emitterHook(emit, {
+                type: SnapshotType.MOUSE,
+                data: {
+                    type: MouseEventType.MOVE,
+                    x: e.x,
+                    y: e.y
+                },
+                time: getTime().toString()
+            })
         }
         const name = 'mousemove'
         const listenerHandle = throttle(evt, 100, {
@@ -151,8 +152,6 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
     const mutationCallback: MutationCallback = (records: MutationRecord[]) => {
-
-        // debugger
         const attrNodesMap: Map<Node, string | null> = new Map()
         const addNodesSet: Set<Node> = new Set()
         const textNodesSet: Set<Node> = new Set()
@@ -189,19 +188,6 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     break
             }
         })
-
-        function getAllChildNodes(nodes: Node[], resultSet: Set<Node> = new Set()) {
-            if (!nodes || !nodes.length) {
-                return resultSet
-            }
-            nodes.forEach(node => {
-                resultSet.add(node)
-                if (node.childNodes) {
-                    getAllChildNodes([...node.childNodes], resultSet)
-                }
-            })
-            return resultSet
-        }
 
         const removeNodes: Node[] = [...removeNodesSet].filter(node => !document.documentElement.contains(node))
 
@@ -250,7 +236,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 }
             })
 
-        const data = {
+        const data: DOMUpdateDataType = {
             addedList: addNodes.map(node => {
                 let vNode: any
                 if (isElementNode(node)) {
@@ -264,7 +250,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     parentId: nodeStore.getNodeId(node.parentNode as Element),
                     vNode,
                     pos: getPos(node)
-                }
+                } as AddedUpdateData
             }),
             removedList: removedNodesMutation,
             removedAllList: removedAllIds,
@@ -275,7 +261,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                     id: nodeStore.getNodeId(node),
                     parentId,
                     pos
-                }
+                } as movedUpdateData
             }),
             attrs: [...attrNodesMap.entries()]
                 .map(data => {
@@ -285,10 +271,10 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                             id: nodeStore.getNodeId(node),
                             key,
                             value: key ? (node as Element).getAttribute(key) : ''
-                        }
+                        } as AttributesUpdateData
                     }
                 })
-                .filter(Boolean),
+                .filter(Boolean) as AttributesUpdateData[],
             texts: [...textNodesSet]
                 .map(textNode => {
                     if (
@@ -299,10 +285,10 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                             parentId: nodeStore.getNodeId(textNode.parentNode as Element),
                             value: textNode.textContent,
                             pos: getPos(textNode)
-                        }
+                        } as CharacterDataUpdateData
                     }
                 })
-                .filter(Boolean)
+                .filter(Boolean) as CharacterDataUpdateData[]
         }
 
         if (Object.values(data).some(item => item.length)) {

@@ -130,3 +130,17 @@ export function swapNode(nodeA: Node, nodeB: Node) {
         parentNodeB.removeChild(tempB)
     }
 }
+
+
+export function getAllChildNodes(nodes: Node[], resultSet: Set<Node> = new Set()) {
+    if (!nodes || !nodes.length) {
+        return resultSet
+    }
+    nodes.forEach(node => {
+        resultSet.add(node)
+        if (node.childNodes) {
+            getAllChildNodes([...node.childNodes], resultSet)
+        }
+    })
+    return resultSet
+}
