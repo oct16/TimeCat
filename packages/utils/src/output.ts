@@ -29,7 +29,7 @@ async function initOptions(opts: Opts) {
     const scriptList = scripts || ([] as ScriptItem[])
     if (autoPlay) {
         scriptList.push({
-            name: 'webReplayInit',
+            name: 'web-replay-init',
             src: `wr.replay()`
         })
     }
@@ -65,7 +65,7 @@ async function getScript(src: string) {
 }
 
 async function injectData() {
-    const data = await (await DB).getData()
+    const data = window.__ReplayData__ || (await (await DB).getData())
     const jsonData = JSON.stringify(data)
     const dataScript = document.createElement('script')
     const scriptContent = `var __ReplayData__ = ${filteringScriptTag(jsonData)}`

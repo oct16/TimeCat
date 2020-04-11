@@ -66,8 +66,28 @@ export class KeyboardComponent {
     }
 
     export() {
+        const mainScript = document.getElementById('web-replay') as HTMLScriptElement
+        const initScript = document.getElementById('web-replay-init') as HTMLScriptElement
+        const scriptList = []
+
+        if (mainScript) {
+            const source = (mainScript.src || mainScript.textContent)!
+            scriptList.push({
+                name: 'web-replay',
+                src: source
+            })
+        }
+
+        if (initScript) {
+            const source = (initScript.src || initScript.textContent)!
+            scriptList.push({
+                name: 'web-replay-init',
+                src: source
+            })
+        }
+
         exportReplay({
-            // scripts: 
+            scripts: scriptList
         })
     }
 }

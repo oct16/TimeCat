@@ -1,7 +1,7 @@
 import { dispatchEvent, sendMessageToBackgroundScript } from './common'
 
 const isDev = process.env.NODE_ENV === 'development'
-const script = isDev ? 'http://localhost:4321/replay.min.js' : chrome.runtime.getURL('replay.min.js')
+const webReplayScript = isDev ? 'http://localhost:4321/replay.min.js' : chrome.runtime.getURL('replay.min.js')
 
 chrome.runtime.onMessage.addListener(request => {
     const { type } = request
@@ -13,8 +13,8 @@ chrome.runtime.onMessage.addListener(request => {
             dispatchEvent('CHROME_RECORD_FINISH', {
                 scripts: [
                     {
-                        name: 'webReplay',
-                        src: script
+                        name: 'web-replay',
+                        src: webReplayScript
                     }
                 ]
             })
@@ -31,34 +31,38 @@ window.addEventListener('CHROME_RECORD_CANCEL', () =>
     })
 )
 
-function injectScriptOnce(script: string, callback?: () => void) {
+function injectScriptOnce(scriptItem: { name: string; src: string }, callback?: () => void) {
     let el: HTMLScriptElement | null = null
 
     return function() {
+        const { name, src } = scriptItem
+
         const doc = window.document
         if (el && callback) {
             if (callback) callback()
             return el
         }
 
-        const existingScripts = doc.body.getElementsByTagName('script')
-        if (existingScripts) {
-            const scripts = [].map
-                .call(existingScripts, (s: HTMLElement) => s.getAttribute('src'))
-                .filter(Boolean) as string[]
-            if (scripts.includes(script)) {
-                return
-            }
+        if (document.getElementById(name)) {
+            return
         }
+
         const s = doc.createElement('script')
         doc.body.appendChild(s)
         s.onload = () => callback && callback()
-        s.src = script
+        s.id = name
+        s.src = src
         el = s
     }
 }
 
-const injectMain = injectScriptOnce(script)
-const injectPageJS = injectScriptOnce(chrome.runtime.getURL('replay-chrome-page.js'))
+const injectMain = injectScriptOnce({
+    name: 'web-replay',
+    src: webReplayScript
+})
+const injectPageJS = injectScriptOnce({
+    name: 'replay-chrome-page',
+    src: chrome.runtime.getURL('replay-chrome-page.js')
+})
 injectMain()
 injectPageJS()

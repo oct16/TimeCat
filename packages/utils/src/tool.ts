@@ -1,5 +1,5 @@
-const origin = ((window as any).__ReplayData__ && (window as any).__ReplayData__.origin) || location.origin
-const protocol = origin.match(/.*?\/\//)[0] || location.protocol
+const origin = (window.__ReplayData__ && window.__ReplayData__.origin) || location.origin
+const protocol = origin.match(/.*?\/\//)![0] || location.protocol
 
 export const isDev = process.env.NODE_ENV === 'development'
 
@@ -130,7 +130,6 @@ export function swapNode(nodeA: Node, nodeB: Node) {
         parentNodeB.removeChild(tempB)
     }
 }
-
 
 export function getAllChildNodes(nodes: Node[], resultSet: Set<Node> = new Set()) {
     if (!nodes || !nodes.length) {
