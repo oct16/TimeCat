@@ -151,7 +151,6 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
     const mutationCallback: MutationCallback = (records: MutationRecord[]) => {
-        console.log(records)
 
         // debugger
         const attrNodesMap: Map<Node, string | null> = new Map()
