@@ -17,9 +17,9 @@ import {
     CharacterDataUpdateData,
     DOMUpdateDataType
 } from './types'
-import throttle from 'lodash-es/throttle'
 import {
     logger,
+    throttle,
     isTextNode,
     isDev,
     nodeStore,

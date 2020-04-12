@@ -1,6 +1,5 @@
-import { ProgressState, secondToDate } from '@WebReplay/utils'
+import { throttle, ProgressState, secondToDate } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
-import throttle from 'lodash-es/throttle'
 
 export class ProgressComponent {
     progress: HTMLElement
@@ -15,7 +14,7 @@ export class ProgressComponent {
     totalDistance = 0
 
     throttleTimer = throttle(
-        percentage => {
+        (percentage: number) => {
             this.setThumb(percentage)
         },
         250,

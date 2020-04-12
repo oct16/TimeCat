@@ -1,6 +1,6 @@
 import { PlayerTypes } from './reducers/player'
 import { ProgressTypes } from './reducers/progress'
-import isEqual from 'lodash-es/isEqual'
+import { objectEquals } from '../tools/tool'
 
 export type State = { [key: string]: any }
 
@@ -44,7 +44,7 @@ export function createStore(reducer: (state: State, action: any) => State, initS
         const topicName = getTypeInTopics(action.type)
         if (topicName && topics[topicName]) {
             return topics[topicName].forEach(listener => {
-                if (!isEqual(state[topicName], oldState[topicName])) {
+                if (!objectEquals(state[topicName], oldState[topicName])) {
                     listener(state[topicName])
                 }
             })

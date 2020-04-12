@@ -1,21 +1,11 @@
+import { isDev } from './common'
+
 const origin = () => (window.__ReplayData__ && window.__ReplayData__.origin) || location.origin
 const protocol = () => origin().match(/.*?\/\//)![0] || location.protocol
 const href = () => origin() + ((window.__ReplayData__ && window.__ReplayData__.pathname) || location.pathname)
 
-export const isDev = process.env.NODE_ENV === 'development'
 
-export function secondToDate(ms: number) {
-    if (ms <= 0) {
-        ms = 0
-    }
-    const [h, m, s] = [Math.floor(ms / 3600), Math.floor((ms / 60) % 60), Math.floor(ms % 60)]
-    const timeStr = [h, m, s].map(i => (i <= 9 ? '0' + i : i)).join(':')
-    return timeStr.replace(/^00\:/, '')
-}
 
-export function getTime() {
-    return performance.timing.navigationStart + performance.now()
-}
 
 export function filteringTemplate(tpl: string) {
     const reg = /<!--env-->[\s\S]*<!--env-->/g
@@ -57,6 +47,7 @@ export function filteringScriptTag(str: string) {
 function startsWithSlash(str: string) {
     return /^\/(?!\/)/.test(str)
 }
+
 function startsWithDoubleSlash(str: string) {
     return /^\/\//.test(str)
 }
@@ -102,10 +93,6 @@ export function completionAttrHref(str: string) {
     }
 
     return str
-}
-
-export function logger(data: any) {
-    console.log('record', data)
 }
 
 export function removeItem(array: any[], item: any) {

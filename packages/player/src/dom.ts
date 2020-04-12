@@ -10,12 +10,12 @@ import {
     WindowObserveData,
     AddedUpdateData,
     removedUpdateData,
-    DOMUpdateDataType
+    DOMUpdateDataType,
+    movedUpdateData
 } from '@WebReplay/snapshot'
 import { PlayerComponent } from './player'
 import { nodeStore, isCommentStr, swapNode, getPos } from '@WebReplay/utils'
 import { convertVNode, setAttribute } from '@WebReplay/virtual-dom'
-import { movedUpdateData } from '../../snapshot/src/types'
 
 export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
     const { type, data } = snapshot

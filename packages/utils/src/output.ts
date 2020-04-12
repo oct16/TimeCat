@@ -1,7 +1,7 @@
 import TPL from '../../../tpls/tpl.html'
 import { DBPromise as DB } from './store/idb'
-import { filteringScriptTag } from './tool'
-import { isDev } from './tool'
+import { filteringScriptTag } from './tools/dom'
+import { isDev } from './tools/common'
 import pako from 'pako'
 
 type ScriptItem = { name: string; src: string }
