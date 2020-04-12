@@ -88,7 +88,7 @@ export function completionAttrHref(str: string) {
         }
 
         if (startsWithSlash(str)) {
-            return origin + str
+            return origin() + str
         }
         return str
     })
