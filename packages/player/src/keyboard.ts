@@ -7,8 +7,7 @@ export class KeyboardComponent {
     c: ContainerComponent
     controller: HTMLElement
 
-    pauseBtn: HTMLElement
-    playBtn: HTMLElement
+    playOrPauseBtn: HTMLButtonElement
     exportBtn: HTMLElement
 
     speed: number
@@ -20,9 +19,8 @@ export class KeyboardComponent {
 
     init() {
         this.controller = this.c.container.querySelector('.wr-keyboard') as HTMLElement
-        this.pauseBtn = this.controller.querySelector('.pause') as HTMLButtonElement
+        this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
         this.exportBtn = this.c.container.querySelector('.wr-export') as HTMLButtonElement
-        this.playBtn = this.controller.querySelector('.play') as HTMLButtonElement
         this.exportBtn.addEventListener('click', this.export)
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
@@ -45,11 +43,13 @@ export class KeyboardComponent {
 
     paly(speed: number) {
         if (speed !== 0) {
-            this.pauseBtn.removeAttribute('disabled')
-            this.playBtn.setAttribute('disabled', '')
+            this.playOrPauseBtn.innerText = 'II'
+            this.playOrPauseBtn.setAttribute('style', 'letter-spacing: 1px;font-weight: bold;')
+            this.playOrPauseBtn.removeAttribute('speed')
         } else {
-            this.playBtn.removeAttribute('disabled')
-            this.pauseBtn.setAttribute('disabled', '')
+            this.playOrPauseBtn.innerText = '▶'
+            this.playOrPauseBtn.removeAttribute('style')
+            this.playOrPauseBtn.setAttribute('speed', '1')
         }
     }
 
@@ -59,7 +59,20 @@ export class KeyboardComponent {
             node.removeAttribute('disabled')
         })
 
-        const index = speed === 1 ? 0 : speed === 4 ? 1 : speed === 8 ? 2 : -1
+        const index = getBtnIndex(speed)
+
+        function getBtnIndex(speed: number) {
+            switch (speed) {
+                case 16:
+                    return 2
+                case 4:
+                    return 1
+                case 1:
+                    return 0
+                default:
+                    return 0
+            }
+        }
         if (index > -1) {
             speedNodes[index].setAttribute('disabled', '')
         }
