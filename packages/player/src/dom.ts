@@ -113,16 +113,19 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             break
         case SnapshotType.FORM_EL_UPDATE:
             const { id, key, type: formType, value } = data as FormElementObserveData
-            const node = nodeStore.getNode(id) as HTMLFormElement
-            if (formType === FormElementEvent.INPUT) {
-                node.value = value
-            } else if (formType === FormElementEvent.FOCUS) {
-                node.focus()
-            } else if (formType === FormElementEvent.BLUR) {
-                node.blur()
-            } else if (formType === FormElementEvent.ATTR) {
-                if (key) {
-                    node[key] = value
+            const node = nodeStore.getNode(id) as HTMLInputElement | undefined
+
+            if (node) {
+                if (formType === FormElementEvent.INPUT) {
+                    node.value = value!
+                } else if (formType === FormElementEvent.FOCUS) {
+                    node.focus()
+                } else if (formType === FormElementEvent.BLUR) {
+                    node.blur()
+                } else if (formType === FormElementEvent.ATTR) {
+                    if (key) {
+                        setAttribute(node, key, value as string)
+                    }
                 }
             }
             break
