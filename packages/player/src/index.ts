@@ -41,5 +41,10 @@ export async function replay() {
                 data: { speed: 1 }
             })
         }, 500)
+    } else {
+        const panel = document.querySelector('.wr-panel')
+        if (panel) {
+            panel.setAttribute('style', 'display: none')
+        }
     }
 }

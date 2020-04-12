@@ -1,5 +1,3 @@
-// import { Redux } from '@WebReplay/utils'
-
 import { PlayerTypes, reduxStore, exportReplay } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
 
@@ -9,8 +7,6 @@ export class KeyboardComponent {
 
     playOrPauseBtn: HTMLButtonElement
     exportBtn: HTMLElement
-
-    speed: number
 
     constructor(container: ContainerComponent) {
         this.c = container
@@ -25,13 +21,7 @@ export class KeyboardComponent {
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
                 const speed = Number((e.target as HTMLElement).getAttribute('speed'))
-                this.speed = speed
-                reduxStore.dispatch({
-                    type: PlayerTypes.SPEED,
-                    data: {
-                        speed
-                    }
-                })
+                this.emitPlaySign(speed)
             }
         })
 
@@ -39,6 +29,40 @@ export class KeyboardComponent {
             this.paly(state.speed)
             this.setSpeed(state.speed)
         })
+
+        this.listenDefocus()
+    }
+
+    emitPlaySign(speed: number) {
+        reduxStore.dispatch({
+            type: PlayerTypes.SPEED,
+            data: {
+                speed
+            }
+        })
+    }
+
+    listenDefocus() {
+        let hidden: string = 'hidden'
+        let state: string
+        let visibilityChange: string
+        if (typeof (document as any).webkitHidden !== undefined) {
+            visibilityChange = 'webkitvisibilitychange'
+            state = 'webkitVisibilityState'
+        } else {
+            visibilityChange = 'visibilitychange'
+            state = 'visibilityState'
+        }
+
+        document.addEventListener(
+            visibilityChange,
+            () => {
+                if (document.visibilityState === hidden) {
+                    this.emitPlaySign(0)
+                }
+            },
+            false
+        )
     }
 
     paly(speed: number) {
