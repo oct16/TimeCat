@@ -1,4 +1,4 @@
-import TPL from '../../../tpls/tpl.html'
+import { TPL } from './tpl'
 import { DBPromise as DB } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
 import { isDev } from './tools/common'

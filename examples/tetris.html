@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="renderer" content="webkit">
+    <meta name="description" content="Tetris" />
+    <meta name="keywords" content="Tetris">
+    <meta name="format-detection" content="telephone=no" />
+    <script>; (function () { var w = parseInt(window.screen.width), s = w / 640, u = navigator.userAgent.toLowerCase(), m = '<meta name="viewport" content="width=640,'; if (/android (\d+\.\d+)/.test(u)) { if (parseFloat(RegExp.$1) > 2.3) m += 'minimum-scale=' + s + ',maximum-scale=' + s + ','; } else { m += 'user-scalable=no,'; } m += 'target-densitydpi=device-dpi">'; document.write(m); }());</script>
+    <meta charset="UTF-8">
+    <title>Tetris</title>
+    <link href="https://chvin.github.io/react-tetris/loader.css" rel="stylesheet" />
+    <link href="https://chvin.github.io/react-tetris/css-1.0.1.css" rel="stylesheet">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        .todo-list li .destroy {
+            display: block !important;
+        }
+
+        #replay {
+            border: 1px solid grey;
+            padding: 5px 10px;
+            font-size: 22px;
+            color: red;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            left: 0;
+        }
+
+        #replay.locked {
+            color: rgb(205, 203, 203);
+            border-color: rgb(205, 203, 203);
+        }
+
+
+        #replay.hide {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <a style="position: absolute; z-index: 100; right: 0" href="https://github.com/oct16/WebReplay">
+        <img width="100" height="100"
+            src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149"
+            alt="Fork me on GitHub" />
+    </a>
+    <div id="root">
+        <div class="load">
+            <div class="loader">Loading...</div>
+        </div>
+    </div>
+    <button id="replay" class="locked">Replay</button>
+    <script type="text/javascript" src="https://chvin.github.io/react-tetris/app-1.0.1.js"></script>
+    <script id="web-replay" src="./replay.min.js"></script>
+
+    <script>
+        const { record, DB } = wr
+        DB.then(db => {
+            db.clear()
+            const ctr = record({
+                emitter: data => {
+                    db.add(data)
+                }
+            })
+            const replayButton = document.getElementById('replay')
+            if (replayButton) {
+                setTimeout(() => {
+                    replayButton.className = ''
+                }, 5000);
+                replayButton.onclick = () => {
+                    if (replayButton.className) {
+                        return
+                    }
+                    replayButton.className = 'hide'
+                    ctr.uninstall()
+                    window.open('replay.html')
+                }
+            }
+        })
+    </script>
+
+    <script>
+        const root = document.getElementById('root')
+        const iframeNodes = root.getElementsByTagName('iframe')
+        const qr = root.querySelector('img[alt="二维码"]')
+            ;[qr, ...iframeNodes].forEach(node => node.parentElement.removeChild(node))
+
+    </script>
+
+    <!--env-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-151180797-1');
+    </script>
+    <!--env-->
+</body>
+
+</html>
