@@ -1,6 +1,7 @@
-const origin = (window.__ReplayData__ && window.__ReplayData__.origin) || location.origin
-const protocol = origin.match(/.*?\/\//)![0] || location.protocol
-const href = origin + ((window.__ReplayData__ && window.__ReplayData__.pathname) || location.pathname)
+const origin = () => (window.__ReplayData__ && window.__ReplayData__.origin) || location.origin
+const protocol = () => origin().match(/.*?\/\//)![0] || location.protocol
+const href = () => origin() + ((window.__ReplayData__ && window.__ReplayData__.pathname) || location.pathname)
+
 export const isDev = process.env.NODE_ENV === 'development'
 
 export function secondToDate(ms: number) {
@@ -64,7 +65,7 @@ export function completionCssHref(str: string) {
     return str.replace(/(url\()['"]?((\/{1,2})[^'"]*?)['"]?(?=\))/g, (a, b, c) => {
         let url: string = ''
         if (startsWithDoubleSlash(c)) {
-            url = protocol + c.substring(2)
+            url = protocol() + c.substring(2)
         } else if (startsWithSlash(c)) {
             url = origin + c.substring(1)
         }
@@ -83,7 +84,7 @@ export function completionAttrHref(str: string) {
     const reg = /^(\/{1,2}.*)/g
     str = str.replace(reg, str => {
         if (startsWithDoubleSlash(str)) {
-            return protocol + str.substring(2)
+            return protocol() + str.substring(2)
         }
 
         if (startsWithSlash(str)) {
@@ -94,9 +95,9 @@ export function completionAttrHref(str: string) {
 
     if (!/^http/.test(str)) {
         if (str.startsWith('./')) {
-            return href + str.substring(1)
+            return href() + str.substring(1)
         } else {
-            return href + str
+            return href() + str
         }
     }
 
