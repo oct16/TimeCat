@@ -12,7 +12,7 @@ const html = parser.parseFromString(TPL, 'text/html')
 export async function exportReplay(opts: Opts = {}) {
     await injectData()
     await initOptions(opts)
-    createAndDownloadFile(`Replay-${Date.now()}`, html.documentElement.outerHTML)
+    createAndDownloadFile(`WebReplay-${Date.now()}`, html.documentElement.outerHTML)
 }
 
 function createAndDownloadFile(fileName: string, content: string) {
