@@ -44,7 +44,7 @@
         "url": "git+https://github.com/oct16/WebReplay.git"
     },
     "author": "oct16",
-    "license": "ISC",
+    "license": "GPL",
     "bugs": {
         "url": "https://github.com/oct16/WebReplay/issues"
     },
