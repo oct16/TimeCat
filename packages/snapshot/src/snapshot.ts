@@ -154,13 +154,13 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 
 function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
     const mutationCallback: MutationCallback = (records: MutationRecord[]) => {
-        const attrNodesMap: Map<Node, string | null> = new Map()
         const addNodesSet: Set<Node> = new Set()
-        const textNodesSet: Set<Node> = new Set()
+        const newNodes: Set<Node> = new Set()
         const removeNodesSet: Set<Node> = new Set()
-        const nMap = new Map()
         const moveNodesSet: Set<Node> = new Set()
-        const newNodes: Node[] = []
+        const nMap: Map<Node, number> = new Map()
+        const attrNodesMap: Map<Node, string | null> = new Map()
+        const textNodesSet: Set<Node> = new Set()
 
         records.forEach((record: MutationRecord) => {
             const { target, addedNodes, removedNodes, type, attributeName } = record
@@ -175,12 +175,12 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 case 'childList':
                     removedNodes.forEach(node => {
                         removeNodesSet.add(node)
-                        nMap.set(node, nodeStore.getNodeId(target))
+                        nMap.set(node, nodeStore.getNodeId(target)!)
                     })
                     addedNodes.forEach(node => addNodesSet.add(node))
                     addNodesSet.forEach(node => {
                         if (!removeNodesSet.has(node)) {
-                            newNodes.push(node)
+                            newNodes.add(node)
                         } else {
                             moveNodesSet.add(node)
                         }
@@ -197,7 +197,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
 
         const addNodes: Node[] = [
             ...new Set(
-                newNodes.filter(node => {
+                [...newNodes].filter(node => {
                     if (!removeNodeChildNodesSet.has(node)) {
                         return true
                     } else {
@@ -207,9 +207,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
             )
         ]
 
-        const moveNodes: Node[] = [...moveNodesSet].filter(
-            node => !newNodes.includes(node) && !removeNodes.includes(node)
-        )
+        const moveNodes: Node[] = [...moveNodesSet].filter(node => !newNodes.has(node) && !removeNodes.includes(node))
 
         const removedNodesMutation: removedUpdateData[] = []
         const removedAllIds: number[] = []
@@ -219,7 +217,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
                 return a.nodeType === Node.TEXT_NODE ? -1 : 1
             })
             .forEach(node => {
-                const parentId = nMap.get(node)
+                const parentId = nMap.get(node)!
                 if (!removedAllIds.includes(parentId)) {
                     // if exist text_node, means to set innerHtml or set innerText to remove all childNodes
                     if (isTextNode(node)) {
