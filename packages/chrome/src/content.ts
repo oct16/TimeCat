@@ -7,7 +7,9 @@ chrome.runtime.onMessage.addListener(request => {
     const { type } = request
     switch (type) {
         case 'START':
-            dispatchEvent('CHROME_RECORD_START')
+            lazyInject(() => {
+                dispatchEvent('CHROME_RECORD_START')
+            })
             break
         case 'FINISH':
             dispatchEvent('CHROME_RECORD_FINISH', {
@@ -31,38 +33,49 @@ window.addEventListener('CHROME_RECORD_CANCEL', () =>
     })
 )
 
-function injectScriptOnce(scriptItem: { name: string; src: string }, callback?: () => void) {
-    let el: HTMLScriptElement | null = null
-
-    return function() {
-        const { name, src } = scriptItem
-
-        const doc = window.document
-        if (el && callback) {
-            if (callback) callback()
-            return el
-        }
-
-        if (document.getElementById(name)) {
-            return
-        }
-
-        const s = doc.createElement('script')
-        doc.body.appendChild(s)
-        s.onload = () => callback && callback()
-        s.id = name
-        s.src = src
-        el = s
-    }
-}
-
 const injectMain = injectScriptOnce({
     name: 'web-replay',
     src: webReplayScript
 })
+
 const injectPageJS = injectScriptOnce({
     name: 'replay-chrome-page',
     src: chrome.runtime.getURL('replay-chrome-page.js')
 })
-injectMain()
-injectPageJS()
+
+function lazyInject(onLoadFn: () => void) {
+    if (!window.document.getElementById('web-replay')) {
+        Promise.all([new Promise(injectMain), new Promise(injectPageJS)]).then(() => {
+            onLoadFn()
+        })
+    } else {
+        onLoadFn()
+    }
+}
+
+function injectScriptOnce(scriptItem: { name: string; src: string }) {
+    let el: HTMLScriptElement | null = null
+
+    return function(callback?: () => void) {
+        const { name, src } = scriptItem
+
+        const document = window.document
+        if (el && callback) {
+            callback()
+            return el
+        }
+
+        if (document.getElementById(name)) {
+            return el
+        }
+
+        const script = document.createElement('script')
+        script.onload = () => {
+            callback && callback()
+        }
+        script.id = name
+        script.src = src
+        el = script
+        document.body.appendChild(script)
+    }
+}
