@@ -1,6 +1,6 @@
 const origin = (window.__ReplayData__ && window.__ReplayData__.origin) || location.origin
 const protocol = origin.match(/.*?\/\//)![0] || location.protocol
-
+const href = origin + ((window.__ReplayData__ && window.__ReplayData__.pathname) || location.pathname)
 export const isDev = process.env.NODE_ENV === 'development'
 
 export function secondToDate(ms: number) {
@@ -93,7 +93,11 @@ export function completionAttrHref(str: string) {
     })
 
     if (!/^http/.test(str)) {
-        return origin + str
+        if (str.startsWith('./')) {
+            return href + str.substring(1)
+        } else {
+            return href + str
+        }
     }
 
     return str

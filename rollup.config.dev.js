@@ -2,6 +2,7 @@ import ts from 'rollup-plugin-typescript2'
 import html from '@rollup/plugin-html'
 import node from 'rollup-plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
+import commonjs from '@rollup/plugin-commonjs'
 
 import browsersync from 'rollup-plugin-browsersync'
 // import copy from 'rollup-plugin-copy'
@@ -37,6 +38,7 @@ export default [
         plugins: [
             ts(),
             node(),
+            commonjs(),
             html({
                 template: () => filteringTemplate(fs.readFileSync('tpls/todo.html', 'utf8'))
             }),

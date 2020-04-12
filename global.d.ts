@@ -33,12 +33,16 @@ declare interface IDBDatabase {
 }
 
 interface Window {
+    __ReplayStrData__: string
     __ReplayData__: {
         [key: string]: any
+        vNode: VNode
+        data: SnapshotData[]
         width: number
         height: number
         scrollTop: number
         scrollLeft: number
         origin: string
+        pathname: string
     }
 }

@@ -42,6 +42,7 @@ function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
 
 function windowObserve(emit: SnapshotEvent<WindowObserve>) {
     const origin = () => window.location.origin
+    const pathname = () => window.location.pathname
     const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
     const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
@@ -55,7 +56,8 @@ function windowObserve(emit: SnapshotEvent<WindowObserve>) {
                 height: height(),
                 scrollTop: scrollTop(),
                 scrollLeft: scrollLeft(),
-                origin: origin()
+                origin: origin(),
+                pathname: pathname()
             },
             time: getTime().toString()
         })

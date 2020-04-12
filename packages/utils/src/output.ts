@@ -2,6 +2,7 @@ import TPL from '../../../tpls/tpl.html'
 import { DBPromise as DB } from './store/idb'
 import { filteringScriptTag } from './tool'
 import { isDev } from './tool'
+import pako from 'pako'
 
 type ScriptItem = { name: string; src: string }
 type Opts = { scripts?: ScriptItem[]; autoPlay?: boolean }
@@ -65,10 +66,11 @@ async function getScript(src: string) {
 }
 
 async function injectData() {
-    const data = window.__ReplayData__ || (await (await DB).getData())
-    const jsonData = JSON.stringify(data)
     const dataScript = document.createElement('script')
-    const scriptContent = `var __ReplayData__ = ${filteringScriptTag(jsonData)}`
+    const data = window.__ReplayData__ || (await (await DB).getData())
+    const jsonStrData = JSON.stringify(data)
+    const zipArray = pako.gzip(jsonStrData)
+    const scriptContent = `var __ReplayStrData__ = ${"'" + zipArray.toString() + "'"}`
     dataScript.innerText = scriptContent
     html.body.insertBefore(dataScript, html.body.firstChild)
 }

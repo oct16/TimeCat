@@ -1,3 +1,4 @@
+import fs from 'fs'
 import ts from 'rollup-plugin-typescript2'
 import html from '@rollup/plugin-html'
 import node from 'rollup-plugin-node-resolve'
@@ -5,9 +6,8 @@ import sourcemaps from 'rollup-plugin-sourcemaps'
 import { terser } from 'rollup-plugin-terser'
 import replace from '@rollup/plugin-replace'
 import copy from 'rollup-plugin-copy'
-
-import fs from 'fs'
 import { string } from 'rollup-plugin-string'
+import commonjs from '@rollup/plugin-commonjs'
 
 export default {
     input: 'index.ts',
@@ -42,6 +42,7 @@ export default {
         node({
             mainFields: ['module', 'main']
         }),
+        commonjs(),
         sourcemaps(),
         html({
             template: () => fs.readFileSync('tpls/todo.html')

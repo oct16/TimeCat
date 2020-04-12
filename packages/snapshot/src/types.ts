@@ -31,6 +31,7 @@ export interface WindowObserveData {
     scrollTop: number
     scrollLeft: number
     origin: string
+    pathname: string
 }
 
 export interface DOMSnapshot {

@@ -5,7 +5,7 @@
         "sourceMap": true,
         "target": "esnext",
         "module": "esnext",
-        "moduleResolution": "Node",
+        "moduleResolution": "node",
         "allowJs": false,
         "noUnusedLocals": false,
         "strictNullChecks": true,
@@ -14,14 +14,14 @@
         "experimentalDecorators": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        "removeComments": false,
+        "removeComments": true,
         "declaration": true,
         "jsx": "preserve",
         "skipLibCheck": true,
         "lib": [
-            "ESNext",
-            "DOM",
-            "DOM.Iterable"
+            "esnext",
+            "dom",
+            "dom.iterable"
         ],
         "types": [
             "@types/chrome",
