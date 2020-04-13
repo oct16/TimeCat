@@ -39,7 +39,7 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                 const { parentId, id } = item
                 const parentNode = nodeStore.getNode(parentId)
                 const node = nodeStore.getNode(id)
-                if (node && parentNode) {
+                if (node && parentNode && parentNode.contains(node)) {
                     parentNode.removeChild(node as Node)
                 }
             })

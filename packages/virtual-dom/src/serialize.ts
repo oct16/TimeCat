@@ -1,14 +1,14 @@
 import { VNode } from './types'
-import { nodeStore, completionCssHref, completionAttrHref, createCommentText } from '@WebReplay/utils'
+import { nodeStore, completionCssHref, createCommentText } from '@WebReplay/utils'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
-    const tagName = el.tagName.toLocaleLowerCase().trim()
+    const tag = el.tagName.toLocaleLowerCase().trim()
     return {
         id: nodeStore.createNodeId(),
         attrs: getAttr(el as HTMLElement & { checked: boolean }),
-        tag: tagName,
+        tag,
         children: [] as VNode[],
-        extra: { isSVG: isSVG || tagName === 'svg' }
+        extra: { isSVG: isSVG || tag === 'svg' }
     }
 }
 
