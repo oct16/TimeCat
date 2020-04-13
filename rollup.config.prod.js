@@ -1,6 +1,5 @@
 import ts from 'rollup-plugin-typescript2'
 import node from 'rollup-plugin-node-resolve'
-import sourcemaps from 'rollup-plugin-sourcemaps'
 import { terser } from 'rollup-plugin-terser'
 import copy from 'rollup-plugin-copy'
 import commonjs from '@rollup/plugin-commonjs'
@@ -12,35 +11,32 @@ export default {
         {
             name: 'wr',
             format: 'iife',
-            file: 'dist/replay.min.js',
-            sourcemap: true
+            file: 'dist/replay.min.js'
         },
         {
             name: 'wr',
             format: 'iife',
-            file: 'dist/chrome/replay.min.js',
-            sourcemap: true
+            file: 'dist/chrome/replay.min.js'
         },
         {
             name: 'wr',
             format: 'cjs',
-            file: 'dist/replay.cjs.js',
-            sourcemap: true
+            file: 'dist/replay.cjs.js'
         },
         {
             name: 'wr',
             format: 'esm',
-            file: 'dist/replay.esm.js',
-            sourcemap: true
+            file: 'dist/replay.esm.js'
         }
     ],
     plugins: [
-        ts(),
+        ts({
+            tsconfigOverride: { compilerOptions: { declaration: false } }
+        }),
         node({
             mainFields: ['module', 'main']
         }),
         commonjs(),
-        sourcemaps(),
         ...htmlExamples(),
         ...env(),
         terser(),

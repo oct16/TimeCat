@@ -11,14 +11,12 @@ export default [
             {
                 name: 'wr',
                 format: 'iife',
-                file: 'dist/replay.min.js',
-                sourcemap: true
+                file: 'dist/replay.min.js'
             },
             {
                 name: 'wr',
                 format: 'iife',
-                file: 'dist/chrome/replay.min.js',
-                sourcemap: true
+                file: 'dist/chrome/replay.min.js'
             }
         ],
         plugins: [
