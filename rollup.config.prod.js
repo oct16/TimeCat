@@ -1,7 +1,6 @@
 import ts from 'rollup-plugin-typescript2'
-import node from 'rollup-plugin-node-resolve'
+import node from '@rollup/plugin-node-resolve'
 import { terser } from 'rollup-plugin-terser'
-import copy from 'rollup-plugin-copy'
 import commonjs from '@rollup/plugin-commonjs'
 import { env, htmlExamples } from './rollup.base'
 
@@ -39,9 +38,6 @@ export default {
         commonjs(),
         ...htmlExamples(),
         ...env(),
-        terser(),
-        copy({
-            targets: [{ src: 'dist/replay.min.js', dest: 'dist/chrome/' }]
-        })
+        terser()
     ]
 }
