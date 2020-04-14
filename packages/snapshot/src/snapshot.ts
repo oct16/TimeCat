@@ -161,7 +161,7 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
         const nMap: Map<Node, number> = new Map()
         const attrNodesMap: Map<Node, string | null> = new Map()
         const textNodesSet: Set<Node> = new Set()
-
+        
         records.forEach((record: MutationRecord) => {
             const { target, addedNodes, removedNodes, type, attributeName } = record
 

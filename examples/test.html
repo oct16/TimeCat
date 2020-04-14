@@ -16,6 +16,7 @@
 
     <div id="test-app">
         <div>
+            <button @click="plus">plus</button>
             <button @click="insert">insertBefore</button>
             <button @click="append">append</button>
             <button @click="remove">remove</button>
@@ -44,6 +45,9 @@
                 ]
             },
             methods: {
+                plus() {
+                    this.list = this.list.map(item => { item.value += 1; return item })
+                },
                 insert() {
                     this.list.unshift({ id: 0, value: 0 })
                 },
