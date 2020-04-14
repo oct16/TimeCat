@@ -1,4 +1,4 @@
-import { DBPromise, ProgressTypes, PlayerTypes, reduxStore } from '@WebReplay/utils'
+import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp } from '@WebReplay/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
@@ -23,24 +23,26 @@ export async function replay() {
     const c = new ContainerComponent({ vNode, width, height })
 
     if (data.length) {
-        new Panel(c, data)
-        reduxStore.dispatch({
-            type: ProgressTypes.INFO,
-            data: {
-                frame: 0,
-                curTime: data[0].time,
-                startTime: data[0].time,
-                endTime: data[data.length - 1].time,
-                length: data.length
-            }
-        })
+        fmp.ready(() => {
+            new Panel(c, data)
+            const startTime = data[0].time
+            const endTime = data[data.length - 1].time
+            reduxStore.dispatch({
+                type: ProgressTypes.INFO,
+                data: {
+                    frame: 0,
+                    curTime: startTime,
+                    startTime,
+                    endTime,
+                    length: data.length
+                }
+            })
 
-        setTimeout(() => {
             reduxStore.dispatch({
                 type: PlayerTypes.SPEED,
                 data: { speed: 1 }
             })
-        }, 500)
+        })
     } else {
         const panel = document.querySelector('.wr-panel')
         if (panel) {

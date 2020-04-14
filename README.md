@@ -137,6 +137,12 @@ const elementList: [HTMLElement, string][] = [
     })
 ```
 
+##### SPA网页的渲染时间
+
+在开始播放前，我们需要把之前的存储的数据还原成真实的DOM，这个过程中会占用一定的加载时间产生白屏，这取决于你的浏览器性能以及录制网页资源情况，参考FMP（First Meaningful Paint）的实现，加载过程中可以通过之前映射的数据动态生成骨架图，等待FMP信号Ready之后再进行播放
+
+> 参考文章 [Time to First Meaningful Paint](https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/view#)
+
 ##### 通过样条曲线模拟鼠标轨迹
 
 用户在网页中移动鼠标会产生很多`mouseMove`事件，通过 `const { x, y } = event.target` 获取到了轨迹的坐标与时间戳
