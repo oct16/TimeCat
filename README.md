@@ -168,8 +168,8 @@ li2 add textNode 4
 我们只需要把这个蠢萌的结果优化一下就可以提升一倍的性能了
 ```
 li0 modify textNode 1 to 2
-li0 modify textNode 2 to 3
-li0 modify textNode 3 to 4
+li1 modify textNode 2 to 3
+li2 modify textNode 3 to 4
 ```
 
 
@@ -231,7 +231,7 @@ li0 modify textNode 3 to 4
 
 快进：加速采集速率的倍速
 
-跳转：跳转相当于一个最快速的快进功能，但是如果跳转的距离太远，性能会非常差，这时需要按一定的距离对播放轴插入预先的snapshot，再从最近的snapshot进行跳转
+跳转：通过virtualDom实现计算
 
 ##### 在客户端进行的Gzip压缩
 
