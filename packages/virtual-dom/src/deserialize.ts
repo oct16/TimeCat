@@ -1,5 +1,5 @@
 import { setAttribute } from './dom'
-import { nodeStore, isDev, isCommentStr } from '@WebReplay/utils'
+import { nodeStore, isDev, isCommentStr, isHideComment } from '@WebReplay/utils'
 import { VNode } from './types'
 
 export function convertVNode(vNode: VNode | string | null, node: Element | null): Element | null {
@@ -27,6 +27,9 @@ function travel(vNode: VNode, node: Element): void {
         let child = nodeChildren.pop() as Element | null
         child = convertVNode(vChild, child)
         if (child) {
+            if (isHideComment(node.lastChild)) {
+                setAttribute(child as HTMLElement, 'style', 'visibility: hidden')
+            }
             node.appendChild(child)
         }
     })

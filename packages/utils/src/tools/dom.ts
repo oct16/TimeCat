@@ -4,9 +4,6 @@ const origin = () => (window.__ReplayData__ && window.__ReplayData__.origin) || 
 const protocol = () => origin().match(/.*?\/\//)![0] || location.protocol
 const href = () => origin() + ((window.__ReplayData__ && window.__ReplayData__.pathname) || location.pathname)
 
-
-
-
 export function filteringTemplate(tpl: string) {
     const reg = /<!--env-->[\s\S]*<!--env-->/g
     if (isDev) {
@@ -134,4 +131,11 @@ export function getAllChildNodes(nodes: Node[], resultSet: Set<Node> = new Set()
         }
     })
     return resultSet
+}
+
+export function isHideComment(node: Node | null) {
+    if (!node) {
+        return false
+    }
+    return node.nodeType === Node.COMMENT_NODE && node.textContent === 'hidden'
 }
