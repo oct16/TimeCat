@@ -3,8 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
     <title>Todo List</title>
+    <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css@2.2.0/index.css">
+
     <style>
         [v-cloak] {
             display: none;
@@ -12,6 +14,10 @@
 
         .todo-list li .destroy {
             display: block !important;
+        }
+
+        .todoapp {
+            margin: 130px 10px 40px 10px;
         }
 
         #replay {
@@ -33,7 +39,6 @@
             visibility: hidden;
         }
     </style>
-    <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css@2.2.0/index.css">
 </head>
 
 <body>
