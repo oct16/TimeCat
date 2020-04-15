@@ -6,7 +6,6 @@
     <meta name="description" content="Tetris" />
     <meta name="keywords" content="Tetris">
     <meta name="format-detection" content="telephone=no" />
-    <script>; (function () { var w = parseInt(window.screen.width), s = w / 640, u = navigator.userAgent.toLowerCase(), m = '<meta name="viewport" content="width=640,'; if (/android (\d+\.\d+)/.test(u)) { if (parseFloat(RegExp.$1) > 2.3) m += 'minimum-scale=' + s + ',maximum-scale=' + s + ','; } else { m += 'user-scalable=no,'; } m += 'target-densitydpi=device-dpi">'; document.write(m); }());</script>
     <meta charset="UTF-8">
     <title>Tetris</title>
     <link href="https://chvin.github.io/react-tetris/loader.css" rel="stylesheet" />
@@ -68,30 +67,51 @@
                         db.add(data)
                     }
                 })
-                const replayButton = document.getElementById('replay')
-                if (replayButton) {
-                    setTimeout(() => {
-                        replayButton.className = ''
-                    }, 5000);
-                    replayButton.addEventListener('click', () => {
-                        if (replayButton.className) {
-                            return
-                        }
-                        replayButton.className = 'hide'
-                        ctr.uninstall()
-                        window.open('replay.html')
-                    })
-                }
+
+                handleReplay(ctr)
             })
         }, 1000)
+
+        function handleReplay(ctr) {
+            function IsPC() {
+                var userAgentInfo = navigator.userAgent;
+                var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
+                var flag = true;
+                for (var v = 0; v < Agents.length; v++) {
+                    if (userAgentInfo.indexOf(Agents[v]) > 0) { flag = false; break; }
+                }
+                return flag;
+            }
+            const replayButton = document.getElementById('replay')
+            setTimeout(() => {
+                replayButton.className = ''
+            }, 5000);
+            document.addEventListener(IsPC() ? 'click' : 'touchstart', e => {
+                if (e.target === replayButton) {
+                    if (replayButton.className) {
+                        return
+                    }
+                    replayButton.className = 'hide'
+                    ctr.uninstall()
+                    if (IsPC()) {
+                        window.open('replay.html')
+                    } else {
+                        location.href = './replay.html'
+                    }
+                }
+            })
+        }
     </script>
 
     <script>
         const root = document.getElementById('root')
         const iframeNodes = root.getElementsByTagName('iframe')
         const qr = root.querySelector('img[alt="二维码"]')
-            ;[qr, ...iframeNodes].forEach(node => node.parentElement.removeChild(node))
-
+            ;[qr, ...iframeNodes].forEach(node => {
+                if (node) {
+                    node.parentElement.removeChild(node)
+                }
+            })
     </script>
 
     <!--env-->
