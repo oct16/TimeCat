@@ -11,13 +11,23 @@ const defaultPlugin = [
     })
 ]
 
+const isDev = process.env.NODE_ENV !== 'production'
+console.log(isDev)
+
+const dest = isDev ? 'dist/chrome/' : 'chrome/'
+
+const copyTargets = [
+    { src: 'packages/chrome/src/assets/*', dest },
+    !isDev ? { src: 'dist/replay.min.js', dest } : null
+].filter(Boolean)
+
 export default [
     {
         input: 'packages/chrome/src/background.ts',
         output: {
             format: 'iife',
             moduleName: 'wr-background',
-            file: 'dist/chrome/replay-chrome-background.js'
+            file: dest + 'replay-chrome-background.js'
         },
         plugins: [...defaultPlugin]
     },
@@ -26,7 +36,7 @@ export default [
         output: {
             format: 'iife',
             moduleName: 'wr-page',
-            file: 'dist/chrome/replay-chrome-page.js'
+            file: dest + 'replay-chrome-page.js'
         },
         plugins: [...defaultPlugin]
     },
@@ -35,12 +45,12 @@ export default [
         output: {
             format: 'iife',
             moduleName: 'wr-content',
-            file: 'dist/chrome/replay-chrome-content.js'
+            file: dest + 'replay-chrome-content.js'
         },
         plugins: [
             ...defaultPlugin,
             copy({
-                targets: [{ src: 'packages/chrome/src/assets/*', dest: 'dist/chrome/' }]
+                targets: copyTargets
             })
         ]
     }

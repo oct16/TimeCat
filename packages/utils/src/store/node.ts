@@ -1,3 +1,4 @@
+import { isDev } from '../tools/common'
 class NodeStore {
     private nodeId = 1
     private nodeMap: Map<number, Node> = new Map()
@@ -31,3 +32,7 @@ class NodeStore {
 }
 
 export const nodeStore = new NodeStore()
+
+if (isDev) {
+    ;(window as any).ns = nodeStore
+}
