@@ -40,15 +40,14 @@ export class ContainerComponent {
     setViewState() {
         const child = convertVNode(this.vNode, null)
         if (child) {
-            const head = child.firstChild
+            const [head] = child.getElementsByTagName('head')
             if (head) {
                 head.insertBefore(this.createStyle(FIXED), head.firstChild)
             }
             const documentElement = this.sandBoxDoc.documentElement
-            documentElement.replaceChild(child.firstChild!, documentElement.firstChild!)
-            documentElement.replaceChild(child.lastChild!, documentElement.lastChild!)
             documentElement.scrollLeft = window.__ReplayData__.scrollLeft
             documentElement.scrollTop = window.__ReplayData__.scrollTop
+            this.sandBoxDoc.replaceChild(child, documentElement)
         }
     }
 

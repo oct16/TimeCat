@@ -73,14 +73,14 @@
                     setTimeout(() => {
                         replayButton.className = ''
                     }, 5000);
-                    replayButton.onclick = () => {
+                    replayButton.addEventListener('click', () => {
                         if (replayButton.className) {
                             return
                         }
                         replayButton.className = 'hide'
                         ctr.uninstall()
                         window.open('replay.html')
-                    }
+                    })
                 }
             })
         }, 1000)

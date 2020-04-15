@@ -11,6 +11,7 @@ export class PlayerComponent {
     index = 0
     frameIndex = 0
     lastPercentage = 0
+    isFirstTimePlay = true
     frames: number[]
     requestID: number
     startTime: number
@@ -41,7 +42,10 @@ export class PlayerComponent {
     play() {
         if (this.index === 0) {
             this.progress.resetThumb()
-            this.c.setViewState()
+            if (!this.isFirstTimePlay) {
+                this.c.setViewState()
+            }
+            this.isFirstTimePlay = false
         }
         cancelAnimationFrame(this.requestID)
         this.requestID = requestAnimationFrame(loop.bind(this))
@@ -79,7 +83,6 @@ export class PlayerComponent {
         while (+(data = this.data[this.index]).time <= this.frames[this.frameIndex]) {
             this.execFrame.call(this, data)
             this.index++
-
             if (this.index === this.data.length) {
                 break
             }
