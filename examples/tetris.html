@@ -54,24 +54,22 @@
             <div class="loader">Loading...</div>
         </div>
     </div>
-     <!--hidden--><button id="replay" class="locked">Replay</button>
+    <!--hidden--><button id="replay" class="locked">Replay</button>
     <script type="text/javascript" src="https://chvin.github.io/react-tetris/app-1.0.1.js"></script>
     <script id="web-replay" src="./replay.min.js"></script>
 
     <script>
-        setTimeout(() => {
-            const { record, DB } = wr
-            DB.then(db => {
-                db.clear()
-                const ctr = record({
-                    emitter: data => {
-                        db.add(data)
-                    }
-                })
-
-                handleReplay(ctr)
+        const { record, DB } = wr
+        DB.then(db => {
+            db.clear()
+            const ctr = record({
+                emitter: data => {
+                    db.add(data)
+                }
             })
-        }, 1000)
+
+            handleReplay(ctr)
+        })
 
         function handleReplay(ctr) {
             function IsPC() {

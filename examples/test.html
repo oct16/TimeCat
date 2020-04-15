@@ -72,24 +72,22 @@
 
     <script src="http://localhost:4321/replay.min.js"></script>
     <script>
-        setTimeout(() => {
-            const { record, DB } = wr
-            DB.then(db => {
-                db.clear()
-                const ctr = record({
-                    emitter: data => {
-                        db.add(data)
-                    }
-                })
-                const replayButton = document.getElementById('replay')
-                if (replayButton) {
-                    replayButton.onclick = () => {
-                        ctr.uninstall()
-                        window.open('replay.html')
-                    }
+        const { record, DB } = wr
+        DB.then(db => {
+            db.clear()
+            const ctr = record({
+                emitter: data => {
+                    db.add(data)
                 }
             })
-        }, 100)
+            const replayButton = document.getElementById('replay')
+            if (replayButton) {
+                replayButton.onclick = () => {
+                    ctr.uninstall()
+                    window.open('replay.html')
+                }
+            }
+        })
     </script>
 
 </body>
