@@ -2,23 +2,18 @@ import { VNode } from './types'
 import { nodeStore, completionCssHref, createCommentText } from '@WebReplay/utils'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
-    const tag = el.tagName.toLocaleLowerCase().trim()
     return {
         id: nodeStore.createNodeId(),
         attrs: getAttr(el as HTMLElement & { checked: boolean }),
-        tag,
+        tag: el.tagName.toLocaleLowerCase(),
         children: [] as VNode[],
-        extra: { isSVG: isSVG || tag === 'svg' }
+        extra: getExtra(el, isSVG)
     }
 }
 
 const getAttr = (el: HTMLElement & { checked: boolean }) => {
     const resAttr: { [key: string]: string } = {}
     const attrs = el.attributes
-    if (el.checked) {
-        resAttr.checked = 'true'
-    }
-
     if (attrs && attrs.length) {
         return Object.values(attrs).reduce((ret: any, attr) => {
             const [name, value] = extraAttr(attr)
@@ -29,6 +24,28 @@ const getAttr = (el: HTMLElement & { checked: boolean }) => {
         }, resAttr)
     }
     return resAttr
+}
+
+function getExtra(node: Element, isSVG?: boolean) {
+    const { tagName } = node
+    const extra: VNode['extra'] = {}
+    if (isSVG || tagName === 'SVG') {
+        extra.isSVG = true
+    }
+    if (tagName === 'INPUT') {
+        const props: VNode['extra']['props'] = {}
+        const { checked, value } = node as any
+        if (value !== undefined) {
+            props.value = value
+        }
+        if (checked !== undefined) {
+            props.checked = checked
+        }
+        if (Object.keys(props).length) {
+            extra.props = props
+        }
+    }
+    return extra
 }
 
 const extraAttr = (attr: Attr) => {
@@ -49,9 +66,6 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | null =
     if (el.nodeType === Node.TEXT_NODE) {
         return null
     }
-    // if (el.tagName === 'SCRIPT') {
-    //     return null
-    // }
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)

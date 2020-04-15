@@ -17,6 +17,7 @@ export function convertVNode(vNode: VNode | string | null, node: Element | null)
         travel(vNode, output)
     }
     createAttributes(vNode, output)
+    createProps(vNode, output)
     return output
 }
 
@@ -33,6 +34,15 @@ function travel(vNode: VNode, node: Element): void {
             node.appendChild(child)
         }
     })
+}
+
+function createProps(vNode: VNode, node: Element): void {
+    const { props } = vNode.extra
+    if (props) {
+        for (let [key, val] of Object.entries(props)) {
+            ;(node as any)[key] = val
+        }
+    }
 }
 
 function createAttributes(vNode: VNode, node: Element): void {

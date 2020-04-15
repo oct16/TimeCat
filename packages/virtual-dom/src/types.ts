@@ -4,6 +4,7 @@ export interface VNode {
     tag: string
     id: number
     extra: {
-        isSVG: boolean
+        props?: { [key: string]: any }
+        isSVG?: boolean
     }
 }
