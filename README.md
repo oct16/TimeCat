@@ -139,40 +139,6 @@ const elementList: [HTMLElement, string][] = [
 
 ##### 对MutationObserver的优化
 
-
-MutationObserver的每次变动取决于每次EventLoop内对DOM的操作
-通常对一个Node节点进行插入删除修改只会产生一次记录，但是程序往往没有那么聪明，所以对于一些复杂的操作场景都有很大的优化空间
-
-举个简单的栗子，有一个``<ul>``，内部有三个``<li>``
-
-```html
-<ul>
-    <li>1</li>
-    <li>2</li>
-    <li>3</li>
-</ul>
-```
-
-我需要对所有的``<li>``都进行 +1 操作，那么对应的逻辑代码可以是 ``` liNodes.forEach(node => node.innerText += 1 ) ```
-
-但是得到结果却是
-```
-li0 remove textNode 1
-li0 add textNode 2
-li1 remove textNode 2
-li1 add textNode 3
-li2 remove textNode 3
-li2 add textNode 4
-```
-
-我们只需要把这个蠢萌的结果优化一下就可以提升一倍的性能了
-```
-li0 modify textNode 1 to 2
-li1 modify textNode 2 to 3
-li2 modify textNode 3 to 4
-```
-
-
 ##### SPA网页的渲染时间
 
 在开始播放前，我们需要把之前的存储的数据还原成真实的DOM，这个过程中会占用一定的加载时间产生白屏，这取决于你的浏览器性能以及录制网页资源情况，参考FMP（First Meaningful Paint）的实现，加载过程中可以通过之前映射的数据动态生成骨架图，等待FMP发出Ready信号之后再进行播放
