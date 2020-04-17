@@ -13,18 +13,18 @@
 </head>
 
 <body>
-
     <div id="test-app">
-        <div>
+        <section>
             <button @click="plus">plus</button>
-            <button @click="insert">insertBefore</button>
-            <button @click="append">append</button>
-            <button @click="remove">remove</button>
-            <button @click="reverse">reverse</button>
-        </div>
+            <button @click="shuffle">shuffle</button>
+            <button @click="move1">move1</button>
+            <button @click="move2">move2</button>
+        </section>
 
         <ul>
-            <li :key="item.id" v-for="item in list" v-text="item.value"></li>
+            <li :key="item.id" v-for="item in list">
+                <span v-text="item.value"></span>
+            </li>
         </ul>
     </div>
 
@@ -41,29 +41,30 @@
                     { id: 2, value: 2 },
                     { id: 3, value: 3 },
                     { id: 4, value: 4 },
-                    { id: 5, value: 5 }
-                ]
+                    { id: 5, value: 5 },
+                    { id: 6, value: 6 },
+                    { id: 7, value: 7 },
+                    { id: 8, value: 8 },
+                    { id: 9, value: 9 },
+                    { id: 10, value: 10 },
+                ],
             },
             methods: {
                 plus() {
                     this.list = this.list.map(item => { item.value += 1; return item })
                 },
-                insert() {
-                    this.list.unshift({ id: 0, value: 0 })
-                },
+                shuffle() {
+                    const newList = []
 
-                append() {
-                    this.list.push({ id: 10, value: 10 })
-                },
+                    while (this.list.length) {
+                        const i = Math.floor(Math.random() * this.list.length)
+                        newList.push(...this.list.splice(i, 1))
+                    }
 
-                remove() {
-                    this.list.splice(3, 1)
+                    this.list = newList
                 },
-
-                reverse() {
-                    this.list.sort((a, b) => b.id - a.id)
-                },
-
+                move1() { },
+                move2() { },
             }
         })
         // mount

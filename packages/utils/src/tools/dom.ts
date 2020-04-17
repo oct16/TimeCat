@@ -120,22 +120,26 @@ export function swapNode(nodeA: Node, nodeB: Node) {
     }
 }
 
-export function getAllChildNodes(nodes: Node[], resultSet: Set<Node> = new Set()) {
-    if (!nodes || !nodes.length) {
-        return resultSet
-    }
-    nodes.forEach(node => {
-        resultSet.add(node)
-        if (node.childNodes) {
-            getAllChildNodes([...node.childNodes], resultSet)
-        }
-    })
-    return resultSet
-}
-
 export function isHideComment(node: Node | null) {
     if (!node) {
         return false
     }
     return node.nodeType === Node.COMMENT_NODE && node.textContent === 'hidden'
+}
+
+export function isExistingNode(node: Node) {
+    return !!document.contains(node)
+}
+
+export function moveNodeTo(node: Element, pos: number) {
+    if (!node || !node.parentNode) {
+        return
+    }
+    const parentNode = node.parentNode!
+    const curPos = getPos(node)
+    if (pos < curPos) {
+        parentNode.insertBefore(node, parentNode.childNodes[pos])
+    } else {
+        parentNode.insertBefore(node, parentNode.childNodes[pos + 1])
+    }
 }

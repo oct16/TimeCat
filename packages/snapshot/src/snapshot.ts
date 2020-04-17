@@ -20,18 +20,17 @@ import {
 import {
     logger,
     throttle,
-    isTextNode,
     isDev,
     nodeStore,
     listenerStore,
     getTime,
     isElementNode,
-    removeItem,
     isCommentNode,
     getPos,
-    getAllChildNodes
+    isExistingNode
 } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
+import { PosCalculator } from './position'
 
 function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
     if (isDev) {
@@ -152,155 +151,168 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
     mouseClick()
 }
 
-function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
-    const mutationCallback: MutationCallback = (records: MutationRecord[]) => {
-        const addNodesSet: Set<Node> = new Set()
-        const newNodes: Set<Node> = new Set()
-        const removeNodesSet: Set<Node> = new Set()
-        const moveNodesSet: Set<Node> = new Set()
-        const nMap: Map<Node, number> = new Map()
-        const attrNodesMap: Map<Node, string | null> = new Map()
-        const textNodesSet: Set<Node> = new Set()
+function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObserve>) {
+    console.log(records)
 
-        records.forEach((record: MutationRecord) => {
-            const { target, addedNodes, removedNodes, type, attributeName } = record
+    const addNodesMap: Map<Node, MutationRecord> = new Map()
+    const removeNodesMap: Map<Node, MutationRecord> = new Map()
+    const moveNodesSet: Set<Node> = new Set()
 
-            switch (type) {
-                case 'attributes':
-                    attrNodesMap.set(target, attributeName)
-                    break
-                case 'characterData':
-                    textNodesSet.add(target)
-                    break
-                case 'childList':
-                    removedNodes.forEach(node => {
-                        removeNodesSet.add(node)
-                        nMap.set(node, nodeStore.getNodeId(target)!)
-                    })
-                    addedNodes.forEach(node => addNodesSet.add(node))
-                    addNodesSet.forEach(node => {
-                        if (!removeNodesSet.has(node)) {
-                            newNodes.add(node)
-                        } else {
-                            moveNodesSet.add(node)
-                        }
-                    })
-                    break
-                default:
-                    break
-            }
-        })
-
-        const removeNodes: Node[] = [...removeNodesSet].filter(node => !document.documentElement.contains(node))
-
-        const removeNodeChildNodesSet: Set<Node> = getAllChildNodes([...removeNodesSet])!
-
-        const addNodes: Node[] = [
-            ...new Set(
-                [...newNodes].filter(node => {
-                    if (!removeNodeChildNodesSet.has(node)) {
-                        return true
-                    } else {
-                        removeItem(removeNodes, node)
-                    }
-                })
-            )
-        ]
-
-        const moveNodes: Node[] = [...moveNodesSet].filter(node => !newNodes.has(node) && !removeNodes.includes(node))
-
-        const removedNodesMutation: removedUpdateData[] = []
-        const removedAllIds: number[] = []
-
-        removeNodes
-            .sort((a: Node) => {
-                return a.nodeType === Node.TEXT_NODE ? -1 : 1
-            })
-            .forEach(node => {
-                const parentId = nMap.get(node)!
-                if (!removedAllIds.includes(parentId)) {
-                    // if exist text_node, means to set innerHtml or set innerText to remove all childNodes
-                    if (isTextNode(node)) {
-                        removedAllIds.push(parentId)
-                    } else if (isElementNode(node)) {
-                        const inAddNodesIndex = addNodes.indexOf(node)
-                        if (inAddNodesIndex === -1) {
-                            removedNodesMutation.push({
-                                parentId,
-                                id: nodeStore.getNodeId(node)!
-                            })
-                        } else {
-                            addNodes.splice(inAddNodesIndex, 1)
-                        }
-                    }
-                }
-            })
-
-        const data: DOMUpdateDataType = {
-            addedList: addNodes.map(node => {
-                let vNode: any
-                if (isElementNode(node)) {
-                    vNode = createElement(node as Element)
-                } else if (isCommentNode(node)) {
-                    vNode = `<!--${node.textContent}-->`
-                } else {
-                    vNode = node.textContent
-                }
-                return {
-                    parentId: nodeStore.getNodeId(node.parentNode as Element),
-                    vNode,
-                    pos: getPos(node)
-                } as AddedUpdateData
-            }),
-            removedList: removedNodesMutation,
-            removedAllList: removedAllIds,
-            movedList: moveNodes.map(node => {
-                const pos = getPos(node)
-                const parentId = nodeStore.getNodeId(node.parentNode as Element)
-                return {
-                    id: nodeStore.getNodeId(node),
-                    parentId,
-                    pos
-                } as movedUpdateData
-            }),
-            attrs: [...attrNodesMap.entries()]
-                .map(data => {
-                    const [node, key] = data
-                    if (document.documentElement.contains(node as Element)) {
-                        return {
-                            id: nodeStore.getNodeId(node),
-                            key,
-                            value: key ? (node as Element).getAttribute(key) : ''
-                        } as AttributesUpdateData
-                    }
-                })
-                .filter(Boolean) as AttributesUpdateData[],
-            texts: [...textNodesSet]
-                .map(textNode => {
-                    if (
-                        document.documentElement.contains(textNode as Node) &&
-                        document.documentElement.contains(textNode.parentNode)
-                    ) {
-                        return {
-                            parentId: nodeStore.getNodeId(textNode.parentNode as Element),
-                            value: textNode.textContent,
-                            pos: getPos(textNode)
-                        } as CharacterDataUpdateData
-                    }
-                })
-                .filter(Boolean) as CharacterDataUpdateData[]
+    const attrNodesMap: Map<Node, string | null> = new Map()
+    const textNodesSet: Set<Node> = new Set()
+    function addNode(node: Node, record: MutationRecord) {
+        if (!node) {
+            return
         }
 
-        if (Object.values(data).some(item => item.length)) {
-            emitterHook(emit, {
-                type: SnapshotType.DOM_UPDATE,
-                data,
-                time: getTime().toString()
-            })
+        if (node.nodeType === node.ELEMENT_NODE) {
+            // If the node is known, it is a move node
+            let nodeId: number | undefined
+            if ((nodeId = nodeStore.getNodeId(node))) {
+                // Because it is a Set, it will be remove duplicate here
+                moveNodesSet.add(node)
+            } else {
+                addNodesMap.set(node, record)
+                return
+            }
+            return
+        } else {
+            addNodesMap.set(node, record)
         }
     }
 
-    const observer = new MutationObserver(mutationCallback)
+    function rmNode(node: Node, record: MutationRecord) {
+        // Deleted after adding
+        if (addNodesMap.has(node)) {
+            addNodesMap.delete(node)
+        }
+
+        // Deleted after moving
+        if (moveNodesSet.has(node)) {
+            moveNodesSet.delete(node)
+        }
+
+        if (!isExistingNode(node)) {
+            // Manually marked for deletion
+            removeNodesMap.set(node, record)
+        }
+    }
+
+    records.forEach((record: MutationRecord) => {
+        const { target, addedNodes, removedNodes, type, attributeName } = record
+        switch (type) {
+            case 'attributes':
+                attrNodesMap.set(target, attributeName)
+                break
+            case 'characterData':
+                textNodesSet.add(target)
+                break
+            case 'childList':
+                addedNodes.forEach(node => addNode(node, record))
+                removedNodes.forEach(node => rmNode(node, record))
+                break
+            default:
+                break
+        }
+    })
+
+    const posCalculator = new PosCalculator(removeNodesMap)
+
+    const removedList = [...removeNodesMap.entries()]
+        .map(entries => {
+            const [node, record] = entries
+            const { target: parentNode } = record
+            if (isElementNode(node)) {
+                return { parentId: nodeStore.getNodeId(parentNode), id: nodeStore.getNodeId(node) }
+            } else {
+                // textNode or commentNode
+                const pos = posCalculator.nodesRelateMap.get(node) as number
+                return {
+                    parentId: nodeStore.getNodeId(parentNode),
+                    pos
+                }
+            }
+        })
+        .filter(Boolean)
+        .sort((a, b) => {
+            if (a.pos && b.pos) {
+                return b.pos - a.pos
+            }
+            return 0
+        }) as removedUpdateData[]
+
+    const addPosCalculator = new PosCalculator(addNodesMap)
+    const addedList = [...addNodesMap].map(entries => {
+        const [node, record] = entries
+        let vNode: any
+        if (isElementNode(node)) {
+            vNode = createElement(node as Element)
+        } else if (isCommentNode(node)) {
+            vNode = `<!--${node.textContent}-->`
+        } else {
+            vNode = node.textContent
+        }
+        const pos = addPosCalculator.nodesRelateMap.get(node)
+        return {
+            parentId: nodeStore.getNodeId(node.parentNode as Element),
+            vNode,
+            pos
+        } as AddedUpdateData
+    })
+
+    const movedList = [...moveNodesSet]
+        .filter(node => isExistingNode(node))
+        .map(node => {
+            const pos = getPos(node)
+            console.log('move: ', node, pos)
+            const parentId = nodeStore.getNodeId(node.parentNode as Element)
+            return {
+                id: nodeStore.getNodeId(node),
+                parentId,
+                pos
+            } as movedUpdateData
+        })
+
+    const data: DOMUpdateDataType = {
+        addedList,
+        removedList,
+        movedList,
+        attrs: [...attrNodesMap.entries()]
+            .map(data => {
+                const [node, key] = data
+                if (isExistingNode(node as Element)) {
+                    return {
+                        id: nodeStore.getNodeId(node),
+                        key,
+                        value: key ? (node as Element).getAttribute(key) : ''
+                    } as AttributesUpdateData
+                }
+            })
+            .filter(Boolean) as AttributesUpdateData[],
+        texts: [...textNodesSet]
+            .map(textNode => {
+                if (isExistingNode(textNode) && textNode.parentNode) {
+                    return {
+                        parentId: nodeStore.getNodeId(textNode.parentNode as Element),
+                        value: textNode.textContent,
+                        pos: getPos(textNode)
+                    } as CharacterDataUpdateData
+                }
+            })
+            .filter(Boolean) as CharacterDataUpdateData[]
+    }
+
+    if (Object.values(data).some(item => item.length)) {
+        emitterHook(emit, {
+            type: SnapshotType.DOM_UPDATE,
+            data,
+            time: getTime().toString()
+        })
+    }
+}
+
+function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
+    const observer = new MutationObserver(callback => mutationCallback(callback, emit))
 
     observer.observe(document.documentElement, {
         attributeOldValue: true,

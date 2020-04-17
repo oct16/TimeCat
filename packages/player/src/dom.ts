@@ -14,7 +14,7 @@ import {
     movedUpdateData
 } from '@WebReplay/snapshot'
 import { PlayerComponent } from './player'
-import { nodeStore, isCommentStr, swapNode, getPos } from '@WebReplay/utils'
+import { nodeStore, isCommentStr, moveNodeTo } from '@WebReplay/utils'
 import { convertVNode, setAttribute } from '@WebReplay/virtual-dom'
 
 export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
@@ -33,21 +33,24 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             }
             break
         case SnapshotType.DOM_UPDATE:
-            const { addedList, removedList, removedAllList, movedList, attrs, texts } = data as DOMUpdateDataType
+            const { addedList, removedList, movedList, attrs, texts } = data as DOMUpdateDataType
 
+            const willRemoveNodes: Node[] = []
             removedList.forEach((item: removedUpdateData) => {
-                const { parentId, id } = item
+                const { parentId, pos, id } = item
                 const parentNode = nodeStore.getNode(parentId)
-                const node = nodeStore.getNode(id)
-                if (node && parentNode && parentNode.contains(node)) {
-                    parentNode.removeChild(node as Node)
-                }
-            })
-
-            removedAllList.forEach(id => {
-                const node = nodeStore.getNode(id) as HTMLElement
-                if (node) {
-                    node.innerHTML = ''
+                if (id) {
+                    const node = nodeStore.getNode(id)
+                    if (node && parentNode && parentNode.contains(node)) {
+                        // parentNode.removeChild(node as Node)
+                        willRemoveNodes.push(node)
+                    }
+                } else if (pos !== undefined) {
+                    // only textNode has pos
+                    if (parentNode) {
+                        willRemoveNodes.push(parentNode.childNodes[pos])
+                        // parentNode.removeChild(parentNode.childNodes[pos] as Node)
+                    }
                 }
             })
 
@@ -73,17 +76,25 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                 }
             })
 
-            movedList.forEach((moved: movedUpdateData) => {
-                const { id, parentId, pos } = moved
-                if (id && parentId) {
-                    const node = nodeStore.getNode(id)!
-                    const curPos = getPos(node)
-
-                    if (curPos !== pos) {
-                        const parentNode = nodeStore.getNode(parentId)!
-                        const shouldSwapNode = parentNode.childNodes[pos]
-                        swapNode(node, shouldSwapNode)
+            movedList
+                // .sort((a, b) => {
+                //     const { id: aId, parentId: aPid, pos: aPos } = a
+                //     const { id: bId, parentId: bPid, pos: bPos } = b
+                //     return (aPid - bPid) * 100 + aPos - bPos
+                // })
+                .forEach((moved: movedUpdateData) => {
+                    const { id, parentId, pos } = moved
+                    if (id && parentId) {
+                        const node = nodeStore.getNode(id)
+                        if (node) {
+                            moveNodeTo(node as Element, pos)
+                        }
                     }
+                })
+
+            willRemoveNodes.forEach(node => {
+                if (node && node.parentNode) {
+                    node.parentNode!.removeChild(node)
                 }
             })
 

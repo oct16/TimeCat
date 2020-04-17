@@ -79,10 +79,10 @@ export interface AddedUpdateData {
     pos: number
 }
 export interface removedUpdateData {
-    id: number
+    id?: number
     parentId: number
+    pos?: number
 }
-export type removedAllUpdateData = number
 export interface movedUpdateData {
     id: number
     pos: number
@@ -92,7 +92,6 @@ export interface movedUpdateData {
 export interface DOMUpdateDataType {
     addedList: AddedUpdateData[]
     removedList: removedUpdateData[]
-    removedAllList: removedAllUpdateData[]
     movedList: movedUpdateData[]
     attrs: AttributesUpdateData[]
     texts: CharacterDataUpdateData[]
