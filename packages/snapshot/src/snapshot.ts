@@ -152,8 +152,6 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 }
 
 function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObserve>) {
-    console.log(records)
-
     const addNodesMap: Map<Node, MutationRecord> = new Map()
     const removeNodesMap: Map<Node, MutationRecord> = new Map()
     const moveNodesSet: Set<Node> = new Set()
@@ -264,7 +262,6 @@ function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObse
         .filter(node => isExistingNode(node))
         .map(node => {
             const pos = getPos(node)
-            console.log('move: ', node, pos)
             const parentId = nodeStore.getNodeId(node.parentNode as Element)
             return {
                 id: nodeStore.getNodeId(node),
@@ -424,14 +421,16 @@ function kidnapInputs(emit: SnapshotEvent<FormElementObserve>) {
     handles.concat([]).forEach(handle => handle())
 
     function handleEvent(this: HTMLElement, key: string, value: string) {
+        const data = {
+            type: FormElementEvent.PROP,
+            id: nodeStore.getNodeId(this)!,
+            key,
+            value
+        }
+
         emit({
             type: SnapshotType.FORM_EL_UPDATE,
-            data: {
-                type: FormElementEvent.ATTR,
-                id: nodeStore.getNodeId(this)!,
-                key,
-                value
-            },
+            data,
             time: getTime().toString()
         })
     }

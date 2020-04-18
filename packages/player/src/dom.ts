@@ -133,9 +133,9 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                     node.focus()
                 } else if (formType === FormElementEvent.BLUR) {
                     node.blur()
-                } else if (formType === FormElementEvent.ATTR) {
+                } else if (formType === FormElementEvent.PROP) {
                     if (key) {
-                        setAttribute(node, key, value as string)
+                        ;(node as any)[key] = value
                     }
                 }
             }

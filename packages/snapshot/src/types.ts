@@ -9,7 +9,7 @@ export enum SnapshotType {
 }
 
 export enum FormElementEvent {
-    'ATTR' = 'ATTR',
+    'PROP' = 'PROP',
     'INPUT' = 'INPUT',
     'CHANGE' = 'CHANGE',
     'FOCUS' = 'FOCUS',
