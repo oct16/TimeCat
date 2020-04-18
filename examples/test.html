@@ -78,7 +78,7 @@
         const replayButton = document.getElementById('replay')
         if (replayButton) {
             replayButton.onclick = () => {
-                ctrl.uninstall()
+                ctrl.unsubscribe()
                 window.open('replay.html')
             }
         }

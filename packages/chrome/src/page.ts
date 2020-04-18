@@ -4,16 +4,8 @@ let ctrl: any
 
 function record(e: Event) {
     const wr = (window as any).wr
-    const { DB, record } = wr
-
-    DB.then((db: any) => {
-        db.clear()
-        ctrl = record({
-            emitter: (data: any) => {
-                db.add(data)
-            }
-        })
-    })
+    const { record } = wr
+    ctrl = record()
 }
 
 function replay(e: Event & { detail: { scripts: { name: string; src: string }[] } }) {
@@ -24,7 +16,7 @@ function replay(e: Event & { detail: { scripts: { name: string; src: string }[] 
             scripts,
             autoPlay: true
         })
-        ctrl.uninstall()
+        ctrl.unsubscribe()
     }
 }
 
@@ -32,7 +24,7 @@ function setWarn(handle?: () => void) {
     document.addEventListener('visibilitychange', function() {
         if (document.visibilityState == 'hidden') {
             if (ctrl) {
-                ctrl.uninstall()
+                ctrl.unsubscribe()
                 ctrl = null
             }
             dispatchEvent('CHROME_RECORD_CANCEL')
