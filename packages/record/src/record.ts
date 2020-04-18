@@ -1,6 +1,5 @@
 import { snapshots, SnapshotData } from '@WebReplay/snapshot'
-import { RecordOptions } from './types'
-import { listenerStore } from '@WebReplay/utils'
+import { listenerStore, IndexedDBOperator, DBPromise } from '@WebReplay/utils'
 
 const ctrl = {
     uninstall: () => {
@@ -8,15 +7,23 @@ const ctrl = {
     }
 }
 
-function recordAll(emitter?: (e: SnapshotData) => void) {
+function recordAll(emitter?: (data: SnapshotData) => void) {
     const recordTasks: Function[] = [...Object.values(snapshots)]
-
     recordTasks.forEach(task => {
         task(emitter)
     })
 }
 
-export const record = ({ emitter }: RecordOptions = {}) => {
-    recordAll(emitter)
+export const record = (fn?: (data: SnapshotData, db: IndexedDBOperator) => void) => {
+    DBPromise.then(db => {
+        db.clear()
+        recordAll(data => {
+            if (fn) {
+                fn(data, db)
+                return
+            }
+            db.add(data)
+        })
+    })
     return ctrl
 }

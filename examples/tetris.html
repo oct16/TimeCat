@@ -22,8 +22,8 @@
 
         #replay {
             border: 1px solid grey;
-            padding: 5px 10px;
-            font-size: 22px;
+            padding: 2px 5px;
+            font-size: 18px;
             color: red;
             font-weight: bold;
             cursor: pointer;
@@ -35,7 +35,6 @@
             color: rgb(205, 203, 203);
             border-color: rgb(205, 203, 203);
         }
-
 
         #replay.hide {
             visibility: hidden;
@@ -59,20 +58,12 @@
     <script id="web-replay" src="./replay.min.js"></script>
 
     <script>
-        const { record, DB } = wr
-        DB.then(db => {
-            db.clear()
-            const ctr = record({
-                emitter: data => {
-                    db.add(data)
-                }
-            })
+        const { record } = wr
+        ctrl = record()
+        handleReplay(ctrl)
 
-            handleReplay(ctr)
-        })
-
-        function handleReplay(ctr) {
-            function IsPC() {
+        function handleReplay(ctrl) {
+            function isPC() {
                 var userAgentInfo = navigator.userAgent;
                 var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
                 var flag = true;
@@ -85,14 +76,14 @@
             setTimeout(() => {
                 replayButton.className = ''
             }, 5000);
-            document.addEventListener(IsPC() ? 'click' : 'touchstart', e => {
+            document.addEventListener(isPC() ? 'click' : 'touchstart', e => {
                 if (e.target === replayButton) {
                     if (replayButton.className) {
                         return
                     }
                     replayButton.className = 'hide'
-                    ctr.uninstall()
-                    if (IsPC()) {
+                    ctrl.uninstall()
+                    if (isPC()) {
                         window.open('replay.html')
                     } else {
                         location.href = './replay.html'

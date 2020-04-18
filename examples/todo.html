@@ -256,29 +256,22 @@
 
     <script id="web-replay" src="./replay.min.js"></script>
     <script>
-        const { record, DB } = wr
-        DB.then(db => {
-            db.clear()
-            const ctr = record({
-                emitter: data => {
-                    db.add(data)
+        const { record } = wr
+        ctrl = record()
+        const replayButton = document.getElementById('replay')
+        if (replayButton) {
+            setTimeout(() => {
+                replayButton.className = ''
+            }, 5000);
+            replayButton.addEventListener('click', () => {
+                if (replayButton.className) {
+                    return
                 }
+                replayButton.className = 'hide'
+                ctrl.uninstall()
+                window.open('replay.html')
             })
-            const replayButton = document.getElementById('replay')
-            if (replayButton) {
-                setTimeout(() => {
-                    replayButton.className = ''
-                }, 5000);
-                replayButton.addEventListener('click', () => {
-                    if (replayButton.className) {
-                        return
-                    }
-                    replayButton.className = 'hide'
-                    ctr.uninstall()
-                    window.open('replay.html')
-                })
-            }
-        })
+        }
     </script>
     <!--env-->
     <!-- Global site tag (gtag.js) - Google Analytics -->
