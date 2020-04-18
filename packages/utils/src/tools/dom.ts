@@ -128,18 +128,18 @@ export function isHideComment(node: Node | null) {
 }
 
 export function isExistingNode(node: Node) {
-    return !!document.contains(node)
+    return node.ownerDocument && !!node.ownerDocument.contains(node)
 }
 
-export function moveNodeTo(node: Element, pos: number) {
-    if (!node || !node.parentNode) {
+export function moveNodeTo(node: Element, pos: number, parentNode?: Node) {
+    if (!node || !isExistingNode(node) || !node.parentNode) {
         return
     }
-    const parentNode = node.parentNode!
+    const pNode = parentNode || node.parentNode!
     const curPos = getPos(node)
-    if (pos < curPos) {
-        parentNode.insertBefore(node, parentNode.childNodes[pos])
+    if (pNode !== node.parentNode || pos < curPos) {
+        pNode.insertBefore(node, pNode.childNodes[pos])
     } else {
-        parentNode.insertBefore(node, parentNode.childNodes[pos + 1])
+        pNode.insertBefore(node, pNode.childNodes[pos + 1])
     }
 }

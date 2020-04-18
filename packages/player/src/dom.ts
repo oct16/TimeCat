@@ -76,21 +76,16 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
                 }
             })
 
-            movedList
-                // .sort((a, b) => {
-                //     const { id: aId, parentId: aPid, pos: aPos } = a
-                //     const { id: bId, parentId: bPid, pos: bPos } = b
-                //     return (aPid - bPid) * 100 + aPos - bPos
-                // })
-                .forEach((moved: movedUpdateData) => {
-                    const { id, parentId, pos } = moved
-                    if (id && parentId) {
-                        const node = nodeStore.getNode(id)
-                        if (node) {
-                            moveNodeTo(node as Element, pos)
-                        }
+            movedList.forEach((moved: movedUpdateData) => {
+                const { id, parentId, pos } = moved
+                if (id && parentId) {
+                    const parentNode = nodeStore.getNode(parentId)
+                    const node = nodeStore.getNode(id)
+                    if (node) {
+                        moveNodeTo(node as Element, pos, parentNode)
                     }
-                })
+                }
+            })
 
             willRemoveNodes.forEach(node => {
                 if (node && node.parentNode) {
