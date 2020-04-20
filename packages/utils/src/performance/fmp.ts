@@ -1,3 +1,7 @@
+/**
+ * Reference: https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint
+ * TODO FMP (first Meaningful Paint) TODO
+ */
 class FMP {
     interval = 1000
     len = 0

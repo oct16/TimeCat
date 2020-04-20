@@ -1,4 +1,4 @@
-import { SnapshotData, WindowObserveData, DOMSnapshotData } from '@WebReplay/snapshot'
+import { SnapshotData, WindowObserveData, DOMSnapshotData, InfoData } from '@WebReplay/snapshot'
 
 export class IndexedDBOperator {
     db: IDBDatabase
@@ -64,10 +64,15 @@ export class IndexedDBOperator {
     async getData() {
         const all = await this.readAll()
 
-        const [window, virtualNode, ...data] = all
-        const [WindowData, { vNode }] = [window.data, virtualNode.data] as [WindowObserveData, DOMSnapshotData]
+        const [initData, window, virtualNode, ...data] = all
+        const [InitData, WindowData, { vNode }] = [initData.data, window.data, virtualNode.data] as [
+            InfoData,
+            WindowObserveData,
+            DOMSnapshotData
+        ]
 
         return {
+            ...InitData,
             ...WindowData,
             vNode,
             data

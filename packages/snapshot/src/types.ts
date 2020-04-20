@@ -1,6 +1,7 @@
 import { VNode } from '@WebReplay/virtual-dom'
 
 export enum SnapshotType {
+    'INFO' = 'INFO',
     'WINDOW' = 'WINDOW',
     'DOM' = 'DOM',
     'MOUSE' = 'MOUSE',
@@ -20,18 +21,25 @@ export enum MouseEventType {
     'CLICK' = 'click'
 }
 
+export interface InfoObserve {
+    type: SnapshotType.INFO
+    data: InfoData
+    time: string
+}
 export interface WindowObserve {
     type: SnapshotType.WINDOW
     data: WindowObserveData
     time: string
+}
+export interface InfoData {
+    origin: string
+    pathname: string
 }
 export interface WindowObserveData {
     width: number
     height: number
     scrollTop: number
     scrollLeft: number
-    origin: string
-    pathname: string
 }
 
 export interface DOMSnapshot {
@@ -112,4 +120,4 @@ export interface FormElementObserveData {
 
 export type SnapshotEvent<T> = (e: T) => void
 
-export type SnapshotData = FormElementObserve | DOMObserve | MouseSnapshot | DOMSnapshot | WindowObserve
+export type SnapshotData = FormElementObserve | DOMObserve | MouseSnapshot | DOMSnapshot | WindowObserve | InfoObserve

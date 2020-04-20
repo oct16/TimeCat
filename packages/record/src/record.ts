@@ -9,9 +9,7 @@ const ctrl = {
 
 function recordAll(emitter?: (data: SnapshotData) => void) {
     const recordTasks: Function[] = [...Object.values(snapshots)]
-    recordTasks.forEach(task => {
-        task(emitter)
-    })
+    recordTasks.forEach(task => task(emitter))
 }
 
 export const record = (fn?: (data: SnapshotData, db: IndexedDBOperator) => void) => {

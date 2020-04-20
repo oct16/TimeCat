@@ -15,7 +15,8 @@ import {
     AddedUpdateData,
     AttributesUpdateData,
     CharacterDataUpdateData,
-    DOMUpdateDataType
+    DOMUpdateDataType,
+    InfoObserve
 } from './types'
 import {
     logger,
@@ -39,9 +40,21 @@ function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
     emit(data)
 }
 
-function windowObserve(emit: SnapshotEvent<WindowObserve>) {
+function initInfo(emit: SnapshotEvent<InfoObserve>) {
     const origin = () => window.location.origin
     const pathname = () => window.location.pathname
+
+    emitterHook(emit, {
+        type: SnapshotType.INFO,
+        data: {
+            origin: origin(),
+            pathname: pathname()
+        },
+        time: getTime().toString()
+    })
+}
+
+function windowObserve(emit: SnapshotEvent<WindowObserve>) {
     const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
     const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
@@ -54,9 +67,7 @@ function windowObserve(emit: SnapshotEvent<WindowObserve>) {
                 width: width(),
                 height: height(),
                 scrollTop: scrollTop(),
-                scrollLeft: scrollLeft(),
-                origin: origin(),
-                pathname: pathname()
+                scrollLeft: scrollLeft()
             },
             time: getTime().toString()
         })
@@ -437,6 +448,7 @@ function kidnapInputs(emit: SnapshotEvent<FormElementObserve>) {
 }
 
 export const snapshots = {
+    initInfo,
     windowObserve,
     DOMSnapshot,
     mouseObserve,
