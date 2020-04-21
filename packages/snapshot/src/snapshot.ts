@@ -231,24 +231,33 @@ function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObse
         .map(entries => {
             const [node, record] = entries
             const { target: parentNode } = record
-            if (isElementNode(node)) {
-                return { parentId: nodeStore.getNodeId(parentNode), id: nodeStore.getNodeId(node) }
-            } else {
-                // textNode or commentNode
-                const pos = posCalculator.nodesRelateMap.get(node) as number
-                return {
-                    parentId: nodeStore.getNodeId(parentNode),
-                    pos
+
+            const parentId = nodeStore.getNodeId(parentNode)
+            if (parentId) {
+                if (isElementNode(node)) {
+                    const id = nodeStore.getNodeId(node)
+                    if (id) {
+                        return { parentId, id }
+                    }
+                    return null
+                } else {
+                    // textNode or commentNode
+                    const pos = posCalculator.nodesRelateMap.get(node) as number
+                    return {
+                        parentId: nodeStore.getNodeId(parentNode),
+                        pos
+                    }
                 }
             }
+            return null
         })
-        .filter(Boolean)
-        .sort((a, b) => {
-            if (a.pos && b.pos) {
-                return b.pos - a.pos
-            }
-            return 0
-        }) as removedUpdateData[]
+        .filter(Boolean) as removedUpdateData[]
+    // .sort((a, b) => {
+    //     if (a.pos && b.pos) {
+    //         return b.pos - a.pos
+    //     }
+    //     return 0
+    // }) as removedUpdateData[]
 
     const addPosCalculator = new PosCalculator(addNodesMap)
     const addedList = [...addNodesMap].map(entries => {
