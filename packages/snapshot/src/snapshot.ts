@@ -252,31 +252,46 @@ function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObse
             return null
         })
         .filter(Boolean) as removedUpdateData[]
-    // .sort((a, b) => {
-    //     if (a.pos && b.pos) {
-    //         return b.pos - a.pos
-    //     }
-    //     return 0
-    // }) as removedUpdateData[]
 
     const addPosCalculator = new PosCalculator(addNodesMap)
-    const addedList = [...addNodesMap].map(entries => {
-        const [node, record] = entries
-        let vNode: any
-        if (isElementNode(node)) {
-            vNode = createElement(node as Element)
-        } else if (isCommentNode(node)) {
-            vNode = `<!--${node.textContent}-->`
-        } else {
-            vNode = node.textContent
+    const addedSet: Set<Node> = new Set()
+
+    function deepAdd(node: Node) {
+        if (!node) {
+            return
         }
-        const pos = addPosCalculator.nodesRelateMap.get(node)
-        return {
-            parentId: nodeStore.getNodeId(node.parentNode as Element),
-            vNode,
-            pos
-        } as AddedUpdateData
-    })
+        addedSet.add(node)
+        node.childNodes.forEach(n => {
+            deepAdd(n)
+        })
+    }
+
+    const addedList = [...addNodesMap]
+        .map(entries => {
+            const [node, record] = entries
+            if (addedSet.has(node)) {
+                return null
+            } else if (nodeStore.getNodeId(node)) {
+                return null
+            }
+            deepAdd(node)
+
+            let vNode: any
+            if (isElementNode(node)) {
+                vNode = createElement(node as Element)
+            } else if (isCommentNode(node)) {
+                vNode = `<!--${node.textContent}-->`
+            } else {
+                vNode = node.textContent
+            }
+            const pos = addPosCalculator.nodesRelateMap.get(node)
+            return {
+                parentId: nodeStore.getNodeId(node.parentNode as Element),
+                vNode,
+                pos
+            } as AddedUpdateData
+        })
+        .filter(Boolean) as AddedUpdateData[]
 
     const movedList = [...moveNodesSet]
         .filter(node => isExistingNode(node))
