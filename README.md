@@ -139,6 +139,8 @@ const elementList: [HTMLElement, string][] = [
 
 #### 对MutationObserver的优化
 
+由于 DOM 的 Diff Patch 是借助 MutationObserver 来实现的，需要对发生更变的记录进行收集处理，这涉及到一些关键问题：例如DOM更变的时序是有先后的，Mutation只归纳为新增和删除，但是在调用insertBefore或者appendChild的时候，会造成移动，要对这些节点进行处理，标记为移动，否则节点的引用丢失就可能会导致渲染错误
+
 // TODO
 
 #### SPA网页的渲染时间
