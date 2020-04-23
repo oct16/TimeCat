@@ -62,7 +62,7 @@ Web录屏器其实也借鉴这样的一种思路，工程上一般称之为Opera
 ---
 ### Web录屏器的技术细节
 
-##### 对DOM进行快照
+#### 对DOM进行快照
 
 通过DOM的API可以很轻易的拿到页面的节点数据，但是对于我们的需求而言，显而DOM Node提供的数据太冗余了，这一步通过参考VirtualDom的设计，把信息精简一下
 
@@ -79,13 +79,13 @@ interface VNode{
 
 在这过程中，有一些节点和属性需要特殊处理，例如
 
-- `InputElement`等类型的Value是从DOM无法获取的，需要从节点中对象中获取
+- `InputElement`等类型的`value` `checked`是无法从DOM获取的，需要从节点中对象中获取
 - `script`标签的内容由于之后不会去执行，所以可以直接`skip`或者标记为`noscript`
 - `SVG`可以直接获取，但是它本身以及它的子元素重新转换为DOM的时候需要使用`createElementNS("http://www.w3.org/2000/svg", tagName)`的方法创建元素
 - `src`或`href`属性如果是相对路径，需要把他们转换为绝对路径
-...
+  ......
 
-##### 记录影响页面元素变化的Action
+#### 记录影响页面元素变化的Action
 
 DOM的变化可以使用`MutationObserver`, 监听到`attributes`,`characterData`,`childList` 三种类型的变化
 ```ts
@@ -137,15 +137,17 @@ const elementList: [HTMLElement, string][] = [
     })
 ```
 
-##### 对MutationObserver的优化
+#### 对MutationObserver的优化
 
-##### SPA网页的渲染时间
+// TODO
+
+#### SPA网页的渲染时间
 
 在开始播放前，我们需要把之前的存储的数据还原成真实的DOM，这个过程中会占用一定的加载时间产生白屏，这取决于你的浏览器性能以及录制网页资源情况，参考FMP（First Meaningful Paint）的实现，加载过程中可以通过之前映射的数据动态生成骨架图，等待FMP发出Ready信号之后再进行播放
 
 > 参考文章： [Time to First Meaningful Paint](https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/view#)
 
-##### 通过样条曲线模拟鼠标轨迹
+#### 通过样条曲线模拟鼠标轨迹
 
 用户在网页中移动鼠标会产生很多`mouseMove`事件，通过 `const { x, y } = event.target` 获取到了轨迹的坐标与时间戳
 
@@ -164,7 +166,7 @@ const elementList: [HTMLElement, string][] = [
 
 通过规则筛选出关键点后，利用B样条曲线计算函数，按照最小间隔进行取样并插入我们的鼠标路径队执行列里，当渲染时重绘鼠标位置的时候，就可以得到一个近似曲线的鼠标轨迹了
 
-##### 通过鼠标数据生成热力图
+#### 通过鼠标数据生成热力图
 
 之前已经通过鼠标事件记录了完整的坐标信息，通过[heatmap.js](https://www.patrick-wied.at/static/heatmapjs/)可以很方便的生成热力图，用于对用户的行为数据进行分析。
 
@@ -172,11 +174,11 @@ const elementList: [HTMLElement, string][] = [
 
 ![heatmap](./assets/heatmap.png)
 
-##### 对于用户隐私的脱敏
+#### 对于用户隐私的脱敏
 
-对于一些客户个人隐私数据，通过在开发时DOM进行标注的 `Node.COMMENT_NODE`（例如： `<!-- ... -->`）信息申明，我们是可以获取并加工的。通过约定好的声明对需要脱敏的DOM块按业务的需求进行处理即可
+对于一些客户个人隐私数据，通过在开发时对DOM进行标注的 `Node.COMMENT_NODE`（例如： `<!-- ... -->`）信息申明，我们是可以获取并加工的。通过约定好的声明对需要脱敏的DOM块按业务的需求进行处理即可，例如在项目的DEMO中，我需要在回放的时候把```<button>```标签隐藏掉，只需改写成```<!--hidden--><button>```
 
-##### 沙箱化提升安全
+#### 沙箱化提升安全
 
 录制的内容有可能属于第三方提供，这意味着可能存在一定的风险，网站中可能有一些恶意的脚本并没有被我们完全过滤掉，例如：`<div onload="alert('something'); script..."></div>`，或者我们的播放器中的一些事件也可能对播放内容产生影响，这时候我们需要一个沙盒来隔离播放内容的环境，HTML5 提供的 iframe sandbox是不错的选择，这可以帮助我们轻易的隔离环境：
 ```
@@ -189,7 +191,7 @@ const elementList: [HTMLElement, string][] = [
 - 不能执行自动播放的tricky. 比如: autofocused, autoplay
 ```
 
-##### 播放、跳转与快进
+#### 播放、跳转与快进
 
 播放：播放器会内置一个精确的计时器，动作的数据存储在一个栈中，栈中的每一个对象就是一帧，通过RAF(requestAnimationFrame) 对数据帧的时间戳进行扫描从而得知下一帧在什么时间发生
 
@@ -199,7 +201,7 @@ const elementList: [HTMLElement, string][] = [
 
 跳转：通过virtualDom实现计算
 
-##### 在客户端进行的Gzip压缩
+#### 在客户端进行的Gzip压缩
 
 Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的数据不一定只存在数据库里，可能会有三种储存方式
 1. 服务器存储 TCP => DB
@@ -208,7 +210,7 @@ Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的�
 
 利用客户端的运算能力，在进行导出或者传输之前，可以对数据进行压缩，极大程度的减小体积
 
-在客户端可以进行基于 `Gzip` 的数据包压缩，这里我选择了[Pako](https://nodeca.github.io/pako/)来对数据进行压缩   
+在客户端可以进行基于 `Gzip` 的数据包压缩，这里我选择了 [Pako](https://nodeca.github.io/pako/) 来对数据进行压缩   
 Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的
 
 LZ77 的核心思路是如果一个串中有两个重复的串，那么只需要知道第一个串的内容和后面串相对于第一个串起始位置的距离 + 串的长度， 而哈夫曼的核心思路是通过构造 Huffman Tree 的方式给字符重新编码
@@ -216,13 +218,13 @@ LZ77 的核心思路是如果一个串中有两个重复的串，那么只需要
 > 参考文章： [How gzip uses Huffman coding](https://jvns.ca/blog/2015/02/22/how-gzip-uses-huffman-coding/)
 > 
 
-##### 数据上传
+#### 数据上传
 
 对于客户端的数据，可以利用浏览器提供的indexedDB进行存储，毕竟indexedDB会比LocalStorage容量大得多，一般来说不少于 250MB，甚至没有上限，此外它使用object store存储，而且支持transaction，另外很重要的一点它是异步的，意味着不会阻塞录屏器的运行
 之后数据可以通过WebSocket或其他方式持续上传到OSS服务器中，由于数据是分块进行传输的，在同步之后还可以增加数据校验码来保证一致性避免错误
 
 
-##### 致谢
+#### 致谢
 
 感谢阿里的XREPLAY的启发   
 感谢RRWEB的技术分享   
