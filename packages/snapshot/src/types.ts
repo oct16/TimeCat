@@ -32,6 +32,7 @@ export interface WindowObserve {
     time: string
 }
 export interface InfoData {
+    doctype: DocumentType
     origin: string
     pathname: string
 }

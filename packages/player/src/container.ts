@@ -13,8 +13,15 @@ export class ContainerComponent {
     width: number
     height: number
 
-    constructor(params: { vNode: VNode; width: number; height: number }) {
-        this.vNode = params.vNode
+    constructor(
+        vNode: VNode,
+        params: {
+            width: number
+            height: number
+            doctype: { name: string; publicId: string; systemId: string }
+        }
+    ) {
+        this.vNode = vNode
         this.width = params.width
         this.height = params.height
         this.init()
@@ -31,7 +38,11 @@ export class ContainerComponent {
         this.sandBox.style.height = this.height + 'px'
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.sandBoxDoc.open()
-        this.sandBoxDoc.write('<!DOCTYPE html><html><head></head><body></body></html>')
+        const doctype = window.__ReplayData__.doctype
+        const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
+            doctype.systemId ? '"' + doctype.systemId + '"' : ''
+        }><html><head></head><body></body></html>`
+        this.sandBoxDoc.write(doc)
         this.sandBoxDoc.close()
         disableScrolling(this.sandBox.contentWindow!)
         this.setViewState()

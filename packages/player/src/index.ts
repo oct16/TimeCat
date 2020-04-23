@@ -18,9 +18,9 @@ function getGZipStrData() {
 export async function replay() {
     const indexedDB = await DBPromise
 
-    const { width, height, vNode, data } = (window.__ReplayData__ =
+    const { width, height, doctype, vNode, data } = (window.__ReplayData__ =
         getGZipStrData() || window.__ReplayData__ || (await indexedDB.getData()))
-    const c = new ContainerComponent({ vNode, width, height })
+    const c = new ContainerComponent(vNode, { width, height, doctype })
 
     if (data.length) {
         fmp.ready(() => {

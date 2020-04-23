@@ -16,7 +16,8 @@ import {
     AttributesUpdateData,
     CharacterDataUpdateData,
     DOMUpdateDataType,
-    InfoObserve
+    InfoObserve,
+    InfoData
 } from './types'
 import {
     logger,
@@ -41,15 +42,18 @@ function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
 }
 
 function initInfo(emit: SnapshotEvent<InfoObserve>) {
+    const { name, publicId, systemId } = window.document.doctype!
+    const doctype = () => ({ name, publicId, systemId })
     const origin = () => window.location.origin
     const pathname = () => window.location.pathname
 
     emitterHook(emit, {
         type: SnapshotType.INFO,
         data: {
+            doctype: doctype(),
             origin: origin(),
             pathname: pathname()
-        },
+        } as InfoData,
         time: getTime().toString()
     })
 }

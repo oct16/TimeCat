@@ -42,6 +42,11 @@ interface Window {
         height: number
         scrollTop: number
         scrollLeft: number
+        doctype: {
+            name: string
+            publicId: string
+            systemId: string
+        }
         origin: string
         pathname: string
     }
