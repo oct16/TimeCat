@@ -3,7 +3,7 @@ const env = 'development'
 
 execa(
     'rollup',
-    ['-c', 'rollup.config.dev.js', '-w', '--environment', [`NODE_ENV:${env}`].filter(Boolean).join(',')],
+    ['-c', 'builders/rollup.config.dev.js', '-w', '--environment', [`NODE_ENV:${env}`].filter(Boolean).join(',')],
     {
         stdio: 'inherit'
     }

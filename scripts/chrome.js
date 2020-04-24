@@ -8,7 +8,7 @@ execa(
     'rollup',
     [
         '-c',
-        'rollup.config.chrome.js',
+        'builders/rollup.config.chrome.js',
         envDev ? '-w' : '',
         '--environment',
         [`NODE_ENV:${env}`].filter(Boolean).join(',')
