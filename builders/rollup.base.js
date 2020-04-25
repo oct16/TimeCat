@@ -30,6 +30,10 @@ export const htmlExamples = () => {
             template: () => filteringTemplate(fs.readFileSync('examples/player.html', 'utf8'))
         }),
         html({
+            fileName: 'live.html',
+            template: () => filteringTemplate(fs.readFileSync('examples/live.html', 'utf8'))
+        }),
+        html({
             fileName: 'test.html',
             template: () => fs.readFileSync('examples/test.html', 'utf8')
         }),

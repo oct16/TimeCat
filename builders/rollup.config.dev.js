@@ -21,7 +21,9 @@ export default [
         ],
         plugins: [
             ts(),
-            node(),
+            node({
+                browser: true
+            }),
             commonjs(),
             ...env(),
             ...htmlExamples(),

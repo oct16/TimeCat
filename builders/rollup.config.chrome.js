@@ -1,11 +1,17 @@
 import ts from 'rollup-plugin-typescript2'
 import copy from 'rollup-plugin-copy'
 import replace from '@rollup/plugin-replace'
+import node from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 
 const defaultPlugin = [
     ts({
         tsconfigOverride: { compilerOptions: { declaration: false } }
     }),
+    node({
+        browser: true
+    }),
+    commonjs(),
     replace({
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     })

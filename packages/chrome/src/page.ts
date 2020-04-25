@@ -1,10 +1,15 @@
 import { dispatchEvent } from './common'
+import io from 'socket.io-client'
 
 let ctrl: any
 
 function record(e: Event) {
-    const wr = (window as any).wr
+    const wr = window.wr
     const { record } = wr
+    // const socket = io('http://localhost:9528')
+    // ctrl = record(data => {
+    //     socket.emit('record-msg', data)
+    // })
     ctrl = record()
 }
 

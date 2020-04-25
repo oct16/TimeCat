@@ -5,7 +5,9 @@ import { reduxStore, PlayerTypes, ProgressState, getTime } from '@WebReplay/util
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 
+const LIVE = Symbol('live')
 export class PlayerComponent {
+    mode: Symbol
     data: SnapshotData[]
     speed = 0
     index = 0
@@ -26,17 +28,26 @@ export class PlayerComponent {
         this.pointer = pointer
         this.progress = progress
 
-        reduxStore.subscribe('player', state => {
-            this.progressState = reduxStore.getState()['progress']
-            const speed = state.speed
-            this.speed = speed
-            if (speed > 0) {
-                this.play()
-            } else {
-                this.pause()
-            }
-            this.frames = this.getAccuratelyFrame()
-        })
+        if (!data.length) {
+            // is live mode
+            this.mode = LIVE
+            window.addEventListener('record-data', (e: CustomEvent) => {
+                const frame = e.detail
+                this.execFrame(frame)
+            })
+        } else {
+            reduxStore.subscribe('player', state => {
+                this.progressState = reduxStore.getState()['progress']
+                const speed = state.speed
+                this.speed = speed
+                if (speed > 0) {
+                    this.play()
+                } else {
+                    this.pause()
+                }
+                this.frames = this.getAccuratelyFrame()
+            })
+        }
     }
 
     play() {

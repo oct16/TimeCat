@@ -4,7 +4,19 @@
     "workspaces": [
         "packages/*"
     ],
-    "dependencies": {},
+    "scripts": {
+        "dev": "node scripts/dev.js",
+        "build": "node scripts/build.js",
+        "chrome": "node scripts/chrome.js",
+        "f": "npx code-formatter --path packages",
+        "live": "node scripts/live.js",
+        "deploy-gh": "git subtree split --prefix dist -b gh-pages && git push -f origin gh-pages:gh-pages",
+        "gh": "npm run build && git push origin `git subtree split --prefix dist master`:gh-pages --force"
+    },
+    "dependencies": {
+        "koa": "^2.11.0",
+        "socket.io": "^2.3.0"
+    },
     "devDependencies": {
         "@oct16/code-formatter": "^1.0.9",
         "@rollup/plugin-commonjs": "^11.0.2",
@@ -14,9 +26,12 @@
         "@types/chrome": "0.0.101",
         "@types/node": "^13.9.2",
         "@types/pako": "^1.0.1",
+        "@types/socket.io-client": "^1.4.32",
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
+        "install": "^0.13.0",
         "mutationobserver-shim": "^0.3.3",
+        "npm": "^6.14.4",
         "pako": "^1.0.11",
         "rollup": "^1.32.0",
         "rollup-plugin-browsersync": "^1.1.0",
@@ -26,14 +41,6 @@
         "rollup-plugin-terser": "^5.3.0",
         "rollup-plugin-typescript2": "^0.26.0",
         "typescript": "^3.8.3"
-    },
-    "scripts": {
-        "dev": "node scripts/dev.js",
-        "build": "node scripts/build.js",
-        "chrome": "node scripts/chrome.js",
-        "f": "npx code-formatter --path packages",
-        "deploy-gh": "git subtree split --prefix dist -b gh-pages && git push -f origin gh-pages:gh-pages",
-        "gh": "npm run build && git push origin `git subtree split --prefix dist master`:gh-pages --force"
     },
     "repository": {
         "type": "git",
