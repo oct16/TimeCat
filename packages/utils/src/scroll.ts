@@ -2,13 +2,13 @@
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 
 export function disableScrolling(target: Window) {
-    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 } as any
+    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 } as { [key: string]: number }
 
     function preventDefault(e: Event) {
         e.preventDefault()
     }
 
-    function preventDefaultForScrollKeys(e: Event & { keyCode: any }) {
+    function preventDefaultForScrollKeys(e: Event & { keyCode: string }) {
         if (keys[e.keyCode]) {
             preventDefault(e)
             return false

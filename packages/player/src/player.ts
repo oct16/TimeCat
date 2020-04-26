@@ -32,7 +32,7 @@ export class PlayerComponent {
             // is live mode
             this.mode = LIVE
             window.addEventListener('record-data', (e: CustomEvent) => {
-                const frame = e.detail
+                const frame = e.detail as SnapshotData
                 this.execFrame(frame)
             })
         } else {

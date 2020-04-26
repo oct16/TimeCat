@@ -49,7 +49,7 @@ function getAsyncDataBySocket(uri: string): Promise<BaseType> {
     })
 }
 
-export async function replay(options: { socketUrl: string } = {} as any) {
+export async function replay(options: { socketUrl?: string } = {}) {
     const { socketUrl } = options
 
     const indexedDB = await DBPromise

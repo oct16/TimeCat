@@ -1,7 +1,9 @@
 import { dispatchEvent } from './common'
 import io from 'socket.io-client'
 
-let ctrl: any
+let ctrl: {
+    unsubscribe: () => void
+} | null
 
 function record(e: Event) {
     const wr = window.wr

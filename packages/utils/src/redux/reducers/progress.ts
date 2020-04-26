@@ -16,7 +16,7 @@ export enum ProgressTypes {
     INFO = 'INFO'
 }
 
-export default function progressReducer(state: State, action?: any) {
+export default function progressReducer(state: State, action?: { type: string; data: any }) {
     if (!state) {
         state = initState
     }

@@ -280,7 +280,7 @@ function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObse
             }
             deepAdd(node)
 
-            let vNode: any
+            let vNode: VNode | string | null
             if (isElementNode(node)) {
                 vNode = createElement(node as Element)
             } else if (isCommentNode(node)) {

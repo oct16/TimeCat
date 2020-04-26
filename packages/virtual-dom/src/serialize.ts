@@ -15,7 +15,7 @@ const getAttr = (el: HTMLElement & { checked: boolean }) => {
     const resAttr: { [key: string]: string } = {}
     const attrs = el.attributes
     if (attrs && attrs.length) {
-        return Object.values(attrs).reduce((ret: any, attr) => {
+        return Object.values(attrs).reduce((ret: { [key: string]: string }, attr) => {
             const [name, value] = extraAttr(attr)
             if (name) {
                 ret[name] = value
