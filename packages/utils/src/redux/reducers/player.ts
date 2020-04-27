@@ -1,4 +1,4 @@
-import { State } from '../create-store'
+import { State } from "../types"
 
 let initState = {
     speed: null

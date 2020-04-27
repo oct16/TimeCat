@@ -1,7 +1,4 @@
-import { State } from './create-store'
-
-export type Action = { type: string; state: State }
-export type Reducer = (state: State, action?: Action) => State
+import { Reducer, Action, State } from './types'
 
 export function combineReducers(reducers: { [key: string]: Reducer }) {
     const reducerKeys = Object.keys(reducers)

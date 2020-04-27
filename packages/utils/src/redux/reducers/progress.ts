@@ -1,4 +1,4 @@
-import { State } from '../create-store'
+import { State } from '../types'
 
 const initState = {
     frame: 0,
@@ -16,7 +16,7 @@ export enum ProgressTypes {
     INFO = 'INFO'
 }
 
-export default function progressReducer(state: State, action?: { type: string; data: any }) {
+export default function progressReducer(state: State, action?: { type: string; data: State }) {
     if (!state) {
         state = initState
     }

@@ -1,10 +1,9 @@
 import { PlayerTypes } from './reducers/player'
 import { ProgressTypes } from './reducers/progress'
 import { objectEquals } from '../tools/tool'
+import { State, Reducer, Action } from './types'
 
-export type State = { [key: string]: any }
-
-export function createStore(reducer: (state: State, action: any) => State, initState: State = {}) {
+export function createStore(reducer: Reducer, initState: State = {}) {
     let state = initState
 
     const topics = {
@@ -29,7 +28,7 @@ export function createStore(reducer: (state: State, action: any) => State, initS
         topics[type].push(listener)
     }
 
-    function dispatch(action?: { type: string; data?: any }) {
+    function dispatch(action: Action) {
         const oldState = state
         state = reducer(state, action)
 
