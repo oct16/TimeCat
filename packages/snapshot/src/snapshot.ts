@@ -155,24 +155,22 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 
 function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObserve>) {
     const addNodesSet: Set<Node> = new Set()
-    const addNodesMap: Map<Node, MutationRecord> = new Map()
-    const removeNodesSet: Set<Node> = new Set()
     const removeNodesMap: Map<Node, Node> = new Map()
     const moveNodesSet: Set<Node> = new Set()
+    const moveMarkSet: Set<string> = new Set()
 
     const attrNodesMap: Map<Node, string | null> = new Map()
     const textNodesSet: Set<Node> = new Set()
-    const moveMarkSet: Set<string> = new Set()
 
     function deepAdd(n: Node, target?: Node) {
-        // 已存在，移动
         const id = nodeStore.getNodeId(n)
         if (id) {
+            // if exist, go to move
             moveNodesSet.add(n)
             if (target) {
                 const targetId = nodeStore.getNodeId(target)
                 if (targetId) {
-                    // 标记移动入口
+                    // mark as entry
                     moveMarkSet.add(targetId + '@' + id)
                 }
             }
@@ -197,14 +195,13 @@ function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObse
         const id = nodeStore.getNodeId(n)
         const pId = nodeStore.getNodeId(n.parentNode!)
 
+        // shaking node if it wasn't join the tree
         if (addNodesSet.has(n)) {
             deepDeleteInSet(addNodesSet, n)
-            removeNodesSet.add(n)
             removeNodesMap.set(n, target)
         } else if (moveNodesSet.has(n) && moveMarkSet.has(pId + '@' + id)) {
             deepDeleteInSet(moveNodesSet, n)
         } else {
-            removeNodesSet.add(n)
             removeNodesMap.set(n, target)
         }
     }
@@ -245,11 +242,10 @@ function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObse
         })
     })
     const removedNodes: RemoveUpdateData[] = []
-    removeNodesSet.forEach(node => {
+    removeNodesMap.forEach((node, parent) => {
         const nodeId = nodeStore.getNodeId(node)
-        const parent = removeNodesMap.get(node)
         removedNodes.push({
-            parentId: nodeStore.getNodeId(parent!)!,
+            parentId: nodeStore.getNodeId(parent)!,
             id: nodeId!
         })
     })
@@ -310,7 +306,9 @@ function DOMObserve(emit: SnapshotEvent<DOMObserve>) {
 
 function formElementObserve(emit: SnapshotEvent<FormElementObserve>) {
     listenInputs(emit)
-    kidnapInputs(emit) // for sys write in input
+
+    // for sys write in input
+    kidnapInputs(emit)
 }
 
 function listenInputs(emit: SnapshotEvent<FormElementObserve>) {
