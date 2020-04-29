@@ -1,13 +1,13 @@
 import { isDev } from '../tools/common'
 class NodeStore {
-    private nodeId = 1
+    private static nodeId = 1
     private nodeMap: Map<number, Node> = new Map()
     private idMap: WeakMap<Node, number> = new WeakMap()
 
-    public createNodeId = () => this.nodeId++
+    public createNodeId = () => NodeStore.nodeId++
 
     public getNode(id: number) {
-        return this.nodeMap.get(id)
+        return this.nodeMap.get(id) || null
     }
 
     public addNode(node: Node, id: number = this.createNodeId()) {

@@ -1,13 +1,22 @@
-import { VNode } from './types'
-import { nodeStore, completionCssHref, createCommentText } from '@WebReplay/utils'
+import { VNode, VSNode } from './types'
+import { nodeStore, isElementNode } from '@WebReplay/utils'
 
-const getVNodeByEl = (el: Element, isSVG?: boolean): VNode => {
-    return {
-        id: nodeStore.createNodeId(),
-        attrs: getAttr(el as HTMLElement & { checked: boolean }),
-        tag: el.tagName.toLocaleLowerCase(),
-        children: [] as VNode[],
-        extra: getExtra(el, isSVG)
+const getVNodeByEl = (el: Element, isSVG?: boolean): VNode | VSNode => {
+    if (isElementNode(el)) {
+        return {
+            id: nodeStore.createNodeId(),
+            type: el.nodeType,
+            attrs: getAttr(el as HTMLElement & { checked: boolean }),
+            tag: el.tagName.toLocaleLowerCase(),
+            children: [] as VNode[],
+            extra: getExtra(el, isSVG)
+        }
+    } else {
+        return {
+            id: nodeStore.createNodeId(),
+            type: el.nodeType,
+            value: el.textContent as string
+        }
     }
 }
 
@@ -62,36 +71,29 @@ const extraAttr = (attr: Attr) => {
     return [name, value]
 }
 
-export const createElement = (el: Element, inheritSVG?: boolean): VNode | null => {
-    if (el.nodeType === Node.TEXT_NODE) {
-        return null
-    }
+export const createFlatNode = (el: Element) => {
+    const vNode = getVNodeByEl(el)
+    const { id } = vNode
+    nodeStore.addNode(el, id)
+    return vNode
+}
+
+export const createElement = (el: Element, inheritSVG?: boolean): VNode | VSNode | null => {
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)
-    inheritSVG = inheritSVG || vNode.extra.isSVG
-    el.childNodes.forEach((node: Element) => {
-        if (node.nodeType === Node.ELEMENT_NODE) {
+
+    if (vNode.type === Node.ELEMENT_NODE) {
+        const vn = vNode as VNode
+        inheritSVG = inheritSVG || vn.extra.isSVG
+        el.childNodes.forEach((node: Element) => {
             const child = createElement(node, inheritSVG)
             if (child) {
-                vNode.children.push(child)
+                vn.children.push(child)
             }
-        } else if (node.nodeType === Node.TEXT_NODE) {
-            if (node.nodeValue) {
-                let text = node.nodeValue
-                if (el.tagName === 'STYLE') {
-                    text = completionCssHref(node.nodeValue)
-                }
-                if (text) {
-                    vNode.children.push(text)
-                }
-            }
-        } else if (node.nodeType === Node.COMMENT_NODE) {
-            let data = node.nodeValue!
-            const comment = createCommentText(data)
-            vNode.children.push(comment)
-        }
-    })
+        })
+    }
+
     return vNode
 }
 

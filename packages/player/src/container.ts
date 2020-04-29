@@ -49,7 +49,7 @@ export class ContainerComponent {
     }
 
     setViewState() {
-        const child = convertVNode(this.vNode, null)
+        const child = convertVNode(this.vNode)
         if (child) {
             const [head] = child.getElementsByTagName('head')
             if (head) {

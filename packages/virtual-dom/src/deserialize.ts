@@ -1,23 +1,25 @@
 import { setAttribute } from './dom'
-import { nodeStore, isDev, isCommentStr, isHideComment } from '@WebReplay/utils'
-import { VNode } from './types'
+import { nodeStore, isDev, isHideComment } from '@WebReplay/utils'
+import { VNode, VSNode } from './types'
 
-export function convertVNode(vNode: VNode | string | null, node: Element | null): Element | null {
+export function convertVNode(vNode: VNode | VSNode | null): Element | null {
     if (vNode === null || vNode === undefined) {
         return null
     }
-    if (typeof vNode === 'string') {
-        if (isCommentStr(vNode)) {
-            return createCommentByCommentStr(vNode)
-        }
-        return createText(vNode, node)
+    const vs = vNode as VSNode
+    if (vNode.type === Node.COMMENT_NODE) {
+        return createCommentNode(vs)
     }
-    const output = createNode(vNode)
-    if ((vNode.children && vNode.children.length) || (output.childNodes && output.childNodes.length)) {
-        travel(vNode, output)
+    if (vNode.type === Node.TEXT_NODE) {
+        return createText(vs)
     }
-    createAttributes(vNode, output)
-    createProps(vNode, output)
+    const vn = vNode as VNode
+    const output = createNode(vn)
+
+    if ((vn.children && vn.children.length) || (output.childNodes && output.childNodes.length)) {
+        travel(vn, output)
+    }
+
     return output
 }
 
@@ -26,7 +28,7 @@ function travel(vNode: VNode, node: Element): void {
     const vNodeChildren = vNode.children.slice()
     vNodeChildren.forEach(vChild => {
         let child = nodeChildren.pop() as Element | null
-        child = convertVNode(vChild, child)
+        child = convertVNode(vChild)
         if (child) {
             if (isHideComment(node.lastChild)) {
                 setAttribute(child as HTMLElement, 'style', 'visibility: hidden')
@@ -52,7 +54,24 @@ function createAttributes(vNode: VNode, node: Element): void {
     }
 }
 
-function createNode(vNode: VNode): Element {
+export function createSpecialNode(vsNode: VSNode) {
+    const { type, value, id } = vsNode
+
+    let output: Node
+
+    switch (type) {
+        case Node.TEXT_NODE:
+            output = document.createTextNode(value)
+            break
+        case Node.COMMENT_NODE:
+            output = document.createComment(value)
+            break
+    }
+    nodeStore.updateNode(id, output!)
+    return output!
+}
+
+export function createNode(vNode: VNode): Element {
     const { id, extra } = vNode
     const { isSVG } = extra
     let output: Element
@@ -66,7 +85,8 @@ function createNode(vNode: VNode): Element {
     if (isDev) {
         setAttribute(output as HTMLElement, 'vid', id.toString())
     }
-
+    createAttributes(vNode, output)
+    createProps(vNode, output)
     nodeStore.updateNode(id, output)
     return output
 }
@@ -79,14 +99,18 @@ function transformTagName(tag: string) {
     return tagName
 }
 
-function createText(textNode: string, node: Element | null | null): Element | null {
+function createText(vs: VSNode) {
+    const { value, id } = vs
     let output: Element | Node
-    output = document.createTextNode(textNode)
+    output = document.createTextNode(value)
+    nodeStore.updateNode(id, output)
     return output as Element
 }
 
-function createCommentByCommentStr(text: string) {
+function createCommentNode(vs: VSNode) {
+    const { value, id } = vs
     let output: Element | Node
-    output = document.createComment(text.substring(4, text.length - 3))
+    output = document.createComment(value)
+    nodeStore.updateNode(id, output)
     return output as Element
 }

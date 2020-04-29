@@ -12,10 +12,6 @@ export function filteringTemplate(tpl: string) {
     return tpl
 }
 
-export function isCommentStr(str: string) {
-    return str.startsWith('<!--') && str.endsWith('-->')
-}
-
 export function isCommentNode(node: Node) {
     return node.nodeType === Node.COMMENT_NODE
 }
@@ -30,10 +26,6 @@ export function isTextNode(node: Node) {
 
 export function createCommentText(str: string) {
     return `<!--` + str + `-->`
-}
-
-export function getPos(node: Node) {
-    return [...node.parentNode!.childNodes].indexOf(node as Element)
 }
 
 export function filteringScriptTag(str: string) {
@@ -129,17 +121,4 @@ export function isHideComment(node: Node | null) {
 
 export function isExistingNode(node: Node) {
     return node.ownerDocument && !!node.ownerDocument.contains(node)
-}
-
-export function moveNodeTo(node: Element, pos: number, parentNode?: Node) {
-    if (!node || !isExistingNode(node) || !node.parentNode) {
-        return
-    }
-    const pNode = parentNode || node.parentNode!
-    const curPos = getPos(node)
-    if (pNode !== node.parentNode || pos < curPos) {
-        pNode.insertBefore(node, pNode.childNodes[pos])
-    } else {
-        pNode.insertBefore(node, pNode.childNodes[pos + 1])
-    }
 }

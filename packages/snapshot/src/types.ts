@@ -1,4 +1,4 @@
-import { VNode } from '@WebReplay/virtual-dom'
+import { VNode, VSNode } from '@WebReplay/virtual-dom'
 
 export enum SnapshotType {
     'INFO' = 'INFO',
@@ -79,29 +79,24 @@ export interface AttributesUpdateData {
 export interface CharacterDataUpdateData {
     parentId: number
     value: string
-    pos: number
+    id: number
 }
 
-export interface AddedUpdateData {
+export interface UpdateNodeData {
     parentId: number
-    vNode: VNode
-    pos: number
+    nextId: number | null
+    node: VSNode | VNode | number
 }
-export interface removedUpdateData {
-    id?: number
+
+export interface RemoveUpdateData {
     parentId: number
-    pos?: number
-}
-export interface movedUpdateData {
     id: number
-    pos: number
-    parentId: number
 }
 
 export interface DOMUpdateDataType {
-    addedList: AddedUpdateData[]
-    removedList: removedUpdateData[]
-    movedList: movedUpdateData[]
+    addedNodes: UpdateNodeData[]
+    removedNodes: RemoveUpdateData[]
+
     attrs: AttributesUpdateData[]
     texts: CharacterDataUpdateData[]
 }

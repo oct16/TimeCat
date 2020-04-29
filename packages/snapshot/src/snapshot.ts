@@ -1,4 +1,4 @@
-import { createElement } from '@WebReplay/virtual-dom'
+import { createElement, createFlatNode } from '@WebReplay/virtual-dom'
 import {
     SnapshotType,
     WindowObserve,
@@ -10,29 +10,16 @@ import {
     FormElementEvent,
     MouseEventType,
     SnapshotData,
-    removedUpdateData,
-    movedUpdateData,
-    AddedUpdateData,
     AttributesUpdateData,
     CharacterDataUpdateData,
     DOMUpdateDataType,
     InfoObserve,
-    InfoData
+    InfoData,
+    UpdateNodeData,
+    RemoveUpdateData
 } from './types'
-import {
-    logger,
-    throttle,
-    isDev,
-    nodeStore,
-    listenerStore,
-    getTime,
-    isElementNode,
-    isCommentNode,
-    getPos,
-    isExistingNode
-} from '@WebReplay/utils'
+import { logger, throttle, isDev, nodeStore, listenerStore, getTime, isExistingNode } from '@WebReplay/utils'
 import { VNode } from '@WebReplay/virtual-dom'
-import { PosCalculator } from './position'
 
 function emitterHook(emit: SnapshotEvent<SnapshotData>, data: any) {
     if (isDev) {
@@ -167,51 +154,62 @@ function mouseObserve(emit: SnapshotEvent<MouseSnapshot>) {
 }
 
 function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObserve>) {
+    const addNodesSet: Set<Node> = new Set()
     const addNodesMap: Map<Node, MutationRecord> = new Map()
-    const removeNodesMap: Map<Node, MutationRecord> = new Map()
+    const removeNodesSet: Set<Node> = new Set()
+    const removeNodesMap: Map<Node, Node> = new Map()
     const moveNodesSet: Set<Node> = new Set()
 
     const attrNodesMap: Map<Node, string | null> = new Map()
     const textNodesSet: Set<Node> = new Set()
-    function addNode(node: Node, record: MutationRecord) {
-        if (!node) {
-            return
-        }
+    const moveMarkSet: Set<string> = new Set()
 
-        if (node.nodeType === node.ELEMENT_NODE) {
-            // If the node is known, it is a move node
-            let nodeId: number | undefined
-            if ((nodeId = nodeStore.getNodeId(node))) {
-                // Because it is a Set, it will be remove duplicate here
-                moveNodesSet.add(node)
-            } else {
-                addNodesMap.set(node, record)
-                return
+    function deepAdd(n: Node, target?: Node) {
+        // 已存在，移动
+        const id = nodeStore.getNodeId(n)
+        if (id) {
+            moveNodesSet.add(n)
+            if (target) {
+                const targetId = nodeStore.getNodeId(target)
+                if (targetId) {
+                    // 标记移动入口
+                    moveMarkSet.add(targetId + '@' + id)
+                }
             }
-            return
         } else {
-            addNodesMap.set(node, record)
+            addNodesSet.add(n)
+        }
+        n.childNodes.forEach(cn => deepAdd(cn))
+    }
+
+    function deepDeleteInSet(set: Set<Node>, n: Node) {
+        set.delete(n)
+        n.childNodes.forEach(cn => {
+            deepDeleteInSet(set, cn)
+        })
+    }
+
+    function rmNode(n: Node, target: Node) {
+        if (!n) {
+            return
+        }
+
+        const id = nodeStore.getNodeId(n)
+        const pId = nodeStore.getNodeId(n.parentNode!)
+
+        if (addNodesSet.has(n)) {
+            deepDeleteInSet(addNodesSet, n)
+            removeNodesSet.add(n)
+            removeNodesMap.set(n, target)
+        } else if (moveNodesSet.has(n) && moveMarkSet.has(pId + '@' + id)) {
+            deepDeleteInSet(moveNodesSet, n)
+        } else {
+            removeNodesSet.add(n)
+            removeNodesMap.set(n, target)
         }
     }
 
-    function rmNode(node: Node, record: MutationRecord) {
-        // Deleted after adding
-        if (addNodesMap.has(node)) {
-            addNodesMap.delete(node)
-        }
-
-        // Deleted after moving
-        if (moveNodesSet.has(node)) {
-            moveNodesSet.delete(node)
-        }
-
-        if (!isExistingNode(node)) {
-            // Manually marked for deletion
-            removeNodesMap.set(node, record)
-        }
-    }
-
-    records.forEach((record: MutationRecord) => {
+    records.forEach(record => {
         const { target, addedNodes, removedNodes, type, attributeName } = record
         switch (type) {
             case 'attributes':
@@ -221,122 +219,70 @@ function mutationCallback(records: MutationRecord[], emit: SnapshotEvent<DOMObse
                 textNodesSet.add(target)
                 break
             case 'childList':
-                addedNodes.forEach(node => addNode(node, record))
-                removedNodes.forEach(node => rmNode(node, record))
+                addedNodes.forEach(n => deepAdd(n, target))
+                removedNodes.forEach(n => rmNode(n, target))
                 break
             default:
                 break
         }
     })
 
-    const posCalculator = new PosCalculator(removeNodesMap)
+    const addedNodes: UpdateNodeData[] = []
+    moveNodesSet.forEach(node => {
+        const nodeId = nodeStore.getNodeId(node)
+        addedNodes.push({
+            parentId: nodeStore.getNodeId(node.parentNode!)!,
+            nextId: nodeStore.getNodeId(node.nextSibling!) || null,
+            node: nodeId || createFlatNode(node as Element)
+        })
+    })
+    addNodesSet.forEach(node => {
+        const nodeId = nodeStore.getNodeId(node)
+        addedNodes.push({
+            parentId: nodeStore.getNodeId(node.parentNode!)!,
+            nextId: nodeStore.getNodeId(node.nextSibling!) || null,
+            node: nodeId || createFlatNode(node as Element)
+        })
+    })
+    const removedNodes: RemoveUpdateData[] = []
+    removeNodesSet.forEach(node => {
+        const nodeId = nodeStore.getNodeId(node)
+        const parent = removeNodesMap.get(node)
+        removedNodes.push({
+            parentId: nodeStore.getNodeId(parent!)!,
+            id: nodeId!
+        })
+    })
 
-    const removedList = [...removeNodesMap.entries()]
-        .map(entries => {
-            const [node, record] = entries
-            const { target: parentNode } = record
-
-            const parentId = nodeStore.getNodeId(parentNode)
-            if (parentId) {
-                if (isElementNode(node)) {
-                    const id = nodeStore.getNodeId(node)
-                    if (id) {
-                        return { parentId, id }
-                    }
-                    return null
-                } else {
-                    // textNode or commentNode
-                    const pos = posCalculator.nodesRelateMap.get(node) as number
-                    return {
-                        parentId: nodeStore.getNodeId(parentNode),
-                        pos
-                    }
-                }
+    const attrs: AttributesUpdateData[] = [...attrNodesMap.entries()]
+        .map(data => {
+            const [node, key] = data
+            if (isExistingNode(node as Element)) {
+                return {
+                    id: nodeStore.getNodeId(node),
+                    key,
+                    value: key ? (node as Element).getAttribute(key) : ''
+                } as AttributesUpdateData
             }
-            return null
         })
-        .filter(Boolean) as removedUpdateData[]
+        .filter(Boolean) as AttributesUpdateData[]
 
-    const addPosCalculator = new PosCalculator(addNodesMap)
-    const addedSet: Set<Node> = new Set()
-
-    function deepAdd(node: Node) {
-        if (!node) {
-            return
-        }
-        addedSet.add(node)
-        node.childNodes.forEach(n => {
-            deepAdd(n)
-        })
-    }
-
-    const addedList = [...addNodesMap]
-        .map(entries => {
-            const [node, record] = entries
-            if (addedSet.has(node)) {
-                return null
-            } else if (nodeStore.getNodeId(node)) {
-                return null
-            }
-            deepAdd(node)
-
-            let vNode: VNode | string | null
-            if (isElementNode(node)) {
-                vNode = createElement(node as Element)
-            } else if (isCommentNode(node)) {
-                vNode = `<!--${node.textContent}-->`
-            } else {
-                vNode = node.textContent
-            }
-            const pos = addPosCalculator.nodesRelateMap.get(node)
-            return {
-                parentId: nodeStore.getNodeId(node.parentNode as Element),
-                vNode,
-                pos
-            } as AddedUpdateData
-        })
-        .filter(Boolean) as AddedUpdateData[]
-
-    const movedList = [...moveNodesSet]
-        .filter(node => isExistingNode(node))
-        .map(node => {
-            const pos = getPos(node)
-            const parentId = nodeStore.getNodeId(node.parentNode as Element)
-            return {
-                id: nodeStore.getNodeId(node),
-                parentId,
-                pos
-            } as movedUpdateData
-        })
-
-    const data: DOMUpdateDataType = {
-        addedList,
-        removedList,
-        movedList,
-        attrs: [...attrNodesMap.entries()]
-            .map(data => {
-                const [node, key] = data
-                if (isExistingNode(node as Element)) {
-                    return {
-                        id: nodeStore.getNodeId(node),
-                        key,
-                        value: key ? (node as Element).getAttribute(key) : ''
-                    } as AttributesUpdateData
-                }
-            })
-            .filter(Boolean) as AttributesUpdateData[],
+    const data = {
+        addedNodes,
+        removedNodes,
+        attrs,
         texts: [...textNodesSet]
             .map(textNode => {
                 if (isExistingNode(textNode) && textNode.parentNode) {
                     return {
+                        id: nodeStore.getNodeId(textNode),
                         parentId: nodeStore.getNodeId(textNode.parentNode as Element),
-                        value: textNode.textContent,
-                        pos: getPos(textNode)
+                        value: textNode.textContent
                     } as CharacterDataUpdateData
                 }
             })
             .filter(Boolean) as CharacterDataUpdateData[]
-    }
+    } as DOMUpdateDataType
 
     if (Object.values(data).some(item => item.length)) {
         emitterHook(emit, {

@@ -8,14 +8,54 @@ import {
     AttributesUpdateData,
     FormElementEvent,
     WindowObserveData,
-    AddedUpdateData,
-    removedUpdateData,
-    DOMUpdateDataType,
-    movedUpdateData
+    UpdateNodeData,
+    RemoveUpdateData,
+    DOMUpdateDataType
 } from '@WebReplay/snapshot'
 import { PlayerComponent } from './player'
-import { nodeStore, isCommentStr, moveNodeTo } from '@WebReplay/utils'
-import { convertVNode, setAttribute } from '@WebReplay/virtual-dom'
+import { nodeStore, isElementNode } from '@WebReplay/utils'
+import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@WebReplay/virtual-dom'
+
+function isVNode(n: VNode | VSNode) {
+    return !!(n as any).tag
+}
+
+function insertOrMoveNode(data: UpdateNodeData) {
+    const { parentId, nextId, node } = data
+    const parentNode = nodeStore.getNode(parentId!)
+
+    if (parentNode) {
+        const nextNode = findNextNode(nextId)
+        const n = node as VNode | VSNode
+
+        let refNode: Node
+        if (typeof node === 'number') {
+            refNode = nodeStore.getNode(node)!
+        } else if (isVNode(n)) {
+            refNode = createNode(n as VNode)
+        } else {
+            refNode = createSpecialNode(n as VSNode)
+        }
+
+        if (nextNode && isChildNode(parentNode, nextNode)) {
+            parentNode.insertBefore(refNode, nextNode)
+        } else {
+            parentNode.appendChild(refNode)
+        }
+    }
+}
+
+function isChildNode(parentNode: Node, childNode: Node) {
+    if (isElementNode(parentNode)) {
+        const childNodes = parentNode.childNodes
+        return [...childNodes].indexOf(childNode as ChildNode) !== -1
+    }
+    return false
+}
+
+function findNextNode(nextId: number | null): Node | null {
+    return nextId ? nodeStore.getNode(nextId) : null
+}
 
 export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
     const { type, data } = snapshot
@@ -33,65 +73,17 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             }
             break
         case SnapshotType.DOM_UPDATE:
-            const { addedList, removedList, movedList, attrs, texts } = data as DOMUpdateDataType
-
-            const willRemoveNodes: Node[] = []
-            removedList.forEach((item: removedUpdateData) => {
-                const { parentId, pos, id } = item
+            const { addedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
+            removedNodes.forEach((data: RemoveUpdateData) => {
+                const { parentId, id } = data
                 const parentNode = nodeStore.getNode(parentId)
-                if (id) {
-                    const node = nodeStore.getNode(id)
-                    if (node && parentNode && parentNode.contains(node)) {
-                        // parentNode.removeChild(node as Node)
-                        willRemoveNodes.push(node)
-                    }
-                } else if (pos !== undefined) {
-                    // only textNode has pos
-                    if (parentNode) {
-                        willRemoveNodes.push(parentNode.childNodes[pos])
-                        // parentNode.removeChild(parentNode.childNodes[pos] as Node)
-                    }
+                const node = nodeStore.getNode(id)
+                if (node && parentNode && parentNode.contains(node)) {
+                    parentNode.removeChild(node as Node)
                 }
             })
 
-            addedList.forEach((item: AddedUpdateData) => {
-                const { parentId, vNode, pos } = item
-                const parentNode = nodeStore.getNode(parentId)
-                if (parentNode) {
-                    let node: Node
-                    if (typeof vNode === 'string') {
-                        const text = vNode as string
-                        if (isCommentStr(vNode)) {
-                            node = document.createComment(text.substring(4, text.length - 3))
-                        } else {
-                            node = document.createTextNode(text)
-                        }
-                    } else {
-                        node = convertVNode(vNode, null) as Node
-                    }
-
-                    if (node) {
-                        parentNode.insertBefore(node, parentNode.childNodes[pos])
-                    }
-                }
-            })
-
-            movedList.forEach((moved: movedUpdateData) => {
-                const { id, parentId, pos } = moved
-                if (id && parentId) {
-                    const parentNode = nodeStore.getNode(parentId)
-                    const node = nodeStore.getNode(id)
-                    if (node) {
-                        moveNodeTo(node as Element, pos, parentNode)
-                    }
-                }
-            })
-
-            willRemoveNodes.forEach(node => {
-                if (node && node.parentNode) {
-                    node.parentNode!.removeChild(node)
-                }
-            })
+            addedNodes.forEach((data: UpdateNodeData) => insertOrMoveNode(data))
 
             attrs.forEach((attr: AttributesUpdateData) => {
                 const { id, key, value } = attr
@@ -103,15 +95,15 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             })
 
             texts.forEach((text: CharacterDataUpdateData) => {
-                const { pos, value, parentId } = text
-                const parentEl = nodeStore.getNode(parentId) as HTMLElement
+                const { id, value, parentId } = text
+                const parentNode = nodeStore.getNode(parentId) as HTMLElement
+                const node = nodeStore.getNode(id) as HTMLElement
 
-                if (parentEl) {
-                    if (pos !== null) {
-                        const target = parentEl.childNodes[pos as number]
-                        parentEl.replaceChild(document.createTextNode(value), target)
+                if (parentNode && node) {
+                    if (node) {
+                        parentNode.replaceChild(document.createTextNode(value), node)
                     } else {
-                        parentEl.innerText = value
+                        parentNode.innerText = value
                     }
                 }
             })
