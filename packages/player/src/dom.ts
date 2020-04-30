@@ -1,17 +1,17 @@
 import {
-    SnapshotData,
-    MouseSnapshotData,
-    FormElementObserveData,
-    SnapshotType,
+    RecordData,
+    MouseRecordData,
+    FormElementWatcherData,
+    RecordType,
     MouseEventType,
     CharacterDataUpdateData,
     AttributesUpdateData,
     FormElementEvent,
-    WindowObserveData,
+    WindowWatcherData,
     UpdateNodeData,
     RemoveUpdateData,
     DOMUpdateDataType
-} from '@WebReplay/snapshot'
+} from '@WebReplay/record'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode } from '@WebReplay/utils'
 import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@WebReplay/virtual-dom'
@@ -57,23 +57,25 @@ function findNextNode(nextId: number | null): Node | null {
     return nextId ? nodeStore.getNode(nextId) : null
 }
 
-export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
-    const { type, data } = snapshot
+export function updateDom(this: PlayerComponent, Record: RecordData) {
+    const { type, data } = Record
     switch (type) {
-        case SnapshotType.WINDOW:
-            const { scrollLeft, scrollTop } = data as WindowObserveData
+        case RecordType.WINDOW:
+            const { scrollLeft, scrollTop } = data as WindowWatcherData
             this.c.sandBoxDoc.documentElement.scrollTo(scrollLeft, scrollTop)
             break
-        case SnapshotType.MOUSE:
-            const { x, y, type } = data as MouseSnapshotData
+        case RecordType.MOUSE:
+            const { x, y, type } = data as MouseRecordData
             if (type === MouseEventType.MOVE) {
                 this.pointer.move(x, y)
             } else if (type === MouseEventType.CLICK) {
                 this.pointer.click(x, y)
             }
             break
-        case SnapshotType.DOM_UPDATE:
+        case RecordType.DOM_UPDATE:
             const { addedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
+            console.log(data);
+            
             removedNodes.forEach((data: RemoveUpdateData) => {
                 const { parentId, id } = data
                 const parentNode = nodeStore.getNode(parentId)
@@ -109,8 +111,8 @@ export function updateDom(this: PlayerComponent, snapshot: SnapshotData) {
             })
 
             break
-        case SnapshotType.FORM_EL_UPDATE:
-            const { id, key, type: formType, value } = data as FormElementObserveData
+        case RecordType.FORM_EL_UPDATE:
+            const { id, key, type: formType, value } = data as FormElementWatcherData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
 
             if (node) {

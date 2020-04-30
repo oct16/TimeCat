@@ -3,10 +3,8 @@ import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
-import { InfoData, WindowObserveData, DOMSnapshotData, SnapshotData } from '@WebReplay/snapshot'
-
-type KeyOf<T> = keyof T
-type BaseType = { [key in KeyOf<InfoData & WindowObserveData & DOMSnapshotData>]: any } & { data: SnapshotData[] }
+import { SnapshotData } from '@WebReplay/snapshot'
+import { RecordData } from '@WebReplay/record'
 
 function getGZipStrData() {
     const data = window.__ReplayStrData__
@@ -20,54 +18,54 @@ function getGZipStrData() {
     return JSON.parse(str)
 }
 
-function dispatchEvent(type: string, data: SnapshotData) {
+function dispatchEvent(type: string, data: RecordData) {
     event = new CustomEvent(type, { detail: data })
     window.dispatchEvent(event)
 }
 
-function getAsyncDataBySocket(uri: string): Promise<BaseType> {
+async function getAsyncDataFromSocket(uri: string): Promise<{ snapshot: SnapshotData; records: [] }> {
     var socket = io(uri)
-    let base: BaseType = {} as BaseType
-
-    return new Promise(resolve => {
-        let isSent = false
-        socket.on('record-data', (data: SnapshotData) => {
-            const { doctype, width, vNode } = base
-            if (!isSent) {
-                base = { ...base, ...data.data }
+    return await new Promise(resolve => {
+        let initialized = false
+        socket.on('record-data', (data: SnapshotData | RecordData) => {
+            if (initialized) {
+                dispatchEvent('record-data', data as RecordData)
             } else {
-                dispatchEvent('record-data', data)
-                return
-            }
-
-            if (doctype && width && vNode) {
-                resolve({ ...base, data: [] } as BaseType)
+                resolve({ snapshot: data as SnapshotData, records: [] })
                 fmp.observe()
-                isSent = true
+                initialized = true
             }
         })
     })
 }
 
+async function getDataFromDB() {
+    const indexedDB = await DBPromise
+    const data = await indexedDB.getRecords()
+    const [snapshot, ...records] = data
+    return {
+        snapshot,
+        records
+    }
+}
+
 export async function replay(options: { socketUrl?: string } = {}) {
     const { socketUrl } = options
-
-    const indexedDB = await DBPromise
-
-    const { width, height, doctype, vNode, data } = (window.__ReplayData__ =
-        (socketUrl && (await getAsyncDataBySocket(socketUrl))) ||
+    const { snapshot, records } = (window.__ReplayData__ =
+        (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
         getGZipStrData() ||
         window.__ReplayData__ ||
-        (await indexedDB.getData()))
+        (await getDataFromDB()))
 
+    const { vNode, width, height, doctype } = snapshot as SnapshotData
     const c = new ContainerComponent(vNode, { width, height, doctype })
 
     fmp.ready(() => {
-        new Panel(c, data)
+        new Panel(c, records)
 
-        if (data.length) {
-            const startTime = data[0].time
-            const endTime = data[data.length - 1].time
+        if (records.length) {
+            const startTime = records[0].time
+            const endTime = records[records.length - 1].time
             reduxStore.dispatch({
                 type: ProgressTypes.INFO,
                 data: {
@@ -75,7 +73,7 @@ export async function replay(options: { socketUrl?: string } = {}) {
                     curTime: startTime,
                     startTime,
                     endTime,
-                    length: data.length
+                    length: records.length
                 }
             })
 
@@ -86,7 +84,7 @@ export async function replay(options: { socketUrl?: string } = {}) {
         }
     })
 
-    if (!data.length) {
+    if (!records.length) {
         const panel = document.querySelector('.wr-panel')
         if (panel) {
             panel.setAttribute('style', 'display: none')

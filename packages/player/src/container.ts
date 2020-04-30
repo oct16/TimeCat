@@ -38,7 +38,9 @@ export class ContainerComponent {
         this.sandBox.style.height = this.height + 'px'
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.sandBoxDoc.open()
-        const doctype = window.__ReplayData__.doctype
+
+        const { snapshot } = window.__ReplayData__
+        const doctype = snapshot
         const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
             doctype.systemId ? '"' + doctype.systemId + '"' : ''
         }><html><head></head><body></body></html>`
@@ -50,14 +52,16 @@ export class ContainerComponent {
 
     setViewState() {
         const child = convertVNode(this.vNode)
+        const { snapshot } = window.__ReplayData__
+
         if (child) {
             const [head] = child.getElementsByTagName('head')
             if (head) {
                 head.insertBefore(this.createStyle(FIXED), head.firstChild)
             }
             const documentElement = this.sandBoxDoc.documentElement
-            documentElement.scrollLeft = window.__ReplayData__.scrollLeft
-            documentElement.scrollTop = window.__ReplayData__.scrollTop
+            documentElement.scrollLeft = snapshot.scrollLeft
+            documentElement.scrollTop = snapshot.scrollTop
             this.sandBoxDoc.replaceChild(child, documentElement)
         }
     }

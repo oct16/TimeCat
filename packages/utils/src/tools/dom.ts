@@ -1,8 +1,9 @@
 import { isDev } from './common'
 
-const origin = () => (window.__ReplayData__ && window.__ReplayData__.origin) || location.origin
+const snapshot = window.__ReplayData__ && window.__ReplayData__.snapshot
+const origin = () => (snapshot && snapshot.origin) || location.origin
 const protocol = () => origin().match(/.*?\/\//)![0] || location.protocol
-const href = () => origin() + ((window.__ReplayData__ && window.__ReplayData__.pathname) || location.pathname)
+const href = () => origin() + ((snapshot && snapshot.pathname) || location.pathname)
 
 export function filteringTemplate(tpl: string) {
     const reg = /<!--env-->[\s\S]*<!--env-->/g

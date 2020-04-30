@@ -1,12 +1,12 @@
 import { KeyboardComponent } from './keyboard'
 import { PlayerComponent } from './player'
 import { PointerComponent } from './pointer'
-import { SnapshotData } from '@WebReplay/snapshot'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
+import { RecordData } from '@WebReplay/record'
 
 export class Panel {
-    data: SnapshotData[]
+    data: RecordData[]
 
     keyboard: KeyboardComponent
     progress: ProgressComponent
@@ -14,7 +14,7 @@ export class Panel {
     player: PlayerComponent
     container: ContainerComponent
 
-    constructor(container: ContainerComponent, data: SnapshotData[]) {
+    constructor(container: ContainerComponent, data: RecordData[]) {
         this.container = container
         this.data = data
         this.initComponent()

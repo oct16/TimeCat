@@ -20,20 +20,8 @@ declare interface IDBDatabase {
 interface Window {
     __ReplayStrData__: string
     __ReplayData__: {
-        [key: string]: any
-        vNode: VNode
-        data: SnapshotData[]
-        width: number
-        height: number
-        scrollTop: number
-        scrollLeft: number
-        doctype: {
-            name: string
-            publicId: string
-            systemId: string
-        }
-        origin: string
-        pathname: string
+        snapshot: any
+        records: any[]
     }
     wr: {
         record: (

@@ -67,7 +67,7 @@ async function getScript(src: string) {
 
 async function injectData() {
     const dataScript = document.createElement('script')
-    const data = window.__ReplayData__ || (await (await DB).getData())
+    const data = window.__ReplayData__ || (await (await DB).getRecords())
     const jsonStrData = JSON.stringify(data)
     const zipArray = pako.gzip(jsonStrData)
     const scriptContent = `var __ReplayStrData__ = ${"'" + zipArray.toString() + "'"}`
