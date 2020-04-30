@@ -8,10 +8,15 @@ let ctrl: {
 function record(e: Event) {
     const wr = window.wr
     const { record } = wr
-    // const socket = io('http://localhost:9528')
-    // ctrl = record(data => {
-    //     socket.emit('record-msg', data)
-    // })
+
+    if (process.env.LIVE_MODE) {
+        const socket = io('http://localhost:9528')
+        ctrl = record(data => {
+            socket.emit('record-msg', data)
+        })
+        return
+    }
+
     ctrl = record()
 }
 

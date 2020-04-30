@@ -8,6 +8,8 @@
         "dev": "node scripts/dev.js",
         "build": "node scripts/build.js",
         "chrome": "node scripts/chrome.js",
+        "chrome:dev": "npm run chrome dev",
+        "chrome:live": "npm run chrome dev live",
         "f": "npx code-formatter --path packages",
         "live": "node scripts/live.js",
         "deploy-gh": "git subtree split --prefix dist -b gh-pages && git push -f origin gh-pages:gh-pages",
