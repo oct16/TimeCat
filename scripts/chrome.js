@@ -4,6 +4,7 @@ const envLive = args.includes('live')
 
 const execa = require('execa')
 const env = envDev ? 'development' : 'production'
+const live = envLive ? 'live' : ''
 
 execa(
     'rollup',
@@ -12,7 +13,7 @@ execa(
         'builders/rollup.config.chrome.js',
         envDev ? '-w' : '',
         '--environment',
-        [`NODE_ENV:${env}`, `LIVE_MODE:${envLive}`].filter(Boolean).join(',')
+        [`NODE_ENV:${env}`, `LIVE_MODE:${live}`].filter(Boolean).join(',')
     ].filter(Boolean),
     {
         stdio: 'inherit'
