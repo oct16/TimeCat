@@ -25,10 +25,6 @@ export function isTextNode(node: Node) {
     return node.nodeType === Node.TEXT_NODE
 }
 
-export function createCommentText(str: string) {
-    return `<!--` + str + `-->`
-}
-
 export function filteringScriptTag(str: string) {
     const reg = /<\/script>/g
     return str.replace(reg, '<\\/script>')
@@ -83,34 +79,6 @@ export function completionAttrHref(str: string) {
     }
 
     return str
-}
-
-export function removeItem(array: any[], item: any) {
-    if (!Array.isArray(array)) {
-        return
-    }
-    const index = array.indexOf(item)
-    if (~index) {
-        array.splice(index, 1)
-    }
-}
-
-export function swapNode(nodeA: Node, nodeB: Node) {
-    if (nodeA && nodeB) {
-        const parentNodeA = nodeA.parentNode!
-        const tempA = document.createElement('span')
-        parentNodeA.insertBefore(tempA, nodeA)
-
-        const parentNodeB = nodeB.parentNode!
-        const tempB = document.createElement('span')
-        parentNodeB.insertBefore(tempB, nodeB)
-
-        parentNodeA.insertBefore(nodeB, tempA)
-        parentNodeB.insertBefore(nodeA, tempB)
-
-        parentNodeA.removeChild(tempA)
-        parentNodeB.removeChild(tempB)
-    }
 }
 
 export function isHideComment(node: Node | null) {
