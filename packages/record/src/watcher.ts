@@ -164,7 +164,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         const id = nodeStore.getNodeId(n)
         const pId = nodeStore.getNodeId(n.parentNode!)
 
-        // shaking node if it wasn't join the tree
+        // shaking node if it hasn't joined the tree
         if (addNodesSet.has(n)) {
             deepDeleteInSet(addNodesSet, n)
             removeNodesMap.set(n, target)
