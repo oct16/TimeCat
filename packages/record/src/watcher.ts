@@ -170,6 +170,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
             removeNodesMap.set(n, target)
         } else if (moveNodesSet.has(n) && moveMarkSet.has(pId + '@' + id)) {
             deepDeleteInSet(moveNodesSet, n)
+            moveMarkSet.delete(pId + '@' + id)
         } else {
             removeNodesMap.set(n, target)
         }
@@ -194,7 +195,8 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     })
 
     const addedNodes: UpdateNodeData[] = []
-    moveNodesSet.forEach(node => {
+
+    addNodesSet.forEach(node => {
         const nodeId = nodeStore.getNodeId(node)
         addedNodes.push({
             parentId: nodeStore.getNodeId(node.parentNode!)!,
@@ -202,7 +204,8 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
             node: nodeId || createFlatNode(node as Element)
         })
     })
-    addNodesSet.forEach(node => {
+
+    moveNodesSet.forEach(node => {
         const nodeId = nodeStore.getNodeId(node)
         addedNodes.push({
             parentId: nodeStore.getNodeId(node.parentNode!)!,

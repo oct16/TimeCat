@@ -37,8 +37,12 @@ function insertOrMoveNode(data: UpdateNodeData) {
             refNode = createSpecialNode(n as VSNode)
         }
 
-        if (nextNode && isChildNode(parentNode, nextNode)) {
-            parentNode.insertBefore(refNode, nextNode)
+        if (nextNode) {
+            if (isChildNode(parentNode, nextNode)) {
+                parentNode.insertBefore(refNode, nextNode)
+            } else {
+                return 'revert'
+            }
         } else {
             parentNode.appendChild(refNode)
         }
@@ -74,8 +78,7 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
             break
         case RecordType.DOM_UPDATE:
             const { addedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
-            console.log(data);
-            
+
             removedNodes.forEach((data: RemoveUpdateData) => {
                 const { parentId, id } = data
                 const parentNode = nodeStore.getNode(parentId)
@@ -85,7 +88,17 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
                 }
             })
 
-            addedNodes.forEach((data: UpdateNodeData) => insertOrMoveNode(data))
+            const maxRevertCount = addedNodes.length
+            let revertCount = 0
+            while (addedNodes.length) {
+                const addData = addedNodes.shift()
+                if (addData) {
+                    const revertSignal = insertOrMoveNode(addData)
+                    if (revertSignal === 'revert' && revertCount++ < maxRevertCount) {
+                        addedNodes.push(addData)
+                    }
+                }
+            }
 
             attrs.forEach((attr: AttributesUpdateData) => {
                 const { id, key, value } = attr
