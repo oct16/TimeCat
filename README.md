@@ -71,11 +71,11 @@ Web录屏器其实也借鉴这样的一种思路，工程上一般称之为Opera
 
 ```ts
 interface VNode {
-    attrs: { [key: string]: string }
     type: number
-    children: VNode[]
-    tag: string
     id: number
+    tag: string
+    attrs: Attrs
+    children: VNode[]
     extra: Extra
 }
 ```
