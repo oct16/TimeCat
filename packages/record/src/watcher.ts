@@ -13,7 +13,8 @@ import {
     CharacterDataUpdateData,
     DOMUpdateDataType,
     UpdateNodeData,
-    RemoveUpdateData
+    RemoveUpdateData,
+    ScrollWatcher
 } from './types'
 import { logger, throttle, isDev, nodeStore, listenerStore, getTime, isExistingNode } from '@WebReplay/utils'
 
@@ -24,51 +25,78 @@ function emitterHook(emit: RecordEvent<RecordData>, data: any) {
     emit(data)
 }
 
-function windowWatcher(emit: RecordEvent<WindowWatcher>) {
-    const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-    const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
-    const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-    const scrollLeft = () => window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft
-
-    function emitData() {
-        emitterHook(emit, {
-            type: RecordType.WINDOW,
-            data: {
-                width: width(),
-                height: height(),
-                scrollTop: scrollTop(),
-                scrollLeft: scrollLeft()
-            },
-            time: getTime().toString()
-        })
-    }
-
-    emitData()
-
-    function handleFn(e: Event) {
-        const { type } = e
-        if (type === 'scroll') {
-            emitData()
-        }
-    }
-
-    const listenerHandle = throttle(handleFn, 500, {
+function registerEvent(eventTypes: string[], handleFn: Function, opts: AddEventListenerOptions, throttleTime = 500) {
+    const listenerHandle = throttle(handleFn, throttleTime, {
         trailing: true
     })
 
-    const eventTypes = ['scroll']
-
     eventTypes
         .map(type => (fn: (e: Event) => void) => {
-            document.addEventListener(type, fn, { once: false, passive: true, capture: true })
+            window.addEventListener(type, fn, opts)
         })
         .forEach(handle => handle(listenerHandle))
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            document.removeEventListener(type, listenerHandle, true)
+            window.removeEventListener(type, listenerHandle, opts)
         })
     })
+}
+
+function windowWatcher(emit: RecordEvent<WindowWatcher>) {
+    const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
+    const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+
+    function emitData(target: Element | Document) {
+        emitterHook(emit, {
+            type: RecordType.WINDOW,
+            data: {
+                id: nodeStore.getNodeId(target) || null,
+                width: width(),
+                height: height()
+            },
+            time: getTime().toString()
+        })
+    }
+
+    emitData(document)
+
+    function handleFn(e: Event) {
+        
+        const { type, target } = e
+        if (type === 'resize') {
+            emitData(target as Element | Document)
+        }
+    }
+    registerEvent(['resize'], handleFn, { capture: true })
+}
+
+function scrollWatcher(emit: RecordEvent<ScrollWatcher>) {
+    const scrollTop = (target: HTMLElement) => target.scrollTop
+    const scrollLeft = (target: HTMLElement) => target.scrollLeft
+
+    function emitData(target: Element | Document) {
+        const el = target instanceof Document ? document.documentElement : (target as HTMLElement)
+        emitterHook(emit, {
+            type: RecordType.SCROLL,
+            data: {
+                id: nodeStore.getNodeId(target) || null, // if null, target is document
+                top: scrollTop(el),
+                left: scrollLeft(el)
+            },
+            time: getTime().toString()
+        })
+    }
+
+    emitData(document)
+
+    function handleFn(e: Event) {
+        const { type, target } = e
+        if (type === 'scroll') {
+            emitData(target as Element | Document)
+        }
+    }
+    registerEvent(['scroll'], handleFn, { capture: true })
 }
 
 function mouseWatcher(emit: RecordEvent<MouseRecord>) {
@@ -398,6 +426,7 @@ function kidnapInputs(emit: RecordEvent<FormElementWatcher>) {
 
 export const watchers = {
     windowWatcher,
+    scrollWatcher,
     mouseWatcher,
     DOMWatcher,
     formElementWatcher

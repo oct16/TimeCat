@@ -10,7 +10,8 @@ import {
     WindowWatcherData,
     UpdateNodeData,
     RemoveUpdateData,
-    DOMUpdateDataType
+    DOMUpdateDataType,
+    ScrollWatcherData
 } from '@WebReplay/record'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode } from '@WebReplay/utils'
@@ -64,10 +65,21 @@ function findNextNode(nextId: number | null): Node | null {
 export function updateDom(this: PlayerComponent, Record: RecordData) {
     const { type, data } = Record
     switch (type) {
-        case RecordType.WINDOW:
-            const { scrollLeft, scrollTop } = data as WindowWatcherData
-            this.c.sandBoxDoc.documentElement.scrollTo(scrollLeft, scrollTop)
+        case RecordType.SCROLL: {
+            const { top, left, id } = data as ScrollWatcherData
+            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : document.documentElement
+            target.scrollTo(left, top)
             break
+        }
+        case RecordType.WINDOW: {
+            const { width, height, id } = data as WindowWatcherData
+            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : document.documentElement
+            if (target) {
+                ;(target as HTMLElement).style.width = width + 'px'
+                ;(target as HTMLElement).style.height = height + 'px'
+            }
+            break
+        }
         case RecordType.MOUSE:
             const { x, y, type } = data as MouseRecordData
             if (type === MouseEventType.MOVE) {

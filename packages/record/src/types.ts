@@ -2,6 +2,7 @@ import { VNode, VSNode } from '@WebReplay/virtual-dom'
 
 export enum RecordType {
     'WINDOW' = 'WINDOW',
+    'SCROLL' = 'SCROLL',
     'MOUSE' = 'MOUSE',
     'DOM_UPDATE' = 'DOM_UPDATE',
     'FORM_EL_UPDATE' = 'FORM_EL_UPDATE'
@@ -26,10 +27,21 @@ export interface WindowWatcher {
 }
 
 export interface WindowWatcherData {
+    id: number
     width: number
     height: number
-    scrollTop: number
-    scrollLeft: number
+}
+
+export interface ScrollWatcher {
+    type: RecordType.SCROLL
+    data: ScrollWatcherData
+    time: string
+}
+
+export interface ScrollWatcherData {
+    id: number
+    top: number
+    left: number
 }
 
 export interface MouseRecord {
@@ -96,4 +108,4 @@ export interface FormElementWatcherData {
 
 export type RecordEvent<T> = (e: T) => void
 
-export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher
+export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher
