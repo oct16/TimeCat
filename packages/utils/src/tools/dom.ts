@@ -1,9 +1,9 @@
 import { isDev } from './common'
 
-const snapshot = window.__ReplayData__ && window.__ReplayData__.snapshot
-const origin = () => (snapshot && snapshot.origin) || location.origin
+const snapshot = () => window.__ReplayData__ && window.__ReplayData__.snapshot
+const origin = () => (snapshot() && snapshot().origin) || location.origin
 const protocol = () => origin().match(/.*?\/\//)![0] || location.protocol
-const href = () => origin() + ((snapshot && snapshot.pathname) || location.pathname)
+const href = () => origin() + ((snapshot() && snapshot().pathname) || location.pathname)
 
 export function filteringTemplate(tpl: string) {
     const reg = /<!--env-->[\s\S]*<!--env-->/g
@@ -44,7 +44,7 @@ export function completionCssHref(str: string) {
         if (startsWithDoubleSlash(c)) {
             url = protocol() + c.substring(2)
         } else if (startsWithSlash(c)) {
-            url = origin + c.substring(1)
+            url = origin() + c.substring(1)
         }
         if (url) {
             return a.replace(c, url)
@@ -74,7 +74,7 @@ export function completionAttrHref(str: string) {
         if (str.startsWith('./')) {
             return href() + str.substring(1)
         } else {
-            return href() + str
+            return origin() + '/' + str
         }
     }
 

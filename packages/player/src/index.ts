@@ -56,7 +56,6 @@ export async function replay(options: { socketUrl?: string } = {}) {
         getGZipStrData() ||
         window.__ReplayData__ ||
         (await getDataFromDB()))
-
     const { vNode, width, height, doctype } = snapshot as SnapshotData
     const c = new ContainerComponent(vNode, { width, height, doctype })
 
