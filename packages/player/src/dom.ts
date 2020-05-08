@@ -14,7 +14,7 @@ import {
     ScrollWatcherData
 } from '@WebReplay/record'
 import { PlayerComponent } from './player'
-import { nodeStore, isElementNode } from '@WebReplay/utils'
+import { nodeStore, isElementNode, isExistingNode } from '@WebReplay/utils'
 import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@WebReplay/virtual-dom'
 
 function isVNode(n: VNode | VSNode) {
@@ -128,7 +128,7 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
 
                 if (parentNode && node) {
                     if (node) {
-                        parentNode.replaceChild(document.createTextNode(value), node)
+                        isExistingNode(node) && parentNode.replaceChild(document.createTextNode(value), node)
                     } else {
                         parentNode.innerText = value
                     }
