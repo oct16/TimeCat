@@ -12,7 +12,7 @@ export class ContainerComponent {
     vNode: VNode
     width: number
     height: number
-
+    doctype: { name: string; publicId: string; systemId: string }
     constructor(
         vNode: VNode,
         params: {
@@ -24,6 +24,7 @@ export class ContainerComponent {
         this.vNode = vNode
         this.width = params.width
         this.height = params.height
+        this.doctype = params.doctype
         this.init()
     }
 
@@ -39,8 +40,7 @@ export class ContainerComponent {
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.sandBoxDoc.open()
 
-        const { snapshot } = window.__ReplayData__
-        const doctype = snapshot
+        const doctype = this.doctype
         const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
             doctype.systemId ? '"' + doctype.systemId + '"' : ''
         }><html><head></head><body></body></html>`
