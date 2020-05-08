@@ -67,13 +67,13 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
     switch (type) {
         case RecordType.SCROLL: {
             const { top, left, id } = data as ScrollWatcherData
-            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : document.documentElement
+            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.body
             target.scrollTo(left, top)
             break
         }
         case RecordType.WINDOW: {
             const { width, height, id } = data as WindowWatcherData
-            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : document.documentElement
+            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.body
             if (target) {
                 ;(target as HTMLElement).style.width = width + 'px'
                 ;(target as HTMLElement).style.height = height + 'px'
