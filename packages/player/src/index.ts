@@ -3,7 +3,7 @@ import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
-import { SnapshotData } from '@WebReplay/snapshot'
+import { SnapshotData, snapshots } from '@WebReplay/snapshot'
 import { RecordData } from '@WebReplay/record'
 
 function getGZipStrData() {
@@ -15,7 +15,12 @@ function getGZipStrData() {
     const str = pako.ungzip(arrayData, {
         to: 'string'
     })
-    return JSON.parse(str)
+    const dataArray = JSON.parse(str)
+    const [snapshot, ...records] = dataArray as [SnapshotData, ...RecordData[]]
+    return {
+        snapshot,
+        records
+    }
 }
 
 function dispatchEvent(type: string, data: RecordData) {
