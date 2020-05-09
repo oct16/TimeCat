@@ -69,8 +69,10 @@ export async function replay(options: { socketUrl?: string; proxy?: string } = {
         new Panel(c, records)
 
         if (records.length) {
-            const startTime = records[0].time
-            const endTime = records[records.length - 1].time
+            const firstRecord = records[0]
+            const lastRecord = records.slice(-1)[0]
+            const startTime = firstRecord.time
+            const endTime = lastRecord.time
             reduxStore.dispatch({
                 type: ProgressTypes.INFO,
                 data: {
