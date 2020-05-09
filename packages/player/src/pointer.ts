@@ -26,6 +26,6 @@ export class PointerComponent {
         setAttribute(this.pointer, 'active', '')
         setTimeout(() => {
             setAttribute(this.pointer, 'active', null)
-        }, 20)
+        }, 400)
     }
 }

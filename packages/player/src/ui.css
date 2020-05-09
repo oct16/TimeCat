@@ -16,12 +16,59 @@ body {
     width: 10px;
     height: 10px;
     position: absolute;
-    transition: all .2s
+    transition: all .2s;
 }
 
-#wr-pointer[active] svg {
-    fill: red;
-    transform: scale3d(1.2, 1.2, 1.2);
+#wr-pointer img {
+    width: 15px;
+    position: absolute;
+    z-index: 100;
+}
+
+#wr-pointer .loading {
+    display: flex;
+    animation-delay: 1s;
+}
+
+#wr-pointer .dot {
+    position: relative;
+    width: 2em;
+    height: 2em;
+    margin: 0.8em;
+    border-radius: 50%;
+}
+
+#wr-pointer[active] .dot {
+    width: 1px;
+    height: 1px;
+    border-radius: 50%;
+    position: absolute;
+    background: #4682b4;
+    top: -10px;
+    left: -10px;
+}
+
+#wr-pointer[active] .dot::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    animation: wave .45s ease-out infinite;
+}
+
+@keyframes wave {
+
+    40%,
+    75% {
+        transform: scale(30);
+    }
+
+    80%,
+    100% {
+        opacity: 0;
+    }
 }
 
 .wr-container {
