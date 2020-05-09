@@ -1,9 +1,9 @@
 import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp } from '@WebReplay/utils'
-import { ContainerComponent } from './container'
+import { ContainerComponent, CProps } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
-import { SnapshotData, snapshots } from '@WebReplay/snapshot'
+import { SnapshotData } from '@WebReplay/snapshot'
 import { RecordData } from '@WebReplay/record'
 
 function getGZipStrData() {
@@ -54,15 +54,16 @@ async function getDataFromDB() {
     }
 }
 
-export async function replay(options: { socketUrl?: string } = {}) {
-    const { socketUrl } = options
+export async function replay(options: { socketUrl?: string; proxy?: string } = {}) {
+    const { socketUrl, proxy } = options
     const { snapshot, records } = (window.__ReplayData__ =
         (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
         getGZipStrData() ||
         window.__ReplayData__ ||
         (await getDataFromDB()))
     const { vNode, width, height, doctype } = snapshot as SnapshotData
-    const c = new ContainerComponent(vNode, { width, height, doctype })
+    const props: CProps = { vNode, width, height, doctype, proxy }
+    const c = new ContainerComponent(props)
 
     fmp.ready(() => {
         new Panel(c, records)

@@ -4,27 +4,21 @@ import HTML from './ui.html'
 import STYLE from './ui.css'
 import FIXED from './fixed.css'
 
+export interface CProps {
+    vNode: VNode
+    width: number
+    height: number
+    doctype: { name: string; publicId: string; systemId: string }
+    proxy?: string
+}
 export class ContainerComponent {
     container: HTMLElement
     sandBox: HTMLIFrameElement
     sandBoxDoc: Document
 
-    vNode: VNode
-    width: number
-    height: number
-    doctype: { name: string; publicId: string; systemId: string }
-    constructor(
-        vNode: VNode,
-        params: {
-            width: number
-            height: number
-            doctype: { name: string; publicId: string; systemId: string }
-        }
-    ) {
-        this.vNode = vNode
-        this.width = params.width
-        this.height = params.height
-        this.doctype = params.doctype
+    props: CProps
+    constructor(props: CProps) {
+        this.props = props
         this.init()
     }
 
@@ -35,12 +29,12 @@ export class ContainerComponent {
 
     initSandbox() {
         this.sandBox = this.container.querySelector('#wr-sandbox') as HTMLIFrameElement
-        this.sandBox.style.width = this.width + 'px'
-        this.sandBox.style.height = this.height + 'px'
+        this.sandBox.style.width = this.props.width + 'px'
+        this.sandBox.style.height = this.props.height + 'px'
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.sandBoxDoc.open()
 
-        const doctype = this.doctype
+        const doctype = this.props.doctype
         const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
             doctype.systemId ? '"' + doctype.systemId + '"' : ''
         }><html><head></head><body></body></html>`
@@ -51,7 +45,7 @@ export class ContainerComponent {
     }
 
     setViewState() {
-        const child = convertVNode(this.vNode)
+        const child = convertVNode(this.props.vNode)
         const { snapshot } = window.__ReplayData__
 
         if (child) {
@@ -74,8 +68,8 @@ export class ContainerComponent {
     createContainer() {
         const parser = new DOMParser()
         const element = parser.parseFromString(filteringTemplate(HTML), 'text/html').body.firstChild as HTMLElement
-        element.style.width = this.width + 'px'
-        element.style.height = this.height + 'px'
+        element.style.width = this.props.width + 'px'
+        element.style.height = this.props.height + 'px'
         element.style.position = 'relative'
         element.style.margin = '0 auto'
         return (this.container = element)
