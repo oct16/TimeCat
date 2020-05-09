@@ -67,7 +67,7 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
     switch (type) {
         case RecordType.SCROLL: {
             const { top, left, id } = data as ScrollWatcherData
-            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.body
+            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
             target.scrollTo(left, top)
             break
         }
