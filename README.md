@@ -58,7 +58,7 @@ Web录屏器其实也借鉴这样的一种思路，工程上一般称之为Opera
 1. 异常监控系统，例如[LogRocket](https://logrocket.com/)，可以理解他是一个整合了Sentry + 录屏器的工具，能回放网页错误时的图形界面与数据日志，从而帮助Debug
 2. 记录用户的行为进行分析，例如[MouseFlow](https://mouseflow.com/)。甚至还可以是直播的方式[LiveSession](https://livesession.io/)，“连接”到用户的浏览中，看看用户是怎么使用网站的
 3. 对客服人员的监控，例如阿里的有十万级别的客服小二人员分散在全国各地，需要对他们的服务过程进行7x24小时的录屏，在这个数量级上的对监控的性能要求就非常高了，阿里内部的工具叫`XReplay`
-4. 协同工具，例如协同文档和协同编辑器等，会涉及类似的技术
+4. 协同工具，Web直播等，也会涉及类似的技术
 
 ....
 
@@ -146,8 +146,6 @@ const elementList: [HTMLElement, string][] = [
 
 由于 DOM 的 Diff Patch 是借助 MutationObserver 来实现的，需要对发生更变的记录进行收集处理，这涉及到一些关键问题：例如DOM更变的时序是有先后的，Mutation只归纳为新增和删除，但是在调用insertBefore或者appendChild的时候，会造成移动，要对这些节点进行处理，标记为移动，否则节点的引用丢失就可能会导致渲染错误
 
-// TODO
-
 #### SPA网页的渲染时间
 
 在开始播放前，我们需要把之前的存储的数据还原成真实的DOM，这个过程中会占用一定的加载时间产生白屏，这取决于你的浏览器性能以及录制网页资源情况，参考FMP（First Meaningful Paint）的实现，加载过程中可以通过之前映射的数据动态生成骨架图，等待FMP发出Ready信号之后再进行播放
@@ -188,7 +186,6 @@ const elementList: [HTMLElement, string][] = [
 #### 沙箱化提升安全
 
 录制的内容有可能属于第三方提供，这意味着可能存在一定的风险，网站中可能有一些恶意的脚本并没有被我们完全过滤掉，例如：`<div onload="alert('something'); script..."></div>`，或者我们的播放器中的一些事件也可能对播放内容产生影响，这时候我们需要一个沙盒来隔离播放内容的环境，HTML5 提供的 iframe sandbox是不错的选择，这可以帮助我们轻易的隔离环境：
-```
 - script脚本不能执行
 - 不能发送ajax请求
 - 不能使用本地存储，即localStorage,cookie等
@@ -196,39 +193,36 @@ const elementList: [HTMLElement, string][] = [
 - 不能发送表单
 - 不能加载额外插件比如flash等
 - 不能执行自动播放的tricky. 比如: autofocused, autoplay
-```
 
 #### 播放、跳转与快进
 
-播放：播放器会内置一个精确的计时器，动作的数据存储在一个栈中，栈中的每一个对象就是一帧，通过RAF(requestAnimationFrame) 对数据帧的时间戳进行扫描从而得知下一帧在什么时间发生
+播放：播放器会内置一个精确的计时器，动作的数据存储在一个栈中，栈中的每一个对象就是一帧，通过RAF(RequestAnimationFrame) 对数据帧的时间戳进行扫描从而得知下一帧在什么时间发生
 
 暂停：通过cancelAnimationFrame暂停计时器
-
 快进：加速采集速率的倍速
-
 跳转：通过virtualDom实现计算
 
 #### 在客户端进行的Gzip压缩
 
 Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的数据不一定只存在数据库里，可能会有三种储存方式
 1. 服务器存储 TCP => DB
-2. 本地储存 localStorage、indexedDB、web SQL
-3. 保存为本地文件，例如直接导出可运行的HTML文件
+2. 本地储存 LocalStorage、IndexedDB、Web SQL
+3. 数据持久化于script中，保存为本地文件，例如直接导出可运行的HTML文件
 
 利用客户端的运算能力，在进行导出或者传输之前，可以对数据进行压缩，极大程度的减小体积
 
 在客户端可以进行基于 `Gzip` 的数据包压缩，这里我选择了 [Pako](https://nodeca.github.io/pako/) 来对数据进行压缩   
-Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的
-
-LZ77 的核心思路是如果一个串中有两个重复的串，那么只需要知道第一个串的内容和后面串相对于第一个串起始位置的距离 + 串的长度， 而哈夫曼的核心思路是通过构造 Huffman Tree 的方式给字符重新编码
-
-> 参考文章： [How gzip uses Huffman coding](https://jvns.ca/blog/2015/02/22/how-gzip-uses-huffman-coding/)
-> 
+Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的，通过压缩减少约5倍左右的体积
 
 #### 数据上传
 
 对于客户端的数据，可以利用浏览器提供的indexedDB进行存储，毕竟indexedDB会比LocalStorage容量大得多，一般来说不少于 250MB，甚至没有上限，此外它使用object store存储，而且支持transaction，另外很重要的一点它是异步的，意味着不会阻塞录屏器的运行
 之后数据可以通过WebSocket或其他方式持续上传到OSS服务器中，由于数据是分块进行传输的，在同步之后还可以增加数据校验码来保证一致性避免错误
+
+#### 加载SDK
+
+通过RollUp打包器可以生成多种格式版本，例如``IIFE``与``ESM``等
+在项目中加载SDK或者利用Chrome的插件注入IIFE模块，可以很方便的注入代码，控制数据录制的过程
 
 
 #### 致谢
