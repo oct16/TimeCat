@@ -38,7 +38,7 @@ const getAttr = (el: HTMLElement & { checked: boolean }) => {
 function getExtra(node: Element, isSVG?: boolean) {
     const { tagName } = node
     const extra: VNode['extra'] = {}
-    if (isSVG || tagName === 'SVG') {
+    if (isSVG || tagName.toLowerCase() === 'svg') {
         extra.isSVG = true
     }
     if (tagName === 'INPUT') {
