@@ -56,11 +56,16 @@ async function getDataFromDB() {
 
 export async function replay(options: { socketUrl?: string; proxy?: string } = {}) {
     const { socketUrl, proxy } = options
-    const { snapshot, records } = (window.__ReplayData__ =
+    const { snapshot, records } = (window.__ReplayData__ = Object.assign(
+        {
+            opts: options
+        },
         (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
-        getGZipStrData() ||
-        window.__ReplayData__ ||
-        (await getDataFromDB()))
+            getGZipStrData() ||
+            window.__ReplayData__ ||
+            (await getDataFromDB())
+    ))
+
     const { vNode, width, height, doctype } = snapshot as SnapshotData
     const props: CProps = { vNode, width, height, doctype, proxy }
     const c = new ContainerComponent(props)

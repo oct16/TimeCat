@@ -1,8 +1,8 @@
 import { setAttribute } from './dom'
-import { nodeStore, isDev, isHideComment } from '@WebReplay/utils'
+import { nodeStore, isDev, isHideComment, completionCssHref } from '@WebReplay/utils'
 import { VNode, VSNode } from './types'
 
-export function convertVNode(vNode: VNode | VSNode | null): Element | null {
+export function convertVNode(vNode: VNode | VSNode | null, parent?: VNode): Element | null {
     if (vNode === null || vNode === undefined) {
         return null
     }
@@ -11,6 +11,9 @@ export function convertVNode(vNode: VNode | VSNode | null): Element | null {
         return createCommentNode(vs)
     }
     if (vNode.type === Node.TEXT_NODE) {
+        if (parent && parent.tag === 'style') {
+            vs.value = completionCssHref(vs.value)
+        }
         return createText(vs)
     }
     const vn = vNode as VNode
@@ -28,7 +31,7 @@ function travel(vNode: VNode, node: Element): void {
     const vNodeChildren = vNode.children.slice()
     vNodeChildren.forEach(vChild => {
         let child = nodeChildren.pop() as Element | null
-        child = convertVNode(vChild)
+        child = convertVNode(vChild, vNode)
         if (child) {
             if (isHideComment(node.lastChild)) {
                 setAttribute(child as HTMLElement, 'style', 'visibility: hidden')

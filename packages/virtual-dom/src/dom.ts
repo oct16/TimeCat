@@ -1,4 +1,4 @@
-import { completionAttrHref, completionCssHref } from '@WebReplay/utils'
+import { completionAttrHref, completionCssHref, proxyResource } from '@WebReplay/utils'
 
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null): void {
     if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -34,8 +34,22 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
 
     value = String(value)
 
-    if (name === 'background' || name === 'src' || name === 'href') {
+    if (name === 'href') {
         value = completionAttrHref(String(value))
+    }
+
+    if (name === 'background' || name === 'src') {
+        if (value.startsWith('data:')) {
+            // skip
+        } else {
+            value = proxyResource(completionAttrHref(String(value)))
+        }
+    }
+
+    // The srcset attribute specifies the URL of the image to use in different situations
+    if (name === 'srcset') {
+        const srcArray = value.split(',')
+        value = srcArray.map(src => proxyResource(completionAttrHref(src.trim()))).toString()
     }
 
     if (value.startsWith('/')) {

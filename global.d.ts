@@ -21,6 +21,7 @@ interface Window {
     __ReplayStrData__: string
     __ReplayData__: {
         snapshot: any
+        opts: any
         records: any[]
     }
     wr: {

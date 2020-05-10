@@ -38,6 +38,17 @@ function startsWithDoubleSlash(str: string) {
     return /^\/\//.test(str)
 }
 
+export function proxyResource(url: string) {
+    const { opts } = window.__ReplayData__
+    const proxy = opts.proxy as string
+
+    if (proxy) {
+        const proxyUrl = proxy.endsWith('/') ? proxy + url : proxy + '/' + url
+        return proxyUrl
+    }
+    return url
+}
+
 export function completionCssHref(str: string) {
     return str.replace(/(url\()['"]?((\/{1,2})[^'"]*?)['"]?(?=\))/g, (a, b, c) => {
         let url: string = ''
