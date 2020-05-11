@@ -101,14 +101,12 @@ observer.observe(target, options)
 ```
 
 再借助`WindowEventHandlers` `addEventListener` 等的能力组合，就可以监听到页面一系列的操作事件了
-```
 - Add Node Action
 - Delete Node Action
 - Change Attribute Action
 - Scroll Action
 - Change Location Action
 ...
-```
 
 通过 `mouseMove` 和 `click` 事件记录鼠标动作 
 
@@ -145,6 +143,28 @@ const elementList: [HTMLElement, string][] = [
 #### 对MutationObserver的优化
 
 由于 DOM 的 Diff Patch 是借助 MutationObserver 来实现的，需要对发生更变的记录进行收集处理，这涉及到一些关键问题：例如DOM更变的时序是有先后的，Mutation只归纳为新增和删除，但是在调用insertBefore或者appendChild的时候，会造成移动，要对这些节点进行处理，标记为移动，否则节点的引用丢失就可能会导致渲染错误
+
+
+#### 跨域时外链的处理
+
+加载HTML以后会引用很多外界的资源，通常会有多种形式
+
+例如：
+- 绝对路径 ``<img src="/xx.png" />`` 
+- 相对路径 ``<img src="./xx.png" />`` 
+- 相对当前path的路径 ``<img src="xx.png" />`` 
+- 协议相对URL (The Protocol-relative URL)``<img src="//cnd.xx.png" />``
+- srcset响应式图片 [Responsive images](https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images) ``src="www.xxx.png" srcset="www.xxx.png 1x, www.xxx.png 2x"``   
+...
+
+以上就需要一个转换器来处理路径问题，在``Deserialize``阶段，把他们转成原域名下的绝对路径才能在跨域下正常加载
+还有一种情况是对于第三方资源加载第三方资源的问题，这就需要借助服务器来解决了
+
+###### CORS Error 问题
+
+通常是由于被录制的网站对资源进行了限制, 开启了CORS Policy，解决方案是，如果资源可控，可以添加白名单或者忽略，另外就是使用代理服务器， 
+> 参考文章：[3 Ways to Fix the CORS Error](https://medium.com/@dtkatz/3-ways-to-fix-the-cors-error-and-how-access-control-allow-origin-works-d97d55946d9)
+
 
 #### SPA网页的渲染时间
 
