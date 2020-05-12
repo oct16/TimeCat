@@ -10,7 +10,7 @@ export class PointerComponent {
     }
 
     initPointer() {
-        this.pointer = document.getElementById('wr-pointer') as HTMLElement
+        this.pointer = document.getElementById('cat-pointer') as HTMLElement
         this.move(0, 0)
     }
 

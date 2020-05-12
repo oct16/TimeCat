@@ -6,8 +6,8 @@ let ctrl: {
 } | null
 
 function record(e: Event) {
-    const wr = window.wr
-    const { record } = wr
+    const cat = window.cat
+    const { record } = cat
 
     if (process.env.LIVE_MODE) {
         const socket = io('http://localhost:9528')
@@ -21,10 +21,10 @@ function record(e: Event) {
 }
 
 function replay(e: Event & { detail: { scripts: { name: string; src: string }[] } }) {
-    const wr = (window as any).wr
+    const cat = (window as any).cat
     if (ctrl) {
         const { scripts } = e.detail
-        wr.exportReplay({
+        cat.exportReplay({
             scripts,
             autoPlay: true
         })

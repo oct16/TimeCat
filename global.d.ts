@@ -24,7 +24,7 @@ interface Window {
         opts: any
         records: any[]
     }
-    wr: {
+    cat: {
         record: (
             fn?: ((data: SnapshotData, db: IndexedDBOperator) => void) | undefined
         ) => {

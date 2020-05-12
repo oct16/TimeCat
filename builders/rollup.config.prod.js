@@ -8,19 +8,19 @@ export default {
     input: 'index.ts',
     output: [
         {
-            name: 'wr',
+            name: 'cat',
             format: 'iife',
-            file: 'dist/replay.min.js'
+            file: 'dist/timecat.min.js'
         },
         {
-            name: 'wr',
+            name: 'cat',
             format: 'cjs',
-            file: 'dist/replay.cjs.js'
+            file: 'dist/timecat.cjs.js'
         },
         {
-            name: 'wr',
+            name: 'cat',
             format: 'esm',
-            file: 'dist/replay.esm.js'
+            file: 'dist/timecat.esm.js'
         }
     ],
     plugins: [

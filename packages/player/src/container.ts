@@ -28,7 +28,7 @@ export class ContainerComponent {
     }
 
     initSandbox() {
-        this.sandBox = this.container.querySelector('#wr-sandbox') as HTMLIFrameElement
+        this.sandBox = this.container.querySelector('#cat-sandbox') as HTMLIFrameElement
         this.sandBox.style.width = this.props.width + 'px'
         this.sandBox.style.height = this.props.height + 'px'
         this.sandBoxDoc = this.sandBox.contentDocument!

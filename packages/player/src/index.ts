@@ -97,7 +97,7 @@ export async function replay(options: { socketUrl?: string; proxy?: string } = {
     })
 
     if (!records.length) {
-        const panel = document.querySelector('.wr-panel')
+        const panel = document.querySelector('.cat-panel')
         if (panel) {
             panel.setAttribute('style', 'display: none')
         }

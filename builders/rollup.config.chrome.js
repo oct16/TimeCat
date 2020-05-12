@@ -24,7 +24,7 @@ const dest = isDev ? 'dist/chrome/' : 'chrome/'
 
 const copyTargets = [
     { src: 'packages/chrome/src/assets/*', dest },
-    !isDev ? { src: 'dist/replay.min.js', dest } : null
+    !isDev ? { src: 'dist/timecat.min.js', dest } : null
 ].filter(Boolean)
 
 export default [
@@ -32,8 +32,8 @@ export default [
         input: 'packages/chrome/src/background.ts',
         output: {
             format: 'iife',
-            moduleName: 'wr-background',
-            file: dest + 'replay-chrome-background.js'
+            moduleName: 'cat-background',
+            file: dest + 'timecat-chrome-background.js'
         },
         plugins: [...defaultPlugin]
     },
@@ -41,8 +41,8 @@ export default [
         input: 'packages/chrome/src/page.ts',
         output: {
             format: 'iife',
-            moduleName: 'wr-page',
-            file: dest + 'replay-chrome-page.js'
+            moduleName: 'cat-page',
+            file: dest + 'timecat-chrome-page.js'
         },
         plugins: [...defaultPlugin]
     },
@@ -50,8 +50,8 @@ export default [
         input: 'packages/chrome/src/content.ts',
         output: {
             format: 'iife',
-            moduleName: 'wr-content',
-            file: dest + 'replay-chrome-content.js'
+            moduleName: 'cat-content',
+            file: dest + 'timecat-chrome-content.js'
         },
         plugins: [
             ...defaultPlugin,

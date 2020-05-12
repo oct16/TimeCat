@@ -30,8 +30,8 @@ async function initOptions(opts: Opts) {
     const scriptList = scripts || ([] as ScriptItem[])
     if (autoPlay) {
         scriptList.push({
-            name: 'web-replay-init',
-            src: `wr.replay()`
+            name: 'time-cat-init',
+            src: `cat.replay()`
         })
     }
     await injectScripts(scriptList)

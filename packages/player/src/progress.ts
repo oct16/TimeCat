@@ -21,10 +21,10 @@ export class ProgressComponent {
         { trailing: true }
     )
     constructor(c: ContainerComponent) {
-        this.progress = c.container.querySelector('.wr-progress')! as HTMLElement
-        this.timer = c.container.querySelector('.wr-timer') as HTMLElement
-        this.thumb = this.progress.querySelector('.wr-thumb') as HTMLElement
-        this.slider = this.progress.querySelector('.wr-slider-bar') as HTMLElement
+        this.progress = c.container.querySelector('.cat-progress')! as HTMLElement
+        this.timer = c.container.querySelector('.cat-timer') as HTMLElement
+        this.thumb = this.progress.querySelector('.cat-thumb') as HTMLElement
+        this.slider = this.progress.querySelector('.cat-slider-bar') as HTMLElement
     }
 
     updateProgress(percentage: number) {

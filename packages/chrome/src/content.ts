@@ -1,7 +1,7 @@
 import { dispatchEvent, sendMessageToBackgroundScript } from './common'
 
 const isDev = process.env.NODE_ENV === 'development'
-const timeCatScript = isDev ? 'http://localhost:4321/replay.min.js' : chrome.runtime.getURL('replay.min.js')
+const timeCatScript = isDev ? 'http://localhost:4321/timecat.min.js' : chrome.runtime.getURL('timecat.min.js')
 
 chrome.runtime.onMessage.addListener(request => {
     const { type } = request
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener(request => {
             dispatchEvent('CHROME_RECORD_FINISH', {
                 scripts: [
                     {
-                        name: 'web-replay',
+                        name: 'time-cat',
                         src: timeCatScript
                     }
                 ]
@@ -34,17 +34,17 @@ window.addEventListener('CHROME_RECORD_CANCEL', () =>
 )
 
 const injectMain = injectScriptOnce({
-    name: 'web-replay',
+    name: 'time-cat',
     src: timeCatScript
 })
 
 const injectPageJS = injectScriptOnce({
-    name: 'replay-chrome-page',
-    src: chrome.runtime.getURL('replay-chrome-page.js')
+    name: 'timecat-chrome-page',
+    src: chrome.runtime.getURL('timecat-chrome-page.js')
 })
 
 function lazyInject(onLoadFn: () => void) {
-    if (!window.document.getElementById('web-replay')) {
+    if (!window.document.getElementById('time-cat')) {
         Promise.all([new Promise(injectMain), new Promise(injectPageJS)]).then(() => {
             onLoadFn()
         })

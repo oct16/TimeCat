@@ -21,12 +21,12 @@
                 "https://*/*"
             ],
             "js": [
-                "replay-chrome-content.js"
+                "timecat-chrome-content.js"
             ]
         }
     ],
     "web_accessible_resources": [
-        "replay.min.js",
-        "replay-chrome-page.js"
+        "timecat.min.js",
+        "timecat-chrome-page.js"
     ]
 }

@@ -14,9 +14,9 @@ export class KeyboardComponent {
     }
 
     init() {
-        this.controller = this.c.container.querySelector('.wr-keyboard') as HTMLElement
+        this.controller = this.c.container.querySelector('.cat-keyboard') as HTMLElement
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
-        this.exportBtn = this.c.container.querySelector('.wr-export') as HTMLButtonElement
+        this.exportBtn = this.c.container.querySelector('.cat-export') as HTMLButtonElement
         this.exportBtn.addEventListener('click', this.export)
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
@@ -103,14 +103,14 @@ export class KeyboardComponent {
     }
 
     export() {
-        const mainScript = document.getElementById('web-replay') as HTMLScriptElement
-        const initScript = document.getElementById('web-replay-init') as HTMLScriptElement
+        const mainScript = document.getElementById('time-cat') as HTMLScriptElement
+        const initScript = document.getElementById('time-cat-init') as HTMLScriptElement
         const scriptList = []
 
         if (mainScript) {
             const source = (mainScript.src || mainScript.textContent)!
             scriptList.push({
-                name: 'web-replay',
+                name: 'time-cat',
                 src: source
             })
         }
@@ -118,7 +118,7 @@ export class KeyboardComponent {
         if (initScript) {
             const source = (initScript.src || initScript.textContent)!
             scriptList.push({
-                name: 'web-replay-init',
+                name: 'time-cat-init',
                 src: source
             })
         }
