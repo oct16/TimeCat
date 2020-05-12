@@ -28,6 +28,7 @@ export default {
             tsconfigOverride: { compilerOptions: { declaration: false } }
         }),
         node({
+            browser: true,
             mainFields: ['module', 'main']
         }),
         commonjs(),

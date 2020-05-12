@@ -18,9 +18,9 @@ const defaultPlugin = [
     })
 ]
 
-const isDev = process.env.NODE_ENV !== 'production'
+const isDev = process.env.NODE_ENV === 'development'
 
-const dest = isDev ? 'dist/chrome/' : 'chrome/'
+const dest = isDev ? 'dist/chrome/' : 'dist/chrome/'
 
 const copyTargets = [
     { src: 'packages/chrome/src/assets/*', dest },

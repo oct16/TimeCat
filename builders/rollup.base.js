@@ -5,8 +5,8 @@ import replace from '@rollup/plugin-replace'
 
 function filteringTemplate(tpl) {
     const reg = /<!--env-->[\s\S]*<!--env-->/g
-    const isProd = process.env.NODE_ENV === 'production'
-    if (!isProd) {
+    const isDev = process.env.NODE_ENV === 'development'
+    if (isDev) {
         tpl = tpl.replace(reg, '')
     }
     return tpl
