@@ -1,7 +1,7 @@
 {
-    "name": "WebReplay Chrome",
+    "name": "TimeCat Chrome",
     "manifest_version": 2,
-    "description": "WebReplay Chrome",
+    "description": "TimeCat Chrome",
     "version": "1.3",
     "background": {
         "scripts": [

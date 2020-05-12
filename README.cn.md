@@ -1,8 +1,8 @@
 ### 项目简介 
 
-[English](https://github.com/oct16/WebReplay)
+[English](https://github.com/oct16/TimeCat)
 
-[🖥 DEMO](https://oct16.github.io/WebReplay) Chrome浏览器
+[🖥 DEMO](https://oct16.github.io/TimeCat) Chrome浏览器
 
 ### Updates:
 
@@ -11,7 +11,7 @@
 
 03.31 Add Chrome Plugin 
 
-### 不可思议的Web录屏器
+### TimeCat -- 不可思议的Web录屏器
 
 如果你爱打游戏，一定打过魔兽争霸3（暴露年纪🤣），你也许会游戏导出的录像文件感到好奇，明明打了一个小时游戏，为什么录像才几百KB而已。不过很快你又发现另一个问题，在每次导入录像的时候需要重新加载一次地图，否则就不能播放。
 

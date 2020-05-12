@@ -1,4 +1,4 @@
-import { createFlatNode } from '@WebReplay/virtual-dom'
+import { createFlatNode } from '@TimeCat/virtual-dom'
 import {
     RecordType,
     WindowWatcher,
@@ -16,7 +16,7 @@ import {
     RemoveUpdateData,
     ScrollWatcher
 } from './types'
-import { logger, throttle, isDev, nodeStore, listenerStore, getTime, isExistingNode } from '@WebReplay/utils'
+import { logger, throttle, isDev, nodeStore, listenerStore, getTime, isExistingNode } from '@TimeCat/utils'
 
 function emitterHook(emit: RecordEvent<RecordData>, data: any) {
     if (isDev) {
@@ -62,7 +62,6 @@ function windowWatcher(emit: RecordEvent<WindowWatcher>) {
     emitData(document)
 
     function handleFn(e: Event) {
-        
         const { type, target } = e
         if (type === 'resize') {
             emitData(target as Element | Document)

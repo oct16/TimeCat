@@ -1,6 +1,6 @@
-import { createElement } from '@WebReplay/virtual-dom'
+import { createElement } from '@TimeCat/virtual-dom'
 import { InfoData, DOMSnapshotData } from './types'
-import { VNode } from '@WebReplay/virtual-dom'
+import { VNode } from '@TimeCat/virtual-dom'
 
 function getInitInfo(): InfoData {
     const { name, publicId, systemId } = window.document.doctype!

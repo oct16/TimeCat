@@ -1,4 +1,4 @@
-import { VNode, VSNode } from '@WebReplay/virtual-dom'
+import { VNode, VSNode } from '@TimeCat/virtual-dom'
 
 export enum RecordType {
     'WINDOW' = 'WINDOW',

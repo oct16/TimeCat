@@ -1,4 +1,4 @@
-import { throttle, ProgressState, secondToDate } from '@WebReplay/utils'
+import { throttle, ProgressState, secondToDate } from '@TimeCat/utils'
 import { ContainerComponent } from './container'
 
 export class ProgressComponent {

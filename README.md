@@ -1,9 +1,9 @@
 
 ### Project Description
 
-[中文](https://github.com/oct16/WebReplay/blob/master/README.cn.md)
+[中文](https://github.com/oct16/TimeCat/blob/master/README.cn.md)
 
-[🖥 DEMO](https://oct16.github.io/WebReplay) Chrome Browser
+[🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
 ### Updates:
 
@@ -12,7 +12,7 @@
 
 03.31 Add Chrome Plugin 
 
-### A Magical Web Recorder
+### TimeCat -- A Magical Web Recorder
 
 If you love to play games, you must have played Warcraft 3. You may be curious about the video files exported by the game. After playing the game for an hour, why the video is only a few hundred KB. But soon you will found another problem, you need to reload the map every time when you import the replay video, otherwise, it will not play.
 

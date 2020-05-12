@@ -1,5 +1,5 @@
-import { VNode, convertVNode } from '@WebReplay/virtual-dom'
-import { filteringTemplate, disableScrolling } from '@WebReplay/utils'
+import { VNode, convertVNode } from '@TimeCat/virtual-dom'
+import { filteringTemplate, disableScrolling } from '@TimeCat/utils'
 import HTML from './ui.html'
 import STYLE from './ui.css'
 import FIXED from './fixed.css'

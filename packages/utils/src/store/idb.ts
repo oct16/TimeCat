@@ -1,5 +1,5 @@
-import { SnapshotData } from '@WebReplay/snapshot'
-import { RecordData } from '@WebReplay/record'
+import { SnapshotData } from '@TimeCat/snapshot'
+import { RecordData } from '@TimeCat/record'
 
 export class IndexedDBOperator {
     db: IDBDatabase

@@ -29,7 +29,7 @@
         ],
         "rootDir": ".",
         "paths": {
-            "@WebReplay/*": [
+            "@TimeCat/*": [
                 "packages/*/src"
             ]
         }

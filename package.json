@@ -1,5 +1,5 @@
 {
-    "description": "WebReplay plugin",
+    "description": "TimeCat plugin",
     "version": "1.0.0",
     "workspaces": [
         "packages/*"
@@ -46,12 +46,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/oct16/WebReplay.git"
+        "url": "git+https://github.com/oct16/TimeCat.git"
     },
     "author": "oct16",
     "license": "GPL",
     "bugs": {
-        "url": "https://github.com/oct16/WebReplay/issues"
+        "url": "https://github.com/oct16/TimeCat/issues"
     },
-    "homepage": "https://github.com/oct16/WebReplay#readme"
+    "homepage": "https://github.com/oct16/TimeCat#readme"
 }

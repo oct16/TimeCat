@@ -1,4 +1,4 @@
-import { VNode } from '@WebReplay/virtual-dom'
+import { VNode } from '@TimeCat/virtual-dom'
 
 export interface InfoData {
     doctype: DocumentType

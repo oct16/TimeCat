@@ -1,4 +1,4 @@
-import { setAttribute } from '@WebReplay/virtual-dom'
+import { setAttribute } from '@TimeCat/virtual-dom'
 
 export class PointerComponent {
     x = 0

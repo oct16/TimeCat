@@ -1,7 +1,7 @@
 import { dispatchEvent, sendMessageToBackgroundScript } from './common'
 
 const isDev = process.env.NODE_ENV === 'development'
-const webReplayScript = isDev ? 'http://localhost:4321/replay.min.js' : chrome.runtime.getURL('replay.min.js')
+const timeCatScript = isDev ? 'http://localhost:4321/replay.min.js' : chrome.runtime.getURL('replay.min.js')
 
 chrome.runtime.onMessage.addListener(request => {
     const { type } = request
@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(request => {
                 scripts: [
                     {
                         name: 'web-replay',
-                        src: webReplayScript
+                        src: timeCatScript
                     }
                 ]
             })
@@ -35,7 +35,7 @@ window.addEventListener('CHROME_RECORD_CANCEL', () =>
 
 const injectMain = injectScriptOnce({
     name: 'web-replay',
-    src: webReplayScript
+    src: timeCatScript
 })
 
 const injectPageJS = injectScriptOnce({

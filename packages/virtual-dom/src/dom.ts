@@ -1,4 +1,4 @@
-import { completionAttrHref, completionCssHref, proxyResource } from '@WebReplay/utils'
+import { completionAttrHref, completionCssHref, proxyResource } from '@TimeCat/utils'
 
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null): void {
     if (node.nodeType !== Node.ELEMENT_NODE) {

@@ -1,7 +1,7 @@
 import { watchers } from './watcher'
 import { RecordData, RecordEvent } from './types'
-import { listenerStore, IndexedDBOperator, DBPromise } from '@WebReplay/utils'
-import { snapshots, SnapshotData } from '@WebReplay/snapshot'
+import { listenerStore, IndexedDBOperator, DBPromise } from '@TimeCat/utils'
+import { snapshots, SnapshotData } from '@TimeCat/snapshot'
 const ctrl = {
     unsubscribe: () => {
         Array.from(listenerStore.values()).forEach(un => un())

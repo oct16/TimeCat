@@ -12,10 +12,10 @@ import {
     RemoveUpdateData,
     DOMUpdateDataType,
     ScrollWatcherData
-} from '@WebReplay/record'
+} from '@TimeCat/record'
 import { PlayerComponent } from './player'
-import { nodeStore, isElementNode, isExistingNode } from '@WebReplay/utils'
-import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@WebReplay/virtual-dom'
+import { nodeStore, isElementNode, isExistingNode } from '@TimeCat/utils'
+import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@TimeCat/virtual-dom'
 
 function isVNode(n: VNode | VSNode) {
     return !!(n as any).tag
@@ -67,7 +67,9 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
     switch (type) {
         case RecordType.SCROLL: {
             const { top, left, id } = data as ScrollWatcherData
-            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
+            let target = (id as number | null)
+                ? (nodeStore.getNode(id) as HTMLElement)
+                : this.c.sandBoxDoc.documentElement
             target.scrollTo(left, top)
             break
         }

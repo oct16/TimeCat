@@ -1,9 +1,9 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from './dom'
-import { reduxStore, PlayerTypes, ProgressState, getTime } from '@WebReplay/utils'
+import { reduxStore, PlayerTypes, ProgressState, getTime } from '@TimeCat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData } from '@WebReplay/record'
+import { RecordData } from '@TimeCat/record'
 
 const LIVE = Symbol('live')
 export class PlayerComponent {

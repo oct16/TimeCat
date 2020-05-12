@@ -1,5 +1,5 @@
 import { VNode, VSNode } from './types'
-import { nodeStore, isElementNode } from '@WebReplay/utils'
+import { nodeStore, isElementNode } from '@TimeCat/utils'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode | VSNode => {
     if (isElementNode(el)) {

@@ -1,10 +1,10 @@
-import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp } from '@WebReplay/utils'
+import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp } from '@TimeCat/utils'
 import { ContainerComponent, CProps } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
-import { SnapshotData } from '@WebReplay/snapshot'
-import { RecordData } from '@WebReplay/record'
+import { SnapshotData } from '@TimeCat/snapshot'
+import { RecordData } from '@TimeCat/record'
 
 function getGZipStrData() {
     const data = window.__ReplayStrData__

@@ -1,4 +1,4 @@
-import { PlayerTypes, reduxStore, exportReplay } from '@WebReplay/utils'
+import { PlayerTypes, reduxStore, exportReplay } from '@TimeCat/utils'
 import { ContainerComponent } from './container'
 
 export class KeyboardComponent {

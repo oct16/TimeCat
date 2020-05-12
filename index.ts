@@ -1,5 +1,5 @@
 import 'mutationobserver-shim'
 
-export { record } from '@WebReplay/record'
-export { replay } from '@WebReplay/player'
-export { exportReplay } from '@WebReplay/utils'
+export { record } from '@TimeCat/record'
+export { replay } from '@TimeCat/player'
+export { exportReplay } from '@TimeCat/utils'

@@ -3,7 +3,7 @@ import { PlayerComponent } from './player'
 import { PointerComponent } from './pointer'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData } from '@WebReplay/record'
+import { RecordData } from '@TimeCat/record'
 
 export class Panel {
     data: RecordData[]

@@ -1,5 +1,5 @@
 import { setAttribute } from './dom'
-import { nodeStore, isDev, isHideComment, completionCssHref } from '@WebReplay/utils'
+import { nodeStore, isDev, isHideComment, completionCssHref } from '@TimeCat/utils'
 import { VNode, VSNode } from './types'
 
 export function convertVNode(vNode: VNode | VSNode | null, parent?: VNode): Element | null {
