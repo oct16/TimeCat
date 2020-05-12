@@ -1,5 +1,9 @@
 
-[🖥 DEMO](https://oct16.github.io/WebReplay) Chrome浏览器
+### Project Description
+
+[中文](https://github.com/oct16/WebReplay/blob/master/README.cn.md)
+
+[🖥 DEMO](https://oct16.github.io/WebReplay) Chrome Browser
 
 ### Updates:
 
@@ -8,66 +12,60 @@
 
 03.31 Add Chrome Plugin 
 
-### 不可思议的Web录屏器
+### A Magical Web Recorder
 
-如果你爱打游戏，一定打过魔兽争霸3（暴露年纪🤣），你也许会游戏导出的录像文件感到好奇，明明打了一个小时游戏，为什么录像才几百KB而已。不过很快你又发现另一个问题，在每次导入录像的时候需要重新加载一次地图，否则就不能播放。
+If you love to play games, you must have played Warcraft 3. You may be curious about the video files exported by the game. After playing the game for an hour, why the video is only a few hundred KB. But soon you will found another problem, you need to reload the map every time when you import the replay video, otherwise, it will not play.
 
+The data recorded in the video is not a video file, but a series of actions with time stamps. When importing the map, it is actually equivalent to an initial state. On the basis of this state, only the previous actions need to be restored. To restore the previous game process, this is the basic principle of reply
 
-录像记录的数据不是一个视频文件，而是带着时间戳的一系列动作，导入地图的时候，实际相当于初始了一个状态，在这个状态的基础上，只需要对之前的动作进行还原，也就还原了之前的游戏过程，这就是repl的基本原理了
-
-> 相关问题：[《魔兽争霸》的录像，为什么长达半小时的录像大小只有几百 KB？](https://www.zhihu.com/question/25431134)
-
-
-但是这样有什么好处呢？
-
-首先是对于一个录像，这样的方式极大程度的减小了体积，假设我们需要录一个小时的1080p24f视频，在视频未压缩的情况下
+For a video, it greatly reduces the size, assuming that we need to record an hour of 1080p24f video, in the case of uncompressed video   
 ```
-总帧数 = 3600s * 24 = 86400frame
+Frames = 3600s * 24 = 86400frame
 
-假设每个逻辑像素用RGB三基色表示，每个基色8bits(256色)   
-帧大小 = (1920 * 1080)pixels * 8bits * 3 = 49766400bits
+Assume that each logical pixel is represented by three primary colors of RGB, 
+each primary color is 8 bits (256 colors)
+Frame size = (1920 * 1080) pixels * 8bits * 3 = 49766400bits
 
-换算成KB是 49766400bits / 8 / 1024 = 6075KB
+Converted to KB is 49766400bits / 8/1024 = 6075KB
 
-总视频体积 = 6075KB * 86400 = 524880000KB ≈ 500GB
+Total video volume = 6075KB * 86400 = 524880000KB ≈ 500GB
 ```
 
-所以对比传统的视频录像方法，假设录像是500KB，那么理论上体积上缩小了大约 524880000KB / 500KB ≈ 1000000倍
+So compared with the traditional video recorder, assuming that the recording is 500KB, then the volume is reduced by about 524880000KB / 500KB ≈ 1000000 times  in theory
 
-Web录屏器其实也借鉴这样的一种思路，工程上一般称之为Operations Log, 本质上他的实现也是通过记录一系列的浏览器事件数据，利用浏览器引擎重新渲染，还原了之前的操作过程，也就达到了“录屏器”的效果
+In fact, the Web recorder also draws on such an idea, which is generally called Operations Log. In essence, it's recording a series of browser event data, re-render using the browser engine, and restore the previous operations. 
 
-从实际来看，即使对比采用H.265压缩比达到几百倍的压缩视频，体积上至少也能节省200倍以上
+From a practical point of really, even if you compare the compressed video with an H.265 compression ratio of several hundred times, you can save at least 200 times in volume
 
-对比传统的视频流，它的优势也是显而易见的
+Compared with traditional video streaming, its better obvious
 
-    1. 极大程度减小录像文件体积
-    2. 极低的CPU与内存占用比率
-    3. 无损显示，可以进行无极缩放，窗口自适应等
-    4. 非常灵活的时间跳转，几乎无法感知的缓冲时间
-    5. 所有信息都是活的，文本图片可以复制，链接可以点击，鼠标可以滚动
-    6. 可以方便的录制声音，并让声音和画面同步，还以类似YouTube那样把声音翻译成字幕
-    7. 方便进行视频细节的修改，例如显示的内容进行脱敏，生成热力图等
-    8. 记录的序列化数据，十分利于知乎进行数据分析   
-        ...
+1. Greatly reduce the size of video files
+2. Very low consumption of CPU and memory
+3. Lossless display, infinite zoom, window adaptation, etc.
+4. Very flexible time jump, almost imperceptible buffer time
+5. All information is live (text and pictures can be copied, links can be clicked, and the mouse can scroll)
+6. You can easily record the sound, and synchronize the sound with the picture, and also translate the sound into subtitles similar to YouTube
+7. It is convenient to modify the details of the video, such as desensitizing the displayed content, generating a heat map, etc.
+8. The recorded serialized data is very useful for  the data analysis
+   ...
 
+So the question is coming: Why do we have to record web pages? What are the scenarios?
 
-那么问题来了：为什么要对网页录像？有哪些应用场景？
+I think of the following aspects
 
-我能想到的主要有以下几个方面
-
-1. 异常监控系统，例如[LogRocket](https://logrocket.com/)，可以理解他是一个整合了Sentry + 录屏器的工具，能回放网页错误时的图形界面与数据日志，从而帮助Debug
-2. 记录用户的行为进行分析，例如[MouseFlow](https://mouseflow.com/)。甚至还可以是直播的方式[LiveSession](https://livesession.io/)，“连接”到用户的浏览中，看看用户是怎么使用网站的
-3. 对客服人员的监控，例如阿里的有十万级别的客服小二人员分散在全国各地，需要对他们的服务过程进行7x24小时的录屏，在这个数量级上的对监控的性能要求就非常高了，阿里内部的工具叫`XReplay`
-4. 协同工具，Web直播等，也会涉及类似的技术
+1. The anomaly monitoring system, such as [LogRocket](https://logrocket.com/), it can be understood that he is a tool that integrates Sentry and Web Recorder, which can playback the graphical interface and data logs of webpage errors to help Debugging
+2. Record the user's behavior for analysis, such as [MouseFlow](https://mouseflow.com/). [LiveSession](https://livesession.io/), "connect" to the user's to see what people do on the website
+3. Monitoring for customer service quality, for example, Alibaba has 100,000 customer service personnel are scattered throughout the country, and they need to record 7x24 hours of their service process. The performance requirements for monitoring on this order of magnitude are very High, Ali's internal tool is called `XReplay`
+4. Collaborative tools, web live broadcast, etc., will also involve similar technologies
 
 ....
 
 ---
-### Web录屏器的技术细节
+### Technical details of the Web Recorder
 
-#### 对DOM进行快照
+#### Take a snapshot of the DOM
 
-通过DOM的API可以很轻易的拿到页面的节点数据，但是对于我们的需求而言，显而DOM Node提供的数据太冗余了，这一步通过参考VirtualDom的设计，把信息精简一下
+The node data of the page can be easily obtained through the DOM API, but for our needs, it is obvious that the data provided by the DOM Node is too redundant. This step is to simplify the information by referring to the design of VirtualDom
 
 ```ts
 interface VNode {
@@ -80,19 +78,20 @@ interface VNode {
 }
 ```
 
-对DOM进行深度遍历后，DOM被映射成了VNode类型节点，需要记录的 Node 主要是三种类型 ``ELEMENT_NODE``，`COMMENT_NODE`和 ``TEXT_NODE``，之后在播放时，只需要对VNode进行解析，就可以还原成记录时的状态了
+After deep traversal of the DOM, the DOM is mapped to a VNode type node. The Nodes to be recorded are mainly three types `` ELEMENT_NODE '', `COMMENT_NODE` and` `TEXT_NODE``. After deserialized, it can be restored the state 
 
-在这过程中，有一些节点和属性需要特殊处理，例如
+there are some nodes and attributes that need special treatment, such as
 
-- `InputElement`等类型的`value` `checked`是无法从DOM获取的，需要从节点中对象中获取
-- `script`标签的内容由于之后不会去执行，所以可以直接`skip`或者标记为`noscript`
-- `SVG`可以直接获取，但是它本身以及它的子元素重新转换为DOM的时候需要使用`createElementNS("http://www.w3.org/2000/svg", tagName)`的方法创建元素
-- `src`或`href`属性如果是相对路径，需要把他们转换为绝对路径
+- `Input` and other types of` value` `checked` cannot be obtained from the DOM, and need to be obtained from the node
+- The content of the `script` tag will not be executed later, so it can be directly skipped or marked as` noscript`
+- `SVG` can be obtained directly, but it and it's children needs to use` createElementNS ("http://www.w3.org/2000/svg", tagName) `to create
+
+- If the `src` or` href` attributes are relative paths, they need to be converted to absolute paths
   ......
 
-#### 记录影响页面元素变化的Action
+#### Record Actions that affect page element changes
 
-DOM的变化可以使用`MutationObserver`, 监听到`attributes`,`characterData`,`childList` 三种类型的变化
+DOM changes can use `MutationObserver`, listen to` attributes`, `characterData`,` childList` three types of changes
 ```ts
 const observer = new MutationObserver((mutationRecords, observer) => {
     // Record the data
@@ -100,7 +99,8 @@ const observer = new MutationObserver((mutationRecords, observer) => {
 observer.observe(target, options)
 ```
 
-再借助`WindowEventHandlers` `addEventListener` 等的能力组合，就可以监听到页面一系列的操作事件了
+With the help of the ability combination of `WindowEventHandlers`` addEventListener`, etc., you can listen to a series of operation events on the page
+
 - Add Node Action
 - Delete Node Action
 - Change Attribute Action
@@ -108,13 +108,13 @@ observer.observe(target, options)
 - Change Location Action
 ...
 
-通过 `mouseMove` 和 `click` 事件记录鼠标动作 
+Record mouse actions through `mouseMove` and` click` events
 
-对于 `mouseMove` 事件，在移动的过程中会频繁的触发，产生很容冗余的数据，这样的数据会浪费很多的空间，因此对于鼠标的轨迹，我们只采集少量的关键点，最简单的办法是使用节流来减小事件产生的数据量，但是也有一些缺点：   
-    1. 截流的间隔中可能会丢失关键的鼠标坐标数据   
-    2. 即时通过截流在移动距离足够长的时候任然会产生巨大的数据量，更好的办法是通过 `Spline Curves(样条曲线)` 函数来计算得出移动轨迹、抖动、加速度等生成一条路径曲线用来控制鼠标的移动   
+For the `MouseMove` event, it will be triggered frequently during the movement, resulting in very redundant data, such data will waste a lot of space, so for the mouse tracking, we only collect a small number of key points, the simplest The method is to use throttling to reduce the amount of data generated by the event, but there are some disadvantages:
+    1. Critical mouse coordinate data may be lost in the intercepted
+    2. huge data will be generated even if the movement distance is long. The better way is to calculate the movement trajectory through the `Spline Curves`. 
 
-Input的变换我们可以通过`Node.addEventListener` 的 `input` `blur` `focus` 事件监听，不过这只能监听到用户的行为，如果是通过JavaScript对标签进行赋值，我们是监听不到数据的变化的，这时我们可以通过`Object.defineProperty`来对一些表单对象的特殊属性进行劫持，在不影响目标赋值的情况下，把value新值转发到自定的handle上，统一处理状态变化
+We can watches the input via `input`` blur` `focus` event of` Node.addEventListener`, but this can only listen to the user's behavior. If we assign values ​ via JavaScript, we can't listen to the data Changes, at this time we can hijack some special properties through `Object.defineProperty`, without affecting the target, forward the new value to the custom handle, and handle the change in a unified method
 
 ```ts
 const elementList: [HTMLElement, string][] = [
@@ -140,112 +140,110 @@ const elementList: [HTMLElement, string][] = [
     })
 ```
 
-#### 对MutationObserver的优化
+#### Optimization of MutationObserver
 
-由于 DOM 的 Diff Patch 是借助 MutationObserver 来实现的，需要对发生更变的记录进行收集处理，这涉及到一些关键问题：例如DOM更变的时序是有先后的，Mutation只归纳为新增和删除，但是在调用insertBefore或者appendChild的时候，会造成移动，要对这些节点进行处理，标记为移动，否则节点的引用丢失就可能会导致渲染错误
+Because the DOM Diff Patch is implemented with the MutationObserver, it is necessary to collect and process the changed records, which involves some key issues: For example, the timing of DOM changes is sequential, and Mutation can only be summarized as adding and deleting, However when calling insertBefore or appendChild, it will cause movement. These nodes must be processed and marked as moved, otherwise, the loss of node references may cause rendering errors.
 
 
-#### 跨域时外链的处理
+#### Cross-domain processing of external links
 
-加载HTML以后会引用很多外界的资源，通常会有多种形式
+After loading HTML, it will refer to many external resources, usually in many forms
 
-例如：
-- 绝对路径 ``<img src="/xx.png" />`` 
-- 相对路径 ``<img src="./xx.png" />`` 
-- 相对当前path的路径 ``<img src="xx.png" />`` 
-- 协议相对URL (The Protocol-relative URL)``<img src="//cnd.xx.png" />``
-- srcset响应式图片 [Responsive images](https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images) ``src="www.xxx.png" srcset="www.xxx.png 1x, www.xxx.png 2x"``   
+For Example：
+- Absolute path  ``<img src="/xx.png" />`` 
+- Relative path ``<img src="./xx.png" />`` 
+- relative to the current path ``<img src="xx.png" />`` 
+- The Protocol-relative URL``<img src="//cnd.xx.png" />``
+- [Responsive images](https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images) ``src="www.xxx.png" srcset="www.xxx.png 1x, www.xxx.png 2x"``   
 ...
 
-以上就需要一个转换器来处理路径问题，在``Deserialize``阶段，把他们转成原域名下的绝对路径才能在跨域下正常加载
-还有一种情况是对于第三方资源加载第三方资源的问题，这就需要借助服务器来解决了
+The above requires a converter to deal with the path problem. In the ``Deserialize`` stage, they can be converted to the absolute path under the original domain in order to load normally in cross-domain
+There is also a situation where the problem of loading resources for third-party resources requires the proxy server.
 
-###### CORS Error 问题
+###### CORS Error
 
-通常是由于被录制的网站对资源进行了限制, 开启了CORS Policy，解决方案是，如果资源可控，可以添加白名单或者忽略，另外就是使用代理服务器， 
-> 参考文章：[3 Ways to Fix the CORS Error](https://medium.com/@dtkatz/3-ways-to-fix-the-cors-error-and-how-access-control-allow-origin-works-d97d55946d9)
+Usually, due to the limitation of the resources of the recorded website with the CORS Policy. The solution is that if the resources are controllable, you can add a white list or ignore it. The other is to use a proxy server.
+> Reference article: [3 Ways to Fix the CORS Error](https://medium.com/@dtkatz/3-ways-to-fix-the-cors-error-and-how-access-control-allow-origin-works-d97d55946d9)
 
 
-#### SPA网页的渲染时间
+#### Rendering time of SPA web page
 
-在开始播放前，我们需要把之前的存储的数据还原成真实的DOM，这个过程中会占用一定的加载时间产生白屏，这取决于你的浏览器性能以及录制网页资源情况，参考FMP（First Meaningful Paint）的实现，加载过程中可以通过之前映射的数据动态生成骨架图，等待FMP发出Ready信号之后再进行播放
+Before starting to play, we need to restore the previous data to the real DOM. This will take a certain time to get a white page, which depends on your browser performance and recording web page resources. Refer to FMP (First Meaningful Paint), during the loading process, the skeleton map can be dynamically generated from the previously mapped data, and wait for the FMP to send the Ready signal before playing
 
-> 参考文章： [Time to First Meaningful Paint](https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/view#)
+> Reference article: [Time to First Meaningful Paint](https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/view#)
 
-#### 通过样条曲线模拟鼠标轨迹
+#### Simulate mouse path through splines
 
-用户在网页中移动鼠标会产生很多`mouseMove`事件，通过 `const { x, y } = event.target` 获取到了轨迹的坐标与时间戳
+When the user moves the mouse on the page, many `mouseMove` events are generated. The coordinates and timestamp of the track are obtained through` const { x, y } = event.target`
 
-假如我在页面上用鼠标划过一个💖的轨迹，可能会得到下图这样的坐标点
+If I use a mouse to trace a track on the page, I may get the coordinate points like the picture below
 ![heart1](./assets/heart1.png)
 
-但是对于录屏这个业务场景来说，大部分场合我们并不要求100%还原精确的鼠标轨迹，我门只会关心两种情况：
+However, for the scenario of recording, on most occasions, we do not require 100% restoration of accurate mouse path, and we only care about two situations:
 ```
-1. 鼠标在哪里点击?
-2. 鼠标在哪里停留?
+1. Where does the mouse click?
+2. Where does the mouse stay?
 ```
 
-那么通过这个两个策略对鼠标轨迹进行精简后，画一个💖大约只需要6个点，通过样条曲线来模拟鼠标的虚拟轨迹，当 t = 0.2 的时候，就可以得到一个下图这样带着弧度的轨迹了
+After simplifying the mouse path through these two strategies, it takes only about 6 points to draw a 💖, to simulate the virtual path of the mouse through the spline curve
 
 ![heart2](./assets/heart2.png)
 
-通过规则筛选出关键点后，利用B样条曲线计算函数，按照最小间隔进行取样并插入我们的鼠标路径队执行列里，当渲染时重绘鼠标位置的时候，就可以得到一个近似曲线的鼠标轨迹了
+After filtering out the key points through the rules, use the B-spline curve calculation function, When redrawing the mouse position during rendering, you can get a mouse with an approximate curve Track
 
-#### 通过鼠标数据生成热力图
+#### Generate heat map from mouse data
 
-之前已经通过鼠标事件记录了完整的坐标信息，通过[heatmap.js](https://www.patrick-wied.at/static/heatmapjs/)可以很方便的生成热力图，用于对用户的行为数据进行分析。
+Recorded a coordinate info through a mouse event, by[heatmap.js](https://www.patrick-wied.at/static/heatmapjs/) The heat map can be easily generated for analyzing the user's behavior data.
 
-这里需要注意的地方是当页面切换的时候我们需要重置热力图，如果是单页应用，通过 `History` 的 `popstate` 与 `hashchange` 可以监听页面的变化
+When the page switches, we need to reset the heat map. If it is a single-page application, pass `History` 的 `popstate` 与 `hashchange` Can monitor changes on the page
 
 ![heatmap](./assets/heatmap.png)
 
-#### 对于用户隐私的脱敏
+#### Desensitization to user privacy
 
-对于一些客户个人隐私数据，通过在开发时对DOM进行标注的 `Node.COMMENT_NODE`（例如： `<!-- ... -->`）信息申明，我们是可以获取并加工的。通过约定好的声明对需要脱敏的DOM块按业务的需求进行处理即可，例如在项目的DEMO中，我需要在回放的时候把```<button>```标签隐藏掉，只需改写成```<!--hidden--><button>```
+For some personal privacy data, through the annotation of the DOM during development `Node.COMMENT_NODE` like： `<!-- ... -->`）annotation，We can obtain and process. Through the agreed statement, the DOM tag that needs to be desensitized，For example ，if want hide tag```<button>```, we need change to```<!--hidden--><button>```
 
-#### 沙箱化提升安全
+#### Sandboxing improves safety
 
-录制的内容有可能属于第三方提供，这意味着可能存在一定的风险，网站中可能有一些恶意的脚本并没有被我们完全过滤掉，例如：`<div onload="alert('something'); script..."></div>`，或者我们的播放器中的一些事件也可能对播放内容产生影响，这时候我们需要一个沙盒来隔离播放内容的环境，HTML5 提供的 iframe sandbox是不错的选择，这可以帮助我们轻易的隔离环境：
-- script脚本不能执行
-- 不能发送ajax请求
-- 不能使用本地存储，即localStorage,cookie等
-- 不能创建新的弹窗和window, 比如window.open or target="_blank"
-- 不能发送表单
-- 不能加载额外插件比如flash等
-- 不能执行自动播放的tricky. 比如: autofocused, autoplay
+The recorded content may be provided by a third party, which means that there may be certain risks. for example: `<div onload="alert('something'); script..."></div>`, or some events in our player may also affect the playback content, so we need a sandbox to isolate the playback environment, HTML5 provides iframe sandbox is good choice, which can help us easily isolate the environment:
 
-#### 播放、跳转与快进
+- Script cannot be executed
+- Cannot send ajax request
+- Cannot use local storage, ie localStorage, cookies, etc.
+- Cannot create alert and windows, such as window.open or target = "_ blank"
+- Cannot send form
+- Cannot load additional plugins such as flash etc.
+- Cannot perform tricky for autoplay. For example: autofocused, autoplay
 
-播放：播放器会内置一个精确的计时器，动作的数据存储在一个栈中，栈中的每一个对象就是一帧，通过RAF(RequestAnimationFrame) 对数据帧的时间戳进行扫描从而得知下一帧在什么时间发生
+#### Play jump and fast forward
 
-暂停：通过cancelAnimationFrame暂停计时器
-快进：加速采集速率的倍速
-跳转：通过virtualDom实现计算
+Play: The player will have a accurate timer. The action data is stored in a stack. Each data is a frame. With RAF (RequestAnimationFrame) to exec the next frame
+Pause: pause timer through cancelAnimationFrame
+Fast forward: double the speed of the acquisition rate
+Jump: computing by virtualDom
 
-#### 在客户端进行的Gzip压缩
+#### Gzip on the client
 
-Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的数据不一定只存在数据库里，可能会有三种储存方式
-1. 服务器存储 TCP => DB
-2. 本地储存 LocalStorage、IndexedDB、Web SQL
-3. 数据持久化于script中，保存为本地文件，例如直接导出可运行的HTML文件
+Gzip generally compresses the transmitted data in the network application layer, but our data does not only in the database, there may be three storage type:
+1. The server stores TCP => DB
+2. Local storage LocalStorage, IndexedDB, Web SQL
+3. The data is persisted in the script and saved as a local file, such as directly exporting a working HTML file
 
-利用客户端的运算能力，在进行导出或者传输之前，可以对数据进行压缩，极大程度的减小体积
+Greatly reducing the data size before exporting or transmitting,
 
-在客户端可以进行基于 `Gzip` 的数据包压缩，这里我选择了 [Pako](https://nodeca.github.io/pako/) 来对数据进行压缩   
-Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的，通过压缩减少约5倍左右的体积
+On the client-side, the compression based on `Gzip`, I chose [Pako](https://nodeca.github.io/pako/)   
 
-#### 数据上传
+#### Data upload
 
-对于客户端的数据，可以利用浏览器提供的indexedDB进行存储，毕竟indexedDB会比LocalStorage容量大得多，一般来说不少于 250MB，甚至没有上限，此外它使用object store存储，而且支持transaction，另外很重要的一点它是异步的，意味着不会阻塞录屏器的运行
-之后数据可以通过WebSocket或其他方式持续上传到OSS服务器中，由于数据是分块进行传输的，在同步之后还可以增加数据校验码来保证一致性避免错误
+For client data, you can use indexedDB. indexedDB will be much larger than LocalStorage, generally no less than 250MB, or even no upper limit. In addition, it uses object store and supports transaction, The important point is that it is asynchronous, which means it will not block the operation of the Web Recorder
+After that, the data can be uploaded to the OSS server.
 
-#### 加载SDK
+#### Load SDK
 
-通过RollUp打包器可以生成多种格式版本，例如``IIFE``与``ESM``等
-在项目中加载SDK或者利用Chrome的插件注入IIFE模块，可以很方便的注入代码，控制数据录制的过程
+The RollUp packer can generate multiple formats, such as `` IIFE `` and `` ESM ``, etc.
+Load the SDK in the project or use the Chrome plug-in to inject the IIFE module, you can easily to control the data recording
 
+#### Thanks
 
-#### 致谢
-
-感谢阿里的XREPLAY的启发   
-感谢RRWEB的技术分享   
+Thanks to Ali's XREPLAY for inspiration 
+Thanks to RRWEB for technical sharing
