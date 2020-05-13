@@ -1,5 +1,5 @@
 import { VNode, convertVNode } from '@TimeCat/virtual-dom'
-import { filteringTemplate, disableScrolling } from '@TimeCat/utils'
+import { filteringTemplate, disableScrolling, nodeStore } from '@TimeCat/utils'
 import HTML from './ui.html'
 import STYLE from './ui.css'
 import FIXED from './fixed.css'
@@ -45,6 +45,7 @@ export class ContainerComponent {
     }
 
     setViewState() {
+        nodeStore.reset()
         const child = convertVNode(this.props.vNode)
         const { snapshot } = window.__ReplayData__
 

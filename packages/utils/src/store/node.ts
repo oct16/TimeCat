@@ -1,8 +1,21 @@
 import { isDev } from '../tools/common'
 class NodeStore {
     private static nodeId = 1
-    private nodeMap: Map<number, Node> = new Map()
-    private idMap: WeakMap<Node, number> = new WeakMap()
+    private nodeMap: Map<number, Node>
+    private idMap: WeakMap<Node, number>
+
+    constructor() {
+        this.init()
+    }
+
+    private init() {
+        this.nodeMap = new Map()
+        this.idMap = new WeakMap()
+    }
+
+    public reset() {
+        this.nodeMap.clear()
+    }
 
     public createNodeId = () => NodeStore.nodeId++
 

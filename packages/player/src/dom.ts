@@ -92,7 +92,6 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
             break
         case RecordType.DOM_UPDATE:
             const { addedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
-
             removedNodes.forEach((data: RemoveUpdateData) => {
                 const { parentId, id } = data
                 const parentNode = nodeStore.getNode(parentId)
@@ -102,14 +101,15 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
                 }
             })
 
-            const maxRevertCount = addedNodes.length
+            const addedList = addedNodes.slice()
+            const maxRevertCount = addedList.length
             let revertCount = 0
-            while (addedNodes.length) {
-                const addData = addedNodes.shift()
+            while (addedList.length) {
+                const addData = addedList.shift()
                 if (addData) {
                     const revertSignal = insertOrMoveNode(addData)
                     if (revertSignal === 'revert' && revertCount++ < maxRevertCount) {
-                        addedNodes.push(addData)
+                        addedList.push(addData)
                     }
                 }
             }
@@ -129,14 +129,13 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
                 const node = nodeStore.getNode(id) as HTMLElement
 
                 if (parentNode && node) {
-                    if (node) {
-                        isExistingNode(node) && parentNode.replaceChild(document.createTextNode(value), node)
-                    } else {
-                        parentNode.innerText = value
+                    if (isExistingNode(node)) {
+                        node.textContent = value
+                        return
                     }
+                    parentNode.innerText = value
                 }
             })
-
             break
         case RecordType.FORM_EL_UPDATE:
             const { id, key, type: formType, value } = data as FormElementWatcherData
