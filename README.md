@@ -144,6 +144,9 @@ const elementList: [HTMLElement, string][] = [
 
 Because the DOM Diff Patch is implemented with the MutationObserver, it is necessary to collect and process the changed records, which involves some key issues: For example, the timing of DOM changes is sequential, and Mutation can only be summarized as adding and deleting, However when calling insertBefore or appendChild, it will cause movement. These nodes must be processed and marked as moved, otherwise, the loss of node references may cause rendering errors.
 
+#### MutationObserver compatibility
+
+[Can I Use MutationObserver] (https://caniuse.com/#search=mutationObserver) shows that only in IE11 and later, Android 4.4 and later can be used, compatible with the old browser can be through [mutationobserver-shim] (https: //www.npmjs.com/package/mutationobserver-shim) to support, but using shim may cause some fatal bugs of the collected data. there is also a situation that some websites may block the MutationObserver API, we can restore the `` Native Code '' by creating an Iframe
 
 #### Cross-domain processing of external links
 
