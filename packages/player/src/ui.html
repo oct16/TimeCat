@@ -1,48 +1,46 @@
-<div>
-    <div class="cat-container">
-        <div id="cat-player">
-            <iframe id="cat-sandbox" sandbox="allow-same-origin allow-scripts"></iframe>
+<div id="cat-container">
+    <div id="cat-player">
+        <iframe id="cat-sandbox" sandbox="allow-same-origin allow-scripts"></iframe>
+    </div>
+    <div id="cat-panel">
+        <div class="cat-keyboard">
+            <button class="play-or-pause" type="button" speed="1">▶</button>
+            <button type="button" class="speed" disabled speed="1">1x</button>
+            <button type="button" class="speed" speed="4">4x</button>
+            <button type="button" class="speed" speed="16">16x</button>
         </div>
-        <div class="cat-panel">
-            <div class="cat-keyboard">
-                <button class="play-or-pause" type="button" speed="1">▶</button>
-                <button type="button" class="speed" disabled speed="1">1x</button>
-                <button type="button" class="speed" speed="4">4x</button>
-                <button type="button" class="speed" speed="16">16x</button>
-            </div>
-            <div class="cat-timer">
-                <time>
-                    00:00
-                </time>
-            </div>
-            <div class="cat-progress">
-                <div class="cat-slider-bar">
-                    <div class="cat-thumb"></div>
-                </div>
-            </div>
-            <div class="cat-export">
-                <button type="button">
-                    <img
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAY0lEQVRIiWNgGOqAkQS1/8nRy0SCBWSBUQtGLRjiFpQzQDIXDKMDZLl6ch2Abgk2TLbhxFhCseH4LKGa4dgsIdpwZhIsOMoAKUEPMjAwNJLktFGADyDXStgyE8Vm07yoGPoAAH1UItbw1O5lAAAAAElFTkSuQmCC" />
-                </button>
+        <div class="cat-timer">
+            <time>
+                00:00
+            </time>
+        </div>
+        <div class="cat-progress">
+            <div class="cat-slider-bar">
+                <div class="cat-thumb"></div>
             </div>
         </div>
-        <div id="cat-pointer">
-            <img src="data:image/webp;base64,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"
-                alt="pointer">
-            <div class="loading">
-                <div class="dot"></div>
-            </div>
+        <div class="cat-export">
+            <button type="button">
+                <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAY0lEQVRIiWNgGOqAkQS1/8nRy0SCBWSBUQtGLRjiFpQzQDIXDKMDZLl6ch2Abgk2TLbhxFhCseH4LKGa4dgsIdpwZhIsOMoAKUEPMjAwNJLktFGADyDXStgyE8Vm07yoGPoAAH1UItbw1O5lAAAAAElFTkSuQmCC" />
+            </button>
         </div>
     </div>
-    <!--env-->
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'UA-151180797-1');
-    </script>
-    <!--env-->
+    <div id="cat-pointer">
+        <img src="data:image/webp;base64,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"
+            alt="pointer">
+        <div class="loading">
+            <div class="dot"></div>
+        </div>
+    </div>
 </div>
+<!--env-->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-151180797-1');
+</script>
+<!--env-->

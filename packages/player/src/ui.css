@@ -71,11 +71,11 @@ body {
     }
 }
 
-.cat-container {
+#cat-container {
     background: grey;
 }
 
-.cat-panel {
+#cat-panel {
     width: 100%;
     box-sizing: border-box;
     padding: 10px;

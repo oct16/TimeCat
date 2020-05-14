@@ -1,7 +1,7 @@
 import { VNode, convertVNode } from '@TimeCat/virtual-dom'
 import { filteringTemplate, disableScrolling, nodeStore } from '@TimeCat/utils'
 import HTML from './ui.html'
-import STYLE from './ui.css'
+import CSS from './ui.css'
 import FIXED from './fixed.css'
 
 export interface CProps {
@@ -52,7 +52,7 @@ export class ContainerComponent {
         if (child) {
             const [head] = child.getElementsByTagName('head')
             if (head) {
-                head.insertBefore(this.createStyle(FIXED), head.firstChild)
+                head.insertBefore(this.createStyle('cat-css-fix', FIXED), head.firstChild)
             }
             const documentElement = this.sandBoxDoc.documentElement
             documentElement.scrollLeft = snapshot.scrollLeft
@@ -62,13 +62,14 @@ export class ContainerComponent {
     }
 
     initTemplate() {
-        document.head.appendChild(this.createStyle(STYLE))
-        document.body.appendChild(this.createContainer())
+        document.head.append(this.createStyle('cat-css', CSS))
+        document.body.append(this.createContainer('cat-main', HTML))
     }
 
-    createContainer() {
+    createContainer(id: string, html: string) {
         const parser = new DOMParser()
-        const element = parser.parseFromString(filteringTemplate(HTML), 'text/html').body.firstChild as HTMLElement
+        const element = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
+        element.id = id
         element.style.width = this.props.width + 'px'
         element.style.height = this.props.height + 'px'
         element.style.position = 'relative'
@@ -76,8 +77,9 @@ export class ContainerComponent {
         return (this.container = element)
     }
 
-    createStyle(s: string) {
+    createStyle(id: string, s: string) {
         const style = document.createElement('style')
+        style.id = id
         style.innerHTML = s
         return style
     }

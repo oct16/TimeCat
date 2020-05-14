@@ -31,10 +31,7 @@ export class PlayerComponent {
         if (!data.length) {
             // is live mode
             this.mode = LIVE
-            window.addEventListener('record-data', (e: CustomEvent) => {
-                const frame = e.detail as RecordData
-                this.execFrame(frame)
-            })
+            window.addEventListener('record-data', this.streamHandle.bind(this))
         } else {
             reduxStore.subscribe('player', state => {
                 this.progressState = reduxStore.getState()['progress']
@@ -48,6 +45,12 @@ export class PlayerComponent {
                 this.frames = this.getAccuratelyFrame()
             })
         }
+    }
+
+    streamHandle(e: CustomEvent) {
+        
+        const frame = e.detail as RecordData
+        this.execFrame(frame)
     }
 
     play() {
