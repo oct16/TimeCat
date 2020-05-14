@@ -39,8 +39,7 @@ function startsWithDoubleSlash(str: string) {
 }
 
 export function proxyResource(url: string) {
-    const { opts } = window.__ReplayData__
-    const proxy = opts.proxy as string
+    const { proxy } = window.__ReplayOptions__
 
     if (proxy) {
         const proxyUrl = proxy.endsWith('/') ? proxy + url : proxy + '/' + url

@@ -1,12 +1,13 @@
 import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp } from '@TimeCat/utils'
-import { ContainerComponent, CProps } from './container'
+import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { RecordData } from '@TimeCat/record'
+import { ReplayOptions } from './types'
 
-function getGZipStrData() {
+function getGZipData() {
     const data = window.__ReplayStrData__
     if (!data) {
         return null
@@ -15,12 +16,12 @@ function getGZipStrData() {
     const str = pako.ungzip(arrayData, {
         to: 'string'
     })
-    const dataArray = JSON.parse(str)
-    const [snapshot, ...records] = dataArray as [SnapshotData, ...RecordData[]]
-    return {
-        snapshot,
-        records
-    }
+    const dataArray = JSON.parse(str) as Array<{
+        snapshot: SnapshotData
+        records: RecordData[]
+    }>
+
+    return dataArray
 }
 
 function dispatchEvent(type: string, data: RecordData) {
@@ -28,7 +29,11 @@ function dispatchEvent(type: string, data: RecordData) {
     window.dispatchEvent(event)
 }
 
-async function getAsyncDataFromSocket(uri: string): Promise<{ snapshot: SnapshotData; records: [] }> {
+function isSnapshot(data: SnapshotData | RecordData) {
+    return !!(data as SnapshotData).vNode
+}
+
+async function getAsyncDataFromSocket(uri: string): Promise<Array<{ snapshot: SnapshotData; records: [] }>> {
     var socket = io(uri)
     return await new Promise(resolve => {
         let initialized = false
@@ -36,9 +41,11 @@ async function getAsyncDataFromSocket(uri: string): Promise<{ snapshot: Snapshot
             if (initialized) {
                 dispatchEvent('record-data', data as RecordData)
             } else {
-                resolve({ snapshot: data as SnapshotData, records: [] })
-                fmp.observe()
-                initialized = true
+                if (data && isSnapshot(data)) {
+                    resolve([{ snapshot: data as SnapshotData, records: [] }])
+                    fmp.observe()
+                    initialized = true
+                }
             }
         })
     })
@@ -54,30 +61,62 @@ async function getDataFromDB() {
     }
 }
 
-export async function replay(options: { socketUrl?: string; proxy?: string } = {}) {
-    const { socketUrl, proxy } = options
-    const { snapshot, records } = (window.__ReplayData__ = Object.assign(
-        {
-            opts: options
-        },
-        (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
-            getGZipStrData() ||
-            window.__ReplayData__ ||
-            (await getDataFromDB())
-    ))
+async function getReplayData() {
+    const { socketUrl } = window.__ReplayOptions__
 
-    const { vNode, width, height, doctype } = snapshot as SnapshotData
-    const props: CProps = { vNode, width, height, doctype, proxy }
-    const c = new ContainerComponent(props)
+    const replayDataList =
+        (socketUrl && (await getAsyncDataFromSocket(socketUrl))) || getGZipData() || window.__ReplayDataList__ //  || await getDataFromDB()
+
+    if (!replayDataList) {
+        return null
+    }
+    window.__ReplayDataList__ = replayDataList
+    window.__ReplayData__ = Object.assign(
+        {
+            index: 0
+        },
+        replayDataList[0]
+    )
+    return window.__ReplayData__
+}
+
+export async function replay(options: ReplayOptions = {}) {
+    window.__ReplayOptions__ = options
+    // const { snapshot, records } = (window.__ReplayData__ = Object.assign(
+    //     {
+    //         opts: options
+    //     },
+    //     // (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
+    //         getGZipStrData() ||
+    //         window.__ReplayData__ ||
+    //         (await getDataFromDB())
+    // ))
+
+    const replayData = await getReplayData()
+
+    if (!replayData) {
+        return
+    }
+
+    const { records } = replayData
+
+    const c = new ContainerComponent()
 
     fmp.ready(() => {
-        new Panel(c, records)
+        new Panel(c)
 
         if (records.length) {
             const firstRecord = records[0]
-            const lastRecord = records.slice(-1)[0]
+
+            const replayList = window.__ReplayDataList__
             const startTime = firstRecord.time
-            const endTime = lastRecord.time
+            const endTime =
+                replayList
+                    .map(r => r.records)
+                    .reduce((acc, records) => {
+                        return acc + (+records.slice(-1)[0].time - +records[0].time)
+                    }, 0) + +startTime
+
             reduxStore.dispatch({
                 type: ProgressTypes.INFO,
                 data: {

@@ -3,23 +3,19 @@ import { filteringTemplate, disableScrolling, nodeStore } from '@TimeCat/utils'
 import HTML from './ui.html'
 import CSS from './ui.css'
 import FIXED from './fixed.css'
+import { SnapshotData } from '@TimeCat/snapshot'
 
-export interface CProps {
-    vNode: VNode
-    width: number
-    height: number
-    doctype: { name: string; publicId: string; systemId: string }
-    proxy?: string
-}
 export class ContainerComponent {
     container: HTMLElement
     sandBox: HTMLIFrameElement
     sandBoxDoc: Document
 
-    props: CProps
-    constructor(props: CProps) {
-        this.props = props
+    constructor() {
         this.init()
+    }
+
+    getSnapshot() {
+        return window.__ReplayData__.snapshot
     }
 
     init() {
@@ -29,12 +25,12 @@ export class ContainerComponent {
 
     initSandbox() {
         this.sandBox = this.container.querySelector('#cat-sandbox') as HTMLIFrameElement
-        this.sandBox.style.width = this.props.width + 'px'
-        this.sandBox.style.height = this.props.height + 'px'
+        this.sandBox.style.width = this.getSnapshot().width + 'px'
+        this.sandBox.style.height = this.getSnapshot().height + 'px'
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.sandBoxDoc.open()
 
-        const doctype = this.props.doctype
+        const doctype = this.getSnapshot().doctype
         const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
             doctype.systemId ? '"' + doctype.systemId + '"' : ''
         }><html><head></head><body></body></html>`
@@ -46,8 +42,7 @@ export class ContainerComponent {
 
     setViewState() {
         nodeStore.reset()
-        const child = convertVNode(this.props.vNode)
-        const { snapshot } = window.__ReplayData__
+        const child = convertVNode(this.getSnapshot().vNode)
 
         if (child) {
             const [head] = child.getElementsByTagName('head')
@@ -55,8 +50,8 @@ export class ContainerComponent {
                 head.insertBefore(this.createStyle('cat-css-fix', FIXED), head.firstChild)
             }
             const documentElement = this.sandBoxDoc.documentElement
-            documentElement.scrollLeft = snapshot.scrollLeft
-            documentElement.scrollTop = snapshot.scrollTop
+            documentElement.scrollLeft = this.getSnapshot().scrollLeft
+            documentElement.scrollTop = this.getSnapshot().scrollTop
             this.sandBoxDoc.replaceChild(child, documentElement)
         }
     }
@@ -70,8 +65,8 @@ export class ContainerComponent {
         const parser = new DOMParser()
         const element = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
         element.id = id
-        element.style.width = this.props.width + 'px'
-        element.style.height = this.props.height + 'px'
+        element.style.width = this.getSnapshot().width + 'px'
+        element.style.height = this.getSnapshot().height + 'px'
         element.style.position = 'relative'
         element.style.margin = '0 auto'
         return (this.container = element)

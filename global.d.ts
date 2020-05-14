@@ -19,11 +19,20 @@ declare interface IDBDatabase {
 
 interface Window {
     __ReplayStrData__: string
-    __ReplayData__: {
+
+    __ReplayDataList__: Array<{
         snapshot: any
-        opts: any
+        records: any[]
+    }>
+
+    __ReplayData__: {
+        index: number
+        snapshot: any
         records: any[]
     }
+
+    __ReplayOptions__: any
+
     cat: {
         record: (
             fn?: ((data: SnapshotData, db: IndexedDBOperator) => void) | undefined
