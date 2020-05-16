@@ -1,10 +1,9 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from './dom'
-import { reduxStore, PlayerTypes, ProgressState, getTime } from '@TimeCat/utils'
+import { reduxStore, PlayerTypes, ProgressState, getTime, isSnapshot } from '@TimeCat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { RecordData } from '@TimeCat/record'
-import { SnapshotData } from '@TimeCat/snapshot'
 
 export class PlayerComponent {
     c: ContainerComponent
@@ -51,16 +50,12 @@ export class PlayerComponent {
 
     streamHandle(this: PlayerComponent, e: CustomEvent) {
         const frame = e.detail as RecordData
-        if (this.isSnapshot(frame)) {
+        if (isSnapshot(frame)) {
             window.__ReplayData__.snapshot = frame
             this.c.setViewState()
             return
         }
         this.execFrame(frame)
-    }
-
-    isSnapshot(frame: RecordData | SnapshotData) {
-        return !!(frame as SnapshotData).vNode
     }
 
     initViewState() {
@@ -132,7 +127,7 @@ export class PlayerComponent {
             const currTime = this.startTime + timeStamp * this.speed
             const nextTime = Number(this.frames[this.frameIndex])
 
-            if (nextTime > this.curViewEndTime) {
+            if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
                 this.switchNextView()
             }
 

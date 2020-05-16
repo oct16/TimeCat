@@ -1,3 +1,6 @@
+import { RecordData } from '@TimeCat/record'
+import { SnapshotData } from '@TimeCat/snapshot'
+
 export const isDev = process.env.NODE_ENV === 'development'
 
 export function logger(data: any) {
@@ -15,4 +18,8 @@ export function secondToDate(ms: number) {
     const [h, m, s] = [Math.floor(ms / 3600), Math.floor((ms / 60) % 60), Math.floor(ms % 60)]
     const timeStr = [h, m, s].map(i => (i <= 9 ? '0' + i : i)).join(':')
     return timeStr.replace(/^00\:/, '')
+}
+
+export function isSnapshot(frame: RecordData | SnapshotData) {
+    return !!(frame as SnapshotData).vNode
 }

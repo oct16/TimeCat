@@ -1,4 +1,4 @@
-import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp } from '@TimeCat/utils'
+import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp, isSnapshot } from '@TimeCat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
@@ -29,10 +29,6 @@ function dispatchEvent(type: string, data: RecordData) {
     window.dispatchEvent(event)
 }
 
-function isSnapshot(data: SnapshotData | RecordData) {
-    return !!(data as SnapshotData).vNode
-}
-
 async function getAsyncDataFromSocket(uri: string): Promise<Array<{ snapshot: SnapshotData; records: [] }>> {
     var socket = io(uri)
     return await new Promise(resolve => {
@@ -54,18 +50,36 @@ async function getAsyncDataFromSocket(uri: string): Promise<Array<{ snapshot: Sn
 async function getDataFromDB() {
     const indexedDB = await DBPromise
     const data = await indexedDB.getRecords()
-    const [snapshot, ...records] = data
-    return {
-        snapshot,
-        records
+
+    function classify(data: (SnapshotData | RecordData)[]) {
+        const dataList: { snapshot: SnapshotData; records: RecordData[] }[] = []
+
+        let viewData: { snapshot: SnapshotData; records: RecordData[] }
+        data.forEach(item => {
+            if (isSnapshot(item)) {
+                viewData = { snapshot: item as SnapshotData, records: [] }
+                dataList.push(viewData)
+            } else {
+                viewData.records.push(item as RecordData)
+            }
+        })
+
+        return dataList
     }
+
+    return classify(data)
 }
 
 async function getReplayData() {
     const { socketUrl } = window.__ReplayOptions__
 
     const replayDataList =
-        (socketUrl && (await getAsyncDataFromSocket(socketUrl))) || getGZipData() || window.__ReplayDataList__ //  || await getDataFromDB()
+        (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
+        getGZipData() ||
+        (await getDataFromDB()) ||
+        window.__ReplayDataList__
+
+    console.log(replayDataList)
 
     if (!replayDataList) {
         return null
@@ -82,16 +96,6 @@ async function getReplayData() {
 
 export async function replay(options: ReplayOptions = {}) {
     window.__ReplayOptions__ = options
-    // const { snapshot, records } = (window.__ReplayData__ = Object.assign(
-    //     {
-    //         opts: options
-    //     },
-    //     // (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
-    //         getGZipStrData() ||
-    //         window.__ReplayData__ ||
-    //         (await getDataFromDB())
-    // ))
-
     const replayData = await getReplayData()
 
     if (!replayData) {
