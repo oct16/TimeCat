@@ -79,8 +79,6 @@ async function getReplayData() {
         (await getDataFromDB()) ||
         window.__ReplayDataList__
 
-    console.log(replayDataList)
-
     if (!replayDataList) {
         return null
     }
