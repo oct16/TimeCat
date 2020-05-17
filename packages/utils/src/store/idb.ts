@@ -19,9 +19,6 @@ export class IndexedDBOperator {
 
         request.onsuccess = e => {
             this.db = request.result
-
-            // this.clear()
-
             callback(this.db)
         }
 
@@ -67,7 +64,7 @@ export class IndexedDBOperator {
 }
 
 export const DBPromise: Promise<IndexedDBOperator> = new Promise(resolve => {
-    const indexedDB = new IndexedDBOperator('wr_db', 1, 'wr_data', () => {
+    const indexedDB = new IndexedDBOperator('cat_db', 1, 'cat_data', () => {
         resolve(indexedDB)
     })
 })
