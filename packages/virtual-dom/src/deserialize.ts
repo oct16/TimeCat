@@ -55,6 +55,9 @@ function createAttributes(vNode: VNode, node: Element): void {
     for (const [name, val] of Object.entries(attrs)) {
         setAttribute(node as HTMLElement, name, val)
     }
+    if (vNode.tag === 'a') {
+        setAttribute(node as HTMLElement, 'target', '_blank')
+    }
 }
 
 export function createSpecialNode(vsNode: VSNode) {
