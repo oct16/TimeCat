@@ -23,3 +23,19 @@ export function secondToDate(ms: number) {
 export function isSnapshot(frame: RecordData | SnapshotData) {
     return !!(frame as SnapshotData).vNode
 }
+
+export function classifyRecords(data: (SnapshotData | RecordData)[]) {
+    const dataList: { snapshot: SnapshotData; records: RecordData[] }[] = []
+
+    let viewData: { snapshot: SnapshotData; records: RecordData[] }
+    data.forEach(item => {
+        if (isSnapshot(item)) {
+            viewData = { snapshot: item as SnapshotData, records: [] }
+            dataList.push(viewData)
+        } else {
+            viewData.records.push(item as RecordData)
+        }
+    })
+
+    return dataList
+}

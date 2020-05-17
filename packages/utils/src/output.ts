@@ -1,7 +1,7 @@
 import { TPL } from './tpl'
-import { DBPromise as DB } from './store/idb'
+import { DBPromise as DB, DBPromise } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
-import { isDev } from './tools/common'
+import { isDev, isSnapshot, classifyRecords } from './tools/common'
 import pako from 'pako'
 
 type ScriptItem = { name: string; src: string }
@@ -65,9 +65,15 @@ async function getScript(src: string) {
         .then(filteringScriptTag)
 }
 
+async function getDataFromDB() {
+    const indexedDB = await DBPromise
+    const data = await indexedDB.getRecords()
+    return classifyRecords(data)
+}
+
 async function injectData() {
     const dataScript = document.createElement('script')
-    const data = window.__ReplayData__ || (await (await DB).getRecords())
+    const data = window.__ReplayDataList__ || (await getDataFromDB())
     const jsonStrData = JSON.stringify(data)
     const zipArray = pako.gzip(jsonStrData)
     const scriptContent = `var __ReplayStrData__ = ${"'" + zipArray.toString() + "'"}`

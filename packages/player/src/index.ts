@@ -1,4 +1,4 @@
-import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp, isSnapshot } from '@TimeCat/utils'
+import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp, isSnapshot, classifyRecords } from '@TimeCat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
@@ -50,24 +50,7 @@ async function getAsyncDataFromSocket(uri: string): Promise<Array<{ snapshot: Sn
 async function getDataFromDB() {
     const indexedDB = await DBPromise
     const data = await indexedDB.getRecords()
-
-    function classify(data: (SnapshotData | RecordData)[]) {
-        const dataList: { snapshot: SnapshotData; records: RecordData[] }[] = []
-
-        let viewData: { snapshot: SnapshotData; records: RecordData[] }
-        data.forEach(item => {
-            if (isSnapshot(item)) {
-                viewData = { snapshot: item as SnapshotData, records: [] }
-                dataList.push(viewData)
-            } else {
-                viewData.records.push(item as RecordData)
-            }
-        })
-
-        return dataList
-    }
-
-    return classify(data)
+    return classifyRecords(data)
 }
 
 async function getReplayData() {
