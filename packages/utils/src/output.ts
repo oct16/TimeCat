@@ -1,7 +1,7 @@
 import { TPL } from './tpl'
-import { DBPromise as DB, DBPromise } from './store/idb'
+import { DBPromise } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
-import { isDev, isSnapshot, classifyRecords } from './tools/common'
+import { isDev, classifyRecords } from './tools/common'
 import pako from 'pako'
 
 type ScriptItem = { name: string; src: string }
@@ -44,7 +44,8 @@ async function injectScripts(scripts?: ScriptItem[]) {
             let scriptContent = src
             const script = document.createElement('script')
             script.id = name
-            const isUrlReg = /:\/\//
+        debugger
+            const isUrlReg = /^(chrome-extension|https?):\/\/.+/
             // is a link or script text
             if (isUrlReg.test(src)) {
                 if (isDev) {
