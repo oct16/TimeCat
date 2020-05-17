@@ -10,7 +10,8 @@
         "f": "npx code-formatter --path packages",
         "live": "node scripts/live.js",
         "deploy-gh": "git subtree split --prefix dist -b gh-pages && git push -f origin gh-pages:gh-pages",
-        "gh": "npm run build && git push origin `git subtree split --prefix dist master`:gh-pages --force"
+        "gh": "npm run build && git push origin `git subtree split --prefix dist master`:gh-pages --force",
+        "embed": "npm run build && cd dist && cp timecat.min.js ../../TimeCatChrome/src/assets/"
     },
     "dependencies": {
         "koa": "^2.11.0",
