@@ -1,9 +1,8 @@
-import { VNode, convertVNode } from '@TimeCat/virtual-dom'
-import { filteringTemplate, disableScrolling, nodeStore } from '@TimeCat/utils'
+import { convertVNode } from '@TimeCat/virtual-dom'
+import { filteringTemplate, disableScrolling, nodeStore, debounce } from '@TimeCat/utils'
 import HTML from './ui.html'
 import CSS from './ui.css'
 import FIXED from './fixed.css'
-import { SnapshotData } from '@TimeCat/snapshot'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -21,6 +20,7 @@ export class ContainerComponent {
     init() {
         this.initTemplate()
         this.initSandbox()
+        this.makeItResponsive(this.container)
     }
 
     initSandbox() {
@@ -63,13 +63,49 @@ export class ContainerComponent {
 
     createContainer(id: string, html: string) {
         const parser = new DOMParser()
-        const element = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
-        element.id = id
-        element.style.width = this.getSnapshot().width + 'px'
-        element.style.height = this.getSnapshot().height + 'px'
-        element.style.position = 'relative'
-        element.style.margin = '0 auto'
-        return (this.container = element)
+        const el = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
+        el.id = id
+        el.style.width = this.getSnapshot().width + 'px'
+        el.style.height = this.getSnapshot().height + 'px'
+        el.style.display = 'none'
+        return (this.container = el)
+    }
+
+    makeItResponsive(target: HTMLElement) {
+        const debounceResizeFn = debounce(resizeHandle, 500)
+        window.addEventListener('resize', debounceResizeFn.bind(this))
+        resizeHandle(({ target: window } as unknown) as Event)
+        setTimeout(() => (this.container.style.opacity = '1'))
+        this.container.style.display = 'block'
+        function resizeHandle(e?: Event) {
+            if (e && e.target instanceof Window) {
+                const htmlElement = e.target.document.documentElement
+                const { clientWidth: w, clientHeight: h } = htmlElement
+                scalePages(target, w, h)
+            }
+        }
+
+        function scalePages(target: HTMLElement, maxWidth: number, maxHeight: number) {
+            const { width: targetWidth, height: targetHeight } = getPageSize(target)
+
+            const scaleX = maxWidth / targetWidth
+            const scaleY = maxHeight / targetHeight
+            const scale = scaleX > scaleY ? scaleY : scaleX
+            const maxScale = scale > 1 ? 1 : scale
+
+            const left = Math.abs(Math.floor((targetWidth * maxScale - maxWidth) / 2))
+            const top = Math.abs(Math.floor((targetHeight * maxScale - maxHeight) / 2))
+            target.style.transform = 'scale(' + maxScale + ')'
+            target.style.left = left + 'px'
+            target.style.top = top + 'px'
+        }
+
+        function getPageSize(target: HTMLElement) {
+            return {
+                width: parseInt(target.style.width),
+                height: parseInt(target.style.height)
+            }
+        }
     }
 
     createStyle(id: string, s: string) {

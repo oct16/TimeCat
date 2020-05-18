@@ -44,7 +44,6 @@ async function injectScripts(scripts?: ScriptItem[]) {
             let scriptContent = src
             const script = document.createElement('script')
             script.id = name
-        debugger
             const isUrlReg = /^(chrome-extension|https?):\/\/.+/
             // is a link or script text
             if (isUrlReg.test(src)) {
