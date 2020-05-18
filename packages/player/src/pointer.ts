@@ -1,4 +1,5 @@
 import { setAttribute } from '@TimeCat/virtual-dom'
+import { delay } from '@TimeCat/utils'
 
 export class PointerComponent {
     x = 0
@@ -21,8 +22,9 @@ export class PointerComponent {
         this.pointer.style.top = this.y + 'px'
     }
 
-    click(x: number, y: number) {
+    async click(x: number, y: number) {
         this.move(x, y)
+        await delay(100)
         setAttribute(this.pointer, 'active', '')
         setTimeout(() => {
             setAttribute(this.pointer, 'active', null)

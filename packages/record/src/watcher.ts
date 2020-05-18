@@ -16,7 +16,7 @@ import {
     RemoveUpdateData,
     ScrollWatcher
 } from './types'
-import { logger, throttle, isDev, nodeStore, listenerStore, getTime, isExistingNode } from '@TimeCat/utils'
+import { logger, throttle, isDev, nodeStore, listenerStore, getTime, isExistingNode, debounce } from '@TimeCat/utils'
 
 function emitterHook(emit: RecordEvent<RecordData>, data: any) {
     if (isDev) {
@@ -25,10 +25,23 @@ function emitterHook(emit: RecordEvent<RecordData>, data: any) {
     emit(data)
 }
 
-function registerEvent(eventTypes: string[], handleFn: Function, opts: AddEventListenerOptions, throttleTime = 500) {
-    const listenerHandle = throttle(handleFn, throttleTime, {
-        trailing: true
-    })
+function registerEvent(
+    eventTypes: string[],
+    handleFn: (...args: any[]) => void,
+    opts: AddEventListenerOptions,
+    type = 'throttle',
+    waitTime = 500
+) {
+    let listenerHandle: (...args: any[]) => void
+    if (type === 'throttle') {
+        listenerHandle = throttle(handleFn, waitTime, {
+            trailing: true
+        })
+    } else {
+        listenerHandle = debounce(handleFn, waitTime, {
+            isImmediate: false
+        })
+    }
 
     eventTypes
         .map(type => (fn: (e: Event) => void) => {

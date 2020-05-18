@@ -39,3 +39,9 @@ export function classifyRecords(data: (SnapshotData | RecordData)[]) {
 
     return dataList
 }
+
+export async function delay(t = 200) {
+    return new Promise(r => {
+        setTimeout(() => r(), t)
+    })
+}

@@ -14,7 +14,7 @@ import {
     ScrollWatcherData
 } from '@TimeCat/record'
 import { PlayerComponent } from './player'
-import { nodeStore, isElementNode, isExistingNode } from '@TimeCat/utils'
+import { nodeStore, isElementNode, isExistingNode, delay } from '@TimeCat/utils'
 import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@TimeCat/virtual-dom'
 
 function isVNode(n: VNode | VSNode) {
@@ -25,7 +25,7 @@ function insertOrMoveNode(data: UpdateNodeData) {
     const { parentId, nextId, node } = data
     const parentNode = nodeStore.getNode(parentId!)
 
-    if (parentNode) {
+    if (parentNode && isElementNode(parentNode)) {
         const nextNode = findNextNode(nextId)
         const n = node as VNode | VSNode
 
@@ -62,7 +62,7 @@ function findNextNode(nextId: number | null): Node | null {
     return nextId ? nodeStore.getNode(nextId) : null
 }
 
-export function updateDom(this: PlayerComponent, Record: RecordData) {
+export async function updateDom(this: PlayerComponent, Record: RecordData) {
     const { type, data } = Record
     switch (type) {
         case RecordType.SCROLL: {
@@ -70,7 +70,17 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
             let target = (id as number | null)
                 ? (nodeStore.getNode(id) as HTMLElement)
                 : this.c.sandBoxDoc.documentElement
-            target.scrollTo(left, top)
+
+            const curTop = target.offsetTop
+
+            // prevent jump too long distance
+            const behavior = Math.abs(top - curTop) > window.__ReplayData__.snapshot.height * 2 ? 'auto' : 'smooth'
+            target.scrollTo({
+                top,
+                left,
+                behavior
+            })
+
             break
         }
         case RecordType.WINDOW: {
@@ -91,6 +101,8 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
             }
             break
         case RecordType.DOM_UPDATE:
+            // Reduce the delay caused by interactive animation
+            await delay(200)
             const { addedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
             removedNodes.forEach((data: RemoveUpdateData) => {
                 const { parentId, id } = data
@@ -138,6 +150,8 @@ export function updateDom(this: PlayerComponent, Record: RecordData) {
             })
             break
         case RecordType.FORM_EL_UPDATE:
+            // Reduce the delay caused by interactive animation
+            await delay(200)
             const { id, key, type: formType, value } = data as FormElementWatcherData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
 
