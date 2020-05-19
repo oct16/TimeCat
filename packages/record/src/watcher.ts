@@ -168,7 +168,9 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     const moveNodesSet: Set<Node> = new Set()
     const moveMarkSet: Set<string> = new Set()
 
-    const attrNodesMap: Map<Node, string | null> = new Map()
+    // A node may modify multiple attributes, so use array(not set)
+    const attrNodesArray: { key: string | null; node: Node }[] = []
+
     const textNodesSet: Set<Node> = new Set()
 
     function deepAdd(n: Node, target?: Node) {
@@ -220,7 +222,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         const { target, addedNodes, removedNodes, type, attributeName } = record
         switch (type) {
             case 'attributes':
-                attrNodesMap.set(target, attributeName)
+                attrNodesArray.push({ key: attributeName, node: target })
                 break
             case 'characterData':
                 textNodesSet.add(target)
@@ -266,9 +268,9 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         }
     })
 
-    const attrs: AttributesUpdateData[] = [...attrNodesMap.entries()]
+    const attrs: AttributesUpdateData[] = attrNodesArray
         .map(data => {
-            const [node, key] = data
+            const { node, key } = data
             if (isExistingNode(node as Element)) {
                 return {
                     id: nodeStore.getNodeId(node),
