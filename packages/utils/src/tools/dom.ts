@@ -42,19 +42,26 @@ export function proxyResource(url: string) {
     const { proxy } = window.__ReplayOptions__
 
     if (proxy) {
-        const proxyUrl = proxy.endsWith('/') ? proxy + url : proxy + '/' + url
+        const proxyUrl = stitchingLink(proxy, url)
         return proxyUrl
     }
     return url
+}
+
+function stitchingLink(pre: string, next: string) {
+    if (pre.endsWith('/') || next.startsWith('/')) {
+        return pre + next
+    }
+    return pre + '/' + next
 }
 
 export function completionCssHref(str: string) {
     return str.replace(/(url\()['"]?((\/{1,2})[^'"]*?)['"]?(?=\))/g, (a, b, c) => {
         let url: string = ''
         if (startsWithDoubleSlash(c)) {
-            url = protocol() + c.substring(2)
+            url = stitchingLink(protocol(), c.substring(2))
         } else if (startsWithSlash(c)) {
-            url = origin() + c.substring(1)
+            url = stitchingLink(origin(), c.substring(1))
         }
         if (url) {
             return a.replace(c, url)
@@ -71,20 +78,20 @@ export function completionAttrHref(str: string) {
     const reg = /^(\/{1,2}.*)/g
     str = str.replace(reg, str => {
         if (startsWithDoubleSlash(str)) {
-            return protocol() + str.substring(2)
+            return stitchingLink(protocol(), str.substring(2))
         }
 
         if (startsWithSlash(str)) {
-            return origin() + str
+            return stitchingLink(origin(), str)
         }
         return str
     })
 
     if (!/^http/.test(str)) {
         if (str.startsWith('./')) {
-            return href() + str.substring(1)
+            return stitchingLink(href(), str.substring(1))
         } else {
-            return origin() + '/' + str
+            return stitchingLink(origin(), str)
         }
     }
 
