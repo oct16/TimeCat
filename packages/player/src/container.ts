@@ -50,8 +50,8 @@ export class ContainerComponent {
                 head.insertBefore(this.createStyle('cat-css-fix', FIXED), head.firstChild)
             }
             const documentElement = this.sandBoxDoc.documentElement
-            documentElement.scrollLeft = this.getSnapshot().scrollLeft
-            documentElement.scrollTop = this.getSnapshot().scrollTop
+            child.scrollLeft = this.getSnapshot().scrollLeft
+            child.scrollTop = this.getSnapshot().scrollTop
             this.sandBoxDoc.replaceChild(child, documentElement)
         }
     }

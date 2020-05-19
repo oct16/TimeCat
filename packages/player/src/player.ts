@@ -1,6 +1,6 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from './dom'
-import { reduxStore, PlayerTypes, ProgressState, getTime, isSnapshot } from '@TimeCat/utils'
+import { reduxStore, PlayerTypes, ProgressState, getTime, isSnapshot, delay } from '@TimeCat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { RecordData } from '@TimeCat/record'
@@ -114,7 +114,7 @@ export class PlayerComponent {
         const initTime = getTime()
         this.startTime = 0
 
-        function loop(this: PlayerComponent) {
+        async function loop(this: PlayerComponent) {
             const timeStamp = getTime() - initTime
             if (this.frameIndex > 0 && !this.frames[this.frameIndex]) {
                 this.stop()
@@ -128,6 +128,9 @@ export class PlayerComponent {
             const nextTime = Number(this.frames[this.frameIndex])
 
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
+                // why delay 200ms here? cause we need to wait for all frame finished
+                await delay(200)
+                
                 this.switchNextView()
             }
 
