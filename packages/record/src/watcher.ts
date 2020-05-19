@@ -125,7 +125,7 @@ function mouseWatcher(emit: RecordEvent<MouseRecord>) {
             })
         }
         const name = 'mousemove'
-        const listenerHandle = throttle(evt, 100, {
+        const listenerHandle = throttle(evt, 300, {
             trailing: true
         })
 
@@ -169,7 +169,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     const moveMarkSet: Set<string> = new Set()
 
     // A node may modify multiple attributes, so use array(not set)
-    const attrNodesArray: { key: string | null; node: Node }[] = []
+    const attrNodesArray: { key: string; node: Node; oldValue: string | null }[] = []
 
     const textNodesSet: Set<Node> = new Set()
 
@@ -219,10 +219,10 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     }
 
     records.forEach(record => {
-        const { target, addedNodes, removedNodes, type, attributeName } = record
+        const { target, addedNodes, removedNodes, type, attributeName, oldValue } = record
         switch (type) {
             case 'attributes':
-                attrNodesArray.push({ key: attributeName, node: target })
+                attrNodesArray.push({ key: attributeName!, node: target, oldValue })
                 break
             case 'characterData':
                 textNodesSet.add(target)
@@ -270,12 +270,17 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
 
     const attrs: AttributesUpdateData[] = attrNodesArray
         .map(data => {
-            const { node, key } = data
+            const { node, key, oldValue } = data
             if (isExistingNode(node as Element)) {
+                const value = (node as Element).getAttribute(key)
+                if (oldValue === value) {
+                    return null
+                }
+                const id = nodeStore.getNodeId(node)
                 return {
-                    id: nodeStore.getNodeId(node),
+                    id,
                     key,
-                    value: key ? (node as Element).getAttribute(key) : ''
+                    value
                 } as AttributesUpdateData
             }
         })
