@@ -71,10 +71,10 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                 ? (nodeStore.getNode(id) as HTMLElement)
                 : this.c.sandBoxDoc.documentElement
 
-            const curTop = target.offsetTop
+            const curTop = target.scrollTop
 
             // prevent jump too long distance
-            const behavior = Math.abs(top - curTop) > window.__ReplayData__.snapshot.height * 2 ? 'auto' : 'smooth'
+            const behavior = Math.abs(top - curTop) > window.__ReplayData__.snapshot.height * 3 ? 'auto' : 'smooth'
             target.scrollTo({
                 top,
                 left,
