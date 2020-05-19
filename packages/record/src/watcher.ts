@@ -1,4 +1,4 @@
-import { createFlatNode } from '@TimeCat/virtual-dom'
+import { createFlatVNode, VNode, VSNode } from '@TimeCat/virtual-dom'
 import {
     RecordType,
     WindowWatcher,
@@ -237,14 +237,26 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     })
 
     const addedNodes: UpdateNodeData[] = []
-
+    const addedVNodesMap: Map<number, VNode> = new Map()
     addNodesSet.forEach(node => {
         const nodeId = nodeStore.getNodeId(node)
+        const parentId = nodeStore.getNodeId(node.parentNode!)!
+
+        const parentVn = addedVNodesMap.get(parentId)
+
+        const isParentSVG = parentVn && parentVn.extra.isSVG
+
+        let vn: VNode | VSNode = createFlatVNode(node as Element, isParentSVG)
+
         addedNodes.push({
-            parentId: nodeStore.getNodeId(node.parentNode!)!,
+            parentId,
             nextId: nodeStore.getNodeId(node.nextSibling!) || null,
-            node: nodeId || createFlatNode(node as Element)
+            node: nodeId || vn
         })
+
+        if (isVNode(vn)) {
+            addedVNodesMap.set(vn.id, vn as VNode)
+        }
     })
 
     moveNodesSet.forEach(node => {
@@ -252,7 +264,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         addedNodes.push({
             parentId: nodeStore.getNodeId(node.parentNode!)!,
             nextId: nodeStore.getNodeId(node.nextSibling!) || null,
-            node: nodeId || createFlatNode(node as Element)
+            node: nodeId || createFlatVNode(node as Element)
         })
     })
     const removedNodes: RemoveUpdateData[] = []
@@ -441,6 +453,10 @@ function kidnapInputs(emit: RecordEvent<FormElementWatcher>) {
             time: getTime().toString()
         })
     }
+}
+
+function isVNode(n: VNode | VSNode) {
+    return !!(n as any).tag
 }
 
 export const watchers = {

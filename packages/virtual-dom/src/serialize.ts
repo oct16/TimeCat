@@ -71,8 +71,8 @@ const extraAttr = (attr: Attr) => {
     return [name, value]
 }
 
-export const createFlatNode = (el: Element) => {
-    const vNode = getVNodeByEl(el)
+export const createFlatVNode = (el: Element, isSVG = false) => {
+    const vNode = getVNodeByEl(el, isSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)
     return vNode
