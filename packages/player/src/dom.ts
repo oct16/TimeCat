@@ -85,10 +85,14 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.WINDOW: {
             const { width, height, id } = data as WindowWatcherData
-            let target = (id as number | null) ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.body
-            if (target) {
+            let target: HTMLElement
+            if (id) {
+                target = nodeStore.getNode(id) as HTMLElement
                 ;(target as HTMLElement).style.width = width + 'px'
                 ;(target as HTMLElement).style.height = height + 'px'
+            } else {
+                target = this.c.sandBoxDoc.body
+                this.c.resize(width, height)
             }
             break
         }

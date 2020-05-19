@@ -17,10 +17,14 @@ body {
     background: white;
     vertical-align: top;
     border: 0;
+    width: 100%;
+    height: 100%;
 }
 
 #cat-player {
     position: relative;
+    width: inherit;
+    height: inherit;
 }
 
 #cat-pointer {
