@@ -11,6 +11,7 @@ body {
     -webkit-transform-origin: top left;
     opacity: 0;
     position: relative;
+    overflow: hidden;
 }
 
 #cat-sandbox {

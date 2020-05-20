@@ -86,8 +86,7 @@ export class ContainerComponent {
 
         function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
             if (e && e.target instanceof Window) {
-                const htmlElement = e.target.document.documentElement
-                const { clientWidth: w, clientHeight: h } = htmlElement
+                const { innerWidth: w, innerHeight: h } = e.target
                 scalePages(target, w, h, setWidth, setHeight)
             }
         }
