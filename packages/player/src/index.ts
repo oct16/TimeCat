@@ -1,4 +1,13 @@
-import { DBPromise, ProgressTypes, PlayerTypes, reduxStore, fmp, isSnapshot, classifyRecords } from '@TimeCat/utils'
+import {
+    DBPromise,
+    ProgressTypes,
+    PlayerTypes,
+    reduxStore,
+    fmp,
+    isSnapshot,
+    classifyRecords,
+    isDev
+} from '@TimeCat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
@@ -8,6 +17,9 @@ import { RecordData } from '@TimeCat/record'
 import { ReplayOptions } from './types'
 
 function getGZipData() {
+    if (isDev) {
+        ;(window as any).pako = pako
+    }
     const data = window.__ReplayStrData__
     if (!data) {
         return null
@@ -20,7 +32,9 @@ function getGZipData() {
         snapshot: SnapshotData
         records: RecordData[]
     }>
-
+    if (isDev) {
+        ;(window as any).data = dataArray
+    }
     return dataArray
 }
 
