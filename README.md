@@ -1,16 +1,31 @@
+<p align="center">
+<h1 align="center">TimeCat</h1>
+<div align="center">
+A Magical Web Recorder 🖥 网页录屏器
+</div>
 
 ### Project Description
 
-[中文](https://github.com/oct16/TimeCat/blob/master/README.cn.md)
+English | [中文](https://github.com/oct16/TimeCat/blob/master/README.cn.md)
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
-### Updates:
+### Features
 
 04.26 Live Mode    
-![live mode](https://github.com/oct16/static/blob/master/gifs/live-mode.gif)
 
 03.31 Add Chrome Plugin 
+
+### Usage
+```ts
+// In WIP
+import { record, replay } from 'TimeCat';
+
+record(options) 
+// or
+replay(options)
+
+```
 
 ### TimeCat -- A Magical Web Recorder
 
