@@ -167,6 +167,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     const removeNodesMap: Map<Node, Node> = new Map()
     const moveNodesSet: Set<Node> = new Set()
     const moveMarkSet: Set<string> = new Set()
+    console.log(records)
 
     // A node may modify multiple attributes, so use array(not set)
     const attrNodesArray: { key: string; node: Node; oldValue: string | null }[] = []
@@ -236,22 +237,32 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         }
     })
 
+    const addedSiblingMap: Map<Node, VNode | VSNode> = new Map()
+    addNodesSet.forEach(node => {
+        const vn: VNode | VSNode = createFlatVNode(node as Element)
+        addedSiblingMap.set(node, vn)
+    })
+
     const addedNodes: UpdateNodeData[] = []
     const addedVNodesMap: Map<number, VNode> = new Map()
+
     addNodesSet.forEach(node => {
-        const nodeId = nodeStore.getNodeId(node)
         const parentId = nodeStore.getNodeId(node.parentNode!)!
 
         const parentVn = addedVNodesMap.get(parentId)
 
         const isParentSVG = parentVn && parentVn.extra.isSVG
 
-        let vn: VNode | VSNode = createFlatVNode(node as Element, isParentSVG)
+        let vn = addedSiblingMap.get(node)!
+
+        if (isParentSVG && isVNode(vn)) {
+            ;(vn as VNode).extra.isSVG = true
+        }
 
         addedNodes.push({
             parentId,
             nextId: nodeStore.getNodeId(node.nextSibling!) || null,
-            node: nodeId || vn
+            node: vn
         })
 
         if (isVNode(vn)) {
@@ -267,6 +278,10 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
             node: nodeId || createFlatVNode(node as Element)
         })
     })
+
+    console.log(addNodesSet)
+    console.log(moveNodesSet)
+
     const removedNodes: RemoveUpdateData[] = []
     removeNodesMap.forEach((parent, node) => {
         const id = nodeStore.getNodeId(node)!
@@ -315,6 +330,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         attrs,
         texts
     } as DOMUpdateDataType
+    console.log(data)
 
     if (Object.values(data).some(item => item.length)) {
         emitterHook(emit, {

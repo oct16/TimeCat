@@ -18,7 +18,7 @@ import { nodeStore, isElementNode, isExistingNode, delay } from '@TimeCat/utils'
 import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@TimeCat/virtual-dom'
 
 function isVNode(n: VNode | VSNode) {
-    return !!(n as any).tag
+    return !!(n as VNode).tag
 }
 
 function insertOrMoveNode(data: UpdateNodeData) {
@@ -26,27 +26,28 @@ function insertOrMoveNode(data: UpdateNodeData) {
     const parentNode = nodeStore.getNode(parentId!)
 
     if (parentNode && isElementNode(parentNode)) {
-        const nextNode = findNextNode(nextId)
-        const n = node as VNode | VSNode
+        let nextNode: Node | null = null
 
-        let refNode: Node
-        if (typeof node === 'number') {
-            refNode = nodeStore.getNode(node)!
-        } else if (isVNode(n)) {
-            refNode = createNode(n as VNode)
-        } else {
-            refNode = createSpecialNode(n as VSNode)
-        }
-
-        if (nextNode) {
-            if (isChildNode(parentNode, nextNode)) {
-                parentNode.insertBefore(refNode, nextNode)
-            } else {
+        if (nextId) {
+            nextNode = findNextNode(nextId)
+            if (!nextNode) {
                 return 'revert'
             }
-        } else {
-            parentNode.appendChild(refNode)
         }
+        const n = node as VNode | VSNode
+
+        let insertNode: Node
+        if (typeof node === 'number') {
+            insertNode = nodeStore.getNode(node)!
+        } else if (isVNode(n)) {
+            insertNode = createNode(n as VNode)
+        } else {
+            insertNode = createSpecialNode(n as VSNode)
+        }
+
+        parentNode.insertBefore(insertNode, nextNode)
+    } else {
+        return 'revert'
     }
 }
 
@@ -118,14 +119,18 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             })
 
             const addedList = addedNodes.slice()
-            const maxRevertCount = addedList.length
+            const n = addedList.length
+            // Math Termial
+            const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
             let revertCount = 0
             while (addedList.length) {
                 const addData = addedList.shift()
                 if (addData) {
                     const revertSignal = insertOrMoveNode(addData)
-                    if (revertSignal === 'revert' && revertCount++ < maxRevertCount) {
-                        addedList.push(addData)
+                    if (revertSignal === 'revert') {
+                        if (revertCount++ < maxRevertCount) {
+                            addedList.push(addData)
+                        }
                     }
                 }
             }
