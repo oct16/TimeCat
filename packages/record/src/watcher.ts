@@ -186,10 +186,11 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     function deepAdd(n: Node, target?: Node) {
         const id = nodeStore.getNodeId(n)
         if (id) {
-            // if exist, go to move and delete in removedSet
-            moveNodesSet.add(n)
-            removeNodesMap.delete(n)
             if (target) {
+                // if exist, go to move and delete in removedSet
+                moveNodesSet.add(n)
+                removeNodesMap.delete(n)
+
                 const targetId = nodeStore.getNodeId(target)
                 if (targetId) {
                     // mark as entry
