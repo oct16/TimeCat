@@ -1,5 +1,6 @@
 import { RecordData } from '@TimeCat/record'
 import { SnapshotData } from '@TimeCat/snapshot'
+import { VNode, VSNode } from '@TimeCat/virtual-dom'
 
 export const isDev = process.env.NODE_ENV === 'development'
 
@@ -44,4 +45,7 @@ export async function delay(t = 200) {
     return new Promise(r => {
         setTimeout(() => r(), t)
     })
+}
+export function isVNode(n: VNode | VSNode) {
+    return !!(n as VNode).tag
 }

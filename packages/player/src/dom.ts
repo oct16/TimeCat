@@ -14,14 +14,10 @@ import {
     ScrollWatcherData
 } from '@TimeCat/record'
 import { PlayerComponent } from './player'
-import { nodeStore, isElementNode, isExistingNode, delay } from '@TimeCat/utils'
+import { nodeStore, isElementNode, isExistingNode, delay, isVNode } from '@TimeCat/utils'
 import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@TimeCat/virtual-dom'
 
-function isVNode(n: VNode | VSNode) {
-    return !!(n as VNode).tag
-}
-
-function insertOrMoveNode(data: UpdateNodeData) {
+function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     const { parentId, nextId, node } = data
     const parentNode = nodeStore.getNode(parentId!)
 
@@ -29,6 +25,11 @@ function insertOrMoveNode(data: UpdateNodeData) {
         let nextNode: Node | null = null
 
         if (nextId) {
+            // Must wait for the relation node inserted first
+            if (orderSet.has(nextId)) {
+                return 'revert'
+            }
+
             nextNode = findNextNode(nextId)
             if (!nextNode) {
                 return 'revert'
@@ -39,6 +40,10 @@ function insertOrMoveNode(data: UpdateNodeData) {
         let insertNode: Node
         if (typeof node === 'number') {
             insertNode = nodeStore.getNode(node)!
+
+            if (orderSet.has(node)) {
+                orderSet.delete(node)
+            }
         } else if (isVNode(n)) {
             insertNode = createNode(n as VNode)
         } else {
@@ -123,10 +128,26 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             // Math Termial
             const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
             let revertCount = 0
+
+            // node1 -> node2 -> node3
+            // insert node2 first
+            // insert node1 last
+            // => if nextId equal id, insert id first
+
+            const orderSet: Set<number> = new Set()
+            addedList.forEach(data => {
+                // Is there a relations between two nodes
+                if (data.nextId) {
+                    if (orderSet.has(data.nextId) || addedList.some(a => a.node === data.nextId)) {
+                        orderSet.add(data.nextId)
+                    }
+                }
+            })
+
             while (addedList.length) {
                 const addData = addedList.shift()
                 if (addData) {
-                    const revertSignal = insertOrMoveNode(addData)
+                    const revertSignal = insertOrMoveNode(addData, orderSet)
                     if (revertSignal === 'revert') {
                         if (revertCount++ < maxRevertCount) {
                             addedList.push(addData)

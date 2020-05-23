@@ -16,7 +16,17 @@ import {
     RemoveUpdateData,
     ScrollWatcher
 } from './types'
-import { logger, throttle, isDev, nodeStore, listenerStore, getTime, isExistingNode, debounce } from '@TimeCat/utils'
+import {
+    logger,
+    throttle,
+    isDev,
+    nodeStore,
+    listenerStore,
+    getTime,
+    isExistingNode,
+    debounce,
+    isVNode
+} from '@TimeCat/utils'
 
 function emitterHook(emit: RecordEvent<RecordData>, data: any) {
     if (isDev) {
@@ -167,7 +177,6 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     const removeNodesMap: Map<Node, Node> = new Map()
     const moveNodesSet: Set<Node> = new Set()
     const moveMarkSet: Set<string> = new Set()
-    console.log(records)
 
     // A node may modify multiple attributes, so use array(not set)
     const attrNodesArray: { key: string; node: Node; oldValue: string | null }[] = []
@@ -328,7 +337,6 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         attrs,
         texts
     } as DOMUpdateDataType
-    console.log(data)
 
     if (Object.values(data).some(item => item.length)) {
         emitterHook(emit, {
@@ -467,10 +475,6 @@ function kidnapInputs(emit: RecordEvent<FormElementWatcher>) {
             time: getTime().toString()
         })
     }
-}
-
-function isVNode(n: VNode | VSNode) {
-    return !!(n as any).tag
 }
 
 export const watchers = {
