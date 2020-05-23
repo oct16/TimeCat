@@ -80,6 +80,12 @@ export interface UpdateNodeData {
     node: VSNode | VNode | number
 }
 
+export interface movedNodesData {
+    parentId: number
+    id: number
+    nextId: number | null
+}
+
 export interface RemoveUpdateData {
     parentId: number
     id: number
@@ -87,8 +93,8 @@ export interface RemoveUpdateData {
 
 export interface DOMUpdateDataType {
     addedNodes: UpdateNodeData[]
+    movedNodes: movedNodesData[]
     removedNodes: RemoveUpdateData[]
-
     attrs: AttributesUpdateData[]
     texts: CharacterDataUpdateData[]
 }

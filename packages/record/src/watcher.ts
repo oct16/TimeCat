@@ -14,7 +14,8 @@ import {
     DOMUpdateDataType,
     UpdateNodeData,
     RemoveUpdateData,
-    ScrollWatcher
+    ScrollWatcher,
+    movedNodesData
 } from './types'
 import {
     logger,
@@ -281,12 +282,13 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
         }
     })
 
+    const movedNodes: movedNodesData[] = []
     moveNodesSet.forEach(node => {
-        const nodeId = nodeStore.getNodeId(node)
-        addedNodes.push({
+        const nodeId = nodeStore.getNodeId(node)!
+        movedNodes.push({
             parentId: nodeStore.getNodeId(node.parentNode!)!,
             nextId: nodeStore.getNodeId(node.nextSibling!) || null,
-            node: nodeId || createFlatVNode(node as Element)
+            id: nodeId
         })
     })
 
@@ -332,8 +334,10 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
             }
         })
         .filter(Boolean) as CharacterDataUpdateData[]
+
     const data = {
         addedNodes,
+        movedNodes,
         removedNodes,
         attrs,
         texts

@@ -113,7 +113,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         case RecordType.DOM_UPDATE:
             // Reduce the delay caused by interactive animation
             await delay(200)
-            const { addedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
+            const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
             removedNodes.forEach((data: RemoveUpdateData) => {
                 const { parentId, id } = data
                 const parentNode = nodeStore.getNode(parentId)
@@ -123,11 +123,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                 }
             })
 
-            const addedList = addedNodes.slice()
-            const n = addedList.length
-            // Math Termial
-            const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
-            let revertCount = 0
+            const movedList = movedNodes.slice()
 
             // node1 -> node2 -> node3
             // insert node2 first
@@ -135,14 +131,30 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             // => if nextId equal id, insert id first
 
             const orderSet: Set<number> = new Set()
-            addedList.forEach(data => {
+            movedList.forEach(data => {
                 // Is there a relations between two nodes
                 if (data.nextId) {
-                    if (orderSet.has(data.nextId) || addedList.some(a => a.node === data.nextId)) {
+                    if (movedList.some(a => a.id === data.nextId)) {
                         orderSet.add(data.nextId)
                     }
                 }
             })
+
+            const addedList = movedList
+                .map(item => {
+                    const { id, parentId, nextId } = item
+                    return {
+                        node: id,
+                        parentId,
+                        nextId
+                    } as UpdateNodeData
+                })
+                .concat(addedNodes.slice())
+
+            // Math Termial
+            const n = addedList.length
+            const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
+            let revertCount = 0
 
             while (addedList.length) {
                 const addData = addedList.shift()
