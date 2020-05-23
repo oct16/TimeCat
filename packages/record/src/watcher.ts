@@ -177,8 +177,9 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     function deepAdd(n: Node, target?: Node) {
         const id = nodeStore.getNodeId(n)
         if (id) {
-            // if exist, go to move
+            // if exist, go to move and delete in removedSet
             moveNodesSet.add(n)
+            removeNodesMap.delete(n)
             if (target) {
                 const targetId = nodeStore.getNodeId(target)
                 if (targetId) {
@@ -278,9 +279,6 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
             node: nodeId || createFlatVNode(node as Element)
         })
     })
-
-    console.log(addNodesSet)
-    console.log(moveNodesSet)
 
     const removedNodes: RemoveUpdateData[] = []
     removeNodesMap.forEach((parent, node) => {
