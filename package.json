@@ -1,6 +1,8 @@
 {
-    "description": "TimeCat plugin",
+    "name": "timecat",
     "version": "1.0.0",
+    "description": "TimeCat Web Recorder",
+    "main": "index.ts",
     "workspaces": [
         "packages/*"
     ],
