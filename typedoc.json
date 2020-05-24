@@ -4,6 +4,7 @@
     "out": "dist/docs",
     "mode": "file",
     "theme": "default",
+    "gitRevision": "master",
     "includeDeclarations": false,
     "excludePrivate": true,
     "excludeProtected": true,
