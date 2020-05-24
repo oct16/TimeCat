@@ -1,9 +1,9 @@
 {
     "name": "TimeCat",
     "inputFiles": "index.ts",
-    "out": "docs",
+    "out": "dist/docs",
     "mode": "file",
-    "theme": "minimal",
+    "theme": "default",
     "includeDeclarations": false,
     "excludePrivate": true,
     "excludeProtected": true,
