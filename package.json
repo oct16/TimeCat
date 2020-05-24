@@ -11,7 +11,7 @@
         "build": "node scripts/build.js",
         "live": "node scripts/live.js",
         "f": "npx code-formatter --path packages",
-        "doc": "npx typedoc --tsconfig tsconfig.json",
+        "doc": "npx typedoc",
         "embed": "npm run build && cd dist && cp timecat.min.js ../../TimeCatChrome/src/assets/",
         "count": "find . -type f -not -path './node_modules/*' -not -path './dist/*'  -name '*.ts' | xargs wc -l"
     },

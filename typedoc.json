@@ -1,0 +1,13 @@
+{
+    "name": "TimeCat",
+    "inputFiles": "index.ts",
+    "out": "docs",
+    "mode": "file",
+    "theme": "minimal",
+    "includeDeclarations": false,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "excludeNotExported": true,
+    "gaID": "151180797"
+}
