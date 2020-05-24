@@ -103,4 +103,5 @@ typings/
 .tern-port
 
 dist
+docs
 .DS_Store

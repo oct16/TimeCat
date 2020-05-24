@@ -2,7 +2,6 @@
     "compilerOptions": {
         "baseUrl": ".",
         "outDir": "dist",
-        "sourceMap": true,
         "target": "esnext",
         "module": "esnext",
         "moduleResolution": "node",
@@ -40,5 +39,10 @@
         "examples/*",
         "packages/*/__tests__",
         "packages/chrome/src/assets/ctrl.js"
-    ]
+    ],
+    "typedocOptions": {
+        "name": "TimeCat",
+        "mode": "file",
+        "out": "docs",
+    }
 }
