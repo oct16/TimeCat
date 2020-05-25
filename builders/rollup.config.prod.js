@@ -24,9 +24,7 @@ export default {
         }
     ],
     plugins: [
-        ts({
-            tsconfigOverride: { compilerOptions: { declaration: false } }
-        }),
+        ts(),
         node({
             browser: true,
             mainFields: ['module', 'main']
