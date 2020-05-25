@@ -1,8 +1,21 @@
 {
-    "name": "timecat",
+    "name": "timecatjs",
+    "author": "oct16",
     "version": "1.0.0",
     "description": "TimeCat Web Recorder",
-    "main": "index.ts",
+    "main": "dist/timecat.esm.js",
+    "keywords": [
+        "recorder",
+        "replay",
+        "player",
+        "virtual-dom",
+        "screenshots",
+        "audio",
+        "video",
+        "chrome",
+        "chrome-extension"
+    ],
+    "license": "GPL",
     "workspaces": [
         "packages/*"
     ],
@@ -14,10 +27,6 @@
         "doc": "npx typedoc",
         "embed": "npm run build && cd dist && cp timecat.min.js ../../TimeCatChrome/src/assets/",
         "count": "find . -type f -not -path './node_modules/*' -not -path './dist/*'  -name '*.ts' | xargs wc -l"
-    },
-    "dependencies": {
-        "koa": "^2.11.0",
-        "socket.io": "^2.3.0"
     },
     "devDependencies": {
         "@oct16/code-formatter": "^1.0.9",
@@ -45,10 +54,11 @@
         "type": "git",
         "url": "git+https://github.com/oct16/TimeCat.git"
     },
-    "author": "oct16",
-    "license": "GPL",
     "bugs": {
         "url": "https://github.com/oct16/TimeCat/issues"
     },
-    "homepage": "https://github.com/oct16/TimeCat#readme"
+    "homepage": "https://github.com/oct16/TimeCat#readme",
+    "files": [
+        "dist/*"
+    ]
 }
