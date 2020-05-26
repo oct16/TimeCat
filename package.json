@@ -3,7 +3,9 @@
     "author": "oct16",
     "version": "1.0.0",
     "description": "TimeCat Web Recorder",
-    "main": "lib/timecat.esm.js",
+    "main": "lib/timecat.cjs.js",
+    "module": "lib/timecat.esm.js",
+    "types": "lib/timecat.d.ts",
     "keywords": [
         "recorder",
         "replay",
