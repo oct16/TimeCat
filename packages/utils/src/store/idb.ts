@@ -53,14 +53,11 @@ export class IndexedDBOperator {
         const objectStore = this.db.transaction([`${this.storeName}`], 'readwrite').objectStore(`${this.storeName}`)
         return new Promise(resolve => {
             objectStore.getAll().onsuccess = event => {
-                resolve(event!.target!.result as (SnapshotData | RecordData)[])
+                resolve(event!.target!.result)
             }
         })
     }
 
-    async getRecords() {
-        return await this.readAllRecords()
-    }
 }
 
 export const DBPromise: Promise<IndexedDBOperator> = new Promise(resolve => {

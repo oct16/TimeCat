@@ -3,7 +3,7 @@
     "author": "oct16",
     "version": "1.0.0",
     "description": "TimeCat Web Recorder",
-    "main": "dist/timecat.esm.js",
+    "main": "lib/timecat.esm.js",
     "keywords": [
         "recorder",
         "replay",
@@ -25,10 +25,11 @@
         "live": "node scripts/live.js",
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",
-        "embed": "npm run build && cd dist && cp timecat.min.js ../../TimeCatChrome/src/assets/",
-        "count": "find . -type f -not -path './node_modules/*' -not -path './dist/*'  -name '*.ts' | xargs wc -l"
+        "embed": "npm run build && cd lib && cp timecat.min.js ../../TimeCatChrome/src/assets/",
+        "count": "find . -type f -not -path './node_modules/*' -not -path './lib/*'  -name '*.ts' | xargs wc -l"
     },
     "devDependencies": {
+        "@microsoft/api-extractor": "^7.8.9",
         "@oct16/code-formatter": "^1.0.9",
         "@rollup/plugin-commonjs": "^11.0.2",
         "@rollup/plugin-html": "^0.1.1",
@@ -37,6 +38,7 @@
         "@types/node": "^13.9.2",
         "@types/pako": "^1.0.1",
         "@types/socket.io-client": "^1.4.32",
+        "@zerollup/ts-transform-paths": "^1.7.17",
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "pako": "^1.0.11",
@@ -47,8 +49,9 @@
         "rollup-plugin-string": "^3.0.0",
         "rollup-plugin-terser": "^5.3.0",
         "rollup-plugin-typescript2": "^0.26.0",
+        "ttypescript": "^1.5.10",
         "typedoc": "^0.17.7",
-        "typescript": "^3.9.2"
+        "typescript": "^3.9.3"
     },
     "repository": {
         "type": "git",
@@ -59,6 +62,6 @@
     },
     "homepage": "https://github.com/oct16/TimeCat#readme",
     "files": [
-        "dist/*"
+        "lib/**/*"
     ]
 }

@@ -67,7 +67,7 @@ async function getScript(src: string) {
 
 async function getDataFromDB() {
     const indexedDB = await DBPromise
-    const data = await indexedDB.getRecords()
+    const data = await indexedDB.readAllRecords()
     return classifyRecords(data)
 }
 

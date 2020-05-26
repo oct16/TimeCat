@@ -1,7 +1,7 @@
 {
     "name": "TimeCat",
     "inputFiles": "index.ts",
-    "out": "dist/docs",
+    "out": "lib/docs",
     "mode": "file",
     "theme": "default",
     "gitRevision": "master",

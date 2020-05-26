@@ -1,0 +1,48 @@
+/**
+ * Config file for API Extractor.  For more info, please visit: https://api-extractor.com
+ */
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+    "mainEntryPointFilePath": "<projectFolder>/lib/index.d.ts",
+    "bundledPackages": [],
+    "compiler": {},
+    "apiReport": {
+        "enabled": false
+    },
+    "docModel": {
+        "enabled": false,
+    },
+    "dtsRollup": {
+        "enabled": false,
+    },
+    "tsdocMetadata": {
+        "enabled": false,
+    },
+    "messages": {
+        "extractorMessageReporting": {
+            "default": {
+                "logLevel": "none"
+            },
+            "ae-forgotten-export": {
+                "logLevel": "none",
+                "addToApiReportFile": false
+            },
+            "ae-incompatible-release-tags": {
+                "logLevel": "none",
+                "addToApiReportFile": false
+            },
+            "ae-internal-missing-underscore": {
+                "logLevel": "none",
+                "addToApiReportFile": false
+            },
+            "ae-unresolved-inheritdoc-reference": {
+                "logLevel": "none",
+                "addToApiReportFile": false
+            },
+            "ae-unresolved-inheritdoc-base": {
+                "logLevel": "none",
+                "addToApiReportFile": false
+            }
+        }
+    }
+}

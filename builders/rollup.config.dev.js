@@ -11,12 +11,12 @@ export default [
             {
                 name: 'cat',
                 format: 'iife',
-                file: 'dist/timecat.min.js'
+                file: 'lib/timecat.min.js'
             },
             {
                 name: 'cat',
                 format: 'iife',
-                file: 'dist/chrome/timecat.min.js'
+                file: 'lib/chrome/timecat.min.js'
             }
         ],
         plugins: [
@@ -27,7 +27,7 @@ export default [
             commonjs(),
             ...env(),
             ...htmlExamples(),
-            browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
+            browsersync({ codeSync: false, server: 'lib', port: 4321, notify: false, open: false })
         ]
     }
 ]
