@@ -1,7 +1,7 @@
 {
     "name": "timecatjs",
     "author": "oct16",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "TimeCat Web Recorder",
     "main": "lib/timecat.cjs.js",
     "module": "lib/timecat.esm.js",
