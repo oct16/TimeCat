@@ -9,9 +9,9 @@ function move() {
         console.error(chalk.red('Document: Lib is not exist'))
         process.exit(0)
     }
-    fs.copyFileSync(...getPath('timecat.min.js'))
-    fs.copyFileSync(...getPath('timecat.cjs.js'))
-    fs.copyFileSync(...getPath('timecat.esm.js'))
+    fs.copyFileSync(...getPath('timecatjs.min.js'))
+    fs.copyFileSync(...getPath('timecatjs.cjs.js'))
+    fs.copyFileSync(...getPath('timecatjs.esm.js'))
     fs.copyFileSync(...getPath('timecatjs.d.ts'))
 }
 

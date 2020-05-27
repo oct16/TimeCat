@@ -11,17 +11,17 @@ export default {
         {
             name: 'cat',
             format: 'iife',
-            file: 'dist/timecat.min.js'
+            file: 'dist/timecatjs.min.js'
         },
         {
             name: 'cat',
             format: 'cjs',
-            file: 'dist/timecat.cjs.js'
+            file: 'dist/timecatjs.cjs.js'
         },
         {
             name: 'cat',
             format: 'esm',
-            file: 'dist/timecat.esm.js'
+            file: 'dist/timecatjs.esm.js'
         }
     ],
     plugins: [

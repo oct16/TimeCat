@@ -3,9 +3,9 @@
     "author": "oct16",
     "version": "1.0.2",
     "description": "TimeCat Web Recorder",
-    "main": "lib/timecat.cjs.js",
-    "module": "lib/timecat.esm.js",
-    "types": "lib/timecat.d.ts",
+    "main": "lib/timecatjs.cjs.js",
+    "module": "lib/timecatjs.esm.js",
+    "types": "lib/timecatjs.d.ts",
     "keywords": [
         "recorder",
         "replay",
@@ -28,7 +28,7 @@
         "lib": "node scripts/lib.js",
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",
-        "embed": "npm run build && cd dist && cp timecat.min.js ../../TimeCatChrome/src/assets/",
+        "embed": "npm run build && cd dist && cp timecatjs.min.js ../../TimeCatChrome/src/assets/",
         "count": "find . -type f -not -path './node_modules/*' -not -path './dist/*'  -name '*.ts' | xargs wc -l"
     },
     "devDependencies": {
