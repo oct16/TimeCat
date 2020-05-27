@@ -25,10 +25,11 @@
         "dev": "node scripts/dev.js",
         "build": "node scripts/build.js",
         "live": "node scripts/live.js",
+        "lib": "node scripts/lib.js",
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",
-        "embed": "npm run build && cd lib && cp timecat.min.js ../../TimeCatChrome/src/assets/",
-        "count": "find . -type f -not -path './node_modules/*' -not -path './lib/*'  -name '*.ts' | xargs wc -l"
+        "embed": "npm run build && cd dist && cp timecat.min.js ../../TimeCatChrome/src/assets/",
+        "count": "find . -type f -not -path './node_modules/*' -not -path './dist/*'  -name '*.ts' | xargs wc -l"
     },
     "devDependencies": {
         "@microsoft/api-extractor": "^7.8.9",
@@ -64,6 +65,6 @@
     },
     "homepage": "https://github.com/oct16/TimeCat#readme",
     "files": [
-        "lib/**/*"
+        "lib"
     ]
 }
