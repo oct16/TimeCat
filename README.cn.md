@@ -15,21 +15,28 @@ A Magical Web Recorder 🖥 网页录屏器
     04.26 Live Mode    
     03.31 Add Chrome Plugin 
 
+### Installation
+
+#### npm
+```
+npm i timecatjs -D
+```
+#### cdn
+    https://unpkg.com/timecatjs/lib/timecatjs.min.js
 ### Usage
 ```ts
-// In WIP
-import { record, replay } from 'TimeCat';
+import { record, replay } from 'timecatjs';
+// from cdn
+const { record, replay } = window.timecat
 
-record(options) 
+record()
 // or
-replay(options)
-
+replay()
 ```
 
 ### API Documentation
 
 [TYPEDOC](https://oct16.github.io/TimeCat/docs/globals.html)
-
 
 ### TimeCat -- 不可思议的Web录屏器
 
@@ -206,10 +213,9 @@ const elementList: [HTMLElement, string][] = [
 ![heart1](./assets/heart1.png)
 
 但是对于录屏这个业务场景来说，大部分场合我们并不要求100%还原精确的鼠标轨迹，我门只会关心两种情况：
-```
-1. 鼠标在哪里点击?
-2. 鼠标在哪里停留?
-```
+
+    1. 鼠标在哪里点击?
+    2. 鼠标在哪里停留?
 
 那么通过这个两个策略对鼠标轨迹进行精简后，画一个💖大约只需要6个点，通过样条曲线来模拟鼠标的虚拟轨迹，当 t = 0.2 的时候，就可以得到一个下图这样带着弧度的轨迹了
 
