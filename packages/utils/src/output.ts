@@ -31,7 +31,7 @@ async function initOptions(opts: Opts) {
     if (autoPlay) {
         scriptList.push({
             name: 'time-cat-init',
-            src: `cat.replay()`
+            src: `timecat.replay()`
         })
     }
     await injectScripts(scriptList)

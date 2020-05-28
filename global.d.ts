@@ -33,7 +33,7 @@ interface Window {
 
     __ReplayOptions__: any
 
-    cat: {
+    timecat: {
         record: (
             fn?: ((data: SnapshotData, db: IndexedDBOperator) => void) | undefined
         ) => {

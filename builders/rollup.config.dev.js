@@ -9,7 +9,7 @@ export default [
         input: 'index.ts',
         output: [
             {
-                name: 'cat',
+                name: 'timecat',
                 format: 'iife',
                 file: 'dist/timecatjs.min.js'
             }
