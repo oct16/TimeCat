@@ -1,14 +1,16 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from './dom'
-import { reduxStore, PlayerTypes, ProgressState, getTime, isSnapshot, delay } from '@TimeCat/utils'
+import { reduxStore, PlayerTypes, ProgressState, getTime, isSnapshot, delay, toTimeStamp } from '@TimeCat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData } from '@TimeCat/record'
+import { RecordData, AudioData } from '@TimeCat/record'
+import { BroadcasterComponent } from './broadcaster'
 
 export class PlayerComponent {
     c: ContainerComponent
     pointer: PointerComponent
     progress: ProgressComponent
+    broadcaster: BroadcasterComponent
     progressState: ProgressState
     data: RecordData[]
     speed = 0
@@ -21,14 +23,23 @@ export class PlayerComponent {
     startTime: number
 
     curViewEndTime: number
-    curViewDiffTime: number = 0
+    curViewDiffTime = 0
 
-    constructor(c: ContainerComponent, pointer: PointerComponent, progress: ProgressComponent) {
-        this.initViewState()
+    subtitlesIndex = 0
+    audioData: AudioData
 
+    constructor(
+        c: ContainerComponent,
+        pointer: PointerComponent,
+        progress: ProgressComponent,
+        broadcaster: BroadcasterComponent
+    ) {
         this.c = c
         this.pointer = pointer
         this.progress = progress
+        this.broadcaster = broadcaster
+
+        this.initViewState()
 
         if (!this.data.length) {
             // is live mode
@@ -63,10 +74,15 @@ export class PlayerComponent {
         const firstData = list[0]
         this.data = firstData.records
 
+        this.audioData = firstData.audio
+
         // live mode
         if (!this.data.length) {
             return
         }
+
+        this.subtitlesIndex = 0
+        this.broadcaster.cleanText()
 
         this.curViewEndTime = +this.data.slice(-1)[0].time
         this.curViewDiffTime = 0
@@ -93,6 +109,7 @@ export class PlayerComponent {
 
         window.__ReplayData__ = { index: nextIndex, ...nextData }
         this.data = nextData.records
+        this.audioData = nextData.audio
         this.curViewEndTime = +this.data.slice(-1)[0].time
         this.index = 0
         this.c.setViewState()
@@ -130,7 +147,7 @@ export class PlayerComponent {
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
                 // why delay 200ms here? cause we need to wait for all frame finished
                 await delay(200)
-                
+
                 this.switchNextView()
             }
 
@@ -156,6 +173,21 @@ export class PlayerComponent {
                 break
             }
         }
+
+        if (this.audioData) {
+            const subtitles = this.audioData.subtitles
+            const cur = this.frames[this.frameIndex] - this.startTime
+            const { start, end, text } = subtitles[this.subtitlesIndex]
+            const audioStartTime = toTimeStamp(start)
+            const audioEndTime = toTimeStamp(end)
+            if (cur > audioEndTime) {
+                this.broadcaster.cleanText()
+                this.subtitlesIndex++
+            } else if (cur > audioStartTime) {
+                this.broadcaster.updateText(text)
+            }
+        }
+
         this.frameIndex++
     }
 

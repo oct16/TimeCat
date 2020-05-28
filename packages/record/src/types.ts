@@ -115,3 +115,14 @@ export interface FormElementWatcherData {
 export type RecordEvent<T> = (e: T) => void
 
 export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher
+
+export interface AudioData {
+    src: string
+    subtitles: SubtitlesData[]
+}
+
+interface SubtitlesData {
+    start: string
+    end: string
+    text: string
+}

@@ -1,4 +1,4 @@
-import { RecordData } from '@TimeCat/record'
+import { RecordData, AudioData } from '@TimeCat/record'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { VNode, VSNode } from '@TimeCat/virtual-dom'
 
@@ -21,14 +21,25 @@ export function secondToDate(ms: number) {
     return timeStr.replace(/^00\:/, '')
 }
 
+export function toTimeStamp(timeStr: string) {
+    const parts = timeStr.split(':')
+    if (parts.length === 2) {
+        const [min, sec] = parts
+        return (+min * 60 + +sec) * 1000
+    }
+
+    const [hour, min, sec] = parts
+    return (+hour * 3600 + +min * 60 + +sec) * 1000
+}
+
 export function isSnapshot(frame: RecordData | SnapshotData) {
     return !!(frame as SnapshotData).vNode
 }
 
 export function classifyRecords(data: (SnapshotData | RecordData)[]) {
-    const dataList: { snapshot: SnapshotData; records: RecordData[] }[] = []
+    const dataList: { snapshot: SnapshotData; records: RecordData[]; audio?: AudioData }[] = []
 
-    let viewData: { snapshot: SnapshotData; records: RecordData[] }
+    let viewData: { snapshot: SnapshotData; records: RecordData[]; audio?: AudioData }
     data.forEach(item => {
         if (isSnapshot(item)) {
             viewData = { snapshot: item as SnapshotData, records: [] }

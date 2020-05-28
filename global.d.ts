@@ -21,6 +21,7 @@ interface Window {
     __ReplayStrData__: string
 
     __ReplayDataList__: Array<{
+        audio?: any
         snapshot: any
         records: any[]
     }>

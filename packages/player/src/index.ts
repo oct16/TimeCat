@@ -13,7 +13,7 @@ import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
 import { SnapshotData } from '@TimeCat/snapshot'
-import { RecordData } from '@TimeCat/record'
+import { RecordData, AudioData } from '@TimeCat/record'
 import { ReplayOptions } from './types'
 
 function getGZipData() {
@@ -31,6 +31,7 @@ function getGZipData() {
     const dataArray = JSON.parse(str) as Array<{
         snapshot: SnapshotData
         records: RecordData[]
+        audio?: AudioData
     }>
     if (isDev) {
         ;(window as any).data = dataArray
@@ -43,7 +44,9 @@ function dispatchEvent(type: string, data: RecordData) {
     window.dispatchEvent(event)
 }
 
-async function getAsyncDataFromSocket(uri: string): Promise<Array<{ snapshot: SnapshotData; records: [] }>> {
+async function getAsyncDataFromSocket(
+    uri: string
+): Promise<Array<{ snapshot: SnapshotData; records: RecordData[]; audio?: AudioData }>> {
     var socket = io(uri)
     return await new Promise(resolve => {
         let initialized = false
