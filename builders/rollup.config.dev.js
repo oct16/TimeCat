@@ -12,11 +12,6 @@ export default [
                 name: 'cat',
                 format: 'iife',
                 file: 'dist/timecatjs.min.js'
-            },
-            {
-                name: 'cat',
-                format: 'iife',
-                file: 'dist/chrome/timecatjs.min.js'
             }
         ],
         plugins: [
