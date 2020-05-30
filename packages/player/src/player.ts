@@ -3,7 +3,7 @@ import { updateDom } from './dom'
 import { reduxStore, PlayerTypes, ProgressState, getTime, isSnapshot, delay, toTimeStamp } from '@TimeCat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData } from '@TimeCat/record'
+import { RecordData, AudioData, base64ToFloat32Array, encodeWAV } from '@TimeCat/record'
 import { BroadcasterComponent } from './broadcaster'
 
 export class PlayerComponent {
@@ -11,6 +11,9 @@ export class PlayerComponent {
     pointer: PointerComponent
     progress: ProgressComponent
     broadcaster: BroadcasterComponent
+    audioNode: HTMLAudioElement
+    audioCurrentTime = 0
+
     progressState: ProgressState
     data: RecordData[]
     speed = 0
@@ -27,6 +30,7 @@ export class PlayerComponent {
 
     subtitlesIndex = 0
     audioData: AudioData
+    audioBlobUrl: string
 
     constructor(
         c: ContainerComponent,
@@ -38,6 +42,7 @@ export class PlayerComponent {
         this.pointer = pointer
         this.progress = progress
         this.broadcaster = broadcaster
+        this.audioNode = new Audio()
 
         this.initViewState()
 
@@ -59,6 +64,29 @@ export class PlayerComponent {
         }
     }
 
+    initAudio() {
+        if (!this.audioData || !this.audioData.audioBase64DataArray.length) {
+            return
+        }
+
+        const arrayData = this.audioData.audioBase64DataArray
+
+        const f32ArrayData: Float32Array[] = []
+        for (let i = 0; i < arrayData.length; i++) {
+            const f32 = base64ToFloat32Array(arrayData[i])
+            f32ArrayData.push(f32)
+        }
+
+        const audioBlob = encodeWAV(f32ArrayData, {
+            sampleBits: 16,
+            sampleRate: 44100,
+            channelCount: 1,
+            bufferSize: 256
+        })
+        const audioBlobUrl = URL.createObjectURL(audioBlob)
+        this.audioBlobUrl = audioBlobUrl
+    }
+
     streamHandle(this: PlayerComponent, e: CustomEvent) {
         const frame = e.detail as RecordData
         if (isSnapshot(frame)) {
@@ -75,6 +103,7 @@ export class PlayerComponent {
         this.data = firstData.records
 
         this.audioData = firstData.audio
+        this.initAudio()
 
         // live mode
         if (!this.data.length) {
@@ -110,12 +139,14 @@ export class PlayerComponent {
         window.__ReplayData__ = { index: nextIndex, ...nextData }
         this.data = nextData.records
         this.audioData = nextData.audio
+        this.initAudio()
         this.curViewEndTime = +this.data.slice(-1)[0].time
         this.index = 0
         this.c.setViewState()
     }
 
     play() {
+        this.playAudio()
         if (this.index === 0) {
             this.progress.resetThumb()
             if (!this.isFirstTimePlay) {
@@ -159,6 +190,30 @@ export class PlayerComponent {
         }
     }
 
+    playAudio() {
+        if (!this.audioData || !this.audioData.audioBase64DataArray.length) {
+            return
+        }
+
+        if (!this.audioBlobUrl) {
+            this.pauseAudio()
+        }
+        if (this.audioNode) {
+            this.audioNode.src = this.audioBlobUrl
+            if (this.audioCurrentTime) {
+                this.audioNode.currentTime = this.audioCurrentTime
+            }
+            this.audioNode.play()
+        }
+    }
+
+    pauseAudio() {
+        if (this.audioNode) {
+            this.audioNode.pause()
+            this.audioCurrentTime = this.audioNode.currentTime
+        }
+    }
+
     renderEachFrame(time: number) {
         const { startTime } = this.progressState
         this.progress.updateTimer((time - startTime) / 1000)
@@ -174,7 +229,7 @@ export class PlayerComponent {
             }
         }
 
-        if (this.audioData) {
+        if (this.audioData && this.audioData.subtitles.length) {
             const subtitles = this.audioData.subtitles
             const cur = this.frames[this.frameIndex] - this.startTime
             const { start, end, text } = subtitles[this.subtitlesIndex]
@@ -199,6 +254,7 @@ export class PlayerComponent {
                 speed: 0
             }
         })
+        this.pauseAudio()
     }
 
     stop() {
@@ -207,6 +263,8 @@ export class PlayerComponent {
         this.frameIndex = 0
         this.lastPercentage = 0
         this.pause()
+
+        this.audioCurrentTime = 0
     }
 
     execFrame(this: PlayerComponent, record: RecordData) {

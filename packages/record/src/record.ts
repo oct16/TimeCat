@@ -1,6 +1,7 @@
 import { watchers } from './watcher'
-import { RecordData, RecordEvent } from './types'
-import { listenerStore, IndexedDBOperator, DBPromise } from '@TimeCat/utils'
+import { recordAudio } from './audio'
+import { RecordData, RecordEvent, RecordOptions } from './types'
+import { listenerStore, DBPromise } from '@TimeCat/utils'
 import { snapshots, SnapshotData } from '@TimeCat/snapshot'
 const ctrl = {
     unsubscribe: () => {
@@ -15,21 +16,29 @@ function getSnapshotData(emit: RecordEvent<SnapshotData>): void {
     emit({ ...initInfo, ...snapshot })
 }
 
-function recordAll(emitter?: (data: RecordData & SnapshotData) => void) {
-    const recordTasks: Function[] = [getSnapshotData, ...Object.values(watchers)]
-    recordTasks.forEach(task => task(emitter))
+function getRecorders(options: RecordOptions) {
+    const recorders: Function[] = [getSnapshotData, ...Object.values(watchers)]
+    if (options) {
+        const { audio } = options
+        if (audio) {
+            recorders.push(recordAudio)
+        }
+    }
+    return recorders
 }
 
-export const record = (fn?: (data: RecordData, db: IndexedDBOperator) => void) => {
+export const record = (options: RecordOptions) => {
     DBPromise.then(db => {
         db.clear()
-        recordAll(data => {
-            if (fn) {
-                fn(data, db)
-                return
-            }
-            db.add(data)
-        })
+        getRecorders(options).forEach(task =>
+            task((data: RecordData & SnapshotData) => {
+                if (options && options.emitter) {
+                    options.emitter(data, db)
+                    return
+                }
+                db.add(data)
+            })
+        )
     })
     return ctrl
 }

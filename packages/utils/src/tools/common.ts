@@ -1,4 +1,4 @@
-import { RecordData, AudioData } from '@TimeCat/record'
+import { RecordData, AudioData, AudioWatcher } from '@TimeCat/record'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { VNode, VSNode } from '@TimeCat/virtual-dom'
 
@@ -39,13 +39,27 @@ export function isSnapshot(frame: RecordData | SnapshotData) {
 export function classifyRecords(data: (SnapshotData | RecordData)[]) {
     const dataList: { snapshot: SnapshotData; records: RecordData[]; audio?: AudioData }[] = []
 
-    let viewData: { snapshot: SnapshotData; records: RecordData[]; audio?: AudioData }
+    function isAudio(frame: RecordData | SnapshotData) {
+        return (frame as RecordData).type === 'AUDIO'
+    }
+
+    let dataBasket: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }
     data.forEach(item => {
         if (isSnapshot(item)) {
-            viewData = { snapshot: item as SnapshotData, records: [] }
-            dataList.push(viewData)
+            dataBasket = {
+                snapshot: item as SnapshotData,
+                records: [],
+                audio: {
+                    audioBase64DataArray: [],
+                    subtitles: []
+                }
+            }
+            dataList.push(dataBasket)
+        } else if (isAudio(item)) {
+            const audioData = item as AudioWatcher
+            dataBasket.audio.audioBase64DataArray.push(...audioData.data.data)
         } else {
-            viewData.records.push(item as RecordData)
+            dataBasket.records.push(item as RecordData)
         }
     })
 

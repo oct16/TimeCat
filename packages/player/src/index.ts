@@ -100,11 +100,11 @@ export async function replay(options: ReplayOptions = {}) {
         return
     }
 
-    const { records } = replayData
+    const { records, audio } = replayData
 
     const c = new ContainerComponent()
 
-    fmp.ready(() => {
+    fmp.ready(async () => {
         new Panel(c)
 
         if (records.length) {
@@ -130,6 +130,12 @@ export async function replay(options: ReplayOptions = {}) {
                 }
             })
 
+            if (audio && audio.audioBase64DataArray.length) {
+                await waitStart()
+            } else {
+                removeStartPage()
+            }
+
             reduxStore.dispatch({
                 type: PlayerTypes.SPEED,
                 data: { speed: 1 }
@@ -142,5 +148,24 @@ export async function replay(options: ReplayOptions = {}) {
         if (panel) {
             panel.setAttribute('style', 'display: none')
         }
+    }
+
+    function removeStartPage() {
+        const startPage = document.querySelector('#cat-start-page')!
+        startPage.parentElement!.removeChild(startPage)
+    }
+
+    async function waitStart(): Promise<void> {
+        const startPage = document.querySelector('#cat-start-page')! as HTMLElement
+        startPage.setAttribute('style', '')
+        return new Promise(r => {
+            const playBtn = document.querySelector('.play-btn')!
+            playBtn.addEventListener('click', async () => {
+                r()
+                startPage.className = 'clearly'
+                await new Promise(rr => setTimeout(() => rr(), 500))
+                removeStartPage
+            })
+        })
     }
 }

@@ -28,6 +28,7 @@ interface Window {
 
     __ReplayData__: {
         index: number
+        audio?: any
         snapshot: any
         records: any[]
     }

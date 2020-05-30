@@ -1,11 +1,13 @@
 import { VNode, VSNode } from '@TimeCat/virtual-dom'
+import { IndexedDBOperator } from '@TimeCat/utils'
 
 export enum RecordType {
     'WINDOW' = 'WINDOW',
     'SCROLL' = 'SCROLL',
     'MOUSE' = 'MOUSE',
     'DOM_UPDATE' = 'DOM_UPDATE',
-    'FORM_EL_UPDATE' = 'FORM_EL_UPDATE'
+    'FORM_EL_UPDATE' = 'FORM_EL_UPDATE',
+    'AUDIO' = 'AUDIO',
 }
 
 export enum FormElementEvent {
@@ -112,12 +114,21 @@ export interface FormElementWatcherData {
     value?: string
 }
 
+export interface AudioWatcher {
+    type: RecordType.AUDIO
+    data: {
+        type: "base64",
+        data: string[]
+    }
+    time: string
+}
+
 export type RecordEvent<T> = (e: T) => void
 
-export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher
+export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher | AudioWatcher
 
 export interface AudioData {
-    src: string
+    audioBase64DataArray: string[]
     subtitles: SubtitlesData[]
 }
 
@@ -126,3 +137,17 @@ interface SubtitlesData {
     end: string
     text: string
 }
+
+export interface RecordOptions {
+    audio?: boolean
+    emitter?: (data: RecordData, db: IndexedDBOperator) => void
+}
+
+export interface IRecorderOptions {
+    sampleBits?: number
+    sampleRate?: number
+    channelCount?: 1 | 2
+    bufferSize?: 256 | 512 | 1024 | 2064 | 4096
+}
+
+export type IRecorderStatus = 'PAUSE' | 'RECORDING' | 'STOP'
