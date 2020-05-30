@@ -1,8 +1,13 @@
 <p align="center">
 <h1 align="center">TimeCat</h1>
-<div align="center">
+<h6 align="center">
 A Magical Web Recorder 🖥 网页录屏器
-</div>
+</h6>
+<h6 align="center">
+
+[![Analytics](https://ga-beacon.appspot.com/UA-151180797-1/timecat-home)](https://github.com/oct16/timeCat) ![GitHub issues](https://img.shields.io/github/issues-raw/oct16/TimeCat) ![GitHub last commit](https://img.shields.io/github/last-commit/oct16/timecat) ![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)
+
+<h6>
 
 ### 项目简介
 
@@ -10,7 +15,7 @@ A Magical Web Recorder 🖥 网页录屏器
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome浏览器
 
-### Features
+### Progress
     05.24 Beta Core 1.0.0-Beta Released
     04.26 Live Mode    
     03.31 Add Chrome Plugin 
