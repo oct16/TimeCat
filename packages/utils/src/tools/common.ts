@@ -1,4 +1,4 @@
-import { RecordData, AudioData, AudioWatcher } from '@TimeCat/record'
+import { RecordData, AudioData, AudioWatcher, AudioStrList, IRecorderOptions } from '@TimeCat/record'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { VNode, VSNode } from '@TimeCat/virtual-dom'
 
@@ -37,8 +37,11 @@ export function isSnapshot(frame: RecordData | SnapshotData) {
 }
 
 export function classifyRecords(data: (SnapshotData | RecordData)[]) {
-    const dataList: { snapshot: SnapshotData; records: RecordData[]; audio?: AudioData }[] = []
+    const dataList: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }[] = []
 
+    function isAudioBufferStr(frame: AudioWatcher) {
+        return frame.data.type === 'base64'
+    }
     function isAudio(frame: RecordData | SnapshotData) {
         return (frame as RecordData).type === 'AUDIO'
     }
@@ -50,14 +53,19 @@ export function classifyRecords(data: (SnapshotData | RecordData)[]) {
                 snapshot: item as SnapshotData,
                 records: [],
                 audio: {
-                    audioBase64DataArray: [],
-                    subtitles: []
+                    bufferStrList: [],
+                    subtitles: [],
+                    opts: {}
                 }
             }
             dataList.push(dataBasket)
         } else if (isAudio(item)) {
-            const audioData = item as AudioWatcher
-            dataBasket.audio.audioBase64DataArray.push(...audioData.data.data)
+            if (isAudioBufferStr(item as AudioWatcher)) {
+                const audioData = item as AudioWatcher
+                dataBasket.audio.bufferStrList.push(...(audioData.data as AudioStrList).data)
+            } else {
+                dataBasket.audio.opts = (item as AudioWatcher).data.data as IRecorderOptions
+            }
         } else {
             dataBasket.records.push(item as RecordData)
         }

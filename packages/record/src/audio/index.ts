@@ -13,6 +13,15 @@ export function recordAudio(emitter: (data: AudioWatcher) => void) {
         recorder.stop()
     })
 
+    emitter({
+        type: RecordType.AUDIO,
+        data: {
+            type: 'opts',
+            data: recorder.getOptions()
+        },
+        time: getTime().toString()
+    })
+
     recorder.onProgress = audioBase64Data => {
         emitter({
             type: RecordType.AUDIO,

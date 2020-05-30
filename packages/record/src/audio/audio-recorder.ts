@@ -18,6 +18,10 @@ export class Recorder {
         this.setOptions(opts)
     }
 
+    getOptions(): IRecorderOptions {
+        return this.opts
+    }
+
     setOptions(opts?: IRecorderOptions) {
         const { sampleBits, sampleRate, channelCount, bufferSize } = opts || {}
         this.opts = {

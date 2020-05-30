@@ -31,7 +31,7 @@ function getGZipData() {
     const dataArray = JSON.parse(str) as Array<{
         snapshot: SnapshotData
         records: RecordData[]
-        audio?: AudioData
+        audio: AudioData
     }>
     if (isDev) {
         ;(window as any).data = dataArray
@@ -46,7 +46,7 @@ function dispatchEvent(type: string, data: RecordData) {
 
 async function getAsyncDataFromSocket(
     uri: string
-): Promise<Array<{ snapshot: SnapshotData; records: RecordData[]; audio?: AudioData }>> {
+): Promise<Array<{ snapshot: SnapshotData; records: RecordData[]; audio: AudioData }>> {
     var socket = io(uri)
     return await new Promise(resolve => {
         let initialized = false
@@ -55,7 +55,9 @@ async function getAsyncDataFromSocket(
                 dispatchEvent('record-data', data as RecordData)
             } else {
                 if (data && isSnapshot(data)) {
-                    resolve([{ snapshot: data as SnapshotData, records: [] }])
+                    resolve([
+                        { snapshot: data as SnapshotData, records: [], audio: { bufferStrList: [], subtitles: [], opts: {} } }
+                    ])
                     fmp.observe()
                     initialized = true
                 }
@@ -130,7 +132,7 @@ export async function replay(options: ReplayOptions = {}) {
                 }
             })
 
-            if (audio && audio.audioBase64DataArray.length) {
+            if (audio && audio.bufferStrList.length) {
                 await waitStart()
             } else {
                 removeStartPage()
@@ -164,7 +166,7 @@ export async function replay(options: ReplayOptions = {}) {
                 r()
                 startPage.className = 'clearly'
                 await new Promise(rr => setTimeout(() => rr(), 500))
-                removeStartPage
+                removeStartPage()
             })
         })
     }

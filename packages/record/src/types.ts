@@ -7,7 +7,7 @@ export enum RecordType {
     'MOUSE' = 'MOUSE',
     'DOM_UPDATE' = 'DOM_UPDATE',
     'FORM_EL_UPDATE' = 'FORM_EL_UPDATE',
-    'AUDIO' = 'AUDIO',
+    'AUDIO' = 'AUDIO'
 }
 
 export enum FormElementEvent {
@@ -116,11 +116,16 @@ export interface FormElementWatcherData {
 
 export interface AudioWatcher {
     type: RecordType.AUDIO
-    data: {
-        type: "base64",
-        data: string[]
-    }
+    data: AudioStrList | AudioOptions
     time: string
+}
+export interface AudioOptions {
+    type: 'opts'
+    data: IRecorderOptions
+}
+export interface AudioStrList {
+    type: 'base64'
+    data: string[]
 }
 
 export type RecordEvent<T> = (e: T) => void
@@ -128,7 +133,8 @@ export type RecordEvent<T> = (e: T) => void
 export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher | AudioWatcher
 
 export interface AudioData {
-    audioBase64DataArray: string[]
+    opts: IRecorderOptions
+    bufferStrList: string[]
     subtitles: SubtitlesData[]
 }
 

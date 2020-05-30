@@ -21,14 +21,14 @@ interface Window {
     __ReplayStrData__: string
 
     __ReplayDataList__: Array<{
-        audio?: any
+        audio: any
         snapshot: any
         records: any[]
     }>
 
     __ReplayData__: {
         index: number
-        audio?: any
+        audio: any
         snapshot: any
         records: any[]
     }

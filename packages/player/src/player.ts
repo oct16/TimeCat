@@ -65,24 +65,19 @@ export class PlayerComponent {
     }
 
     initAudio() {
-        if (!this.audioData || !this.audioData.audioBase64DataArray.length) {
+        if (!this.audioData || !this.audioData.bufferStrList.length) {
             return
         }
 
-        const arrayData = this.audioData.audioBase64DataArray
+        const bufferStrList = this.audioData.bufferStrList
 
         const f32ArrayData: Float32Array[] = []
-        for (let i = 0; i < arrayData.length; i++) {
-            const f32 = base64ToFloat32Array(arrayData[i])
+        for (let i = 0; i < bufferStrList.length; i++) {
+            const f32 = base64ToFloat32Array(bufferStrList[i])
             f32ArrayData.push(f32)
         }
 
-        const audioBlob = encodeWAV(f32ArrayData, {
-            sampleBits: 16,
-            sampleRate: 44100,
-            channelCount: 1,
-            bufferSize: 256
-        })
+        const audioBlob = encodeWAV(f32ArrayData, this.audioData.opts)
         const audioBlobUrl = URL.createObjectURL(audioBlob)
         this.audioBlobUrl = audioBlobUrl
     }
@@ -191,7 +186,7 @@ export class PlayerComponent {
     }
 
     playAudio() {
-        if (!this.audioData || !this.audioData.audioBase64DataArray.length) {
+        if (!this.audioData || !this.audioData.bufferStrList.length) {
             return
         }
 
