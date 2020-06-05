@@ -70,14 +70,13 @@ export class PlayerComponent {
         }
 
         const bufferStrList = this.audioData.bufferStrList
-
-        const f32ArrayData: Float32Array[] = []
+        const dataArray: Float32Array[] = []
         for (let i = 0; i < bufferStrList.length; i++) {
-            const f32 = base64ToFloat32Array(bufferStrList[i])
-            f32ArrayData.push(f32)
+            const data = base64ToFloat32Array(bufferStrList[i])
+            dataArray.push(data)
         }
 
-        const audioBlob = encodeWAV(f32ArrayData, this.audioData.opts)
+        const audioBlob = encodeWAV(dataArray, this.audioData.opts)
         const audioBlobUrl = URL.createObjectURL(audioBlob)
         this.audioBlobUrl = audioBlobUrl
     }

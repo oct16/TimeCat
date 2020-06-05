@@ -3,9 +3,7 @@ import { AudioWatcher, RecordType } from '../types'
 import { getTime, listenerStore } from '@TimeCat/utils'
 
 export function recordAudio(emitter: (data: AudioWatcher) => void) {
-    const recorder = new Recorder({
-        bufferSize: 256 // min of range
-    })
+    const recorder = new Recorder()
 
     recorder.start()
 

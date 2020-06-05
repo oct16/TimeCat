@@ -13,7 +13,7 @@ import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
 import { SnapshotData } from '@TimeCat/snapshot'
-import { RecordData, AudioData } from '@TimeCat/record'
+import { RecordData, AudioData, RecorderOptions } from '@TimeCat/record'
 import { ReplayOptions } from './types'
 
 function getGZipData() {
@@ -28,15 +28,15 @@ function getGZipData() {
     const str = pako.ungzip(arrayData, {
         to: 'string'
     })
-    const dataArray = JSON.parse(str) as Array<{
+    const replayData = JSON.parse(str) as Array<{
         snapshot: SnapshotData
         records: RecordData[]
         audio: AudioData
     }>
     if (isDev) {
-        ;(window as any).data = dataArray
+        ;(window as any).data = replayData
     }
-    return dataArray
+    return replayData
 }
 
 function dispatchEvent(type: string, data: RecordData) {
@@ -56,7 +56,11 @@ async function getAsyncDataFromSocket(
             } else {
                 if (data && isSnapshot(data)) {
                     resolve([
-                        { snapshot: data as SnapshotData, records: [], audio: { bufferStrList: [], subtitles: [], opts: {} } }
+                        {
+                            snapshot: data as SnapshotData,
+                            records: [],
+                            audio: { bufferStrList: [], subtitles: [], opts: {}  as RecorderOptions }
+                        }
                     ])
                     fmp.observe()
                     initialized = true

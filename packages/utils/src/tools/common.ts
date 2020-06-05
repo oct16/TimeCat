@@ -1,4 +1,4 @@
-import { RecordData, AudioData, AudioWatcher, AudioStrList, IRecorderOptions } from '@TimeCat/record'
+import { RecordData, AudioData, AudioWatcher, AudioStrList, RecorderOptions } from '@TimeCat/record'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { VNode, VSNode } from '@TimeCat/virtual-dom'
 
@@ -55,7 +55,7 @@ export function classifyRecords(data: (SnapshotData | RecordData)[]) {
                 audio: {
                     bufferStrList: [],
                     subtitles: [],
-                    opts: {}
+                    opts: {} as RecorderOptions
                 }
             }
             dataList.push(dataBasket)
@@ -64,7 +64,7 @@ export function classifyRecords(data: (SnapshotData | RecordData)[]) {
                 const audioData = item as AudioWatcher
                 dataBasket.audio.bufferStrList.push(...(audioData.data as AudioStrList).data)
             } else {
-                dataBasket.audio.opts = (item as AudioWatcher).data.data as IRecorderOptions
+                dataBasket.audio.opts = (item as AudioWatcher).data.data as RecorderOptions
             }
         } else {
             dataBasket.records.push(item as RecordData)

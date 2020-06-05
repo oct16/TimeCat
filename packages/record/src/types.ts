@@ -121,7 +121,7 @@ export interface AudioWatcher {
 }
 export interface AudioOptions {
     type: 'opts'
-    data: IRecorderOptions
+    data: RecorderOptions
 }
 export interface AudioStrList {
     type: 'base64'
@@ -133,7 +133,7 @@ export type RecordEvent<T> = (e: T) => void
 export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher | AudioWatcher
 
 export interface AudioData {
-    opts: IRecorderOptions
+    opts: RecorderOptions
     bufferStrList: string[]
     subtitles: SubtitlesData[]
 }
@@ -149,11 +149,10 @@ export interface RecordOptions {
     emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
 
-export interface IRecorderOptions {
-    sampleBits?: number
-    sampleRate?: number
-    channelCount?: 1 | 2
-    bufferSize?: 256 | 512 | 1024 | 2064 | 4096
+export interface RecorderOptions {
+    sampleBits: 8 | 16
+    sampleRate: 8000 | 16000 | 22050 | 24000 | 44100 | 48000
+    channelCount: 1 | 2
 }
 
 export type IRecorderStatus = 'PAUSE' | 'RECORDING' | 'STOP'

@@ -1,9 +1,15 @@
-import { IRecorderOptions, IRecorderStatus } from '../types'
+import { RecorderOptions, IRecorderStatus } from '../types'
 import { float32ArrayToBase64 } from './transform'
 
 export class Recorder {
+    static defaultRecordOptions = {
+        sampleBits: 8,
+        sampleRate: 8000,
+        channelCount: 1
+    } as RecorderOptions
+
     private status: IRecorderStatus
-    private opts: IRecorderOptions = {}
+    private opts: RecorderOptions
 
     private audioContext: AudioContext
     private mediaStream: MediaStream
@@ -14,55 +20,44 @@ export class Recorder {
 
     onProgress: ((audioBase64Data: string[]) => void) | null
 
-    constructor(opts?: IRecorderOptions) {
+    constructor(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
         this.setOptions(opts)
     }
 
-    getOptions(): IRecorderOptions {
+    getOptions(): RecorderOptions {
         return this.opts
     }
 
-    setOptions(opts?: IRecorderOptions) {
-        const { sampleBits, sampleRate, channelCount, bufferSize } = opts || {}
+    setOptions(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
+        const { sampleBits, sampleRate, channelCount } = opts
         this.opts = {
-            bufferSize: this.opts.bufferSize || bufferSize || 1024,
-            sampleBits: this.opts.sampleBits || sampleBits || 16,
-            sampleRate: this.opts.sampleRate || sampleRate || 44100,
-            channelCount: this.opts.channelCount || channelCount || 1
+            sampleBits: sampleBits || this.opts.sampleBits,
+            sampleRate: sampleRate || this.opts.sampleRate,
+            channelCount: channelCount || this.opts.channelCount
         }
     }
 
     private beginRecord() {
-        const b64strArray: string[] = []
-        const timerGap = 5 // each duration around 0.092s
-
         this.audioContext = new window.AudioContext({ sampleRate: this.opts.sampleRate })
+
         this.mediaNode = this.audioContext.createMediaStreamSource(this.mediaStream)
 
         let createScript = this.audioContext.createScriptProcessor
 
-        this.processNode = createScript.call(
-            this.audioContext,
-            this.opts.bufferSize,
-            this.opts.channelCount,
-            this.opts.channelCount
-        )
+        this.processNode = createScript.call(this.audioContext, 4096, this.opts.channelCount, this.opts.channelCount)
 
         this.processNode.connect(this.audioContext.destination)
         this.processNode.onaudioprocess = onAudioProcess.bind(this)
 
         function onAudioProcess(this: Recorder, event: AudioProcessingEvent) {
             const inputBuffer = event.inputBuffer
-            const audioBuffer_0 = inputBuffer.getChannelData(0)
+
+            // 1 channel, temporarily
+            const audioBuffer_0 = inputBuffer.getChannelData(0).slice()
 
             if (this.onProgress) {
-                if (b64strArray.length >= timerGap) {
-                    this.onProgress(b64strArray.slice())
-                    b64strArray.length = 0
-                }
-
-                const b64str = float32ArrayToBase64(audioBuffer_0.slice())
-                b64strArray.push(b64str)
+                const data = [float32ArrayToBase64(audioBuffer_0)]
+                this.onProgress(data)
             }
         }
         this.mediaNode.connect(this.processNode)
@@ -82,7 +77,7 @@ export class Recorder {
         })
     }
 
-    public async start(opts?: IRecorderOptions) {
+    public async start(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
         this.setOptions(opts)
         this.mediaStream = await this.initRecorder()
         this.beginRecord()
