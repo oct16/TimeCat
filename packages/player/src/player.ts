@@ -177,8 +177,6 @@ export class PlayerComponent {
                 this.switchNextView()
             }
 
-            // console.log(currTime, nextTime)
-
             if (currTime >= nextTime) {
                 this.renderEachFrame(currTime)
             }

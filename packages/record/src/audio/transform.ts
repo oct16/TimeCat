@@ -48,7 +48,7 @@ function mergeArray(list: Float32Array[]) {
 
 function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRate }: RecorderOptions) {
     const WAV_HEAD_SIZE = 44
-    let buffer = new ArrayBuffer(44 + audioData.byteLength)
+    let buffer = new ArrayBuffer(WAV_HEAD_SIZE + audioData.byteLength)
     const isLittleEndian = true
     // control buffer
     const view = new DataView(buffer)
@@ -92,7 +92,6 @@ function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRa
         offset++
         // offset += 2
     }
-    console.log('view', view.byteLength)
 
     return view
 }
