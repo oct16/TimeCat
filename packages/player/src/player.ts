@@ -24,6 +24,7 @@ export class PlayerComponent {
     frames: number[]
     requestID: number
     startTime: number
+    elapsedTime = 0
 
     curViewEndTime: number
     curViewDiffTime = 0
@@ -176,9 +177,13 @@ export class PlayerComponent {
                 this.switchNextView()
             }
 
+            // console.log(currTime, nextTime)
+
             if (currTime >= nextTime) {
                 this.renderEachFrame(currTime)
             }
+
+            this.elapsedTime = (currTime - this.frames[0]) / 1000
 
             this.requestID = requestAnimationFrame(loop.bind(this))
         }
@@ -193,11 +198,20 @@ export class PlayerComponent {
             this.pauseAudio()
         }
         if (this.audioNode) {
-            this.audioNode.src = this.audioBlobUrl
-            if (this.audioCurrentTime) {
-                this.audioNode.currentTime = this.audioCurrentTime
+            if (!this.audioNode.src || this.audioNode.src !== this.audioBlobUrl) {
+                this.audioNode.src = this.audioBlobUrl
             }
-            this.audioNode.play()
+
+            // for pause and forward
+            if (this.audioCurrentTime) {
+                this.audioNode.currentTime = this.elapsedTime + 0.5
+            }
+
+            if (this.speed > 1) {
+                this.audioNode.pause()
+            } else {
+                this.audioNode.play()
+            }
         }
     }
 
@@ -256,6 +270,7 @@ export class PlayerComponent {
         this.index = 0
         this.frameIndex = 0
         this.lastPercentage = 0
+        this.elapsedTime = 0 // unit: sec
         this.pause()
 
         this.audioCurrentTime = 0
