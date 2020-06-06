@@ -24,8 +24,15 @@ function getGZipData() {
     if (!data) {
         return null
     }
-    const arrayData = (data.split(',') as unknown) as number[]
-    const str = pako.ungzip(arrayData, {
+
+    const codeArray: number[] = []
+    const strArray = data.split('')
+    for (let i = 0; i < strArray.length; i++) {
+        const num = strArray[i].charCodeAt(0)
+        codeArray.push(num >= 300 ? num - 300 : num)
+    }
+
+    const str = pako.ungzip(codeArray, {
         to: 'string'
     })
     const replayData = JSON.parse(str) as Array<{
@@ -59,7 +66,7 @@ async function getAsyncDataFromSocket(
                         {
                             snapshot: data as SnapshotData,
                             records: [],
-                            audio: { bufferStrList: [], subtitles: [], opts: {}  as RecorderOptions }
+                            audio: { bufferStrList: [], subtitles: [], opts: {} as RecorderOptions }
                         }
                     ])
                     fmp.observe()
