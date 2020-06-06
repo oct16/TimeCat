@@ -237,14 +237,16 @@ export class PlayerComponent {
 
         if (this.audioData && this.audioData.subtitles.length) {
             const subtitles = this.audioData.subtitles
-            const cur = this.frames[this.frameIndex] - this.startTime
             const { start, end, text } = subtitles[this.subtitlesIndex]
             const audioStartTime = toTimeStamp(start)
             const audioEndTime = toTimeStamp(end)
-            if (cur > audioEndTime) {
+
+            if (this.elapsedTime > audioEndTime / 1000) {
                 this.broadcaster.cleanText()
-                this.subtitlesIndex++
-            } else if (cur > audioStartTime) {
+                if (this.subtitlesIndex < subtitles.length - 1) {
+                    this.subtitlesIndex++
+                }
+            } else if (this.elapsedTime > audioStartTime / 1000) {
                 this.broadcaster.updateText(text)
             }
         }
