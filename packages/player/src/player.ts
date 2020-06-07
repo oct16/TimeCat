@@ -12,7 +12,6 @@ export class PlayerComponent {
     progress: ProgressComponent
     broadcaster: BroadcasterComponent
     audioNode: HTMLAudioElement
-    audioCurrentTime = 0
 
     progressState: ProgressState
     data: RecordData[]
@@ -200,10 +199,7 @@ export class PlayerComponent {
                 this.audioNode.src = this.audioBlobUrl
             }
 
-            // for pause and forward
-            if (this.audioCurrentTime) {
-                this.audioNode.currentTime = this.elapsedTime + 0.5
-            }
+            this.audioNode.currentTime = this.elapsedTime + 0.5
 
             if (this.speed > 1) {
                 this.audioNode.pause()
@@ -216,7 +212,6 @@ export class PlayerComponent {
     pauseAudio() {
         if (this.audioNode) {
             this.audioNode.pause()
-            this.audioCurrentTime = this.audioNode.currentTime
         }
     }
 
@@ -273,7 +268,7 @@ export class PlayerComponent {
         this.elapsedTime = 0 // unit: sec
         this.pause()
 
-        this.audioCurrentTime = 0
+        this.audioNode.currentTime = 0
     }
 
     execFrame(this: PlayerComponent, record: RecordData) {
