@@ -2,17 +2,16 @@ const fs = require('fs-extra')
 const path = require('path')
 const chalk = require('chalk')
 
+const copyList = ['min.js', 'cjs.js', 'esm.js', 'd.ts'].map(i => 'timecatjs.' + i)
+
 move()
 
 function move() {
-    if (fs.ensureDirSync(path.join(__dirname, '../lib'))) {
-        console.error(chalk.red('Document: Lib is not exist'))
-        process.exit(0)
-    }
-    fs.copyFileSync(...getPath('timecatjs.min.js'))
-    fs.copyFileSync(...getPath('timecatjs.cjs.js'))
-    fs.copyFileSync(...getPath('timecatjs.esm.js'))
-    fs.copyFileSync(...getPath('timecatjs.d.ts'))
+    const libPath = path.join(__dirname, '../lib')
+    fs.ensureDirSync(libPath)
+    fs.emptyDirSync(libPath)
+    copyList.forEach(path => fs.copyFileSync(...getPath(path)))
+    console.log(chalk.green(`Copy ${copyList.join(', ')} into Lib`))
 }
 
 function getPath(fileName) {
