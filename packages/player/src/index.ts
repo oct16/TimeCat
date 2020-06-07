@@ -145,9 +145,8 @@ export async function replay(options: ReplayOptions = {}) {
 
             if (audio && audio.bufferStrList.length) {
                 await waitStart()
-            } else {
-                removeStartPage()
             }
+            removeStartPage()
 
             reduxStore.dispatch({
                 type: PlayerTypes.SPEED,
@@ -177,7 +176,6 @@ export async function replay(options: ReplayOptions = {}) {
                 r()
                 startPage.className = 'clearly'
                 await new Promise(rr => setTimeout(() => rr(), 500))
-                removeStartPage()
             })
         })
     }
