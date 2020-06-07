@@ -1,7 +1,7 @@
 import { TPL } from './tpl'
 import { DBPromise } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
-import { isDev, classifyRecords } from './tools/common'
+import { isDev, classifyRecords, download } from './tools/common'
 import pako from 'pako'
 
 type ScriptItem = { name: string; src: string }
@@ -16,12 +16,8 @@ export async function exportReplay(opts: Opts = {}) {
 }
 
 function createAndDownloadFile(fileName: string, content: string) {
-    var aTag = document.createElement('a')
-    var blob = new Blob([content], { type: 'text/html' })
-    aTag.download = fileName + '.html'
-    aTag.href = URL.createObjectURL(blob)
-    aTag.click()
-    URL.revokeObjectURL(blob as any)
+    const blob = new Blob([content], { type: 'text/html' })
+    download(blob, fileName + '.html')
 }
 
 async function initOptions(html: Document, opts: Opts) {

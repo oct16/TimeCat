@@ -82,3 +82,11 @@ export async function delay(t = 200) {
 export function isVNode(n: VNode | VSNode) {
     return !!(n as VNode).tag
 }
+
+export function download(blob: Blob, name: string) {
+    var tag = document.createElement('a')
+    tag.download = name
+    tag.href = URL.createObjectURL(blob)
+    tag.click()
+    URL.revokeObjectURL(blob as any)
+}

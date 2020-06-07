@@ -1,4 +1,5 @@
 import { RecorderOptions } from '../types'
+import { isDev, download } from '@TimeCat/utils'
 
 function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
     const { sampleBits } = opts
@@ -31,6 +32,10 @@ export function encodeWAV(data: Float32Array[], opts: RecorderOptions) {
     let blob = new Blob([arrayBuffer], {
         type: 'audio/wav'
     })
+
+    if (isDev) {
+        ;(window as any).downloadWAV = () => download(blob, 'test-wav.wav')
+    }
 
     return blob
 }
