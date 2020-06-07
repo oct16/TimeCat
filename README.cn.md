@@ -16,6 +16,7 @@ A Magical Web Recorder 🖥 网页录屏器
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome浏览器
 
 ### Progress
+    06.07 Support Audio
     05.24 Beta Core 1.0.0-Beta Released
     04.26 Live Mode    
     03.31 Add Chrome Plugin 
@@ -30,7 +31,9 @@ npm i timecatjs -D
     https://unpkg.com/timecatjs/lib/timecatjs.min.js
 ### Usage
 ```ts
+// from module
 import { record, replay } from 'timecatjs';
+
 // from cdn
 const { record, replay } = window.timecat
 
@@ -115,7 +118,7 @@ interface VNode {
 }
 ```
 
-对DOM进行深度遍历后，DOM被映射成了VNode类型节点，需要记录的 Node 主要是三种类型 ``ELEMENT_NODE``，`COMMENT_NODE`和 ``TEXT_NODE``，之后在播放时，只需要对VNode进行解析，就可以还原成记录时的状态了
+对DOM进行深度遍历后，DOM被映射成了VNode类型节点，需要记录的 Node 主要是三种类型 `ELEMENT_NODE`，`COMMENT_NODE`和 `TEXT_NODE`，之后在播放时，只需要对VNode进行解析，就可以还原成记录时的状态了
 
 在这过程中，有一些节点和属性需要特殊处理，例如
 
@@ -259,6 +262,10 @@ const elementList: [HTMLElement, string][] = [
 快进：加速采集速率的倍速
 跳转：通过virtualDom实现计算
 
+### 录制音频与生成字幕
+
+通过HTML5提供的`WebRTC`接口可以进行音频录制，由于主要是录制人声语音，所以对于录制品质要求并不高，这里我选用了8000的采样率和8比特率单声道的PCM录制格式，以节省空间。字幕会通过一些第三方服务分析录制文件后自动生成
+
 #### 在客户端进行的Gzip压缩
 
 Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的数据不一定只存在数据库里，可能会有三种储存方式
@@ -269,7 +276,7 @@ Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的�
 利用客户端的运算能力，在进行导出或者传输之前，可以对数据进行压缩，极大程度的减小体积
 
 在客户端可以进行基于 `Gzip` 的数据包压缩，这里我选择了 [Pako](https://nodeca.github.io/pako/) 来对数据进行压缩   
-Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的，通过压缩减少约5倍左右的体积
+Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的，通过Gzip把文本数据转换成`Uint8Array`, 再把`Uint8`转成对应的`Unicode`，这样的好处是每一个编码只会占用`1byte`的空间，通过压缩减少约`5`倍左右的体积
 
 #### 数据上传
 

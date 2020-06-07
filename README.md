@@ -16,6 +16,7 @@ English | [中文](./README.cn.md)
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
 ### Progress
+    06.07 Support Audio
     05.24 Beta Core 1.0.0-Beta Released
     04.26 Live Mode    
     03.31 Add Chrome Plugin 
@@ -30,7 +31,9 @@ npm i timecatjs -D
     https://unpkg.com/timecatjs/lib/timecatjs.min.js
 ### Usage
 ```ts
+// from module
 import { record, replay } from 'timecatjs';
+
 // from cdn
 const { record, replay } = window.timecat
 
@@ -109,7 +112,7 @@ interface VNode {
 }
 ```
 
-After deep traversal of the DOM, the DOM is mapped to a VNode type node. The Nodes to be recorded are mainly three types `` ELEMENT_NODE '', `COMMENT_NODE` and` `TEXT_NODE``. After deserialized, it can be restored the state 
+After deep traversal of the DOM, the DOM is mapped to a VNode type node. The Nodes to be recorded are mainly three types `ELEMENT_NODE`, `COMMENT_NODE` and `TEXT_NODE`. After deserialized, it can be restored the state 
 
 there are some nodes and attributes that need special treatment, such as
 
@@ -130,7 +133,7 @@ const observer = new MutationObserver((mutationRecords, observer) => {
 observer.observe(target, options)
 ```
 
-With the help of the ability combination of `WindowEventHandlers`` addEventListener`, etc., you can listen to a series of operation events on the page
+With the help of the ability combination of `WindowEventHandlers` `addEventListener`, etc., you can listen to a series of operation events on the page
 
 - Add Node Action
 - Delete Node Action
@@ -145,7 +148,7 @@ For the `MouseMove` event, it will be triggered frequently during the movement, 
     1. Critical mouse coordinate data may be lost in the intercepted
     2. huge data will be generated even if the movement distance is long. The better way is to calculate the movement trajectory through the `Spline Curves`. 
 
-We can watches the input via `input`` blur` `focus` event of` Node.addEventListener`, but this can only listen to the user's behavior. If we assign values ​ via JavaScript, we can't listen to the data Changes, at this time we can hijack some special properties through `Object.defineProperty`, without affecting the target, forward the new value to the custom handle, and handle the change in a unified method
+We can watches the input via `input` `blur` `focus` event of` Node.addEventListener`, but this can only listen to the user's behavior. If we assign values ​ via JavaScript, we can't listen to the data Changes, at this time we can hijack some special properties through `Object.defineProperty`, without affecting the target, forward the new value to the custom handle, and handle the change in a unified method
 
 ```ts
 const elementList: [HTMLElement, string][] = [
@@ -255,16 +258,22 @@ Pause: pause timer through cancelAnimationFrame
 Fast forward: double the speed of the acquisition rate
 Jump: computing by virtualDom
 
+### Record audio and generate subtitles
+
+Audio recording can be provided by the HTML5 WebRTC. Since it mainly records human voice, not need high quality. I chose the 8000 sample rate, 8-bit rate and mono PCM recording format to save space. Subtitles will be automatically generated after analyzing the recording files by some third-party services
+
 #### Gzip on the client
 
 Gzip generally compresses the transmitted data in the network application layer, but our data does not only in the database, there may be three storage type:
-1. The server stores TCP => DB
-2. Local storage LocalStorage, IndexedDB, Web SQL
-3. The data is persisted in the script and saved as a local file, such as directly exporting a working HTML file
+
+  1. The server stores TCP => DB
+  2. Local storage LocalStorage, IndexedDB, Web SQL
+  3. The data is persisted in the script and saved as a local file, such as directly exporting a working HTML file
 
 Greatly reducing the data size before exporting or transmitting,
 
-On the client-side, the compression based on `Gzip`, I chose [Pako](https://nodeca.github.io/pako/)   
+On the client side, the compression based on `Gzip`, here I chose [Pako](https://nodeca.github.io/pako/) to compress the data
+The core of Gzip is Deflate, and Deflate is based on LZ77 and Huffman tree. The text data is converted into `Uint8Array` through Gzip, and then `Uint8` is converted into the corresponding `Unicode`. The advantage is that each encoding only use `1byte`, and reduce the volume by about 5 times by compression
 
 #### Data upload
 
