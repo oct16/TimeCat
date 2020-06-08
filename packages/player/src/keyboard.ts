@@ -67,11 +67,11 @@ export class KeyboardComponent {
 
     paly(speed: number) {
         if (speed !== 0) {
-            this.playOrPauseBtn.innerText = 'II'
+            this.playOrPauseBtn.innerText = '〓'
             this.playOrPauseBtn.setAttribute('style', 'letter-spacing: 1px;font-weight: bold;')
             this.playOrPauseBtn.removeAttribute('speed')
         } else {
-            this.playOrPauseBtn.innerText = '▶'
+            this.playOrPauseBtn.innerText = '▲'
             this.playOrPauseBtn.removeAttribute('style')
             this.playOrPauseBtn.setAttribute('speed', '1')
         }

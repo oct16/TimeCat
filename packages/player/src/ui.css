@@ -110,6 +110,14 @@ body {
     white-space: nowrap;
 }
 
+.play-or-pause {
+    transform: rotate(90deg);
+    line-height: 24px;
+    width: 21px;
+    text-indent: -4px;
+    margin-right: 4px;
+}
+
 .cat-progress {
     width: 100%;
     height: 20px;
