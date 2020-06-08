@@ -23,12 +23,13 @@ A Magical Web Recorder 🖥 网页录屏器
 
 ### Installation
 
-#### npm
-```
-npm i timecatjs -D
-```
-#### cdn
+##### NPM
+
+    npm i timecatjs -D
+
+##### CDN
     https://unpkg.com/timecatjs/lib/timecatjs.min.js
+    https://cdn.jsdelivr.net/npm/timecatjs/lib/timecatjs.min.js
 ### Usage
 ```ts
 // from module
@@ -37,9 +38,14 @@ import { record, replay } from 'timecatjs';
 // from cdn
 const { record, replay } = window.timecat
 
-record()
-// or
-replay()
+// record page
+record(RecordOptions)
+
+// replay record
+replay(ReplayOptions)
+
+// export html file
+exportReplay(Opts)
 ```
 
 ### API Documentation
@@ -148,9 +154,10 @@ observer.observe(target, options)
 
 通过 `mouseMove` 和 `click` 事件记录鼠标动作 
 
-对于 `mouseMove` 事件，在移动的过程中会频繁的触发，产生很容冗余的数据，这样的数据会浪费很多的空间，因此对于鼠标的轨迹，我们只采集少量的关键点，最简单的办法是使用节流来减小事件产生的数据量，但是也有一些缺点：   
-    1. 截流的间隔中可能会丢失关键的鼠标坐标数据   
-    2. 即时通过截流在移动距离足够长的时候任然会产生巨大的数据量，更好的办法是通过 `Spline Curves(样条曲线)` 函数来计算得出移动轨迹、抖动、加速度等生成一条路径曲线用来控制鼠标的移动   
+对于 `mouseMove` 事件，在移动的过程中会频繁的触发，产生很容冗余的数据，这样的数据会浪费很多的空间，因此对于鼠标的轨迹，我们只采集少量的关键点，最简单的办法是使用节流来减小事件产生的数据量，但是也有一些缺点： 
+
+- 截流的间隔中可能会丢失关键的鼠标坐标数据   
+- 即时通过截流在移动距离足够长的时候任然会产生巨大的数据量，更好的办法是通过 `Spline Curves(样条曲线)` 函数来计算得出移动轨迹、抖动、加速度等生成一条路径曲线用来控制鼠标的移动   
 
 Input的变换我们可以通过`Node.addEventListener` 的 `input` `blur` `focus` 事件监听，不过这只能监听到用户的行为，如果是通过JavaScript对标签进行赋值，我们是监听不到数据的变化的，这时我们可以通过`Object.defineProperty`来对一些表单对象的特殊属性进行劫持，在不影响目标赋值的情况下，把value新值转发到自定的handle上，统一处理状态变化
 
@@ -258,25 +265,26 @@ const elementList: [HTMLElement, string][] = [
 
 播放：播放器会内置一个精确的计时器，动作的数据存储在一个栈中，栈中的每一个对象就是一帧，通过RAF(RequestAnimationFrame) 对数据帧的时间戳进行扫描从而得知下一帧在什么时间发生
 
-暂停：通过cancelAnimationFrame暂停计时器
-快进：加速采集速率的倍速
-跳转：通过virtualDom实现计算
+- 暂停：通过cancelAnimationFrame暂停计时器
+- 快进：加速采集速率的倍速
+- 跳转：通过virtualDom实现计算
 
-### 录制音频与生成字幕
+#### 录制音频与生成字幕
 
 通过HTML5提供的`WebRTC`接口可以进行音频录制，由于主要是录制人声语音，所以对于录制品质要求并不高，这里我选用了8000的采样率和8比特率单声道的PCM录制格式，以节省空间。字幕会通过一些第三方服务分析录制文件后自动生成
 
 #### 在客户端进行的Gzip压缩
 
 Gzip一般是在网络应用层里对传输数据进行压缩，但是我们的数据不一定只存在数据库里，可能会有三种储存方式
-1. 服务器存储 TCP => DB
-2. 本地储存 LocalStorage、IndexedDB、Web SQL
-3. 数据持久化于script中，保存为本地文件，例如直接导出可运行的HTML文件
+
+- 服务器存储 TCP => DB
+- 本地储存 LocalStorage、IndexedDB、Web SQL
+- 数据持久化于script中，保存为本地文件，例如直接导出可运行的HTML文件
 
 利用客户端的运算能力，在进行导出或者传输之前，可以对数据进行压缩，极大程度的减小体积
 
 在客户端可以进行基于 `Gzip` 的数据包压缩，这里我选择了 [Pako](https://nodeca.github.io/pako/) 来对数据进行压缩   
-Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的，通过Gzip把文本数据转换成`Uint8Array`, 再把`Uint8`转成对应的`Unicode`，这样的好处是每一个编码只会占用`1byte`的空间，通过压缩减少约`5`倍左右的体积
+Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的，通过Gzip把文本数据转换成`Uint8Array`, 再把`Uint8`转成对应的`ASCII`，这样的好处是每一个编码只会占用`1byte`的空间，通过压缩减少约`5`倍左右的体积
 
 #### 数据上传
 
