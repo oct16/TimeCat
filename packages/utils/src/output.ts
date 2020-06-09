@@ -1,10 +1,10 @@
-import { TPL } from './tpl'
+import { TPL, pacmanCss } from './tpl'
 import { DBPromise } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
 import { isDev, classifyRecords, download } from './tools/common'
 import pako from 'pako'
 
-type ScriptItem = { name: string; src: string }
+type ScriptItem = { name?: string; src: string }
 type Opts = { scripts?: ScriptItem[]; autoPlay?: boolean }
 
 export async function exportReplay(opts: Opts = {}) {
@@ -39,7 +39,9 @@ async function injectScripts(html: Document, scripts?: ScriptItem[]) {
             const { src, name } = scriptItem
             let scriptContent = src
             const script = document.createElement('script')
-            script.id = name
+            if (name) {
+                script.id = name
+            }
             const isUrlReg = /^(chrome-extension|https?):\/\/.+/
             // is a link or script text
             if (isUrlReg.test(src)) {
@@ -68,7 +70,6 @@ async function getDataFromDB() {
 }
 
 async function injectData(html: Document) {
-    const dataScript = document.createElement('script')
     const data = window.__ReplayDataList__ || (await getDataFromDB())
     const jsonStrData = JSON.stringify(data)
     const zipArray = pako.gzip(jsonStrData)
@@ -85,6 +86,12 @@ async function injectData(html: Document) {
     }
 
     const scriptContent = `var __ReplayStrData__ =  '${outputStr}'`
-    dataScript.innerHTML = scriptContent
-    html.body.insertBefore(dataScript, html.body.firstChild)
+
+    const loadingScriptContent = `const loadingNode = document.createElement('div')
+    loadingNode.className = 'pacman-box';
+    loadingNode.innerHTML = '<style>${pacmanCss}<\/style><div class="pacman"><div><\/div><div><\/div><div><\/div><div><\/div><div><\/div><\/div>'
+    loadingNode.setAttribute('style', 'text-align: center;vertical-align: middle;line-height: 100vh;')
+    document.body.insertBefore(loadingNode, document.body.firstChild);window.onload = () => loadingNode.parentNode.removeChild(loadingNode)`
+    injectScripts(html, [{ src: loadingScriptContent }])
+    injectScripts(html, [{ src: scriptContent }])
 }
