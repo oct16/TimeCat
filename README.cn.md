@@ -5,7 +5,7 @@ A Magical Web Recorder 🖥 网页录屏器
 </h6>
 <h6 align="center">
 
-[![Analytics](https://ga-beacon.appspot.com/UA-151180797-1/timecat-home)](https://github.com/oct16/timeCat) ![GitHub issues](https://img.shields.io/github/issues-raw/oct16/TimeCat) ![GitHub last commit](https://img.shields.io/github/last-commit/oct16/timecat) ![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)
+![GitHub issues](https://img.shields.io/github/issues-raw/oct16/TimeCat) ![GitHub last commit](https://img.shields.io/github/last-commit/oct16/timecat) ![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)
 
 <h6>
 
