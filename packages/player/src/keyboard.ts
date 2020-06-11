@@ -123,7 +123,9 @@ export class KeyboardComponent {
             })
         }
 
+        const replayOptions = window.__ReplayOptions__
         exportReplay({
+            ...replayOptions,
             scripts: scriptList
         })
     }

@@ -8,7 +8,7 @@ import { RecordData, AudioData, RecorderOptions } from '@TimeCat/record'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 
 type ScriptItem = { name?: string; src: string }
-type ExportOptions = { scripts?: ScriptItem[]; autoPlay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
+type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
 
 const EXPORT_NAME_LABEL = 'TimeCat'
 const downloadAudioConfig = {
@@ -48,15 +48,14 @@ function downloadAudios() {
 }
 
 async function initOptions(html: Document, exportOptions: ExportOptions) {
-    const { autoPlay, scripts } = exportOptions
-
+    const { scripts, autoplay } = exportOptions
+    const options = { autoplay }
     const scriptList = scripts || ([] as ScriptItem[])
-    if (autoPlay) {
-        scriptList.push({
-            name: 'time-cat-init',
-            src: `timecat.replay()`
-        })
-    }
+    scriptList.push({
+        name: 'time-cat-init',
+        src: `timecat.replay(${JSON.stringify(options)})`
+    })
+
     await injectScripts(html, scriptList)
 }
 
@@ -94,7 +93,6 @@ async function getDataFromDB(exportOptions?: ExportOptions) {
     const indexedDB = await DBPromise
     const data = await indexedDB.readAllRecords()
     const classified = classifyRecords(data)
-    debugger
     return extract(classified, exportOptions)
 }
 
@@ -111,8 +109,12 @@ function extract(
 }
 
 function extractAudio(audio: AudioData) {
-    const fileName = `${EXPORT_NAME_LABEL}-audio-${getRandomCode()}.wav`
     const source = audio.bufferStrList.slice()
+    if (!source.length) {
+        return audio
+    }
+
+    const fileName = `${EXPORT_NAME_LABEL}-audio-${getRandomCode()}.wav`
     downloadAudioConfig.extractAudioDataList.push({
         source,
         fileName

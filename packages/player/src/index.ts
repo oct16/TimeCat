@@ -143,15 +143,19 @@ export async function replay(options: ReplayOptions = {}) {
                 }
             })
 
-            if (audio && (audio.src || audio.bufferStrList.length)) {
+            const hasAudio = audio && (audio.src || audio.bufferStrList.length)
+
+            if (hasAudio) {
                 await waitStart()
             }
             removeStartPage()
 
-            reduxStore.dispatch({
-                type: PlayerTypes.SPEED,
-                data: { speed: 1 }
-            })
+            if (options.autoplay || hasAudio) {
+                reduxStore.dispatch({
+                    type: PlayerTypes.SPEED,
+                    data: { speed: 1 }
+                })
+            }
         }
     })
 

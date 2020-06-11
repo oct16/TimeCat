@@ -88,9 +88,12 @@ export class PlayerComponent {
                     .join('/') +
                 '/' +
                 this.audioData.src
-
         } else {
             const bufferStrList = this.audioData.bufferStrList
+            if (!bufferStrList.length) {
+                return
+            }
+
             const dataArray: Float32Array[] = []
             for (let i = 0; i < bufferStrList.length; i++) {
                 const data = base64ToFloat32Array(bufferStrList[i])
@@ -213,9 +216,9 @@ export class PlayerComponent {
         if (!this.audioData) {
             return
         }
-
         if (!this.audioBlobUrl) {
             this.pauseAudio()
+            return
         }
 
         if (this.audioNode) {
