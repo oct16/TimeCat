@@ -1,5 +1,5 @@
 import { RecorderOptions, IRecorderStatus } from '../types'
-import { float32ArrayToBase64 } from './transform'
+import { float32ArrayToBase64 } from '@TimeCat/utils'
 
 export class Recorder {
     static defaultRecordOptions = {
@@ -29,12 +29,7 @@ export class Recorder {
     }
 
     setOptions(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
-        const { sampleBits, sampleRate, channelCount } = opts
-        this.opts = {
-            sampleBits: sampleBits || this.opts.sampleBits,
-            sampleRate: sampleRate || this.opts.sampleRate,
-            channelCount: channelCount || this.opts.channelCount
-        }
+        this.opts = { ...this.opts, ...opts }
     }
 
     private beginRecord() {

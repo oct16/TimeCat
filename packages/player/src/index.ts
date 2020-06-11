@@ -66,7 +66,7 @@ async function getAsyncDataFromSocket(
                         {
                             snapshot: data as SnapshotData,
                             records: [],
-                            audio: { bufferStrList: [], subtitles: [], opts: {} as RecorderOptions }
+                            audio: { src: '', bufferStrList: [], subtitles: [], opts: {} as RecorderOptions }
                         }
                     ])
                     fmp.observe()
@@ -143,7 +143,7 @@ export async function replay(options: ReplayOptions = {}) {
                 }
             })
 
-            if (audio && audio.bufferStrList.length) {
+            if (audio && (audio.src || audio.bufferStrList.length)) {
                 await waitStart()
             }
             removeStartPage()

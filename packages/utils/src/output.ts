@@ -1,27 +1,53 @@
 import { TPL, pacmanCss } from './tpl'
 import { DBPromise } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
-import { isDev, classifyRecords, download } from './tools/common'
+import { isDev, classifyRecords, download, getRandomHash } from './tools/common'
 import pako from 'pako'
+import { SnapshotData } from '@TimeCat/snapshot'
+import { RecordData, AudioData, RecorderOptions } from '@TimeCat/record'
+import { base64ToFloat32Array, encodeWAV } from './transform'
 
 type ScriptItem = { name?: string; src: string }
-type Opts = { scripts?: ScriptItem[]; autoPlay?: boolean }
+type ExportOptions = { scripts?: ScriptItem[]; autoPlay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
 
-export async function exportReplay(opts: Opts = {}) {
+const downloadAudioConfig = {
+    extractAudioDataList: [] as {
+        source: string[]
+        fileName: string
+    }[],
+    opts: {} as RecorderOptions
+}
+
+export async function exportReplay(exportOptions: ExportOptions) {
     const parser = new DOMParser()
     const html = parser.parseFromString(TPL, 'text/html')
-    await injectData(html)
-    await initOptions(html, opts)
-    createAndDownloadFile(`TimeCat-${Date.now()}`, html.documentElement.outerHTML)
+    await injectData(html, exportOptions)
+    await initOptions(html, exportOptions)
+    downloadFiles(html)
 }
 
-function createAndDownloadFile(fileName: string, content: string) {
+function downloadHTML(content: string) {
     const blob = new Blob([content], { type: 'text/html' })
-    download(blob, fileName + '.html')
+    download(blob, `TimeCat-${getRandomHash()}.html`)
 }
 
-async function initOptions(html: Document, opts: Opts) {
-    const { autoPlay, scripts } = opts
+function downloadFiles(html: Document) {
+    downloadHTML(html.documentElement.outerHTML)
+    downloadAudios()
+}
+
+function downloadAudios() {
+    downloadAudioConfig.extractAudioDataList.forEach(extractedData => {
+        const floatArray = extractedData.source.map(data => base64ToFloat32Array(data))
+        const audioBlob = encodeWAV(floatArray, downloadAudioConfig.opts)
+        download(audioBlob, extractedData.fileName)
+    })
+
+    downloadAudioConfig.extractAudioDataList.length = 0
+}
+
+async function initOptions(html: Document, exportOptions: ExportOptions) {
+    const { autoPlay, scripts } = exportOptions
 
     const scriptList = scripts || ([] as ScriptItem[])
     if (autoPlay) {
@@ -63,14 +89,40 @@ async function getScript(src: string) {
         .then(filteringScriptTag)
 }
 
-async function getDataFromDB() {
+async function getDataFromDB(exportOptions?: ExportOptions) {
     const indexedDB = await DBPromise
     const data = await indexedDB.readAllRecords()
-    return classifyRecords(data)
+    const classified = classifyRecords(data)
+    debugger
+    return extract(classified, exportOptions)
 }
 
-async function injectData(html: Document) {
-    const data = window.__ReplayDataList__ || (await getDataFromDB())
+function extract(
+    replayDataList: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }[],
+    exportOptions?: ExportOptions
+) {
+    return replayDataList.map(replayData => {
+        if (exportOptions && exportOptions.audioExternal) {
+            replayData.audio = extractAudio(replayData.audio)
+        }
+        return replayData
+    })
+}
+
+function extractAudio(audio: AudioData) {
+    const fileName = `TimeCat-Audio-${getRandomHash()}.wav`
+    downloadAudioConfig.extractAudioDataList.push({
+        source: audio.bufferStrList.slice(),
+        fileName
+    })
+    downloadAudioConfig.opts = audio.opts
+    audio.src = fileName
+    audio.bufferStrList.length = 0
+    return audio
+}
+
+async function injectData(html: Document, exportOptions: ExportOptions) {
+    const data = window.__ReplayDataList__ || (await getDataFromDB(exportOptions))
     const jsonStrData = JSON.stringify(data)
     const zipArray = pako.gzip(jsonStrData)
     let outputStr: string = ''

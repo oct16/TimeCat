@@ -133,6 +133,7 @@ export type RecordEvent<T> = (e: T) => void
 export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher | AudioWatcher
 
 export interface AudioData {
+    src: string
     opts: RecorderOptions
     bufferStrList: string[]
     subtitles: SubtitlesData[]

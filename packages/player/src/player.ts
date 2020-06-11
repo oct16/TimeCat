@@ -1,9 +1,19 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from './dom'
-import { reduxStore, PlayerTypes, ProgressState, getTime, isSnapshot, delay, toTimeStamp } from '@TimeCat/utils'
+import {
+    reduxStore,
+    PlayerTypes,
+    ProgressState,
+    getTime,
+    isSnapshot,
+    delay,
+    toTimeStamp,
+    base64ToFloat32Array,
+    encodeWAV
+} from '@TimeCat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData, base64ToFloat32Array, encodeWAV } from '@TimeCat/record'
+import { RecordData, AudioData } from '@TimeCat/record'
 import { BroadcasterComponent } from './broadcaster'
 
 export class PlayerComponent {
@@ -66,20 +76,31 @@ export class PlayerComponent {
     }
 
     initAudio() {
-        if (!this.audioData || !this.audioData.bufferStrList.length) {
+        if (!this.audioData) {
             return
         }
 
-        const bufferStrList = this.audioData.bufferStrList
-        const dataArray: Float32Array[] = []
-        for (let i = 0; i < bufferStrList.length; i++) {
-            const data = base64ToFloat32Array(bufferStrList[i])
-            dataArray.push(data)
-        }
+        if (this.audioData.src) {
+            this.audioBlobUrl =
+                location.href
+                    .split('/')
+                    .slice(0, -1)
+                    .join('/') +
+                '/' +
+                this.audioData.src
 
-        const audioBlob = encodeWAV(dataArray, this.audioData.opts)
-        const audioBlobUrl = URL.createObjectURL(audioBlob)
-        this.audioBlobUrl = audioBlobUrl
+        } else {
+            const bufferStrList = this.audioData.bufferStrList
+            const dataArray: Float32Array[] = []
+            for (let i = 0; i < bufferStrList.length; i++) {
+                const data = base64ToFloat32Array(bufferStrList[i])
+                dataArray.push(data)
+            }
+
+            const audioBlob = encodeWAV(dataArray, this.audioData.opts)
+            const audioBlobUrl = URL.createObjectURL(audioBlob)
+            this.audioBlobUrl = audioBlobUrl
+        }
     }
 
     streamHandle(this: PlayerComponent, e: CustomEvent) {
@@ -189,13 +210,14 @@ export class PlayerComponent {
     }
 
     playAudio() {
-        if (!this.audioData || !this.audioData.bufferStrList.length) {
+        if (!this.audioData) {
             return
         }
 
         if (!this.audioBlobUrl) {
             this.pauseAudio()
         }
+
         if (this.audioNode) {
             if (!this.audioNode.src || this.audioNode.src !== this.audioBlobUrl) {
                 this.audioNode.src = this.audioBlobUrl
