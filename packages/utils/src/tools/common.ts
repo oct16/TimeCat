@@ -12,10 +12,8 @@ export function getTime() {
     return performance.timing.navigationStart + performance.now()
 }
 
-export function getRandomHash() {
-    return Math.random()
-        .toString(32)
-        .substring(4, 10)
+export function getRandomCode() {
+    return (Math.random() * 20 + 16).toString(36).substring(4, 10)
 }
 
 export function secondToDate(ms: number) {

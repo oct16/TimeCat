@@ -1,7 +1,7 @@
 import { TPL, pacmanCss } from './tpl'
 import { DBPromise } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
-import { isDev, classifyRecords, download, getRandomHash } from './tools/common'
+import { isDev, classifyRecords, download, getRandomCode } from './tools/common'
 import pako from 'pako'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { RecordData, AudioData, RecorderOptions } from '@TimeCat/record'
@@ -10,6 +10,7 @@ import { base64ToFloat32Array, encodeWAV } from './transform'
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoPlay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
 
+const EXPORT_NAME_LABEL = 'TimeCat'
 const downloadAudioConfig = {
     extractAudioDataList: [] as {
         source: string[]
@@ -28,7 +29,7 @@ export async function exportReplay(exportOptions: ExportOptions) {
 
 function downloadHTML(content: string) {
     const blob = new Blob([content], { type: 'text/html' })
-    download(blob, `TimeCat-${getRandomHash()}.html`)
+    download(blob, `${EXPORT_NAME_LABEL}-${getRandomCode()}.html`)
 }
 
 function downloadFiles(html: Document) {
@@ -110,9 +111,10 @@ function extract(
 }
 
 function extractAudio(audio: AudioData) {
-    const fileName = `TimeCat-Audio-${getRandomHash()}.wav`
+    const fileName = `${EXPORT_NAME_LABEL}-audio-${getRandomCode()}.wav`
+    const source = audio.bufferStrList.slice()
     downloadAudioConfig.extractAudioDataList.push({
-        source: audio.bufferStrList.slice(),
+        source,
         fileName
     })
     downloadAudioConfig.opts = audio.opts
