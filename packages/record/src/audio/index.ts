@@ -1,8 +1,8 @@
 import { Recorder } from './audio-recorder'
-import { AudioWatcher, RecordType } from '../types'
+import { AudioRecord, RecordType } from '../types'
 import { getTime, listenerStore } from '@TimeCat/utils'
 
-export function recordAudio(emitter: (data: AudioWatcher) => void) {
+export function recordAudio(emitter: (data: AudioRecord) => void) {
     const recorder = new Recorder({
         sampleBits: 8,
         sampleRate: 8000,

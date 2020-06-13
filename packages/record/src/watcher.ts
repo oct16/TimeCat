@@ -1,21 +1,21 @@
 import { createFlatVNode, VNode, VSNode } from '@TimeCat/virtual-dom'
 import {
-    RecordType,
-    WindowWatcher,
+    WindowRecord,
     RecordEvent,
     MouseRecord,
-    DOMWatcher,
-    FormElementWatcher,
-    FormElementEvent,
-    MouseEventType,
+    DOMRecord,
+    FormElementRecord,
     RecordData,
     AttributesUpdateData,
     CharacterDataUpdateData,
     DOMUpdateDataType,
     UpdateNodeData,
     RemoveUpdateData,
-    ScrollWatcher,
-    movedNodesData
+    ScrollRecord,
+    movedNodesData,
+    RecordType,
+    FormElementEvent,
+    MouseEventType
 } from './types'
 import {
     logger,
@@ -67,7 +67,7 @@ function registerEvent(
     })
 }
 
-function windowWatcher(emit: RecordEvent<WindowWatcher>) {
+function WindowRecord(emit: RecordEvent<WindowRecord>) {
     const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
     const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
 
@@ -94,7 +94,7 @@ function windowWatcher(emit: RecordEvent<WindowWatcher>) {
     registerEvent(['resize'], handleFn, { capture: true })
 }
 
-function scrollWatcher(emit: RecordEvent<ScrollWatcher>) {
+function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
     const scrollTop = (target: HTMLElement) => target.scrollTop
     const scrollLeft = (target: HTMLElement) => target.scrollLeft
 
@@ -173,7 +173,7 @@ function mouseWatcher(emit: RecordEvent<MouseRecord>) {
     mouseClick()
 }
 
-function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatcher>) {
+function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord>) {
     const addNodesSet: Set<Node> = new Set()
     const removeNodesMap: Map<Node, Node> = new Map()
     const moveNodesSet: Set<Node> = new Set()
@@ -352,7 +352,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMWatche
     }
 }
 
-function DOMWatcher(emit: RecordEvent<DOMWatcher>) {
+function DOMRecord(emit: RecordEvent<DOMRecord>) {
     const Watcher = new MutationObserver(callback => mutationCallback(callback, emit))
 
     Watcher.observe(document.documentElement, {
@@ -367,14 +367,14 @@ function DOMWatcher(emit: RecordEvent<DOMWatcher>) {
     listenerStore.add(() => Watcher.disconnect())
 }
 
-function formElementWatcher(emit: RecordEvent<FormElementWatcher>) {
+function FormElementRecord(emit: RecordEvent<FormElementRecord>) {
     listenInputs(emit)
 
     // for sys write in input
     kidnapInputs(emit)
 }
 
-function listenInputs(emit: RecordEvent<FormElementWatcher>) {
+function listenInputs(emit: RecordEvent<FormElementRecord>) {
     const eventTypes = ['input', 'change', 'focus', 'blur']
 
     eventTypes
@@ -391,7 +391,7 @@ function listenInputs(emit: RecordEvent<FormElementWatcher>) {
 
     function handleFn(e: InputEvent) {
         const eventType = e.type
-        let data!: FormElementWatcher
+        let data!: FormElementRecord
         switch (eventType) {
             case 'input':
             case 'change':
@@ -433,7 +433,7 @@ function listenInputs(emit: RecordEvent<FormElementWatcher>) {
     }
 }
 
-function kidnapInputs(emit: RecordEvent<FormElementWatcher>) {
+function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
     const elementList: [HTMLElement, string][] = [
         [HTMLInputElement.prototype, 'value'],
         [HTMLInputElement.prototype, 'checked'],
@@ -483,9 +483,9 @@ function kidnapInputs(emit: RecordEvent<FormElementWatcher>) {
 }
 
 export const watchers = {
-    windowWatcher,
-    scrollWatcher,
+    WindowRecord,
+    ScrollRecord,
     mouseWatcher,
-    DOMWatcher,
-    formElementWatcher
+    DOMRecord,
+    FormElementRecord
 }

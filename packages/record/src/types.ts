@@ -22,7 +22,7 @@ export enum MouseEventType {
     'CLICK' = 'click'
 }
 
-export interface WindowWatcher {
+export interface WindowRecord {
     type: RecordType.WINDOW
     data: WindowWatcherData
     time: string
@@ -34,7 +34,7 @@ export interface WindowWatcherData {
     height: number
 }
 
-export interface ScrollWatcher {
+export interface ScrollRecord {
     type: RecordType.SCROLL
     data: ScrollWatcherData
     time: string
@@ -57,7 +57,7 @@ export interface MouseRecordData {
     y: number
     id?: number
 }
-export interface DOMWatcher {
+export interface DOMRecord {
     type: RecordType.DOM_UPDATE
     data: DOMWatcherData
     time: string
@@ -101,7 +101,7 @@ export interface DOMUpdateDataType {
     texts: CharacterDataUpdateData[]
 }
 
-export interface FormElementWatcher {
+export interface FormElementRecord {
     type: RecordType.FORM_EL_UPDATE
     data: FormElementWatcherData
     time: string
@@ -114,7 +114,7 @@ export interface FormElementWatcherData {
     value?: string
 }
 
-export interface AudioWatcher {
+export interface AudioRecord {
     type: RecordType.AUDIO
     data: AudioStrList | AudioOptions
     time: string
@@ -130,7 +130,7 @@ export interface AudioStrList {
 
 export type RecordEvent<T> = (e: T) => void
 
-export type RecordData = FormElementWatcher | DOMWatcher | MouseRecord | WindowWatcher | ScrollWatcher | AudioWatcher
+export type RecordData = FormElementRecord | DOMRecord | MouseRecord | WindowRecord | ScrollRecord | AudioRecord
 
 export interface AudioData {
     src: string
