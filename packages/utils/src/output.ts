@@ -147,7 +147,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     loadingNode.className = 'pacman-box';
     loadingNode.innerHTML = '<style>${pacmanCss}<\/style><div class="pacman"><div><\/div><div><\/div><div><\/div><div><\/div><div><\/div><\/div>'
     loadingNode.setAttribute('style', 'text-align: center;vertical-align: middle;line-height: 100vh;')
-    document.body.insertBefore(loadingNode, document.body.firstChild);window.onload = () => loadingNode.parentNode.removeChild(loadingNode)`
+    document.body.insertBefore(loadingNode, document.body.firstChild);window.addEventListener('DOMContentLoaded', () => loadingNode.parentNode.removeChild(loadingNode))`
     injectScripts(html, [{ src: loadingScriptContent }])
     injectScripts(html, [{ src: scriptContent }])
 }
