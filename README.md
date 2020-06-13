@@ -47,6 +47,7 @@ replay(ReplayOptions)
 // export html file
 exportReplay(Opts)
 ```
+Simple Example: [Todo List](https://oct16.github.io/TimeCat/todo.html)
 
 ### API Documentation
 
@@ -98,7 +99,7 @@ I have though about the following aspects
 3. Monitoring for customer service personnel, for example, Alibaba has 100,000 customer service personnel scattered throughout the country, and they need to record 7x24 hours of their service process. The performance requirements for monitoring on this order of magnitude are very High, Ali's internal tool is called `XReplay`
 4. Collaborative tools, web live broadcast, etc., will also involve similar technologies
 
-....
+...
 
 ---
 ### Technical details of the Web Recorder
