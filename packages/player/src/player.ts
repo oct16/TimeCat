@@ -297,7 +297,7 @@ export class PlayerComponent {
     }
 
     execFrame(this: PlayerComponent, record: RecordData) {
-        updateDom.call(this, record)
+        setTimeout(() => updateDom.call(this, record), 0)
     }
 
     getPercentInterval() {

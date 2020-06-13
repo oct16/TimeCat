@@ -11,7 +11,7 @@ body {
     -webkit-transform-origin: top left;
     opacity: 0;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 #cat-sandbox {
@@ -100,8 +100,8 @@ body {
     height: 40px;
     position: absolute;
     left: 0;
-    bottom: 0;
-    background: darkgray;
+    bottom: -41px;
+    background: #535253;
     opacity: 0.9;
     display: flex;
 }
@@ -110,11 +110,27 @@ body {
     white-space: nowrap;
 }
 
+.cat-keyboard button[disabled] {
+    cursor: default;
+    color: #999;
+}
+
+.cat-keyboard button {
+    margin: 0;
+    vertical-align: middle;
+    border: none;
+    background: none;
+    color: white;
+    outline: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
 .play-or-pause {
     transform: rotate(90deg);
-    line-height: 24px;
+    line-height: 16px;
     width: 21px;
-    text-indent: -4px;
+    text-indent: -3px;
     margin-right: 4px;
 }
 
@@ -136,8 +152,8 @@ body {
 }
 
 .cat-thumb {
-    width: 12px;
-    height: 12px;
+    width: 13px;
+    height: 13px;
     box-sizing: border-box;
     border: 1px solid white;
     background: black;
@@ -147,13 +163,23 @@ body {
     left: 0%;
     transform: translate3d(-5px, -4px, 0);
     z-index: 10;
-    transition: left .25s linear;
+    transition: left .3s linear;
+}
+
+.cat-current-progress {
+    background: darkgray;
+    border-radius: 2px;
+    position: absolute;
+    left: 0;
+    width: 0;
+    height: 5px;
+    transition: width .3s linear;
 }
 
 .cat-timer {
     margin: 0 8px;
     color: white;
-    font-size: 12px;
+    font-size: 16px;
     line-height: 20px;
     font-family: Helvetica;
     vertical-align: middle;

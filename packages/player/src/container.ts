@@ -98,15 +98,17 @@ export class ContainerComponent {
             setWidth?: number,
             setHeight?: number
         ) {
+            const panelHeight = 40
             const { width: targetWidth, height: targetHeight } = getPageSize(target)
-
             const scaleX = maxWidth / (setWidth || targetWidth)
             const scaleY = maxHeight / (setHeight || targetHeight)
-            const scale = scaleX > scaleY ? scaleY : scaleX
+            const allowMaxHeight = maxHeight - panelHeight * scaleY
+            const allowScaleY = allowMaxHeight / (setHeight || targetHeight)
+            const scale = scaleX > allowScaleY ? allowScaleY : scaleX
             const maxScale = scale > 1 ? 1 : scale
 
             const left = Math.abs(Math.floor(((setWidth || targetWidth) * maxScale - maxWidth) / 2))
-            const top = Math.abs(Math.floor(((setHeight || targetHeight) * maxScale - maxHeight) / 2))
+            const top = Math.abs(Math.floor(((setHeight || targetHeight) * maxScale - allowMaxHeight) / 2))
             target.style.transform = 'scale(' + maxScale + ')'
             target.style.left = left + 'px'
             target.style.top = top + 'px'

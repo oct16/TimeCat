@@ -13,7 +13,8 @@ export function getTime() {
 }
 
 export function getRandomCode() {
-    return (Math.random() * 20 + 16).toString(36).substring(4, 10)
+    const code = (Math.random() * 20 + 16).toString(36).substring(4, 10)
+    return code.toUpperCase()
 }
 
 export function secondToDate(ms: number) {
