@@ -105,7 +105,7 @@ async function getReplayData() {
     return window.__ReplayData__
 }
 
-export async function replay(options: ReplayOptions = {}) {
+export async function replay(options: ReplayOptions = { autoplay: true }) {
     window.__ReplayOptions__ = options
     const replayData = await getReplayData()
 
