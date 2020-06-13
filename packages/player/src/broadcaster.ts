@@ -13,16 +13,13 @@ export class BroadcasterComponent {
     }
 
     updateText(text: string) {
-        if (this.subtitle.innerText.trim() === text.trim()) {
+        text = text.trim()
+        if (this.subtitle.innerText.trim() === text) {
             return
         }
 
         this.subtitle.innerText = text
-        if (text) {
-            const span = document.createElement('span')
-            span.innerHTML = '&nbsp;'
-            this.subtitle.appendChild(span)
-        }
+        this.floatLayer.toggleAttribute('hidden', !text)
     }
     cleanText() {
         this.updateText('')

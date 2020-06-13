@@ -206,14 +206,18 @@ body {
 }
 
 .cat-broadcaster .float-layer {
-    background: green;
-    font-size: 16px;
-    line-height: 24px;
+    margin: 0 10px;
+    line-height: 20px;
     color: #fff;
     background-color: rgba(0, 0, 0, 0.6);
     border-radius: 2px;
+    padding: 5px;
     box-shadow: 0px 0px 2px rgba(26, 26, 26, .5);
-    text-indent: 5px;
+    text-align: center;
+}
+
+.cat-broadcaster .float-layer[hidden] {
+    display: none;
 }
 
 #cat-start-page {
