@@ -57,7 +57,6 @@ export class IndexedDBOperator {
             }
         })
     }
-
 }
 
 export const DBPromise: Promise<IndexedDBOperator> = new Promise(resolve => {
