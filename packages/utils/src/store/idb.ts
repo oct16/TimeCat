@@ -34,7 +34,7 @@ export class IndexedDBOperator {
         }
     }
 
-    add(data: SnapshotData) {
+    add(data: SnapshotData | RecordData) {
         const request = this.db
             .transaction([`${this.storeName}`], 'readwrite')
             .objectStore(`${this.storeName}`)

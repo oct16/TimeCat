@@ -1,10 +1,10 @@
 import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
-import { isDev, classifyRecords, download, getRandomCode } from './tools/common'
+import { isDev, classifyRecords, download, getRandomCode, getTime } from './tools/common'
 import pako from 'pako'
 import { SnapshotData } from '@TimeCat/snapshot'
-import { RecordData, AudioData, RecorderOptions } from '@TimeCat/record'
+import { RecordData, AudioData, RecorderOptions, NONERecord } from '@TimeCat/record'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 
 type ScriptItem = { name?: string; src: string }
@@ -20,11 +20,21 @@ const downloadAudioConfig = {
 }
 
 export async function exportReplay(exportOptions: ExportOptions) {
+    await addNoneFrame()
     const parser = new DOMParser()
     const html = parser.parseFromString(TPL, 'text/html')
     await injectData(html, exportOptions)
     await initOptions(html, exportOptions)
     downloadFiles(html)
+}
+
+async function addNoneFrame() {
+    const DBOperator = await getDBOperator
+    DBOperator.add({
+        type: 'NONE',
+        data: null,
+        time: getTime().toString()
+    } as NONERecord)
 }
 
 function downloadHTML(content: string) {

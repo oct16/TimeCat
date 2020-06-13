@@ -7,7 +7,8 @@ export enum RecordType {
     'MOUSE' = 'MOUSE',
     'DOM_UPDATE' = 'DOM_UPDATE',
     'FORM_EL_UPDATE' = 'FORM_EL_UPDATE',
-    'AUDIO' = 'AUDIO'
+    'AUDIO' = 'AUDIO',
+    'NONE' = 'NONE'
 }
 
 export enum FormElementEvent {
@@ -128,9 +129,22 @@ export interface AudioStrList {
     data: string[]
 }
 
+export interface NONERecord {
+    type: RecordType.NONE
+    data: null
+    time: string
+}
+
 export type RecordEvent<T> = (e: T) => void
 
-export type RecordData = FormElementRecord | DOMRecord | MouseRecord | WindowRecord | ScrollRecord | AudioRecord
+export type RecordData =
+    | FormElementRecord
+    | DOMRecord
+    | MouseRecord
+    | WindowRecord
+    | ScrollRecord
+    | AudioRecord
+    | NONERecord
 
 export interface AudioData {
     src: string

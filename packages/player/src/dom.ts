@@ -211,5 +211,8 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                 }
             }
             break
+        default: {
+            break
+        }
     }
 }

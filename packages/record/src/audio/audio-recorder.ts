@@ -64,7 +64,12 @@ export class Recorder {
                 .getUserMedia({
                     audio: {
                         sampleRate: this.opts.sampleRate,
-                        channelCount: this.opts.channelCount
+                        channelCount: this.opts.channelCount,
+
+                        echoCancellation: true,
+                        autoGainControl: true,
+                        noiseSuppression: true,
+                        latency: 0
                     }
                 })
                 .then(mediaStream => resolve(mediaStream))
