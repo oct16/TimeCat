@@ -1,5 +1,5 @@
 import { TPL, pacmanCss } from './tpl'
-import { DBPromise } from './store/idb'
+import { getDBOperator } from './store/idb'
 import { filteringScriptTag } from './tools/dom'
 import { isDev, classifyRecords, download, getRandomCode } from './tools/common'
 import pako from 'pako'
@@ -90,8 +90,8 @@ async function getScript(src: string) {
 }
 
 async function getDataFromDB(exportOptions?: ExportOptions) {
-    const indexedDB = await DBPromise
-    const data = await indexedDB.readAllRecords()
+    const DBOperator = await getDBOperator
+    const data = await DBOperator.readAllRecords()
     const classified = classifyRecords(data)
     return extract(classified, exportOptions)
 }

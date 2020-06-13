@@ -59,8 +59,8 @@ export class IndexedDBOperator {
     }
 }
 
-export const DBPromise: Promise<IndexedDBOperator> = new Promise(resolve => {
-    const indexedDB = new IndexedDBOperator('cat_db', 1, 'cat_data', () => {
-        resolve(indexedDB)
+export const getDBOperator: Promise<IndexedDBOperator> = new Promise(resolve => {
+    const DBOperator = new IndexedDBOperator('cat_db', 1, 'cat_data', () => {
+        resolve(DBOperator)
     })
 })

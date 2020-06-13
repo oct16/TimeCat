@@ -1,7 +1,7 @@
 import { watchers } from './watcher'
 import { recordAudio } from './audio'
 import { RecordData, RecordEvent, RecordOptions } from './types'
-import { listenerStore, DBPromise } from '@TimeCat/utils'
+import { listenerStore, getDBOperator } from '@TimeCat/utils'
 import { snapshots, SnapshotData } from '@TimeCat/snapshot'
 const ctrl = {
     unsubscribe: () => {
@@ -28,7 +28,7 @@ function getRecorders(options: RecordOptions) {
 }
 
 export const record = (options: RecordOptions) => {
-    DBPromise.then(db => {
+    getDBOperator.then(db => {
         db.clear()
         getRecorders(options).forEach(task =>
             task((data: RecordData & SnapshotData) => {

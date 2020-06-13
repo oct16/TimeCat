@@ -1,5 +1,5 @@
 import {
-    DBPromise,
+    getDBOperator,
     ProgressTypes,
     PlayerTypes,
     reduxStore,
@@ -78,8 +78,8 @@ async function getAsyncDataFromSocket(
 }
 
 async function getDataFromDB() {
-    const indexedDB = await DBPromise
-    const data = await indexedDB.readAllRecords()
+    const DBOperator = await getDBOperator
+    const data = await DBOperator.readAllRecords()
     return classifyRecords(data)
 }
 
