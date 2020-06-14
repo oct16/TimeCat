@@ -106,3 +106,4 @@ dist
 lib
 docs
 .DS_Store
+stats.html

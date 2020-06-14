@@ -4,6 +4,7 @@ import { terser } from 'rollup-plugin-terser'
 import commonjs from '@rollup/plugin-commonjs'
 import { env, htmlExamples } from './rollup.base'
 import ttypescript from 'ttypescript'
+import visualizer from 'rollup-plugin-visualizer';
 
 export default {
     input: 'index.ts',
@@ -45,6 +46,7 @@ export default {
         commonjs(),
         ...htmlExamples(),
         ...env(),
-        terser()
+        terser(),
+        visualizer()
     ]
 }
