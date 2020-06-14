@@ -2,8 +2,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "outDir": "dist",
-        "target": "esnext",
         "module": "esnext",
+        "target": "ES2019",
         "moduleResolution": "node",
         "allowJs": false,
         "noUnusedLocals": false,
@@ -18,12 +18,13 @@
         "jsx": "preserve",
         "skipLibCheck": true,
         "lib": [
-            "esnext",
+            "ES2019",
             "dom",
             "dom.iterable"
         ],
         "types": [
-            "@types/node"
+            "node",
+            "jest"
         ],
         "rootDir": ".",
         "paths": {
@@ -37,7 +38,9 @@
         "packages/*/src",
         "index.ts",
         "examples/*",
-        "packages/*/__tests__",
-        "packages/chrome/src/assets/ctrl.js"
+        "test/**/*"
+    ],
+    "exclude": [
+        "node_modules"
     ]
 }
