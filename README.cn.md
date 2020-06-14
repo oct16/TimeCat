@@ -47,7 +47,9 @@ replay(ReplayOptions)
 // export html file
 exportReplay(Opts)
 ```
-Simple Example: [Todo List](https://oct16.github.io/TimeCat/todo.html)
+Simple Example:  
+[Record Todo List](https://github.com/oct16/TimeCat/blob/073c467afc644ce37e4f51937c28eb5000b2a92c/examples/todo.html#L258) and [Replay Todo List](https://github.com/oct16/TimeCat/blob/073c467afc644ce37e4f51937c28eb5000b2a92c/examples/player.html#L14)
+
 ### API Documentation
 
 [TYPEDOC](https://oct16.github.io/TimeCat/docs/globals.html)
