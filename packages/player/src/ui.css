@@ -115,23 +115,24 @@ body {
     color: #999;
 }
 
+.cat-export button,
 .cat-keyboard button {
-    margin: 0;
     vertical-align: middle;
     border: none;
     background: none;
     color: white;
     outline: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 18px;
+    padding: 0 4px;
 }
 
-.play-or-pause {
+button.play-or-pause {
+    padding: 0;
+    text-indent: 1px;
     transform: rotate(90deg);
-    line-height: 16px;
-    width: 21px;
-    text-indent: -3px;
-    margin-right: 4px;
+    width: 18px;
 }
 
 .cat-progress {
@@ -152,8 +153,8 @@ body {
 }
 
 .cat-thumb {
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
     box-sizing: border-box;
     border: 1px solid white;
     background: black;
@@ -179,7 +180,7 @@ body {
 .cat-timer {
     margin: 0 8px;
     color: white;
-    font-size: 16px;
+    font-size: 13px;
     line-height: 20px;
     font-family: Helvetica;
     vertical-align: middle;
