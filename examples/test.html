@@ -83,9 +83,7 @@
     <script src="http://localhost:4321/timecatjs.min.js"></script>
     <script>
         const { record } = timecat
-        ctrl = record({
-            audio: true
-        })
+        ctrl = record()
         const replayButton = document.getElementById('replay')
         if (replayButton) {
             replayButton.onclick = () => {

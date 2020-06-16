@@ -28,8 +28,6 @@ function getRecorders(options: RecordOptions) {
 }
 
 export const record = (options: RecordOptions) => {
-    console.log(options)
-
     getDBOperator.then(db => {
         db.clear()
         getRecorders(options).forEach(task =>
