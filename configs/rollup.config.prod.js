@@ -5,6 +5,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import { env, htmlExamples } from './rollup.base'
 import ttypescript from 'ttypescript'
 import visualizer from 'rollup-plugin-visualizer'
+import scss from 'rollup-plugin-scss'
 
 export default {
     input: 'index.ts',
@@ -33,6 +34,10 @@ export default {
                     ]
                 }
             }
+        }),
+        scss({
+            output: false,
+            failOnError: true
         }),
         node({
             browser: true,

@@ -1,7 +1,7 @@
 import { convertVNode } from '@TimeCat/virtual-dom'
 import { filteringTemplate, disableScrolling, nodeStore, debounce } from '@TimeCat/utils'
 import HTML from './ui.html'
-import CSS from './ui.css'
+import CSS from './ui.scss'
 import FIXED from './fixed.css'
 
 export class ContainerComponent {

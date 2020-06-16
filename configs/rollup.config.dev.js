@@ -3,6 +3,7 @@ import node from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import { htmlExamples, env } from './rollup.base'
 import browsersync from 'rollup-plugin-browsersync'
+import scss from 'rollup-plugin-scss'
 
 export default [
     {
@@ -16,6 +17,10 @@ export default [
         ],
         plugins: [
             ts(),
+            scss({
+                output: false,
+                failOnError: true
+            }),
             node({
                 browser: true
             }),

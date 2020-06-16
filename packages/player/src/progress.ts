@@ -29,7 +29,7 @@ export class ProgressComponent {
 
     setThumb(percentage: number) {
         const x = (percentage / 100) * (this.progress.offsetWidth - 10)
-        this.thumb.style.left = x - 1 + 'px'
+        this.thumb.style.left = x + 'px'
         this.currentProgress.style.width = x + 'px'
     }
 
