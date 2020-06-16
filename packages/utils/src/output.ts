@@ -61,10 +61,13 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
     const { scripts, autoplay } = exportOptions
     const options = { autoplay }
     const scriptList = scripts || ([] as ScriptItem[])
-    scriptList.push({
-        name: 'time-cat-init',
-        src: `timecat.replay(${JSON.stringify(options)})`
-    })
+
+    if (scriptList.some(item => item.name === 'time-cat-init')) {
+        scriptList.push({
+            name: 'time-cat-init',
+            src: `timecat.replay(${JSON.stringify(options)})`
+        })
+    }
 
     await injectScripts(html, scriptList)
 }
@@ -145,13 +148,12 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
         outputStr += String.fromCharCode(num)
     }
 
-    const scriptContent = `var __ReplayStrData__ =  '${outputStr}'`
-
+    const replayData = `var __ReplayStrData__ =  '${outputStr}'`
     const loadingScriptContent = `const loadingNode = document.createElement('div')
     loadingNode.className = 'pacman-box';
     loadingNode.innerHTML = '<style>${pacmanCss}<\/style><div class="pacman"><div><\/div><div><\/div><div><\/div><div><\/div><div><\/div><\/div>'
     loadingNode.setAttribute('style', 'text-align: center;vertical-align: middle;line-height: 100vh;')
     document.body.insertBefore(loadingNode, document.body.firstChild);window.addEventListener('DOMContentLoaded', () => loadingNode.parentNode.removeChild(loadingNode))`
     injectScripts(html, [{ src: loadingScriptContent }])
-    injectScripts(html, [{ src: scriptContent }])
+    injectScripts(html, [{ src: replayData }])
 }
