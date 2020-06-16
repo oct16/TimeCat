@@ -33,15 +33,20 @@ export const htmlExamples = () => {
             fileName: 'live.html',
             template: () => filteringTemplate(fs.readFileSync('examples/live.html', 'utf8'))
         }),
-        html({
-            fileName: 'test.html',
-            template: () => fs.readFileSync('examples/test.html', 'utf8')
-        }),
+        (() => {
+            if (fs.existsSync('examples/test.html')) {
+                return html({
+                    fileName: 'test.html',
+                    template: () => filteringTemplate(fs.readFileSync('examples/test.html', 'utf8'))
+                })
+            }
+            return null
+        })(),
         string({
             include: ['**/*.html', '**/*.css'],
             exclude: ['**/index.html', '**/index.css']
         })
-    ]
+    ].filter(Boolean)
 }
 
 export const env = () => {
