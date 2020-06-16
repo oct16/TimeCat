@@ -240,6 +240,24 @@ const elementList: [HTMLElement, string][] = [
 
 通过规则筛选出关键点后，利用B样条曲线计算函数，按照最小间隔进行取样并插入我们的鼠标路径队执行列里，当渲染时重绘鼠标位置的时候，就可以得到一个近似曲线的鼠标轨迹了
 
+#### 通过Diff字符串优化数据长度
+
+当我们在一个输入框中不断的敲击内容时，我们的Watcher函数会源源不断的事件响应，通过`Event.target.value`可以拿到当前`HTMLInputElement`最新的值，利用节流函数可以过滤掉一些冗余的响应，但是还不够，例如在一个TextArea中的文本会非常的长长长长长，假设文本的长度的长度是n，我们在文本后面添加了是10个字符，那么响应的长度是：
+> 10n + ∑(k=1, n=10)
+
+可见会产生大量的数据
+
+通过 Diff Patch 之后，把字符串`abcd` 修改 `bcde`可以表达为：
+
+> <h3><del>a</del>bcd<ins>e</ins></h3>
+
+```ts
+const patches = [
+    {type: 'delete', index: 0, count: 1},
+    {type: 'add', index: 3, value: 'e'},
+]
+```
+
 #### 通过鼠标数据生成热力图
 
 之前已经通过鼠标事件记录了完整的坐标信息，通过[heatmap.js](https://www.patrick-wied.at/static/heatmapjs/)可以很方便的生成热力图，用于对用户的行为数据进行分析。

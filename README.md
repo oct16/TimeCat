@@ -236,6 +236,24 @@ After simplifying the mouse path through these two strategies, it takes only abo
 
 After filtering out the key points through the rules, the B-spline curve calculation function is used, When redrawing the mouse position during rendering, you can get a mouse with an approximate curve Track
 
+#### Optimize the data by Diff string
+
+When we constantly taping the content in an input box, our Watcher function will continuously respond to events, through `Event.target.value` you can get the latest value of the current `HTMLInputElement`, you can use the throttling function to filter Some redundant responses are dropped, but it is not enough. For example, the text in a TextArea will be very long and long. Assuming the length of the text is n, we add 10 characters after the text, then the response The length is:
+> 10n + ∑(k=1, n=10)
+
+Visible will produce a lot of data
+
+After passing by Diff Patch, modifying the string `abcd` to `bcde` can be expressed as:
+
+> <h3><del>a</del>bcd<ins>e</ins></h3>
+
+```ts
+const patches = [
+     {type:'delete', index: 0, count: 1},
+     {type:'add', index: 3, value:'e'},
+]
+```
+
 #### Generate heat map from mouse data
 
 Recorded a coordinate info through a mouse event, the heat map can be easily generated for analyzing the user's behavior data by [heatmap.js](https://www.patrick-wied.at/static/heatmapjs/).
