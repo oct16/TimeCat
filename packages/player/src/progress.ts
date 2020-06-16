@@ -10,7 +10,7 @@ export class ProgressComponent {
 
     constructor(c: ContainerComponent) {
         this.progress = c.container.querySelector('.cat-progress')! as HTMLElement
-        this.timer = c.container.querySelector('.cat-timer') as HTMLElement
+        this.timer = c.container.querySelector('.cat-timer time') as HTMLElement
         this.thumb = this.progress.querySelector('.cat-thumb') as HTMLElement
         this.currentProgress = this.progress.querySelector('.cat-current-progress') as HTMLElement
         this.slider = this.progress.querySelector('.cat-slider-bar') as HTMLElement

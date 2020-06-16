@@ -161,7 +161,7 @@ button.play-or-pause {
     border-radius: 100%;
     cursor: pointer;
     position: absolute;
-    left: 0%;
+    left: 0px;
     transform: translate3d(-5px, -4px, 0);
     z-index: 10;
     transition: left .3s linear;
@@ -177,11 +177,12 @@ button.play-or-pause {
     transition: width .3s linear;
 }
 
-.cat-timer {
-    margin: 0 8px;
+.cat-timer>time {
+    padding: 0 4px;
     color: white;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 18px;
+    height: 18px;
     font-family: Helvetica;
     vertical-align: middle;
 }
