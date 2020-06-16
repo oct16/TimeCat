@@ -3,7 +3,7 @@
     "author": "oct16",
     "version": "1.0.5",
     "description": "TimeCat Web Recorder",
-    "main": "lib/timecatjs.cjs.js",
+    "main": "lib/timecatjs.min.js",
     "module": "lib/timecatjs.esm.js",
     "types": "lib/timecatjs.d.ts",
     "keywords": [

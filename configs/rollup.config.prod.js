@@ -11,13 +11,8 @@ export default {
     output: [
         {
             name: 'timecat',
-            format: 'iife',
+            format: 'umd',
             file: 'dist/timecatjs.min.js'
-        },
-        {
-            name: 'timecat',
-            format: 'cjs',
-            file: 'dist/timecatjs.cjs.js'
         },
         {
             name: 'timecat',
