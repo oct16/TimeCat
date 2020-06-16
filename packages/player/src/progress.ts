@@ -1,4 +1,4 @@
-import { throttle, ProgressState, secondToDate } from '@TimeCat/utils'
+import { secondToDate } from '@TimeCat/utils'
 import { ContainerComponent } from './container'
 
 export class ProgressComponent {
@@ -7,20 +7,7 @@ export class ProgressComponent {
     thumb: HTMLElement
     timer: HTMLElement
     slider: HTMLElement
-    speed: number
-    rafId: number
 
-    progressState: ProgressState
-
-    totalDistance = 0
-
-    throttleTimer = throttle(
-        (percentage: number) => {
-            this.setThumb(percentage)
-        },
-        300,
-        { trailing: true }
-    )
     constructor(c: ContainerComponent) {
         this.progress = c.container.querySelector('.cat-progress')! as HTMLElement
         this.timer = c.container.querySelector('.cat-timer') as HTMLElement
@@ -30,7 +17,7 @@ export class ProgressComponent {
     }
 
     updateProgress(percentage: number) {
-        this.throttleTimer(percentage)
+        this.setThumb(percentage)
     }
 
     updateTimer(second: number) {
@@ -41,8 +28,9 @@ export class ProgressComponent {
     }
 
     setThumb(percentage: number) {
-        this.thumb.style.left = percentage + '%'
-        this.currentProgress.style.width = (percentage / 100) * (this.progress.offsetWidth - 10) + 'px'
+        const x = (percentage / 100) * (this.progress.offsetWidth - 10)
+        this.thumb.style.left = x - 1 + 'px'
+        this.currentProgress.style.width = x + 'px'
     }
 
     resetThumb() {
@@ -50,7 +38,7 @@ export class ProgressComponent {
         const currentProgress = this.currentProgress.cloneNode(true) as HTMLElement
         this.thumb.parentNode!.replaceChild(thumb, this.thumb)
         this.currentProgress.parentNode!.replaceChild(currentProgress, this.currentProgress)
-        thumb.style.left = '0%'
+        thumb.style.left = '0px'
         currentProgress.style.width = '0px'
         this.thumb = thumb as HTMLElement
         this.currentProgress = currentProgress as HTMLElement
