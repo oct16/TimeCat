@@ -25,7 +25,7 @@ export class PlayerComponent {
     audioNode: HTMLAudioElement
 
     progressState: ProgressState
-    data: RecordData[]
+    recordDataList: RecordData[]
     speed = 0
     index = 0
     frameIndex = 0
@@ -60,7 +60,7 @@ export class PlayerComponent {
 
         this.initViewState()
 
-        if (!this.data.length) {
+        if (!this.recordDataList.length) {
             // is live mode
             window.addEventListener('record-data', this.streamHandle.bind(this))
         } else {
@@ -122,20 +122,20 @@ export class PlayerComponent {
     initViewState() {
         const { __ReplayDataList__: list } = window
         const firstData = list[0]
-        this.data = firstData.records
+        this.recordDataList = firstData.records
 
         this.audioData = firstData.audio
         this.initAudio()
 
         // live mode
-        if (!this.data.length) {
+        if (!this.recordDataList.length) {
             return
         }
 
         this.subtitlesIndex = 0
         this.broadcaster.cleanText()
 
-        this.curViewEndTime = +this.data.slice(-1)[0].time
+        this.curViewEndTime = +this.recordDataList.slice(-1)[0].time
         this.curViewDiffTime = 0
         window.__ReplayData__ = { index: 0, ...firstData }
     }
@@ -143,7 +143,7 @@ export class PlayerComponent {
     switchNextView() {
         const { __ReplayData__: rData, __ReplayDataList__: list } = window
 
-        if (!this.data) {
+        if (!this.recordDataList) {
             return
         }
 
@@ -154,15 +154,15 @@ export class PlayerComponent {
 
         const nextData = list[nextIndex]
 
-        const curEndTime = +this.data.slice(-1)[0].time
+        const curEndTime = +this.recordDataList.slice(-1)[0].time
         const nextStartTime = +nextData.records[0].time
         this.curViewDiffTime += nextStartTime - curEndTime
 
         window.__ReplayData__ = { index: nextIndex, ...nextData }
-        this.data = nextData.records
+        this.recordDataList = nextData.records
         this.audioData = nextData.audio
         this.initAudio()
-        this.curViewEndTime = +this.data.slice(-1)[0].time
+        this.curViewEndTime = +this.recordDataList.slice(-1)[0].time
         this.index = 0
         this.c.setViewState()
     }
@@ -183,7 +183,7 @@ export class PlayerComponent {
             this.RAF.stop()
         }
 
-        const maxFps = 20
+        const maxFps = 30
         this.RAF = new AnimationFrame(loop.bind(this), maxFps)
         this.RAF.start()
 
@@ -201,7 +201,7 @@ export class PlayerComponent {
             }
 
             const currTime = this.startTime + timeStamp * this.speed
-            const nextTime = Number(this.frames[this.frameIndex])
+            let nextTime = Number(this.frames[this.frameIndex])
 
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
                 // why delay 200ms here? cause we need to wait for all frame finished
@@ -210,12 +210,13 @@ export class PlayerComponent {
                 this.switchNextView()
             }
 
-            if (currTime >= nextTime) {
-                this.renderEachFrame(currTime)
+            while (nextTime && currTime >= nextTime) {
+                this.renderEachFrame()
                 this.frameIndex++
+                nextTime = Number(this.frames[this.frameIndex])
             }
 
-            this.elapsedTime = (currTime - this.frames[0]) / 1000 - Math.max(0, (currTime - nextTime) / 1000)
+            this.elapsedTime = (currTime - this.frames[0]) / 1000
         }
     }
 
@@ -249,19 +250,17 @@ export class PlayerComponent {
         }
     }
 
-    renderEachFrame(time: number) {
-        const { startTime } = this.progressState
-        this.progress.updateTimer((time - startTime) / 1000)
+    renderEachFrame() {
+        this.progress.updateTimer(((this.frameIndex + 1) * this.frameInterval) / 1000)
         const progress = (this.frameIndex / (this.frames.length - 1)) * 100
         this.progress.updateProgress(progress)
         let data: RecordData
-
-        while (+(data = this.data[this.index]).time - this.curViewDiffTime <= this.frames[this.frameIndex]) {
+        while (
+            this.index < this.recordDataList.length &&
+            +(data = this.recordDataList[this.index]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
+        ) {
             this.execFrame.call(this, data)
             this.index++
-            if (this.index === this.data.length) {
-                break
-            }
         }
 
         if (this.audioData && this.audioData.subtitles.length) {
