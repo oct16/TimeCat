@@ -15,6 +15,7 @@ import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { RecordData, AudioData } from '@TimeCat/record'
 import { BroadcasterComponent } from './broadcaster'
+import { AnimationFrame } from './animationFrame'
 
 export class PlayerComponent {
     c: ContainerComponent
@@ -32,7 +33,7 @@ export class PlayerComponent {
     isFirstTimePlay = true
     frameInterval = 250
     frames: number[]
-    requestID: number
+
     startTime: number
     elapsedTime = 0
 
@@ -42,6 +43,8 @@ export class PlayerComponent {
     subtitlesIndex = 0
     audioData: AudioData
     audioBlobUrl: string
+
+    RAF: AnimationFrame
 
     constructor(
         c: ContainerComponent,
@@ -175,8 +178,14 @@ export class PlayerComponent {
             }
             this.isFirstTimePlay = false
         }
-        cancelAnimationFrame(this.requestID)
-        this.requestID = requestAnimationFrame(loop.bind(this))
+
+        if (this.RAF && this.RAF.requestID) {
+            this.RAF.stop()
+        }
+
+        const maxFps = 20
+        this.RAF = new AnimationFrame(loop.bind(this), maxFps)
+        this.RAF.start()
 
         const initTime = getTime()
         this.startTime = 0
@@ -207,8 +216,6 @@ export class PlayerComponent {
             }
 
             this.elapsedTime = (currTime - this.frames[0]) / 1000 - Math.max(0, (currTime - nextTime) / 1000)
-
-            this.requestID = requestAnimationFrame(loop.bind(this))
         }
     }
 
@@ -275,7 +282,9 @@ export class PlayerComponent {
     }
 
     pause() {
-        cancelAnimationFrame(this.requestID)
+        if (this.RAF) {
+            this.RAF.stop()
+        }
         reduxStore.dispatch({
             type: PlayerTypes.SPEED,
             data: {
