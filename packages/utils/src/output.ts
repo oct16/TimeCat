@@ -1,11 +1,11 @@
 import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from './store/idb'
-import { filteringScriptTag } from './tools/dom'
 import { isDev, classifyRecords, download, getRandomCode, getTime } from './tools/common'
 import pako from 'pako'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { RecordData, AudioData, RecorderOptions, NONERecord } from '@TimeCat/record'
 import { base64ToFloat32Array, encodeWAV } from './transform'
+import { getScript } from './tools/dom'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
@@ -91,12 +91,6 @@ async function injectScripts(html: Document, scripts?: ScriptItem[]) {
             html.body.appendChild(script)
         }
     }
-}
-
-async function getScript(src: string) {
-    return await fetch(src)
-        .then(res => res.text())
-        .then(filteringScriptTag)
 }
 
 async function getDataFromDB(exportOptions?: ExportOptions) {

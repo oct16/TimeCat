@@ -108,3 +108,34 @@ export function isHideComment(node: Node | null) {
 export function isExistingNode(node: Node) {
     return node.ownerDocument && !!node.ownerDocument.contains(node)
 }
+
+export function getRawScriptContent(src: string) {
+    if (!src) {
+        return false
+    }
+    if (src.length > 500) {
+        return false
+    }
+
+    const fullSrc = completionAttrHref(src)
+    if (isValidUrl(fullSrc)) {
+        return getScript(fullSrc)
+    }
+
+    return false
+}
+
+function isValidUrl(url: string) {
+    try {
+        new URL(url)
+    } catch (_) {
+        return false
+    }
+    return true
+}
+
+export async function getScript(src: string) {
+    return await fetch(src)
+        .then(res => res.text())
+        .then(filteringScriptTag)
+}
