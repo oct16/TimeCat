@@ -177,12 +177,15 @@ button.play-or-pause {
     transition: width .3s linear;
 }
 
+.cat-timer {
+    line-height: 20px;
+    height: 20px;
+}
+
 .cat-timer>time {
     padding: 0 4px;
     color: white;
     font-size: 13px;
-    line-height: 18px;
-    height: 18px;
     font-family: Helvetica;
     vertical-align: middle;
 }
