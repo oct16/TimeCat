@@ -26,7 +26,8 @@ import {
     getTime,
     isExistingNode,
     debounce,
-    isVNode
+    isVNode,
+    getStrDiffPatches
 } from '@TimeCat/utils'
 
 function emitterHook(emit: RecordEvent<RecordData>, data: any) {
@@ -395,15 +396,31 @@ function listenInputs(emit: RecordEvent<FormElementRecord>) {
         switch (eventType) {
             case 'input':
             case 'change':
+                const target = e.target as HTMLInputElement
+                const str = target.value
+                let newValue = ''
+                const patches: ReturnType<typeof getStrDiffPatches> = []
+                if (str === target.oldValue) {
+                    return
+                }
+                if (str.length <= 20 || !target.oldValue) {
+                    newValue = str
+                } else {
+                    patches.push(...getStrDiffPatches(target.oldValue, str))
+                }
+
                 data = {
                     type: RecordType.FORM_EL_UPDATE,
                     data: {
                         type: FormElementEvent.INPUT,
                         id: nodeStore.getNodeId(e.target as Node)!,
-                        value: (e.target as HTMLInputElement).value
+                        value: !patches.length ? newValue : '',
+                        patches
                     },
                     time: getTime().toString()
                 }
+
+                target.oldValue = str
                 break
             case 'focus':
                 data = {

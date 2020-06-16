@@ -14,7 +14,7 @@ import {
     ScrollWatcherData
 } from '@TimeCat/record'
 import { PlayerComponent } from './player'
-import { nodeStore, isElementNode, isExistingNode, delay, isVNode } from '@TimeCat/utils'
+import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@TimeCat/utils'
 import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@TimeCat/virtual-dom'
 
 function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
@@ -194,12 +194,17 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         case RecordType.FORM_EL_UPDATE:
             // Reduce the delay caused by interactive animation
             await delay(200)
-            const { id, key, type: formType, value } = data as FormElementWatcherData
+            const { id, key, type: formType, value, patches } = data as FormElementWatcherData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
 
             if (node) {
                 if (formType === FormElementEvent.INPUT) {
-                    node.value = value!
+                    if (value) {
+                        node.value = value!
+                    } else if (patches && patches.length) {
+                        const newValue = revertStrByPatches(node.value, patches)
+                        node.value = newValue
+                    }
                 } else if (formType === FormElementEvent.FOCUS) {
                     node.focus()
                 } else if (formType === FormElementEvent.BLUR) {

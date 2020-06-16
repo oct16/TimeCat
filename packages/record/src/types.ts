@@ -113,6 +113,14 @@ export interface FormElementWatcherData {
     id: number
     key?: string
     value?: string
+    patches?: FormElementStrPatches[]
+}
+
+interface FormElementStrPatches {
+    index: number
+    type: 'add' | 'rm'
+    value?: string | undefined
+    len?: number | undefined
 }
 
 export interface AudioRecord {

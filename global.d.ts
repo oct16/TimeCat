@@ -17,6 +17,10 @@ declare interface IDBDatabase {
     value: any
 }
 
+declare interface HTMLInputElement {
+    oldValue: string
+}
+
 interface Window {
     __ReplayStrData__: string
 
