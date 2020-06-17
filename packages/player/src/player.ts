@@ -140,7 +140,7 @@ export class PlayerComponent {
         window.__ReplayData__ = { index: 0, ...firstData }
     }
 
-    switchNextView() {
+    async switchNextView(delayTime?: number) {
         const { __ReplayData__: rData, __ReplayDataList__: list } = window
 
         if (!this.recordDataList) {
@@ -164,6 +164,11 @@ export class PlayerComponent {
         this.initAudio()
         this.curViewEndTime = +this.recordDataList.slice(-1)[0].time
         this.index = 0
+
+        if (delayTime) {
+            await delay(delayTime)
+        }
+
         this.c.setViewState()
     }
 
@@ -204,10 +209,8 @@ export class PlayerComponent {
             let nextTime = Number(this.frames[this.frameIndex])
 
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
-                // why delay 200ms here? cause we need to wait for all frame finished
-                await delay(200)
-
-                this.switchNextView()
+                // delay 200ms wait for all frame finished and switch next
+                await this.switchNextView(200)
             }
 
             while (nextTime && currTime >= nextTime) {
