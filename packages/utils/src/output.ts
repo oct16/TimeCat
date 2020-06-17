@@ -62,7 +62,7 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
     const options = { autoplay }
     const scriptList = scripts || ([] as ScriptItem[])
 
-    if (scriptList.some(item => item.name === 'time-cat-init')) {
+    if (!scriptList.some(item => item.name === 'time-cat-init')) {
         scriptList.push({
             name: 'time-cat-init',
             src: `timecat.replay(${JSON.stringify(options)})`

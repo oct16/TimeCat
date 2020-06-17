@@ -25,8 +25,14 @@ export async function replay(options: ReplayOptions = { autoplay: true }) {
     }
 
     const { records, audio } = replayData
+    const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
     const c = new ContainerComponent()
+
+    if (hasAudio) {
+        await waitStart()
+    }
+    removeStartPage()
 
     fmp.ready(async () => {
         new Panel(c)
@@ -54,13 +60,6 @@ export async function replay(options: ReplayOptions = { autoplay: true }) {
                 }
             })
 
-            const hasAudio = audio && (audio.src || audio.bufferStrList.length)
-
-            if (hasAudio) {
-                await waitStart()
-            }
-            removeStartPage()
-
             if (options.autoplay || hasAudio) {
                 reduxStore.dispatch({
                     type: PlayerTypes.SPEED,
@@ -77,17 +76,21 @@ export async function replay(options: ReplayOptions = { autoplay: true }) {
         }
     }
 
+    function showStartPage() {
+        const startPage = document.querySelector('#cat-start-page')! as HTMLElement
+        startPage.setAttribute('style', '')
+        return startPage
+    }
+
     function removeStartPage() {
         const startPage = document.querySelector('#cat-start-page')!
         startPage.parentElement!.removeChild(startPage)
     }
 
     async function waitStart(): Promise<void> {
-        const startPage = document.querySelector('#cat-start-page')! as HTMLElement
-        startPage.setAttribute('style', '')
+        const startPage = showStartPage()
         return new Promise(r => {
-            const playBtn = document.querySelector('.play-btn')!
-            playBtn.addEventListener('click', async () => {
+            startPage.addEventListener('click', async () => {
                 r()
                 startPage.className = 'clearly'
                 await new Promise(rr => setTimeout(() => rr(), 500))

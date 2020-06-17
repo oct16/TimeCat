@@ -130,7 +130,7 @@ body {
         color: white;
         outline: none;
         cursor: pointer;
-        font-size: 15px;
+        font-size: 13px;
         line-height: 18px;
         padding: 0 4px;
 
@@ -175,7 +175,7 @@ body {
 }
 
 .cat-current-progress {
-    background: darkgray;
+    background: #aaa;
     border-radius: 2px;
     position: absolute;
     left: 0;
@@ -242,10 +242,10 @@ body {
     top: 0;
     width: 100%;
     height: calc(100% + 42px);
-    background: rgba(255, 255, 255, .5);
-    -webkit-backdrop-filter: blur(.7px);
-    backdrop-filter: blur(.7px);
+    -webkit-backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(1.5px);
     transition: .5s all;
+    cursor: pointer;
 
     .play-btn {
         position: absolute;
@@ -256,7 +256,6 @@ body {
         bottom: 0;
         width: 100px;
         height: 100px;
-        cursor: pointer;
         transition: .5s all;
     }
 

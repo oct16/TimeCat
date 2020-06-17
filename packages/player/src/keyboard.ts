@@ -97,7 +97,9 @@ export class KeyboardComponent {
         const scriptList = []
 
         async function getScriptSource(scriptElement: HTMLScriptElement) {
-            return scriptElement.textContent || (await getRawScriptContent(scriptElement.src.trim()))
+            return (
+                scriptElement.textContent || (await getRawScriptContent(scriptElement.src.trim())) || scriptElement.src
+            )
         }
 
         if (SDKScript) {

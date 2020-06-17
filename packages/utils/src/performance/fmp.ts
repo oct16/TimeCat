@@ -5,6 +5,7 @@
 class FMP {
     interval = 1000
     len = 0
+    resolved = false
     listener: Array<() => void> = []
     constructor() {
         this.observe()
@@ -18,6 +19,7 @@ class FMP {
             const len = entries.length
             if (len <= this.len) {
                 performance.clearResourceTimings()
+                this.resolved = true
                 if (this.listener.length) {
                     this.listener.forEach(run => run())
                 }
@@ -41,6 +43,9 @@ class FMP {
     }
 
     ready(fn: () => void) {
+        if (this.resolved) {
+            return fn()
+        }
         this.listener.push(fn)
     }
 }

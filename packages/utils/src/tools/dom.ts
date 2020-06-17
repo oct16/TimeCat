@@ -109,7 +109,7 @@ export function isExistingNode(node: Node) {
     return node.ownerDocument && !!node.ownerDocument.contains(node)
 }
 
-export function getRawScriptContent(src: string) {
+export async function getRawScriptContent(src: string) {
     if (!src) {
         return false
     }
@@ -119,7 +119,12 @@ export function getRawScriptContent(src: string) {
 
     const fullSrc = completionAttrHref(src)
     if (isValidUrl(fullSrc)) {
-        return getScript(fullSrc)
+        try {
+            return await getScript(fullSrc)
+        } catch (err) {
+            // handle cross error
+            return false
+        }
     }
 
     return false
@@ -135,7 +140,5 @@ function isValidUrl(url: string) {
 }
 
 export async function getScript(src: string) {
-    return await fetch(src)
-        .then(res => res.text())
-        .then(filteringScriptTag)
+    return await fetch(src).then(async res => filteringScriptTag(await res.text()))
 }
