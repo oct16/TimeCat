@@ -90,12 +90,17 @@ export function isVNode(n: VNode | VSNode) {
     return !!(n as VNode).tag
 }
 
-export function download(blob: Blob, name: string) {
+export function download(src: Blob | string, name: string) {
     var tag = document.createElement('a')
     tag.download = name
-    tag.href = URL.createObjectURL(blob)
-    tag.click()
-    URL.revokeObjectURL(blob as any)
+    if (typeof src === 'string') {
+        tag.href = src
+        tag.click()
+    } else {
+        tag.href = URL.createObjectURL(src)
+        tag.click()
+        URL.revokeObjectURL(tag.href)
+    }
 }
 
 export function getStrDiffPatches(oldStr: string, newStr: string) {

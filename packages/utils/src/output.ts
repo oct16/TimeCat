@@ -48,6 +48,13 @@ function downloadFiles(html: Document) {
 }
 
 function downloadAudios() {
+    const replayData = window.__ReplayData__
+    const { src } = replayData.audio
+    if (src) {
+        download(src, src)
+        return
+    }
+
     downloadAudioConfig.extractAudioDataList.forEach(extractedData => {
         const floatArray = extractedData.source.map(data => base64ToFloat32Array(data))
         const audioBlob = encodeWAV(floatArray, downloadAudioConfig.opts)
