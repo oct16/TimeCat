@@ -6,6 +6,7 @@ import { SnapshotData } from '@TimeCat/snapshot'
 import { RecordData, AudioData, RecorderOptions, NONERecord } from '@TimeCat/record'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './tools/dom'
+import { recoverNative } from './tools/recover-native'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
@@ -20,12 +21,23 @@ const downloadAudioConfig = {
 }
 
 export async function exportReplay(exportOptions: ExportOptions) {
+    recoveryMethods()
     await addNoneFrame()
     const parser = new DOMParser()
     const html = parser.parseFromString(TPL, 'text/html')
     await injectData(html, exportOptions)
     await initOptions(html, exportOptions)
     downloadFiles(html)
+}
+
+function recoveryMethods() {
+    const methods = [
+        // 'HTMLElement.prototype.insertBefore',
+        // 'HTMLElement.prototype.append',
+        'HTMLElement.prototype.appendChild'
+    ]
+
+    methods.forEach(recoverNative.recoverMethod.bind(recoverNative))
 }
 
 async function addNoneFrame() {
@@ -48,11 +60,13 @@ function downloadFiles(html: Document) {
 }
 
 function downloadAudios() {
-    const replayData = window.__ReplayData__
-    const { src } = replayData.audio
-    if (src) {
-        download(src, src)
-        return
+    if (window.__ReplayData__) {
+        const replayData = window.__ReplayData__
+        if (replayData.audio) {
+            const { src } = replayData.audio
+            download(src, src)
+            return
+        }
     }
 
     downloadAudioConfig.extractAudioDataList.forEach(extractedData => {
