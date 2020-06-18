@@ -1,4 +1,4 @@
-import { secondToDate } from '@TimeCat/utils'
+import { secondToDate, delay } from '@TimeCat/utils'
 import { ContainerComponent } from './container'
 
 export class ProgressComponent {
@@ -16,8 +16,34 @@ export class ProgressComponent {
         this.slider = this.progress.querySelector('.cat-slider-bar') as HTMLElement
     }
 
-    updateProgress(percentage: number) {
-        this.setThumb(percentage)
+    async setProgressAnimation(index: number, total: number, interval: number, speed: number) {
+        // progress end
+        if (!index && !speed) {
+            return
+        }
+
+        this.thumb.classList.remove('active')
+        this.currentProgress.classList.remove('active')
+
+        await delay(20)
+
+        const currentLeft = (index / total) * 100 + '%'
+        this.thumb.style.left = currentLeft
+        this.currentProgress.style.width = currentLeft
+
+        // pause
+        if (!speed) {
+            this.thumb.style.removeProperty('transition-duration')
+            this.currentProgress.style.removeProperty('transition-duration')
+            return
+        }
+
+        const duration = ((total - index) * interval) / speed / 1000 + 's'
+        this.thumb.style.transitionDuration = duration
+        this.currentProgress.style.transitionDuration = duration
+
+        this.thumb.classList.add('active')
+        this.currentProgress.classList.add('active')
     }
 
     updateTimer(second: number) {
@@ -27,13 +53,10 @@ export class ProgressComponent {
         }
     }
 
-    setThumb(percentage: number) {
-        percentage *= 0.992
-        this.thumb.style.left = percentage + '%'
-        this.currentProgress.style.width = percentage + '%'
-    }
-
     resetThumb() {
+        this.thumb.classList.remove('active')
+        this.currentProgress.classList.remove('active')
+
         const thumb = this.thumb.cloneNode(true) as HTMLElement
         const currentProgress = this.currentProgress.cloneNode(true) as HTMLElement
         this.thumb.parentNode!.replaceChild(thumb, this.thumb)

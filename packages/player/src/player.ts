@@ -68,12 +68,15 @@ export class PlayerComponent {
                 this.progressState = reduxStore.getState()['progress']
                 const speed = state.speed
                 this.speed = speed
+                this.frames = this.getAccuratelyFrame()
+
                 if (speed > 0) {
                     this.play()
                 } else {
                     this.pause()
                 }
-                this.frames = this.getAccuratelyFrame()
+
+                this.setProgress()
             })
         }
     }
@@ -253,10 +256,13 @@ export class PlayerComponent {
         }
     }
 
+    setProgress() {
+        this.progress.setProgressAnimation(this.frameIndex, this.frames.length, this.frameInterval, this.speed)
+    }
+
     renderEachFrame() {
         this.progress.updateTimer(((this.frameIndex + 1) * this.frameInterval) / 1000)
-        const progress = (this.frameIndex / (this.frames.length - 1)) * 100
-        this.progress.updateProgress(progress)
+
         let data: RecordData
         while (
             this.index < this.recordDataList.length &&

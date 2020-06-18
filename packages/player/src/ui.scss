@@ -221,7 +221,13 @@ body {
     left: 0px;
     transform: translate3d(-6px, -4px, 0);
     z-index: 10;
-    transition: left .3s linear;
+    transition-property: left;
+    transition-timing-function: linear;
+    transition-duration: 0s;
+
+    &.active {
+        left: 100% !important;
+    }
 }
 
 .cat-current-progress {
@@ -231,7 +237,13 @@ body {
     left: 0;
     width: 0;
     height: 5px;
-    transition: width .3s linear;
+    transition-property: width;
+    transition-timing-function: linear;
+    transition-duration: 0s;
+
+    &.active {
+        width: 100% !important;
+    }
 }
 
 
