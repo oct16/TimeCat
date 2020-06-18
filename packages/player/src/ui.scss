@@ -77,7 +77,6 @@ body {
             border-radius: inherit;
             animation: wave .45s ease-out infinite;
         }
-
     }
 }
 
@@ -111,6 +110,31 @@ body {
     display: flex;
 }
 
+.cat-broadcaster {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 50px;
+
+    display: flex;
+    justify-content: center;
+
+    .float-layer {
+        margin: 0 10px;
+        line-height: 20px;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 2px;
+        padding: 5px;
+        box-shadow: 0px 0px 2px rgba(26, 26, 26, .5);
+        text-align: center;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+}
+
 .cat-keyboard {
     height: 20px;
     white-space: nowrap;
@@ -124,15 +148,14 @@ body {
 .cat-export,
 .cat-keyboard {
     button {
-        vertical-align: middle;
         border: none;
         background: none;
         color: white;
         outline: none;
         cursor: pointer;
         font-size: 13px;
-        line-height: 18px;
-        padding: 0 4px;
+        // line-height: 18px;
+        padding: 0 5px;
 
         &.play-or-pause {
             padding: 0;
@@ -143,10 +166,37 @@ body {
     }
 }
 
+.cat-export,
+.cat-progress,
+.cat-keyboard,
+.cat-timer {
+    display: flex;
+    align-items: center;
+}
+
+.cat-timer {
+    margin-left: 2px;
+
+    time {
+        margin-top: 1px;
+        padding: 0 4px;
+        color: white;
+        font-size: 12px;
+        font-family: Helvetica;
+        vertical-align: middle;
+    }
+}
+
+.cat-export {
+    button {
+        padding: 0;
+        padding-left: 2px;
+    }
+}
+
 .cat-progress {
     width: 100%;
     height: 20px;
-
 }
 
 .cat-slider-bar {
@@ -176,7 +226,7 @@ body {
 
 .cat-current-progress {
     background: #aaa;
-    border-radius: 2px;
+    border-radius: 2.5px;
     position: absolute;
     left: 0;
     width: 0;
@@ -184,57 +234,6 @@ body {
     transition: width .3s linear;
 }
 
-.cat-timer {
-    line-height: 20px;
-    height: 20px;
-
-    >time {
-        padding: 0 4px;
-        color: white;
-        font-size: 13px;
-        font-family: Helvetica;
-        vertical-align: middle;
-    }
-}
-
-.cat-export {
-    button {
-        margin-left: 8px;
-    }
-
-    img {
-        height: 13px;
-        vertical-align: bottom;
-    }
-}
-
-
-.cat-broadcaster {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    bottom: 50px;
-
-    display: flex;
-    justify-content: center;
-
-    .float-layer {
-        margin: 0 10px;
-        line-height: 20px;
-        color: #fff;
-        background-color: rgba(0, 0, 0, 0.6);
-        border-radius: 2px;
-        padding: 5px;
-        box-shadow: 0px 0px 2px rgba(26, 26, 26, .5);
-        text-align: center;
-
-        &[hidden] {
-            display: none;
-        }
-    }
-
-
-}
 
 #cat-start-page {
     position: absolute;
@@ -260,7 +259,6 @@ body {
     }
 
     &.clearly {
-
         -webkit-backdrop-filter: blur(0);
         backdrop-filter: blur(0);
         background: transparent;

@@ -28,9 +28,9 @@ export class ProgressComponent {
     }
 
     setThumb(percentage: number) {
-        const x = (percentage / 100) * (this.progress.offsetWidth - 10)
-        this.thumb.style.left = x + 'px'
-        this.currentProgress.style.width = x + 'px'
+        percentage *= 0.992
+        this.thumb.style.left = percentage + '%'
+        this.currentProgress.style.width = percentage + '%'
     }
 
     resetThumb() {
@@ -38,8 +38,8 @@ export class ProgressComponent {
         const currentProgress = this.currentProgress.cloneNode(true) as HTMLElement
         this.thumb.parentNode!.replaceChild(thumb, this.thumb)
         this.currentProgress.parentNode!.replaceChild(currentProgress, this.currentProgress)
-        thumb.style.left = '0px'
-        currentProgress.style.width = '0px'
+        thumb.style.left = '0'
+        currentProgress.style.width = '0'
         this.thumb = thumb as HTMLElement
         this.currentProgress = currentProgress as HTMLElement
     }
