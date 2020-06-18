@@ -76,9 +76,9 @@ export class KeyboardComponent {
 
         function getBtnIndex(speed: number) {
             switch (speed) {
-                case 128:
+                case 100:
                     return 2
-                case 8:
+                case 10:
                     return 1
                 case 1:
                     return 0
