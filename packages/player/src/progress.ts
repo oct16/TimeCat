@@ -22,27 +22,26 @@ export class ProgressComponent {
             return
         }
 
-        this.thumb.classList.remove('active')
+        // set width 100%
         this.currentProgress.classList.remove('active')
 
+        // fix change class not trigger animate
         await delay(20)
 
-        const currentLeft = (index / total) * 100 + '%'
-        this.thumb.style.left = currentLeft
-        this.currentProgress.style.width = currentLeft
+        this.currentProgress.style.removeProperty('transition')
 
         // pause
         if (!speed) {
-            this.thumb.style.removeProperty('transition-duration')
-            this.currentProgress.style.removeProperty('transition-duration')
+            this.currentProgress.style.width = this.currentProgress.offsetWidth + 'px'
+            this.currentProgress.style.setProperty('transition', 'none')
             return
         }
 
-        const duration = ((total - index) * interval) / speed / 1000 + 's'
-        this.thumb.style.transitionDuration = duration
-        this.currentProgress.style.transitionDuration = duration
+        // remind animation seconds
+        const duration = ((total - index) * interval) / speed / 1000
+        this.currentProgress.style.transitionDuration = duration + 's'
 
-        this.thumb.classList.add('active')
+        // animate
         this.currentProgress.classList.add('active')
     }
 
@@ -54,16 +53,10 @@ export class ProgressComponent {
     }
 
     resetThumb() {
-        this.thumb.classList.remove('active')
         this.currentProgress.classList.remove('active')
-
-        const thumb = this.thumb.cloneNode(true) as HTMLElement
         const currentProgress = this.currentProgress.cloneNode(true) as HTMLElement
-        this.thumb.parentNode!.replaceChild(thumb, this.thumb)
         this.currentProgress.parentNode!.replaceChild(currentProgress, this.currentProgress)
-        thumb.style.left = '0'
         currentProgress.style.width = '0'
-        this.thumb = thumb as HTMLElement
         this.currentProgress = currentProgress as HTMLElement
     }
 }
