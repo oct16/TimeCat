@@ -36,6 +36,7 @@ export class PlayerComponent {
 
     startTime: number
     elapsedTime = 0
+    audioOffset = 500
 
     curViewEndTime: number
     curViewDiffTime = 0
@@ -198,7 +199,7 @@ export class PlayerComponent {
         const initTime = getTime()
         this.startTime = 0
 
-        async function loop(this: PlayerComponent) {
+        async function loop(this: PlayerComponent, t: number, loopIndex: number) {
             const timeStamp = getTime() - initTime
             if (this.frameIndex > 0 && !this.frames[this.frameIndex]) {
                 this.stop()
@@ -223,6 +224,22 @@ export class PlayerComponent {
             }
 
             this.elapsedTime = (currTime - this.frames[0]) / 1000
+
+            // sync audio time
+            // every 2s check once
+
+            const frameCount = Math.floor(2 / (this.frameInterval / 1000))
+            const checkInterval = !(this.frameIndex % frameCount)
+            const checkOnce = loopIndex.toString().endsWith(frameCount * 2 + '')
+
+            const shouldCheckAudioTime = this.audioNode.src && checkInterval && !((loopIndex % frameCount) * 2)
+
+            if (shouldCheckAudioTime) {
+                const allowDiff = 200
+                if (Math.abs((this.elapsedTime - this.audioNode.currentTime) * 1000) > this.audioOffset + allowDiff) {
+                    this.syncAudioCurrentTime()
+                }
+            }
         }
     }
 
@@ -240,7 +257,7 @@ export class PlayerComponent {
                 this.audioNode.src = this.audioBlobUrl
             }
 
-            this.audioNode.currentTime = this.elapsedTime + 0.5
+            this.syncAudioCurrentTime()
 
             if (this.speed > 1) {
                 this.audioNode.pause()
@@ -248,6 +265,10 @@ export class PlayerComponent {
                 this.audioNode.play()
             }
         }
+    }
+
+    syncAudioCurrentTime(elapsedTime: number = this.elapsedTime, offset: number = this.audioOffset / 1000) {
+        this.audioNode.currentTime = elapsedTime + offset
     }
 
     pauseAudio() {

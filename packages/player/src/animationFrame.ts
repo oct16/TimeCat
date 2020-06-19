@@ -2,6 +2,7 @@ export class AnimationFrame {
     requestID: number
     fps: number
     animate: Function
+    index = 0
     constructor(animate: Function, fps = 60) {
         this.fps = fps
         this.animate = animate
@@ -18,7 +19,7 @@ export class AnimationFrame {
 
             if (delta >= interval - tolerance) {
                 then = now - (delta % interval)
-                this.animate(delta)
+                this.animate(delta, this.index++)
             }
         }
         this.requestID = requestAnimationFrame(animateLoop)
