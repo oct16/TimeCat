@@ -15,6 +15,7 @@ import io from 'socket.io-client'
 import { SnapshotData } from '@TimeCat/snapshot'
 import { RecordData, AudioData, RecorderOptions } from '@TimeCat/record'
 import { ReplayOptions } from './types'
+import { waitStart, removeStartPage, showStartMask } from './dom'
 
 export async function replay(options: ReplayOptions = { autoplay: true }) {
     window.__ReplayOptions__ = options
@@ -28,14 +29,15 @@ export async function replay(options: ReplayOptions = { autoplay: true }) {
     const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
     const c = new ContainerComponent()
+    new Panel(c)
 
-    if (hasAudio) {
-        await waitStart()
-    }
-    removeStartPage()
+    showStartMask()
 
     fmp.ready(async () => {
-        new Panel(c)
+        if (hasAudio) {
+            await waitStart()
+        }
+        removeStartPage()
 
         if (records.length) {
             const firstRecord = records[0]
@@ -74,28 +76,6 @@ export async function replay(options: ReplayOptions = { autoplay: true }) {
         if (panel) {
             panel.setAttribute('style', 'display: none')
         }
-    }
-
-    function showStartPage() {
-        const startPage = document.querySelector('#cat-start-page')! as HTMLElement
-        startPage.setAttribute('style', '')
-        return startPage
-    }
-
-    function removeStartPage() {
-        const startPage = document.querySelector('#cat-start-page')!
-        startPage.parentElement!.removeChild(startPage)
-    }
-
-    async function waitStart(): Promise<void> {
-        const startPage = showStartPage()
-        return new Promise(r => {
-            startPage.addEventListener('click', async () => {
-                r()
-                startPage.className = 'clearly'
-                await new Promise(rr => setTimeout(() => rr(), 500))
-            })
-        })
     }
 }
 

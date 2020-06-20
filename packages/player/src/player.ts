@@ -230,7 +230,6 @@ export class PlayerComponent {
 
             const frameCount = Math.floor(2 / (this.frameInterval / 1000))
             const checkInterval = !(this.frameIndex % frameCount)
-            const checkOnce = loopIndex.toString().endsWith(frameCount * 2 + '')
 
             const shouldCheckAudioTime = this.audioNode.src && checkInterval && !((loopIndex % frameCount) * 2)
 

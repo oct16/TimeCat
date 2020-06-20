@@ -261,16 +261,23 @@ body {
         bottom: 0;
         width: 100px;
         height: 100px;
-        transition: .5s all;
-    }
+        transition: all .5s;
+        transform: scale(0);
+        opacity: 0;
 
-    &.clearly {
-        -webkit-backdrop-filter: blur(0);
-        backdrop-filter: blur(0);
-        background: transparent;
-
-        .play-btn {
-            opacity: 0;
+        &.show {
+            transform: scale(1);
+            opacity: 1;
         }
     }
+
+    // &.clearly {
+    //     -webkit-backdrop-filter: blur(0);
+    //     backdrop-filter: blur(0);
+    //     background: transparent;
+
+    //     .play-btn {
+    //         opacity: 0;
+    //     }
+    // }
 }

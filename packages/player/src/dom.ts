@@ -221,3 +221,31 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
     }
 }
+
+export function showStartMask() {
+    const startPage = document.querySelector('#cat-start-page')! as HTMLElement
+    startPage.setAttribute('style', '')
+}
+
+function showStartBtn() {
+    const startPage = document.querySelector('#cat-start-page')! as HTMLElement
+    const btn = startPage.querySelector('.play-btn') as HTMLElement
+    btn.classList.add('show')
+    return btn
+}
+
+export function removeStartPage() {
+    const startPage = document.querySelector('#cat-start-page') as HTMLElement
+    startPage.parentElement!.removeChild(startPage)
+}
+
+export async function waitStart(): Promise<void> {
+    const btn = showStartBtn()
+    return new Promise(r => {
+        btn.addEventListener('click', async () => {
+            btn.classList.remove('show')
+            await delay(500)
+            r()
+        })
+    })
+}
