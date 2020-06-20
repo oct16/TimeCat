@@ -199,7 +199,8 @@ const elementList: [HTMLElement, string][] = [
 
 - Canvas：通过猴子补丁的方式去扩展或修改相应的API，从而获取到对应的动作
 - Iframe：在非跨域的状态下，也可以直接访问内部的节点进行录制，类似的还有Shadow Dom
-- Video：通过截屏的方式进行录制，类似的还有Flash等
+- Video：利用HTMLVideoElement获取并且记录视频的状态信息
+- Flash：通过截屏的方式进行录制，类似的还有Flash等
 
 #### 外链的处理
 

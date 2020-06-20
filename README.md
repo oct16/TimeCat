@@ -195,7 +195,8 @@ Because the DOM Diff Patch is implemented with the MutationObserver, it is neces
 
 - Canvas: Use monkey patching to extending or modifying the original AP to get the corresponding action
 - Iframe: In the non-cross-domain state, you can also directly access the internal nodes to record, similar to Shadow DOM etc
-- Video: Record by screen capture, similar to Flash, etc.
+- Video: By Detect the HTMLVideoElement to get and record video status
+- Flash: Record by screen capture
 
 #### External links
 
