@@ -189,9 +189,15 @@ Because the DOM Diff Patch is implemented with the MutationObserver, it is neces
 
 #### Compatibility of MutationObserver
 
-[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) shows that only in IE11 and later, Android 4.4 and later can be used, compatible with the old browser can be through [mutationobserver-shim](https://www.npmjs.com/package/mutationobserver-shim) to support, but using shim may cause some fatal bugs of the collected data. there is also a situation that some websites may block the MutationObserver API, we can restore the `` Native Code '' by creating an Iframe
+[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) shows that only in IE11 and later, Android 4.4 and later can be used, compatible with the old browser can be through [MutationObserver-shim](https://www.npmjs.com/package/mutationobserver-shim) to support, but using shim may cause some fatal bugs of the collected data. there is also a situation that some websites may block the MutationObserver API, we can restore the `` Native Code '' by creating an Iframe
 
-#### Cross-domain processing of external links
+#### Canvas, Iframe, Video and other elements
+
+- Canvas: Use monkey patching to extending or modifying the original AP to get the corresponding action
+- Iframe: In the non-cross-domain state, you can also directly access the internal nodes to record, similar to Shadow DOM etc
+- Video: Record by screen capture, similar to Flash, etc.
+
+#### External links
 
 After loading HTML, it will refer to many external resources, usually in many forms
 
@@ -249,8 +255,8 @@ After passing by Diff Patch, modifying the string `abcd` to `bcde` can be expres
 
 ```ts
 const patches = [
-     {type:'delete', index: 0, count: 1},
-     {type:'add', index: 3, value:'e'},
+    { type: 'delete', index: 0, count: 1 },
+    { type: 'add', index: 3, value: 'e' }
 ]
 ```
 

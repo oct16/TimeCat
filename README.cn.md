@@ -195,7 +195,13 @@ const elementList: [HTMLElement, string][] = [
 
 [Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) 表示只在IE11及以上，安卓4.4及以上可以使用，对于老浏览器的兼容可以通过[mutationobserver-shim](https://www.npmjs.com/package/mutationobserver-shim)的方式来支持，但是使用shim可能会因为收集的数据致精度不足从而产生一些致命Bug，另外还有一种情况是某些网站可能会屏蔽的掉MutationObserver这个API，遇到这种清空可以通过创建Iframe的方式来还原``Native Code``
 
-#### 跨域时外链的处理
+#### Canvas、Iframe、Video等元素的处理
+
+- Canvas：通过猴子补丁的方式去扩展或修改相应的API，从而获取到对应的动作
+- Iframe：在非跨域的状态下，也可以直接访问内部的节点进行录制，类似的还有Shadow Dom
+- Video：通过截屏的方式进行录制，类似的还有Flash等
+
+#### 外链的处理
 
 加载HTML以后会引用很多外界的资源，通常会有多种形式
 
@@ -253,8 +259,8 @@ const elementList: [HTMLElement, string][] = [
 
 ```ts
 const patches = [
-    {type: 'delete', index: 0, count: 1},
-    {type: 'add', index: 3, value: 'e'},
+    { type: 'delete', index: 0, count: 1 },
+    { type: 'add', index: 3, value: 'e' }
 ]
 ```
 
