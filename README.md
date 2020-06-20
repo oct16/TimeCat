@@ -328,7 +328,7 @@ We can use indexedDB to store client data. IndexedDB has much larger storage roo
 
 #### Load SDK
 
-The RollUp packer can generate multiple formats, such as `IIFE` and `ESM`, etc. Loading SDK in the project or using the Chrome plug-in to inject the IIFE module, we can easily input the code and control the data recording.
+The RollUp packer can generate multiple formats, such as `UMD` and `ESM`, etc. Loading SDK in the project or using the Chrome plug-in to inject the UMD module, we can easily load the code and control it to record the data.
 
 #### Thanks
 
