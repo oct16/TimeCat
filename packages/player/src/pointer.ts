@@ -24,10 +24,12 @@ export class PointerComponent {
 
     async click(x: number, y: number) {
         this.move(x, y)
-        await delay(100)
+        if (this.pointer.hasAttribute('active')) {
+            return
+        }
+        delay(100)
         setAttribute(this.pointer, 'active', '')
-        setTimeout(() => {
-            setAttribute(this.pointer, 'active', null)
-        }, 400)
+        await delay(400)
+        setAttribute(this.pointer, 'active', null)
     }
 }
