@@ -19,38 +19,96 @@ TimeCat 是一套网页录屏的解决方案，利用其独特的算法，提供
 
 ### Progress
     06.07 Support Audio
-    05.24 Beta Core 1.0.0-Beta Released
+    05.24 Beta 1.0.0 Released
     04.26 Live Mode    
     03.31 Add Chrome Plugin 
 
+### Version 
+
+![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)
+
+###### Browsers Support
+
+| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+
 ### Installation
 
-##### NPM
+###### Using [NPM](https://www.npmjs.com/package/timecatjs)
+```shell
+$ npm i timecatjs -D
+```
 
-    npm i timecatjs -D
+###### Import in Browser
 
-##### CDN
-    https://unpkg.com/timecatjs/lib/timecatjs.min.js
-    https://cdn.jsdelivr.net/npm/timecatjs/lib/timecatjs.min.js
+Add script tags in your browser and use the global variable ``timecat``
+
+
+- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs@latest/lib/timecatjs.min.js) 
+- [UNPKG](https://unpkg.com/timecatjs)
+
 ### Usage
+
+###### Import SDK
 ```ts
 // from module
 import { record, replay } from 'timecatjs';
 
 // from cdn
 const { record, replay } = window.timecat
-
-// record page
-record(RecordOptions)
-
-// replay record
-replay(ReplayOptions)
-
-// export html file
-exportReplay(Opts)
 ```
-Simple Example:  
-[Record Todo List](https://github.com/oct16/TimeCat/blob/073c467afc644ce37e4f51937c28eb5000b2a92c/examples/todo.html#L258) and [Replay Todo List](https://github.com/oct16/TimeCat/blob/073c467afc644ce37e4f51937c28eb5000b2a92c/examples/player.html#L14)
+
+###### Record Data
+```ts
+// record page
+interface RecordOptions {
+    audio?: boolean // if your want record audio
+    emitter?: (data: RecordData, db: IndexedDBOperator) => void
+}
+
+// default use IndexedDB to save records
+const ctrl = record(RecordOptions)
+
+// if you wanna send the records to server
+const ctrl = record({
+    emitter: (data, db) => fetch(<Server URL>, {
+            body: JSON.stringify(data),
+            method: 'POST',
+            ContentType: 'application/json'
+        })
+})
+
+// if you want stop record
+ctrl.unsubscribe()
+```
+- [Record Example](https://github.com/oct16/TimeCat/blob/073c467afc644ce37e4f51937c28eb5000b2a92c/examples/todo.html#L258) 
+
+###### Replay
+
+```ts
+// replay record
+interface ReplayOptions {
+    socketUrl?: string // if live mode
+    proxy?: string // if cross domain
+    autoplay?: boolean // autoplay when data loaded
+}
+
+replay(ReplayOptions)
+```
+- [Replay example](https://github.com/oct16/TimeCat/blob/4c91fe2e9dc3786921cd23288e26b421f6ea0848/examples/player.html#L14)
+
+
+###### Export
+```ts
+// export html file
+interface ExportOptions {
+    scripts?: ScriptItem[] // inject script in html
+    autoplay?: boolean // autoplay when data loaded
+    audioExternal?: boolean // export audio as a file, default is inline
+    dataExternal?: boolean // export data json as a file, default is inline
+}
+exportReplay(ExportOptions)
+```
 
 ### API Documentation
 
