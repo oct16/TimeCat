@@ -13,6 +13,8 @@ A Magical Web Recorder 🖥 网页录屏器
 
 中文 | [English](./README.md)
 
+TimeCat 是一套网页录屏的解决方案，利用其独特的算法，提供超高性能，超高压缩比的网页无损录制。可以广泛运作于监控系统，行为分析，案例复盘，远程教育，低流量视频协同等场景
+
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome浏览器
 
 ### Progress
