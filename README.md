@@ -165,6 +165,8 @@ I have though about the following aspects
 ---
 ### Technical details of the Web Recorder
 
+![Architecture](./assets/architecture.png)
+
 #### Take a snapshot of the DOM
 
 The node data of the page can be easily obtained through the DOM API, but for our needs, it is obvious that the data provided by the DOM Node is too redundant. This step is to simplify the information by referring to the design of VirtualDom
