@@ -18,6 +18,10 @@ class RecoverNative {
     }
 
     private getObjByPath(path: string, target: Window) {
+        if (!path) {
+            return target
+        }
+
         var pathArray = this.getMethodAtPath(path)
 
         let method = target
