@@ -22,10 +22,11 @@ const getVNodeByEl = (el: Element, isSVG?: boolean): VNode | VSNode => {
 
 const getAttr = (el: HTMLElement & { checked: boolean }) => {
     const resAttr: { [key: string]: string } = {}
-    const attrs = el.attributes
-    if (attrs && attrs.length) {
-        return Object.values(attrs).reduce((ret: { [key: string]: string }, attr) => {
+    const { attributes, tagName } = el
+    if (attributes && attributes.length) {
+        return Object.values(attributes).reduce((ret: { [key: string]: string }, attr) => {
             const [name, value] = extraAttr(attr)
+
             if (name) {
                 ret[name] = value
             }
@@ -63,9 +64,6 @@ const extraAttr = (attr: Attr) => {
         if (value.startsWith('#/')) {
             return []
         }
-        return [name, value]
-    }
-    if (name === 'style') {
         return [name, value]
     }
     return [name, value]
