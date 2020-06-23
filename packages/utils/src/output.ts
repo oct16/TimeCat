@@ -1,12 +1,14 @@
 import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from './store/idb'
-import { isDev, classifyRecords, download, getRandomCode, getTime } from './tools/common'
+import { isDev, classifyRecords, download, getRandomCode, getTime, isVNode } from './tools/common'
 import pako from 'pako'
 import { SnapshotData } from '@TimeCat/snapshot'
-import { RecordData, AudioData, RecorderOptions, NONERecord } from '@TimeCat/record'
+import { RecordData, AudioData, RecorderOptions, NONERecord, RecordType } from '@TimeCat/record'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './tools/dom'
 import { recoverNative } from './tools/recover-native'
+import { VNode, VSNode } from '@TimeCat/virtual-dom'
+import { nodeStore } from './store/node'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
@@ -155,7 +157,11 @@ function extractAudio(audio: AudioData) {
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
     const data = window.__ReplayDataList__ || (await getDataFromDB(exportOptions))
-    const jsonStrData = JSON.stringify(data)
+
+    const extractedData = await makeCssInline(data) // some link cross origin
+
+    const jsonStrData = JSON.stringify(extractedData)
+
     const zipArray = pako.gzip(jsonStrData)
     let outputStr: string = ''
 
@@ -177,4 +183,64 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     document.body.insertBefore(loadingNode, document.body.firstChild);window.addEventListener('DOMContentLoaded', () => loadingNode.parentNode.removeChild(loadingNode))`
     injectScripts(html, [{ src: loadingScriptContent }])
     injectScripts(html, [{ src: replayData }])
+}
+
+async function makeCssInline(dataList: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }[]) {
+    const extractLinkList: VNode[] = []
+
+    for (let k = 0; k < dataList.length; k++) {
+        const data = dataList[k]
+        const { snapshot, records } = data
+        const tasks = [snapshot.vNode]
+        let node
+        while ((node = tasks.shift())) {
+            if (isVNode(node)) {
+                extractLink(node, extractLinkList)
+                tasks.push(...(node.children as VNode[]))
+            }
+        }
+
+        for (let i = 0; i < records.length; i++) {
+            const record = records[i]
+            if (record.type === 'DOM_UPDATE') {
+                const { addedNodes } = record.data
+                for (let j = 0; j < addedNodes.length; j++) {
+                    const node = addedNodes[j].node
+                    if (isVNode(node as VNode)) {
+                        extractLink(node as VNode, extractLinkList)
+                    }
+                }
+            }
+        }
+    }
+
+    for (const node of extractLinkList) {
+        const { attrs } = node
+        const href = attrs.href
+
+        try {
+            // try to extract css
+            const cssValue = await fetch(href).then(res => res.text())
+            const textNode = {
+                id: nodeStore.createNodeId(),
+                type: Node.TEXT_NODE,
+                value: cssValue
+            } as VSNode
+
+            delete attrs.href
+            node.tag = 'style'
+
+            node.children.push(textNode)
+        } catch (error) {
+            // maybe cross
+        }
+    }
+    return dataList
+}
+
+function extractLink(node: VNode, extractLinkList: VNode[]) {
+    const { tag, attrs } = node
+    if (tag === 'link' && attrs.href && attrs.href.endsWith('.css')) {
+        extractLinkList.push(node)
+    }
 }
