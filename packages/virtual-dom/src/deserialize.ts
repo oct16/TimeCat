@@ -83,16 +83,14 @@ export function createNode(vNode: VNode): Element {
     let output: Element
     const tagName = transformTagName(vNode.tag)
     if (isSVG) {
-        console.log(tagName)
-
         output = document.createElementNS('http://www.w3.org/2000/svg', tagName)
     } else {
         output = document.createElement(tagName)
     }
 
-    // if (isDev) {
-    //     setAttribute(output as HTMLElement, 'vid', id.toString())
-    // }
+    if (isDev) {
+        setAttribute(output as HTMLElement, 'vid', id.toString())
+    }
     createAttributes(vNode, output)
     createProps(vNode, output)
     nodeStore.updateNode(id, output)
