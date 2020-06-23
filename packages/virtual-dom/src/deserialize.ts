@@ -83,14 +83,16 @@ export function createNode(vNode: VNode): Element {
     let output: Element
     const tagName = transformTagName(vNode.tag)
     if (isSVG) {
+        console.log(tagName)
+
         output = document.createElementNS('http://www.w3.org/2000/svg', tagName)
     } else {
         output = document.createElement(tagName)
     }
 
-    if (isDev) {
-        setAttribute(output as HTMLElement, 'vid', id.toString())
-    }
+    // if (isDev) {
+    //     setAttribute(output as HTMLElement, 'vid', id.toString())
+    // }
     createAttributes(vNode, output)
     createProps(vNode, output)
     nodeStore.updateNode(id, output)
@@ -99,7 +101,45 @@ export function createNode(vNode: VNode): Element {
 
 function transformTagName(tag: string) {
     const tagMap: { [key: string]: string } = {
-        script: 'noscript'
+        // script deactivated
+        script: 'noscript',
+
+        // SVG transform tagName
+        altglyph: 'altGlyph',
+        altglyphdef: 'altGlyphDef',
+        altglyphitem: 'altGlyphItem',
+        animatecolor: 'animateColor',
+        animatemotion: 'animateMotion',
+        animatetransform: 'animateTransform',
+        clippath: 'clipPath',
+        feblend: 'feBlend',
+        fecolormatrix: 'feColorMatrix',
+        fecomponenttransfer: 'feComponentTransfer',
+        fecomposite: 'feComposite',
+        feconvolvematrix: 'feConvolveMatrix',
+        fediffuselighting: 'feDiffuseLighting',
+        fedisplacementmap: 'feDisplacementMap',
+        fedistantlight: 'feDistantLight',
+        feflood: 'feFlood',
+        fefunca: 'feFuncA',
+        fefuncb: 'feFuncB',
+        fefuncg: 'feFuncG',
+        fefuncr: 'feFuncR',
+        fegaussianblur: 'feGaussianBlur',
+        feimage: 'feImage',
+        femerge: 'feMerge',
+        femergenode: 'feMergeNode',
+        femorphology: 'feMorphology',
+        feoffset: 'feOffset',
+        fepointLight: 'fePointLight',
+        fespecularlighting: 'feSpecularLighting',
+        fespotlight: 'feSpotLight',
+        fetile: 'feTile',
+        feturbulence: 'feTurbulence',
+        foreignobject: 'foreignObject',
+        lineargradient: 'linearGradient',
+        radialgradient: 'radialGradient',
+        textpath: 'textPath'
     }
     const tagName = tagMap[tag] || tag
     return tagName
