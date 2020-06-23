@@ -1,5 +1,3 @@
-import { State } from '../types'
-
 let initState = {
     speed: null
 }
@@ -8,9 +6,10 @@ export enum PlayerTypes {
     SPEED = 'SPEED'
 }
 
-export type PlayerState = typeof PlayerTypes
-
-export default function playerReducer(state: State, action: { type: string; data: any }) {
+export default function PlayerReducer(
+    state: typeof initState,
+    action: { type: string; data: Partial<typeof initState> }
+) {
     if (!state) {
         state = initState
     }

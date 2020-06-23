@@ -1,5 +1,3 @@
-import { State } from '../types'
-
 const initState = {
     frame: 0,
     length: 0,
@@ -16,7 +14,7 @@ export enum ProgressTypes {
     INFO = 'INFO'
 }
 
-export default function progressReducer(state: State, action?: { type: string; data: State }) {
+export default function progressReducer(state: ProgressState, action?: { type: string; data: Partial<ProgressState> }) {
     if (!state) {
         state = initState
     }
