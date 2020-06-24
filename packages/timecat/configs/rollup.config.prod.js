@@ -6,9 +6,10 @@ import { env, htmlExamples } from './rollup.base'
 import ttypescript from 'ttypescript'
 import visualizer from 'rollup-plugin-visualizer'
 import scss from 'rollup-plugin-scss'
+import { string } from 'rollup-plugin-string'
 
 export default {
-    input: 'index.ts',
+    input: 'src/index.ts',
     output: [
         {
             name: 'timecat',
@@ -44,6 +45,10 @@ export default {
             mainFields: ['module', 'main']
         }),
         commonjs(),
+        string({
+            include: ['**/*.html', '**/*.css'],
+            exclude: ['**/index.html', '**/index.css']
+        }),
         ...htmlExamples(),
         ...env(),
         // https://github.com/terser/terser#minify-options

@@ -1,4 +1,4 @@
-import { PlayerTypes, reduxStore, exportReplay, getRawScriptContent } from '@TimeCat/utils'
+import { PlayerTypes, reduxStore, exportReplay, getRawScriptContent } from '@timecat/utils'
 import { ContainerComponent } from './container'
 
 export class KeyboardComponent {

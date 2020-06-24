@@ -1,5 +1,5 @@
-import { setAttribute } from '@TimeCat/virtual-dom'
-import { delay } from '@TimeCat/utils'
+import { setAttribute } from '@timecat/virtual-dom'
+import { delay } from '@timecat/utils'
 
 export class PointerComponent {
     x = 0

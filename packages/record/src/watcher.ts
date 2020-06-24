@@ -1,4 +1,4 @@
-import { createFlatVNode, VNode, VSNode } from '@TimeCat/virtual-dom'
+import { createFlatVNode } from '@timecat/virtual-dom'
 import {
     WindowRecord,
     RecordEvent,
@@ -15,8 +15,10 @@ import {
     movedNodesData,
     RecordType,
     FormElementEvent,
-    MouseEventType
-} from './types'
+    MouseEventType,
+    VNode,
+    VSNode
+} from '@timecat/share'
 import {
     logger,
     throttle,
@@ -28,7 +30,7 @@ import {
     debounce,
     isVNode,
     getStrDiffPatches
-} from '@TimeCat/utils'
+} from '@timecat/utils'
 
 function emitterHook(emit: RecordEvent<RecordData>, data: any) {
     if (isDev) {

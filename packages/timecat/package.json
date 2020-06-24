@@ -1,0 +1,26 @@
+{
+    "name": "timecat",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "dev": "node scripts/dev.js",
+        "build": "node scripts/build.js",
+        "test": "jest",
+        "live": "node scripts/live.js",
+        "lib": "node scripts/lib.js",
+        "f": "npx code-formatter --path packages",
+        "doc": "npx typedoc",
+        "embed": "npm run build && cd dist && cp timecatjs.min.js ../../TimeCatChrome/src/assets/",
+        "count": "find . -type f -not -path './node_modules/*' -not -path './dist/*'  -name '*.ts' | xargs wc -l"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@timecat/record": "^1.0.0",
+        "@timecat/player": "^1.0.0",
+        "@timecat/utils": "^1.0.0"
+    },
+    "devDependencies": {}
+}

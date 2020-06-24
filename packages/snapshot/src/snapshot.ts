@@ -1,6 +1,5 @@
-import { createElement } from '@TimeCat/virtual-dom'
-import { InfoData, DOMSnapshotData } from './types'
-import { VNode } from '@TimeCat/virtual-dom'
+import { createElement } from '@timecat/virtual-dom'
+import { InfoData, DOMSnapshotData, VNode } from '@timecat/share'
 
 function getInitInfo(): InfoData {
     const { name, publicId, systemId } = window.document.doctype!

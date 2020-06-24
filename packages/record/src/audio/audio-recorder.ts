@@ -1,5 +1,5 @@
-import { RecorderOptions, IRecorderStatus } from '../types'
-import { float32ArrayToBase64 } from '@TimeCat/utils'
+import { RecorderOptions, IRecorderStatus } from '@timecat/share'
+import { float32ArrayToBase64 } from '@timecat/utils'
 
 export class Recorder {
     static defaultRecordOptions = {

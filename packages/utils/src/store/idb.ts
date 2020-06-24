@@ -1,5 +1,5 @@
-import { SnapshotData } from '@TimeCat/snapshot'
-import { RecordData } from '@TimeCat/record'
+import { SnapshotData } from '@timecat/share'
+import { RecordData } from '@timecat/share'
 
 export class IndexedDBOperator {
     db: IDBDatabase

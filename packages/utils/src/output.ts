@@ -2,12 +2,10 @@ import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from './store/idb'
 import { isDev, classifyRecords, download, getRandomCode, getTime, isVNode } from './tools/common'
 import pako from 'pako'
-import { SnapshotData } from '@TimeCat/snapshot'
-import { RecordData, AudioData, RecorderOptions, NONERecord, RecordType } from '@TimeCat/record'
+import { VNode, VSNode, RecordData, AudioData, RecorderOptions, NONERecord, SnapshotData } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './tools/dom'
 import { recoverNative } from './tools/recover-native'
-import { VNode, VSNode } from '@TimeCat/virtual-dom'
 import { nodeStore } from './store/node'
 
 type ScriptItem = { name?: string; src: string }

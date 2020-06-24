@@ -1,4 +1,4 @@
-import { RecorderOptions } from '@TimeCat/record'
+import { RecorderOptions } from '@timecat/share'
 import { download, isDev } from './tools/common'
 
 function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {

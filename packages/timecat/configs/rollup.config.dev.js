@@ -4,10 +4,11 @@ import commonjs from '@rollup/plugin-commonjs'
 import { htmlExamples, env } from './rollup.base'
 import browsersync from 'rollup-plugin-browsersync'
 import scss from 'rollup-plugin-scss'
+import { string } from 'rollup-plugin-string'
 
 export default [
     {
-        input: 'index.ts',
+        input: 'src/index.ts',
         output: [
             {
                 name: 'timecat',
@@ -24,7 +25,13 @@ export default [
             node({
                 browser: true
             }),
-            commonjs(),
+            commonjs({
+                include: /node_modules/
+            }),
+            string({
+                include: ['**/*.html', '**/*.css'],
+                exclude: ['**/index.html', '**/index.css']
+            }),
             ...env(),
             ...htmlExamples(),
             browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })

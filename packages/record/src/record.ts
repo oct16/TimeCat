@@ -1,8 +1,8 @@
 import { watchers } from './watcher'
 import { recordAudio } from './audio'
-import { RecordData, RecordEvent, RecordOptions } from './types'
-import { listenerStore, getDBOperator } from '@TimeCat/utils'
-import { snapshots, SnapshotData } from '@TimeCat/snapshot'
+import { RecordData, RecordEvent, RecordOptions, SnapshotData } from '@timecat/share'
+import { listenerStore, getDBOperator } from '@timecat/utils'
+import { snapshots } from '@timecat/snapshot'
 const ctrl = {
     unsubscribe: () => {
         Array.from(listenerStore.values()).forEach(un => un())

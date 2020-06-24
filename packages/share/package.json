@@ -1,0 +1,13 @@
+{
+    "name": "@timecat/share",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "dev": "rollup -c",
+        "build": "rollup -c"
+    },
+    "author": "",
+    "license": "ISC"
+}

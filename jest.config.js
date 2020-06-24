@@ -13,7 +13,7 @@ module.exports = {
     testRegex: '(/unit/.*|(\\.|/)(test|spec))\\.tsx?$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
     moduleNameMapper: {
-        '^@TimeCat/(.*?)$': '<rootDir>/packages/$1/src',
+        '^@timecat/(.*?)$': '<rootDir>/packages/$1/src',
         'packages/(.*)$': '<rootDir>/packages/$1'
     },
     verbose: true

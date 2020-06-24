@@ -10,10 +10,10 @@ import {
     toTimeStamp,
     base64ToFloat32Array,
     encodeWAV
-} from '@TimeCat/utils'
+} from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData } from '@TimeCat/record'
+import { RecordData, AudioData } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animationFrame'
 

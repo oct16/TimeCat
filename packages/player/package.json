@@ -1,11 +1,20 @@
 {
-  "name": "player",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "@timecat/player",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "dev": "rollup -c -w --silent --environment NODE_ENV:development",
+        "build": "rollup -c"
+    },
+    "dependencies": {
+        "@timecat/utils": "^1.0.0",
+        "@timecat/record": "^1.0.0",
+        "@timecat/virtual-dom": "^1.0.0",
+        "@timecat/snapshot": "^1.0.0",
+        "@timecat/share": "^1.0.0"
+    },
+    "author": "",
+    "license": "ISC"
 }

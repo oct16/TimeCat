@@ -1,6 +1,6 @@
 import { Recorder } from './audio-recorder'
-import { AudioRecord, RecordType } from '../types'
-import { getTime, listenerStore } from '@TimeCat/utils'
+import { AudioRecord, RecordType } from '@timecat/share'
+import { getTime, listenerStore } from '@timecat/utils'
 
 export function recordAudio(emitter: (data: AudioRecord) => void) {
     const recorder = new Recorder({

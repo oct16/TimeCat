@@ -1,5 +1,42 @@
-import { VNode, VSNode } from '@TimeCat/virtual-dom'
-import { IndexedDBOperator } from '@TimeCat/utils'
+export interface InfoData {
+    doctype: DocumentType
+    origin: string
+    pathname: string
+    width: number
+    height: number
+    scrollLeft: number
+    scrollTop: number
+}
+
+export interface DOMSnapshotData {
+    vNode: VNode
+}
+
+export type SnapshotData = DOMSnapshotData & InfoData
+
+type Attrs = { [key: string]: string }
+
+type Extra = {
+    props?: { [key: string]: string | number | boolean }
+    isSVG?: boolean
+}
+
+type Children = (VNode | VSNode)[]
+
+export interface VSNode {
+    id: number
+    type: number
+    value: string
+}
+
+export interface VNode {
+    type: number
+    id: number
+    tag: string
+    attrs: Attrs
+    children: Children
+    extra: Extra
+}
 
 export enum RecordType {
     'WINDOW' = 'WINDOW',
@@ -169,7 +206,8 @@ interface SubtitlesData {
 
 export interface RecordOptions {
     audio?: boolean
-    emitter?: (data: RecordData, db: IndexedDBOperator) => void
+    emitter?: (data: RecordData, db: any) => void
+    // emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
 
 export interface RecorderOptions {
@@ -179,3 +217,9 @@ export interface RecorderOptions {
 }
 
 export type IRecorderStatus = 'PAUSE' | 'RECORDING' | 'STOP'
+
+export interface ReplayOptions {
+    socketUrl?: string
+    proxy?: string
+    autoplay?: boolean
+}

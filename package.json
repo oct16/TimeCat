@@ -3,9 +3,9 @@
     "author": "oct16",
     "version": "1.0.14",
     "description": "TimeCat Web Recorder",
-    "main": "lib/timecatjs.min.js",
-    "module": "lib/timecatjs.esm.js",
-    "types": "lib/timecatjs.d.ts",
+    "main": "packages/timecat/dist/timecatjs.min.js",
+    "module": "packages/timecat/dist/timecatjs.esm.js",
+    "types": "packages/timecat/dist/timecatjs.d.ts",
     "keywords": [
         "recorder",
         "replay",
@@ -22,15 +22,13 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "node scripts/dev.js",
-        "build": "node scripts/build.js",
+        "dev": "lerna run --parallel dev",
+        "build": "lerna run build",
         "test": "jest",
-        "live": "node scripts/live.js",
-        "lib": "node scripts/lib.js",
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",
-        "embed": "npm run build && cd dist && cp timecatjs.min.js ../../TimeCatChrome/src/assets/",
-        "count": "find . -type f -not -path './node_modules/*' -not -path './dist/*'  -name '*.ts' | xargs wc -l"
+        "embed": "npm run build && cp packages/timecat/dist/timecatjs.min.js ../../TimeCatChrome/src/assets/",
+        "count": "find ./packages -type f -not -path **/*.spec.ts -not -path **/global.* -not -path './node_modules/*' -not -path '**/dist/*'  -name '*.ts' | xargs wc -l"
     },
     "devDependencies": {
         "@microsoft/api-extractor": "^7.8.9",
@@ -49,6 +47,7 @@
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "jest": "^26.0.1",
+        "lerna": "^3.22.1",
         "pako": "^1.0.11",
         "rollup": "^1.32.0",
         "rollup-plugin-browsersync": "^1.1.0",

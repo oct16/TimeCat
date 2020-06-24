@@ -1,7 +1,14 @@
 import diff from 'diff'
-import { RecordData, AudioData, AudioRecord, AudioStrList, RecorderOptions } from '@TimeCat/record'
-import { SnapshotData } from '@TimeCat/snapshot'
-import { VNode, VSNode } from '@TimeCat/virtual-dom'
+import {
+    VNode,
+    VSNode,
+    SnapshotData,
+    RecordData,
+    AudioData,
+    AudioRecord,
+    AudioStrList,
+    RecorderOptions
+} from '@timecat/share'
 
 export const isDev = process.env.NODE_ENV === 'development'
 

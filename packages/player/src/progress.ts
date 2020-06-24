@@ -1,4 +1,4 @@
-import { secondToDate, delay } from '@TimeCat/utils'
+import { secondToDate, delay } from '@timecat/utils'
 import { ContainerComponent } from './container'
 
 export class ProgressComponent {

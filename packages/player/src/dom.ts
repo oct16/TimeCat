@@ -11,11 +11,13 @@ import {
     UpdateNodeData,
     RemoveUpdateData,
     DOMUpdateDataType,
-    ScrollWatcherData
-} from '@TimeCat/record'
+    ScrollWatcherData,
+    VNode,
+    VSNode
+} from '@timecat/share'
 import { PlayerComponent } from './player'
-import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@TimeCat/utils'
-import { setAttribute, VNode, VSNode, createNode, createSpecialNode } from '@TimeCat/virtual-dom'
+import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
+import { setAttribute, createNode, createSpecialNode } from '@timecat/virtual-dom'
 
 function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     const { parentId, nextId, node } = data

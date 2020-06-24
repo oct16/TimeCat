@@ -1,6 +1,6 @@
 import { setAttribute } from './dom'
-import { nodeStore, isDev, isHideComment, completionCssHref } from '@TimeCat/utils'
-import { VNode, VSNode } from './types'
+import { nodeStore, isDev, isHideComment, completionCssHref } from '@timecat/utils'
+import { VNode, VSNode } from '@timecat/share'
 
 export function convertVNode(vNode: VNode | VSNode | null, parent?: VNode): Element | null {
     if (vNode === null || vNode === undefined) {

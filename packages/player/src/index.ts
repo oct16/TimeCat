@@ -7,14 +7,12 @@ import {
     isSnapshot,
     classifyRecords,
     isDev
-} from '@TimeCat/utils'
+} from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
 import io from 'socket.io-client'
-import { SnapshotData } from '@TimeCat/snapshot'
-import { RecordData, AudioData, RecorderOptions } from '@TimeCat/record'
-import { ReplayOptions } from './types'
+import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
 
 export async function replay(options: ReplayOptions = { autoplay: true }) {

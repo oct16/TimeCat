@@ -1,5 +1,5 @@
-import { VNode, VSNode } from './types'
-import { nodeStore, isElementNode } from '@TimeCat/utils'
+import { VNode, VSNode } from '@timecat/share'
+import { nodeStore, isElementNode } from '@timecat/utils'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode | VSNode => {
     if (isElementNode(el)) {
