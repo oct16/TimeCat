@@ -22,9 +22,10 @@
         "packages/*"
     ],
     "scripts": {
+        "clean": "lerna clean -y",
         "bootstrap": "lerna bootstrap",
         "dev": "lerna run --parallel dev",
-        "build": "lerna run build",
+        "build": "npm run clean && npm run bootstrap && lerna run build",
         "test": "jest",
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",

@@ -1,3 +1,8 @@
+declare interface HTMLInputElement {
+    oldValue: string
+    value: any
+}
+
 import { createFlatVNode } from '@timecat/virtual-dom'
 import {
     WindowRecord,
@@ -398,7 +403,7 @@ function listenInputs(emit: RecordEvent<FormElementRecord>) {
         switch (eventType) {
             case 'input':
             case 'change':
-                const target = e.target as HTMLInputElement
+                const target = (e.target as unknown) as HTMLInputElement
                 const str = target.value
                 let newValue = ''
                 const patches: ReturnType<typeof getStrDiffPatches> = []

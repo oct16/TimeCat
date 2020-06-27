@@ -11,20 +11,6 @@ declare module '*.scss' {
     export default value
 }
 
-declare interface EventTarget {
-    result: any
-    transaction: IDBTransaction
-}
-
-declare interface IDBDatabase {
-    continue: Function
-    value: any
-}
-
-declare interface HTMLInputElement {
-    oldValue: string
-}
-
 interface Window {
     __ReplayStrData__: string
 
