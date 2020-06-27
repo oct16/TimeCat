@@ -22,6 +22,7 @@
         "packages/*"
     ],
     "scripts": {
+        "bootstrap": "lerna bootstrap",
         "dev": "lerna run --parallel dev",
         "build": "lerna run build",
         "test": "jest",
