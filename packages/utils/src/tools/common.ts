@@ -7,7 +7,8 @@ import {
     AudioData,
     AudioRecord,
     AudioStrList,
-    RecorderOptions
+    RecorderOptions,
+    RecordType
 } from '@timecat/share'
 
 export const isDev = process.env.NODE_ENV === 'development'
@@ -56,7 +57,7 @@ export function classifyRecords(data: (SnapshotData | RecordData)[]) {
         return frame.data.type === 'base64'
     }
     function isAudio(frame: RecordData | SnapshotData) {
-        return (frame as RecordData).type === 'AUDIO'
+        return (frame as RecordData).type === RecordType.AUDIO
     }
 
     let dataBasket: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }

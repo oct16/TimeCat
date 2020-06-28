@@ -1,6 +1,8 @@
 let initState = {
-    speed: null
+    speed: 0
 }
+
+export type PlayerState = typeof initState
 
 export enum PlayerTypes {
     SPEED = 'SPEED'

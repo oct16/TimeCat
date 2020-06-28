@@ -2,7 +2,7 @@ import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from './store/idb'
 import { isDev, classifyRecords, download, getRandomCode, getTime, isVNode } from './tools/common'
 import pako from 'pako'
-import { VNode, VSNode, RecordData, AudioData, RecorderOptions, NONERecord, SnapshotData } from '@timecat/share'
+import { VNode, VSNode, RecordData, AudioData, RecorderOptions, NONERecord, SnapshotData, RecordType } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './tools/dom'
 import { recoverNative } from './tools/recover-native'
@@ -200,7 +200,7 @@ async function makeCssInline(dataList: { snapshot: SnapshotData; records: Record
 
         for (let i = 0; i < records.length; i++) {
             const record = records[i]
-            if (record.type === 'DOM_UPDATE') {
+            if (record.type === RecordType.DOM_UPDATE) {
                 const { addedNodes } = record.data
                 for (let j = 0; j < addedNodes.length; j++) {
                     const node = addedNodes[j].node

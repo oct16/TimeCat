@@ -1,17 +1,21 @@
 import { PlayerTypes } from './reducers/player'
 import { ProgressTypes } from './reducers/progress'
 import { objectEquals } from '../tools/tool'
-import { State, Reducer, Action } from './types'
+import { States, Reducer, Action, TopicName, StateMap } from './types'
+import { ValueOfKey } from '@timecat/share'
 
-export function createStore(reducer: Reducer, initState: State = {}) {
+export function createStore(reducer: Reducer, initState: States = {}) {
     let state = initState
 
     const topics = {
         all: []
     } as { [key: string]: Function[] }
 
-    function subscribe(type: string, listener: (state: State) => void): void
-    function subscribe(listener: (state: State) => void): void
+    function subscribe<T extends keyof StateMap, S extends ValueOfKey<StateMap, T>>(
+        type: T,
+        listener: (state: S) => void
+    ): void
+    function subscribe(listener: (state: StateMap) => void): void
 
     function subscribe(...args: any): void {
         let type = 'all'
@@ -40,7 +44,7 @@ export function createStore(reducer: Reducer, initState: State = {}) {
             return
         }
 
-        const topicName = getTypeInTopics(action.type)
+        const topicName = getTypeInTopics(action.type as TopicName)
         if (topicName && topics[topicName]) {
             return topics[topicName].forEach(listener => {
                 if (!objectEquals(state[topicName], oldState[topicName])) {
@@ -50,22 +54,29 @@ export function createStore(reducer: Reducer, initState: State = {}) {
         }
     }
 
-    function getState() {
-        return state
+    function getState(): StateMap
+
+    function getState<T extends keyof StateMap>(name?: T): StateMap[T]
+    
+    function getState<T extends keyof StateMap>(name?: T) {
+        const s = state as StateMap
+        if (name) {
+            return s[name] as StateMap[T]
+        }
+        return s 
     }
 
-    function getTypeInTopics(type: string) {
+    function getTypeInTopics(type: TopicName): TopicName | undefined {
         const topics = {
             player: Object.keys(PlayerTypes),
             progress: Object.keys(ProgressTypes)
-        } as { [key: string]: string[] }
+        }
 
         for (let [key, enums] of Object.entries(topics)) {
             if (enums.includes(type)) {
-                return key
+                return key as TopicName
             }
         }
-        return null
     }
 
     return {

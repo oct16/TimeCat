@@ -66,18 +66,20 @@ export class PlayerComponent {
             window.addEventListener('record-data', this.streamHandle.bind(this))
         } else {
             reduxStore.subscribe('player', state => {
-                this.progressState = reduxStore.getState()['progress']
-                const speed = state.speed
-                this.speed = speed
-                this.frames = this.getAccuratelyFrame()
+                if (state) {
+                    this.progressState = reduxStore.getState('progress')
+                    const speed = state.speed
+                    this.speed = speed
+                    this.frames = this.getAccuratelyFrame()
 
-                if (speed > 0) {
-                    this.play()
-                } else {
-                    this.pause()
+                    if (speed > 0) {
+                        this.play()
+                    } else {
+                        this.pause()
+                    }
+
+                    this.setProgress()
                 }
-
-                this.setProgress()
             })
         }
     }

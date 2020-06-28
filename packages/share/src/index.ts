@@ -1,3 +1,6 @@
+export type ValueOf<T> = T[keyof T]
+export type ValueOfKey<T, K extends keyof T> = T[K]
+
 export interface InfoData {
     doctype: DocumentType
     origin: string

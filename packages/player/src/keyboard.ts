@@ -26,8 +26,10 @@ export class KeyboardComponent {
         })
 
         reduxStore.subscribe('player', state => {
-            this.paly(state.speed)
-            this.setSpeed(state.speed)
+            if (state) {
+                this.paly(state.speed)
+                this.setSpeed(state.speed)
+            }
         })
 
         this.detectWindowIsActive()
