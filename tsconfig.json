@@ -27,5 +27,13 @@
             "node",
             "jest",
         ],
+        "paths": {
+            "@timecat/*": [
+                "packages/*/src"
+            ],
+            "timecat": [
+                "packages/timecat/src"
+            ]
+        }
     }
 }

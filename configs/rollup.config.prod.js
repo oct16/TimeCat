@@ -1,3 +1,4 @@
+import path from 'path'
 import ts from 'rollup-plugin-typescript2'
 import node from '@rollup/plugin-node-resolve'
 import { terser } from 'rollup-plugin-terser'
@@ -8,18 +9,22 @@ import visualizer from 'rollup-plugin-visualizer'
 import scss from 'rollup-plugin-scss'
 import { string } from 'rollup-plugin-string'
 
+const packagesDir = path.resolve(__dirname, '../packages')
+const packageDir = path.resolve(packagesDir, process.env.TARGET)
+const resolve = p => path.resolve(packageDir, p)
+
 export default {
-    input: 'src/index.ts',
+    input: resolve('src/index.ts'),
     output: [
         {
             name: 'timecat',
-            format: 'umd',
-            file: 'dist/timecatjs.min.js'
+            format: 'iife',
+            file: resolve(`dist/${process.env.TARGET}.min.js`)
         },
         {
             name: 'timecat',
             format: 'esm',
-            file: 'dist/timecatjs.esm.js'
+            file: resolve(`dist/${process.env.TARGET}.esm.js`)
         }
     ],
     plugins: [

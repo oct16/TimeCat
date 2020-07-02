@@ -1,19 +1,24 @@
-import ts from 'rollup-plugin-typescript2'
+import path from 'path'
 import node from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import { htmlExamples, env } from './rollup.base'
+import ts from 'rollup-plugin-typescript2'
 import browsersync from 'rollup-plugin-browsersync'
 import scss from 'rollup-plugin-scss'
 import { string } from 'rollup-plugin-string'
+import { htmlExamples, env } from './rollup.base'
+
+const packagesDir = path.resolve(__dirname, '../packages')
+const packageDir = path.resolve(packagesDir, process.env.TARGET)
+const resolve = p => path.resolve(packageDir, p)
 
 export default [
     {
-        input: 'src/index.ts',
+        input: resolve('src/index.ts'),
         output: [
             {
                 name: 'timecat',
                 format: 'iife',
-                file: 'dist/timecatjs.min.js'
+                file: resolve('dist/timecatjs.min.js')
             }
         ],
         plugins: [
@@ -34,7 +39,7 @@ export default [
             }),
             ...env(),
             ...htmlExamples(),
-            browsersync({ codeSync: false, server: 'dist', port: 4321, notify: false, open: false })
+            browsersync({ codeSync: false, server: resolve('dist'), port: 4321, notify: false, open: false })
         ]
     }
 ]

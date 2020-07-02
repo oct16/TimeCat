@@ -22,10 +22,8 @@
         "packages/*"
     ],
     "scripts": {
-        "clean": "lerna clean -y",
-        "bootstrap": "lerna bootstrap",
-        "dev": "lerna run --parallel dev",
-        "build": "npm run clean && npm run bootstrap && lerna run build",
+        "dev": "node scripts/dev.js",
+        "build": "node scripts/build.js",
         "test": "jest",
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",
@@ -49,7 +47,6 @@
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "jest": "^26.0.1",
-        "lerna": "^3.22.1",
         "pako": "^1.0.11",
         "rollup": "^1.32.0",
         "rollup-plugin-browsersync": "^1.1.0",
@@ -77,6 +74,7 @@
         "lib"
     ],
     "dependencies": {
-        "http-proxy": "^1.18.1"
+        "http-proxy": "^1.18.1",
+        "minimist": "^1.2.5"
     }
 }
