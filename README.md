@@ -1,4 +1,4 @@
-<p align="center">
+****<p align="center">
 <h1 align="center">TimeCat</h1>
 <h6 align="center">
 A Magical Web Recorder 🖥 网页录屏器
@@ -292,7 +292,7 @@ Before starting to play, we need to restore the previous data to the real DOM. T
 When the user moves the mouse on the page, many `mouseMove` events will be generated. The coordinates and timestamp of the track are obtained through` const { x, y } = event.target`
 
 If I use a mouse to trace a track on the page, I may get the coordinate points like the picture below
-![heart1](./assets/heart1.png)
+<img src="./assets/heart1.png" width="300">
 
 However, on most occasions we do not require 100% restoration of accurate mouse path for the scenario of recording, and we only care about two situations:
 
@@ -301,7 +301,7 @@ However, on most occasions we do not require 100% restoration of accurate mouse 
 
 After simplifying the mouse path through these two strategies, it takes only about 6 points to draw a 💖, to simulate the virtual path of the mouse through the spline curve
 
-![heart2](./assets/heart2.png)
+<img src="./assets/heart2.png" width="300">
 
 After filtering out the key points through the rules, the B-spline curve calculation function is used, When redrawing the mouse position during rendering, you can get a mouse with an approximate curve Track
 

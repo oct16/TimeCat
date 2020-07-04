@@ -298,7 +298,8 @@ const elementList: [HTMLElement, string][] = [
 用户在网页中移动鼠标会产生很多`mouseMove`事件，通过 `const { x, y } = event.target` 获取到了轨迹的坐标与时间戳
 
 假如我在页面上用鼠标划过一个💖的轨迹，可能会得到下图这样的坐标点
-![heart1](./assets/heart1.png)
+
+<img src="./assets/heart1.png" width="300">
 
 但是对于录屏这个业务场景来说，大部分场合我们并不要求100%还原精确的鼠标轨迹，我门只会关心两种情况：
 
@@ -307,7 +308,7 @@ const elementList: [HTMLElement, string][] = [
 
 那么通过这个两个策略对鼠标轨迹进行精简后，画一个💖大约只需要6个点，通过样条曲线来模拟鼠标的虚拟轨迹，当 t = 0.2 的时候，就可以得到一个下图这样带着弧度的轨迹了
 
-![heart2](./assets/heart2.png)
+<img src="./assets/heart2.png" width="300">
 
 通过规则筛选出关键点后，利用B样条曲线计算函数，按照最小间隔进行取样并插入我们的鼠标路径队执行列里，当渲染时重绘鼠标位置的时候，就可以得到一个近似曲线的鼠标轨迹了
 
