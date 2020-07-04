@@ -6,6 +6,10 @@ const { Extractor, ExtractorConfig, ExtractorResult } = extractor
 const env = 'production'
 const target = 'timecat'
 
+const packagesDir = path.resolve(__dirname, '../packages')
+const packageDir = path.resolve(packagesDir, target)
+const resolve = p => path.resolve(packageDir, p)
+
 run()
 
 async function run() {
@@ -26,7 +30,7 @@ async function run() {
 }
 
 async function extractAPI() {
-    const apiExtractorJsonPath = path.resolve(__dirname, '../api-extractor.json')
+    const apiExtractorJsonPath = resolve('api-extractor.json')
     const extractorConfig = ExtractorConfig.loadFileAndPrepare(apiExtractorJsonPath)
     const extractorResult = Extractor.invoke(extractorConfig, {
         localBuild: true,
