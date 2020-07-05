@@ -21,7 +21,6 @@ TimeCat is a Web record solution, with a unique algorithm to provide ultra-high 
     06.07 Support Audio
     05.24 Beta 1.0.0 Released
     04.26 Live Mode    
-    03.31 Add Chrome Plugin 
 
 ### Version 
 
@@ -159,6 +158,7 @@ I have though about the following aspects
 2. Recording the user's behavior for analysis, such as [MouseFlow](https://mouseflow.com/). [LiveSession](https://livesession.io/), "connect" to the user's to see what people do through live streaming
 3. Monitoring for customer service personnel, for example, Alibaba has 100,000 customer service personnel scattered throughout the country, and they need to record 7x24 hours of their service process. The performance requirements for monitoring on this order of magnitude are very High, Ali's internal tool is called `XReplay`
 4. Collaborative tools, web live broadcast, etc., will also involve similar technologies
+5. RPA
 
 ...
 
