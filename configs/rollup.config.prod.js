@@ -23,6 +23,11 @@ export default {
         },
         {
             name: 'timecat',
+            format: 'cjs',
+            file: resolve(`dist/${process.env.TARGET}.cjs.js`)
+        },
+        {
+            name: 'timecat',
             format: 'esm',
             file: resolve(`dist/${process.env.TARGET}.esm.js`)
         }
