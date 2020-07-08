@@ -259,7 +259,7 @@ const elementList: [HTMLElement, string][] = [
 
 ###### 兼容性处理
 
-[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) 表示只在IE11及以上，安卓4.4及以上可以使用，对于老浏览器的兼容可以通过[mutationobserver-shim](https://www.npmjs.com/package/mutationobserver-shim)的方式来支持，但是使用shim可能会因为收集的数据致精度不足从而产生一些致命Bug，另外还有一种情况是某些网站可能会屏蔽的掉MutationObserver这个API，遇到这种清空可以通过创建Iframe的方式来还原``Native Code``
+[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) 表示只在IE11及以上，安卓4.4及以上可以使用，对于老浏览器的兼容可以通过[mutationobserver-shim](https://www.npmjs.com/package/mutationobserver-shim)的方式来支持，但是使用shim可能会因为收集的数据致精度不足从而产生一些致命Bug，另外还有一种情况是某些网站可能会屏蔽的掉MutationObserver这个API，遇到这种情况可以通过创建Iframe的方式来还原``Native Code``
 
 #### Canvas、Iframe、Video等元素的处理
 
