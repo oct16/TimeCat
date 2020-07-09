@@ -7,18 +7,27 @@ class FMP {
     len = 0
     resolved = false
     listener: Array<() => void> = []
+    timer: null | number = null
     constructor() {
         this.observe()
     }
 
+    private clearTimer() {
+        if (this.timer) {
+            clearTimeout(this.timer)
+            this.timer = null
+        }
+    }
+
     observe() {
-        setTimeout(() => {
+        this.timer = setTimeout(() => {
             const entries = performance
                 .getEntriesByType('resource')
                 .filter((item: PerformanceResourceTiming) => this.isMatchType(item))
             const len = entries.length
             if (len <= this.len) {
                 performance.clearResourceTimings()
+                this.clearTimer()
                 this.resolved = true
                 if (this.listener.length) {
                     this.listener.forEach(run => run())
