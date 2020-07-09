@@ -1,5 +1,4 @@
-import { SnapshotData } from '@timecat/share'
-import { RecordData } from '@timecat/share'
+import { SnapshotData, TransactionMode, RecordData } from '@timecat/share'
 
 export class IndexedDBOperator {
     db: IDBDatabase
@@ -13,11 +12,11 @@ export class IndexedDBOperator {
         this.storeName = storeName
 
         const request = window.indexedDB.open(DBName, version)
-        request.onerror = e => {
+        request.onerror = () => {
             console.error('open indexedDB on error')
         }
 
-        request.onsuccess = e => {
+        request.onsuccess = () => {
             this.db = request.result
             callback(this.db)
         }
@@ -34,28 +33,42 @@ export class IndexedDBOperator {
         }
     }
 
+    private withIDBStore(type: IDBTransactionMode, callback: (store: IDBObjectStore) => void): Promise<void>{
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(this.storeName, type)
+            transaction.oncomplete = () => resolve()
+            transaction.onabort = transaction.onerror = () => reject(transaction.error)
+            callback(transaction.objectStore(this.storeName))
+        })
+    }
+
     add(data: SnapshotData | RecordData) {
-        const request = this.db
-            .transaction([`${this.storeName}`], 'readwrite')
-            .objectStore(`${this.storeName}`)
-            .add(data)
-        request.onerror = e => {
+        this.withIDBStore(TransactionMode.READWRITE, store => {
+            store.add(data)
+        }).catch(() => {
             throw new Error('write indexedDB on error')
-        }
+        })
     }
 
     clear() {
-        const objectStore = this.db.transaction([`${this.storeName}`], 'readwrite').objectStore(`${this.storeName}`)
-        objectStore.clear()
+        this.withIDBStore(TransactionMode.READWRITE, store => {
+            store.clear()
+        })
     }
 
     async readAllRecords(): Promise<(SnapshotData | RecordData)[]> {
-        const objectStore = this.db.transaction([`${this.storeName}`], 'readwrite').objectStore(`${this.storeName}`)
-        return new Promise(resolve => {
-            objectStore.getAll().onsuccess = event => {
-                resolve(event!.target!.result)
+        const records: (SnapshotData | RecordData)[]= []
+        return this.withIDBStore(TransactionMode.READONLY, store => {
+            // This would be store.getAll(), but it isn't supported by IE now.
+            store.openCursor().onsuccess = event => {
+                const cursor = event!.target!.result
+
+                if (cursor) {
+                    records.push(cursor.value)
+                    cursor.continue()
+                }
             }
-        })
+        }).then(() => records)
     }
 }
 

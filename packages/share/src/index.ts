@@ -226,3 +226,9 @@ export interface ReplayOptions {
     proxy?: string
     autoplay?: boolean
 }
+
+export enum TransactionMode {
+    'READONLY' = 'readonly',
+    'READWRITE' = 'readwrite',
+    'VERSIONCHANGE' = 'versionchange'
+}
