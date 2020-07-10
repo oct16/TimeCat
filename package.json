@@ -3,9 +3,9 @@
     "author": "oct16",
     "version": "1.0.14",
     "description": "TimeCat Web Recorder",
-    "main": "packages/timecat/dist/timecatjs.cjs.js",
-    "module": "packages/timecat/dist/timecatjs.esm.js",
-    "types": "packages/timecat/dist/timecatjs.d.ts",
+    "main": "lib/timecatjs.cjs.js",
+    "module": "lib/timecatjs.esm.js",
+    "types": "lib/timecatjs.d.ts",
     "keywords": [
         "recorder",
         "replay",
@@ -24,10 +24,12 @@
     "scripts": {
         "dev": "node scripts/dev.js",
         "build": "node scripts/build.js",
+        "live": "node scripts/live.js",
+        "lib": "node scripts/lib.js",
         "test": "jest",
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",
-        "embed": "npm run build && cp packages/timecat/dist/timecatjs.min.js ../../TimeCatChrome/src/assets/",
+        "embed": "cp packages/timecat/dist/timecatjs.min.js ../TimeCatChrome/src/assets/",
         "count": "find ./packages -type f -not -path **/*.spec.ts -not -path **/global.* -not -path './node_modules/*' -not -path '**/dist/*'  -name '*.ts' | xargs wc -l"
     },
     "devDependencies": {
@@ -47,6 +49,7 @@
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
         "jest": "^26.0.1",
+        "minimist": "^1.2.5",
         "pako": "^1.0.11",
         "rollup": "^1.32.0",
         "rollup-plugin-browsersync": "^1.1.0",
@@ -72,9 +75,5 @@
     "homepage": "https://github.com/oct16/TimeCat#readme",
     "files": [
         "lib"
-    ],
-    "dependencies": {
-        "http-proxy": "^1.18.1",
-        "minimist": "^1.2.5"
-    }
+    ]
 }

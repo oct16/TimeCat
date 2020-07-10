@@ -13,23 +13,24 @@ const packagesDir = path.resolve(__dirname, '../packages')
 const packageDir = path.resolve(packagesDir, process.env.TARGET)
 const resolve = p => path.resolve(packageDir, p)
 
+const outputName = `${process.env.TARGET}js`
 export default {
     input: resolve('src/index.ts'),
     output: [
         {
             name: 'timecat',
             format: 'iife',
-            file: resolve(`dist/${process.env.TARGET}.min.js`)
+            file: resolve(`dist/${outputName}.min.js`)
         },
         {
             name: 'timecat',
             format: 'cjs',
-            file: resolve(`dist/${process.env.TARGET}.cjs.js`)
+            file: resolve(`dist/${outputName}.cjs.js`)
         },
         {
             name: 'timecat',
             format: 'esm',
-            file: resolve(`dist/${process.env.TARGET}.esm.js`)
+            file: resolve(`dist/${outputName}.esm.js`)
         }
     ],
     plugins: [
