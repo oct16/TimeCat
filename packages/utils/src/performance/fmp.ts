@@ -20,7 +20,7 @@ class FMP {
     }
 
     observe() {
-        this.timer = setTimeout(() => {
+        this.timer = window.setTimeout(() => {
             const entries = performance
                 .getEntriesByType('resource')
                 .filter((item: PerformanceResourceTiming) => this.isMatchType(item))
