@@ -33,42 +33,60 @@ export class IndexedDBOperator {
         }
     }
 
-    private withIDBStore(type: IDBTransactionMode, callback: (store: IDBObjectStore) => void): Promise<void>{
+    private withIDBStore(type: IDBTransactionMode): Promise<IDBObjectStore> {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction(this.storeName, type)
-            transaction.oncomplete = () => resolve()
-            transaction.onabort = transaction.onerror = () => reject(transaction.error)
-            callback(transaction.objectStore(this.storeName))
+            transaction.oncomplete = () => {}
+            transaction.onabort = transaction.onerror = () => {
+                reject(transaction.error)
+                throw new Error('process indexedDB on error')
+            }
+            resolve(transaction.objectStore(this.storeName))
         })
     }
 
-    add(data: SnapshotData | RecordData) {
-        this.withIDBStore(TransactionMode.READWRITE, store => {
-            store.add(data)
-        }).catch(() => {
-            throw new Error('write indexedDB on error')
-        })
+    private getStore() {
+        return this.withIDBStore(TransactionMode.READWRITE)
     }
 
-    clear() {
-        this.withIDBStore(TransactionMode.READWRITE, store => {
-            store.clear()
-        })
+    async add(data: SnapshotData | RecordData) {
+        const store = await this.getStore()
+        store.add(data)
     }
 
-    async readAllRecords(): Promise<(SnapshotData | RecordData)[]> {
-        const records: (SnapshotData | RecordData)[]= []
-        return this.withIDBStore(TransactionMode.READONLY, store => {
-            // This would be store.getAll(), but it isn't supported by IE now.
+    async clear() {
+        const store = await this.getStore()
+        store.clear()
+    }
+
+    async readAllRecords(): Promise<(SnapshotData | RecordData)[] | null> {
+        const store = await this.getStore()
+
+        const records: (SnapshotData | RecordData)[] = []
+        // This would be store.getAll(), but it isn't supported by IE now.
+        return new Promise(resolve => {
             store.openCursor().onsuccess = event => {
                 const cursor = event!.target!.result
 
                 if (cursor) {
                     records.push(cursor.value)
                     cursor.continue()
+                    return
                 }
+                resolve(records)
             }
-        }).then(() => records)
+        }).then((arr: (SnapshotData | RecordData)[]) => (arr.length ? arr : null))
+    }
+
+    async count(): Promise<number> {
+        const store = await this.getStore()
+
+        return new Promise(resolve => {
+            store.count().onsuccess = event => {
+                const count = event!.target!.result
+                resolve(count)
+            }
+        })
     }
 }
 
