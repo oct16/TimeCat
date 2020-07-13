@@ -2,7 +2,7 @@ import { createElement } from '@timecat/virtual-dom'
 import { InfoData, DOMSnapshotData, VNode } from '@timecat/share'
 
 function getInitInfo(): InfoData {
-    const { name, publicId, systemId } = window.document.doctype!
+    const { name, publicId, systemId } = window.document.doctype || {}
     const doctype = () => ({ name, publicId, systemId } as DocumentType)
     const origin = () => window.location.origin
     const pathname = () => window.location.pathname
