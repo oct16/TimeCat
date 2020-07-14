@@ -33,7 +33,7 @@ export class Recorder {
     }
 
     private beginRecord() {
-        this.audioContext = new window.AudioContext({ sampleRate: this.opts.sampleRate })
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: this.opts.sampleRate })
 
         this.mediaNode = this.audioContext.createMediaStreamSource(this.mediaStream)
 
@@ -80,7 +80,7 @@ export class Recorder {
     public async start(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
         this.setOptions(opts)
         this.mediaStream = await this.initRecorder()
-        this.beginRecord()
+        this.mediaStream && this.beginRecord()
     }
 
     public stop(): void {

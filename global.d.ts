@@ -43,6 +43,8 @@ interface Window {
 
     __ReplayOptions__: any
 
+    webkitAudioContext?: typeof AudioContext
+
     timecat: {
         record: (
             fn?: ((data: SnapshotData, db: IndexedDBOperator) => void) | undefined
