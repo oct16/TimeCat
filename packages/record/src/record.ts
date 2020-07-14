@@ -18,11 +18,8 @@ function getSnapshotData(emit: RecordEvent<SnapshotData>): void {
 
 function getRecorders(options: RecordOptions) {
     const recorders: Function[] = [getSnapshotData, ...Object.values(watchers)]
-    if (options) {
-        const { audio } = options
-        if (audio) {
-            recorders.push(recordAudio)
-        }
+    if (options && options.audio) {
+        recorders.push(recordAudio)
     }
     return recorders
 }
