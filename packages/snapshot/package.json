@@ -4,10 +4,7 @@
     "description": "",
     "main": "dist/index.esm.js",
     "types": "dist/index.d.ts",
-    "scripts": {
-        "dev": "rollup -c -w --silent --environment NODE_ENV:development",
-        "build": "rollup -c"
-    },
+    "scripts": {},
     "dependencies": {
         "@timecat/utils": "^1.0.0",
         "@timecat/virtual-dom": "^1.0.0",
