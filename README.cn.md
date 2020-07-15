@@ -21,7 +21,6 @@ TimeCat 是一套网页录屏的解决方案，利用其独特的算法，提供
     06.07 Support Audio
     05.24 Beta 1.0.0 Released
     04.26 Live Mode    
-    03.31 Add Chrome Plugin 
 
 ### Version 
 
@@ -31,6 +30,13 @@ TimeCat 是一套网页录屏的解决方案，利用其独特的算法，提供
 
 | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari |
 | - | - | - | - |
+
+### Chrome Plugin
+
+提供了Chrome插件并支持一键录制导出
+
+| <img src="./assets/logo.png" width="30">| [TimeCat-Chrome](https://chrome.google.com/webstore/detail/timecat-chrome/jgnkkambbdmhfdbdbkljlenddlbplhal?hl=en&authuser=0) |
+|--|--|
 
 ### Installation
 
