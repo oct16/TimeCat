@@ -103,11 +103,12 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
 }
 
 function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
-    const scrollTop = (target: HTMLElement) => target.scrollTop
-    const scrollLeft = (target: HTMLElement) => target.scrollLeft
+    const getCompatibleDocument = () => document.scrollingElement || document.documentElement
+    const scrollTop = (target: Element | HTMLElement) => target.scrollTop
+    const scrollLeft = (target: Element | HTMLElement) => target.scrollLeft
 
     function emitData(target: Element | Document) {
-        const el = target instanceof Document ? document.documentElement : (target as HTMLElement)
+        const el = target instanceof Document ? getCompatibleDocument() : (target as HTMLElement)
         emitterHook(emit, {
             type: RecordType.SCROLL,
             data: {
