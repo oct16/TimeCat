@@ -98,18 +98,23 @@ export class ContainerComponent {
             setWidth?: number,
             setHeight?: number
         ) {
-            const panelHeight = 40
-            const { width: targetWidth, height: targetHeight } = getPageSize(target)
-            const scaleX = maxWidth / (setWidth || targetWidth)
-            const scaleY = maxHeight / (setHeight || targetHeight)
-            const allowMaxHeight = maxHeight - panelHeight * scaleY
-            const allowScaleY = allowMaxHeight / (setHeight || targetHeight)
-            const scale = scaleX > allowScaleY ? allowScaleY : scaleX
-            const maxScale = scale > 1 ? 1 : scale
+            const panelHeight = 40 - 2 // subtract the gap
 
-            const left = Math.abs(Math.floor(((setWidth || targetWidth) * maxScale - maxWidth) / 2))
-            const top = Math.abs(Math.floor(((setHeight || targetHeight) * maxScale - allowMaxHeight) / 2))
-            target.style.transform = 'scale(' + maxScale + ')'
+            const { width: targetWidth, height: targetHeight } = getPageSize(target)
+
+            const scaleX = maxWidth / (setWidth || targetWidth)
+            const scaleY = maxHeight / ((setHeight || targetHeight) + panelHeight)
+
+            // max zoom 1
+            const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, 1)
+
+            const left =
+                ((setWidth || targetWidth) * scale - targetWidth) / 2 +
+                (maxWidth - (setWidth || targetWidth) * scale) / 2
+
+            const top = (maxHeight - targetHeight - panelHeight * scale) / 2
+
+            target.style.transform = `scale(${scale})`
             target.style.left = left + 'px'
             target.style.top = top + 'px'
 

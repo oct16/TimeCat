@@ -4,10 +4,7 @@
     "description": "",
     "main": "dist/index.esm.js",
     "types": "dist/index.d.ts",
-    "scripts": {
-        "dev": "rollup -c -w",
-        "build": "rollup -c"
-    },
+    "scripts": {},
     "author": "",
     "license": "ISC"
 }
