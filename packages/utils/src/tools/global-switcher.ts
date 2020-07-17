@@ -1,6 +1,15 @@
 class GlobalSwitcher {
     // switch property add in here
-    keys = ['addEventListener', 'removeEventListener', 'innerWidth', 'innerHeight', 'pageXOffset', 'pageYOffset']
+    keys = [
+        'addEventListener',
+        'removeEventListener',
+        'innerWidth',
+        'innerHeight',
+        'pageXOffset',
+        'pageYOffset',
+        'scrollTop',
+        'scrollLeft'
+    ]
 
     switch(global: Window) {
         this.keys.forEach(key => {
