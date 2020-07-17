@@ -34,10 +34,11 @@ import {
     isExistingNode,
     debounce,
     isVNode,
-    getStrDiffPatches
+    getStrDiffPatches,
+    GS
 } from '@timecat/utils'
 
-function emitterHook(emit: RecordEvent<RecordData>, data: any) {
+function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
     if (isDev) {
         // logger(data)
     }
@@ -76,8 +77,8 @@ function registerEvent(
 }
 
 function WindowRecord(emit: RecordEvent<WindowRecord>) {
-    const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-    const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+    const width = () => window.innerWidth
+    const height = () => window.innerHeight
 
     function emitData(target: Element | Document) {
         emitterHook(emit, {
@@ -91,7 +92,7 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
         })
     }
 
-    emitData(document)
+    emitData(GS.getDocument())
 
     function handleFn(e: Event) {
         const { type, target } = e
@@ -103,7 +104,7 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
 }
 
 function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
-    const getCompatibleDocument = () => document.scrollingElement || document.documentElement
+    const getCompatibleDocument = () => GS.getDocument().scrollingElement || GS.getDocument().documentElement
     const scrollTop = (target: Element | HTMLElement) => target.scrollTop
     const scrollLeft = (target: Element | HTMLElement) => target.scrollLeft
 
@@ -120,7 +121,7 @@ function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
         })
     }
 
-    emitData(document)
+    emitData(GS.getDocument())
 
     function handleFn(e: Event) {
         const { type, target } = e
@@ -131,15 +132,30 @@ function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
     registerEvent(['scroll'], handleFn, { capture: true })
 }
 
-function mouseWatcher(emit: RecordEvent<MouseRecord>) {
+function getOffsetPosition(element: HTMLElement) {
+    const doc = element.ownerDocument!
+    const frameElement = doc.defaultView!.frameElement as HTMLElement
+    const position = {
+        x: 0,
+        y: 0
+    }
+    if (frameElement) {
+        position.y += frameElement.offsetTop
+        position.x += frameElement.offsetLeft
+    }
+    return position
+}
+
+function MouseRecord(emit: RecordEvent<MouseRecord>) {
     function mouseMove() {
         const evt = (e: MouseEvent) => {
+            const offsetPosition = getOffsetPosition(e.target as HTMLElement)
             emitterHook(emit, {
                 type: RecordType.MOUSE,
                 data: {
                     type: MouseEventType.MOVE,
-                    x: e.x,
-                    y: e.y
+                    x: e.x + offsetPosition.x,
+                    y: e.y + offsetPosition.y
                 },
                 time: getTime().toString()
             })
@@ -149,22 +165,24 @@ function mouseWatcher(emit: RecordEvent<MouseRecord>) {
             trailing: true
         })
 
-        document.addEventListener(name, listenerHandle)
+        GS.getDocument().addEventListener(name, listenerHandle)
 
         listenerStore.add(() => {
-            document.removeEventListener(name, listenerHandle)
+            GS.getDocument().removeEventListener(name, listenerHandle)
         })
     }
 
     function mouseClick() {
         const evt = (e: MouseEvent) => {
+            const offsetPosition = getOffsetPosition(e.target as HTMLElement)
+
             emitterHook(emit, {
                 type: RecordType.MOUSE,
                 data: {
                     type: MouseEventType.CLICK,
                     id: nodeStore.getNodeId(e.target as Element),
-                    x: e.x,
-                    y: e.y
+                    x: e.x + offsetPosition.x,
+                    y: e.y + offsetPosition.y
                 },
                 time: getTime().toString()
             })
@@ -173,9 +191,9 @@ function mouseWatcher(emit: RecordEvent<MouseRecord>) {
         const name = 'click'
         const listenerHandle = throttle(evt, 250)
         listenerStore.add(() => {
-            document.removeEventListener(name, listenerHandle)
+            GS.getDocument().removeEventListener(name, listenerHandle)
         })
-        document.addEventListener(name, listenerHandle)
+        GS.getDocument().addEventListener(name, listenerHandle)
     }
 
     mouseMove()
@@ -364,7 +382,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord
 function DOMRecord(emit: RecordEvent<DOMRecord>) {
     const Watcher = new MutationObserver(callback => mutationCallback(callback, emit))
 
-    Watcher.observe(document.documentElement, {
+    Watcher.observe(GS.getDocument().documentElement, {
         attributeOldValue: true,
         attributes: true,
         characterData: true,
@@ -388,13 +406,13 @@ function listenInputs(emit: RecordEvent<FormElementRecord>) {
 
     eventTypes
         .map(type => (fn: (e: InputEvent) => void) => {
-            document.addEventListener(type, fn, { once: false, passive: true, capture: true })
+            GS.getDocument().addEventListener(type, fn, { once: false, passive: true, capture: true })
         })
         .forEach(handle => handle(handleFn))
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            document.removeEventListener(type, handleFn, true)
+            GS.getDocument().removeEventListener(type, handleFn, true)
         })
     })
 
@@ -510,7 +528,7 @@ function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
 export const watchers = {
     WindowRecord,
     ScrollRecord,
-    mouseWatcher,
+    MouseRecord,
     DOMRecord,
     FormElementRecord
 }

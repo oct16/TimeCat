@@ -13,11 +13,12 @@ import {
     DOMUpdateDataType,
     ScrollWatcherData,
     VNode,
-    VSNode
+    VSNode,
+    SnapshotData
 } from '@timecat/share'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
-import { setAttribute, createNode, createSpecialNode } from '@timecat/virtual-dom'
+import { setAttribute, createNode, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
 
 function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     const { parentId, nextId, node } = data
@@ -70,14 +71,28 @@ function findNextNode(nextId: number | null): Node | null {
     return nextId ? nodeStore.getNode(nextId) : null
 }
 
-export async function updateDom(this: PlayerComponent, Record: RecordData) {
+export async function updateDom(this: PlayerComponent, Record: RecordData | SnapshotData) {
     const { type, data } = Record
     switch (type) {
+        case RecordType.SNAPSHOT: {
+            const snapshotData = data as SnapshotData['data']
+            const { frameId, vNode } = snapshotData
+
+            if (frameId) {
+                const iframeNode = nodeStore.getNode(frameId) as HTMLIFrameElement
+                if (iframeNode) {
+                    const contentDocument = iframeNode.contentDocument!
+                    createIframeDOM(contentDocument, snapshotData)
+                    injectIframeContent(contentDocument, snapshotData)
+                }
+            }
+
+            break
+        }
+
         case RecordType.SCROLL: {
             const { top, left, id } = data as ScrollWatcherData
-            let target = (id as number | null)
-                ? (nodeStore.getNode(id) as HTMLElement)
-                : this.c.sandBoxDoc.documentElement
+            let target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
 
             const curTop = target.scrollTop
 
@@ -250,4 +265,23 @@ export async function waitStart(): Promise<void> {
             r()
         })
     })
+}
+
+export function createIframeDOM(contentDocument: Document, snapshotData: SnapshotData['data']) {
+    contentDocument.open()
+    const doctype = snapshotData.doctype
+    const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
+        doctype.systemId ? '"' + doctype.systemId + '"' : ''
+    }><html><head></head><body></body></html>`
+    contentDocument.write(doc)
+}
+
+export function injectIframeContent(contentDocument: Document, snapshotData: SnapshotData['data']) {
+    const child = convertVNode(snapshotData.vNode)
+    if (child) {
+        const documentElement = contentDocument.documentElement
+        child.scrollLeft = snapshotData.scrollLeft
+        child.scrollTop = snapshotData.scrollTop
+        contentDocument.replaceChild(child, documentElement)
+    }
 }

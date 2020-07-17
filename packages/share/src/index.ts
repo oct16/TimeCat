@@ -9,13 +9,16 @@ export interface InfoData {
     height: number
     scrollLeft: number
     scrollTop: number
+    frameId: number | null
 }
 
-export interface DOMSnapshotData {
-    vNode: VNode
+export interface SnapshotData {
+    type: RecordType.SNAPSHOT
+    data: {
+        vNode: VNode
+    } & InfoData
+    time: string
 }
-
-export type SnapshotData = DOMSnapshotData & InfoData
 
 type Attrs = { [key: string]: string }
 
@@ -42,6 +45,7 @@ export interface VNode {
 }
 
 export enum RecordType {
+    'SNAPSHOT' = 'SNAPSHOT',
     'WINDOW' = 'WINDOW',
     'SCROLL' = 'SCROLL',
     'MOUSE' = 'MOUSE',
@@ -70,7 +74,7 @@ export interface WindowRecord {
 }
 
 export interface WindowWatcherData {
-    id: number
+    id: number | null
     width: number
     height: number
 }
@@ -82,7 +86,7 @@ export interface ScrollRecord {
 }
 
 export interface ScrollWatcherData {
-    id: number
+    id: number | null
     top: number
     left: number
 }
@@ -208,8 +212,9 @@ interface SubtitlesData {
 }
 
 export interface RecordOptions {
+    window?: Window
     audio?: boolean
-    emitter?: (data: RecordData, db: any) => void
+    emitter?: (data: RecordData | SnapshotData, db: any) => void
     // emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
 
