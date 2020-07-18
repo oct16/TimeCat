@@ -41,8 +41,6 @@ interface Window {
         records: any[]
     }
 
-    currentWindow: Window
-
     __ReplayOptions__: any
 
     webkitAudioContext?: typeof AudioContext

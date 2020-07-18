@@ -1,8 +1,9 @@
 import { Recorder } from './audio-recorder'
-import { AudioRecord, RecordType } from '@timecat/share'
+import { AudioRecord, RecordType, WatcherOptions } from '@timecat/share'
 import { getTime, listenerStore } from '@timecat/utils'
 
-export function recordAudio(emitter: (data: AudioRecord) => void) {
+export function recordAudio(options: WatcherOptions<AudioRecord>) {
+    const { emit } = options
     const recorder = new Recorder({
         sampleBits: 8,
         sampleRate: 8000,
@@ -15,7 +16,7 @@ export function recordAudio(emitter: (data: AudioRecord) => void) {
         recorder.stop()
     })
 
-    emitter({
+    emit({
         type: RecordType.AUDIO,
         data: {
             type: 'opts',
@@ -25,7 +26,7 @@ export function recordAudio(emitter: (data: AudioRecord) => void) {
     })
 
     recorder.onProgress = audioBase64Data => {
-        emitter({
+        emit({
             type: RecordType.AUDIO,
             data: {
                 type: 'base64',
