@@ -35,7 +35,8 @@ async function startRecord(options: RecordOptions) {
 
     const allRecorders = getRecorders(options)
     let activeRecorders = allRecorders
-    // refer the iframe global variable
+
+    // is record iframe, switch context
     if (!options || !options.window) {
         db.clear()
         GS.default()

@@ -87,7 +87,7 @@ export function throttle(
 type Procedure = (...args: any[]) => void
 
 type Options = {
-    isImmediate: boolean
+    isImmediate?: boolean
 }
 
 export function debounce<F extends Procedure>(

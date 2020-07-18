@@ -48,30 +48,27 @@ function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
 function registerEvent(
     eventTypes: string[],
     handleFn: (...args: any[]) => void,
-    opts: AddEventListenerOptions,
-    type = 'throttle',
+    listenerOptions: AddEventListenerOptions,
+    type: 'throttle' | 'debounce' = 'throttle',
+    optimizeOptions: { [key: string]: boolean },
     waitTime = 500
 ) {
     let listenerHandle: (...args: any[]) => void
     if (type === 'throttle') {
-        listenerHandle = throttle(handleFn, waitTime, {
-            trailing: true
-        })
+        listenerHandle = throttle(handleFn, waitTime, optimizeOptions)
     } else {
-        listenerHandle = debounce(handleFn, waitTime, {
-            isImmediate: false
-        })
+        listenerHandle = debounce(handleFn, waitTime, optimizeOptions)
     }
 
     eventTypes
         .map(type => (fn: (e: Event) => void) => {
-            window.addEventListener(type, fn, opts)
+            GS.getWindow().addEventListener(type, fn, listenerOptions)
         })
         .forEach(handle => handle(listenerHandle))
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            window.removeEventListener(type, listenerHandle, opts)
+            GS.getWindow().removeEventListener(type, listenerHandle, listenerOptions)
         })
     })
 }
@@ -100,22 +97,24 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
             emitData(target as Element | Document)
         }
     }
-    registerEvent(['resize'], handleFn, { capture: true })
+    registerEvent(['resize'], handleFn, { capture: true }, 'throttle', { trailing: true }, 500)
 }
 
 function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
-    const getCompatibleDocument = () => GS.getDocument().scrollingElement || GS.getDocument().documentElement
+    // const getCompatibleDocument = () => GS.getDocument().documentElement
+    const getCompatibleTarget = (target: Document) => (target.scrollingElement as HTMLElement) || target.documentElement
     const scrollTop = (target: Element | HTMLElement) => target.scrollTop
     const scrollLeft = (target: Element | HTMLElement) => target.scrollLeft
 
     function emitData(target: Element | Document) {
-        const el = target instanceof Document ? getCompatibleDocument() : (target as HTMLElement)
+        const element = target instanceof HTMLElement ? target : getCompatibleTarget(target as Document)
+
         emitterHook(emit, {
             type: RecordType.SCROLL,
             data: {
-                id: nodeStore.getNodeId(target) || null, // if null, target is document
-                top: scrollTop(el),
-                left: scrollLeft(el)
+                id: nodeStore.getNodeId(element) || null, // if null, target is document
+                top: scrollTop(element),
+                left: scrollLeft(element)
             },
             time: getTime().toString()
         })
@@ -129,7 +128,7 @@ function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
             emitData(target as Element | Document)
         }
     }
-    registerEvent(['scroll'], handleFn, { capture: true })
+    registerEvent(['scroll'], handleFn, { capture: true }, 'throttle', { leading: false, trailing: false }, 500)
 }
 
 function getOffsetPosition(element: HTMLElement) {
