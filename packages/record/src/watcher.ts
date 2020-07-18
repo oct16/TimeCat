@@ -501,10 +501,10 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
 function kidnapInputs(options: WatcherOptions<FormElementRecord>) {
     const { emit, context } = options
     const elementList: [HTMLElement, string][] = [
-        [HTMLInputElement.prototype, 'value'],
-        [HTMLInputElement.prototype, 'checked'],
-        [HTMLSelectElement.prototype, 'value'],
-        [HTMLTextAreaElement.prototype, 'value']
+        [(context as any).HTMLInputElement.prototype, 'value'],
+        [(context as any).HTMLInputElement.prototype, 'checked'],
+        [(context as any).HTMLSelectElement.prototype, 'value'],
+        [(context as any).HTMLTextAreaElement.prototype, 'value']
     ]
 
     const handles = elementList.map(item => {
