@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeCat Iframe Demo</title>
+
+    <style>
+        .iframe-container {
+            margin-top: 20px;
+            padding-bottom: 20px;
+            background: white;
+            border: 3px solid grey;
+        }
+
+        iframe {
+            margin: 0 20px;
+        }
+
+        .container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 3px solid grey;
+        }
+
+        number {
+            margin-left: 10px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        #replay {
+            border: 1px solid grey;
+            padding: 2px 10px;
+            margin: 10px;
+            color: red;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #replay.locked {
+            color: rgb(205, 203, 203);
+            border-color: rgb(205, 203, 203);
+        }
+
+
+        #replay.hide {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <!--hidden--><button id="replay" class="locked">Replay</button>
+    <div class="container">
+        <h2>Window</h2>
+        <button>Number ++</button>
+        <number>0</number>
+
+        <div class="iframe-container">
+            <iframe src="./iframe-1.html" align="top" onload="resizeIframe(this)" frameborder="0"></iframe>
+            <iframe src="./iframe-2.html" align="top" onload="resizeIframe(this)" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <script src="http://localhost:4321/timecatjs.min.js"></script>
+
+    <script>
+        function resizeIframe(target) {
+            target.height = target.contentDocument.documentElement.offsetHeight
+        }
+        window.onresize = function () {
+            resizeIframe();
+        }
+
+        const { record } = timecat
+        const ctrl = record()
+        const replayButton = document.getElementById('replay')
+        if (replayButton) {
+            setTimeout(() => {
+                replayButton.className = ''
+            }, 5000);
+            replayButton.addEventListener('click', () => {
+                if (replayButton.className) {
+                    return
+                }
+                replayButton.className = 'hide'
+                ctrl.unsubscribe()
+                window.open('replay.html')
+            })
+        }
+
+        const container = document.querySelector('.container');
+        const number = container.querySelector('number')
+        const button = container.querySelector('button')
+        button.addEventListener('click', () => {
+            number.innerHTML = Number(number.innerHTML) + 1
+        })
+    </script>
+
+
+    <!--env-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-151180797-1');
+    </script>
+    <!--env-->
+</body>
+
+</html>
