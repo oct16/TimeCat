@@ -23,6 +23,7 @@ declare interface IDBDatabase {
 
 declare interface HTMLInputElement {
     oldValue: string
+    value: any
 }
 
 interface Window {

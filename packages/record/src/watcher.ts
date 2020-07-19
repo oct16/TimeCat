@@ -1,8 +1,3 @@
-declare interface HTMLInputElement {
-    oldValue: string
-    value: any
-}
-
 import { createFlatVNode } from '@timecat/virtual-dom'
 import {
     WindowRecord,
@@ -75,7 +70,7 @@ function registerEvent(options: {
     })
 }
 
-function WindowRecordWatcher(options: WatcherOptions<WindowRecord>) {
+function WindowWatcher(options: WatcherOptions<WindowRecord>) {
     const { emit, context } = options
     const width = () => context.innerWidth
     const height = () => context.innerHeight
@@ -110,8 +105,7 @@ function WindowRecordWatcher(options: WatcherOptions<WindowRecord>) {
     })
 }
 
-function ScrollRecordWatcher(options: WatcherOptions<ScrollRecord>) {
-    // const getCompatibleDocument = () => document.documentElement
+function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
     const getCompatibleTarget = (target: Document) => (target.scrollingElement as HTMLElement) || target.documentElement
     const scrollTop = (target: Element | HTMLElement) => target.scrollTop
     const scrollLeft = (target: Element | HTMLElement) => target.scrollLeft
@@ -164,7 +158,7 @@ function getOffsetPosition(element: HTMLElement) {
     return position
 }
 
-function MouseRecordWatcher(options: WatcherOptions<MouseRecord>) {
+function MouseWatcher(options: WatcherOptions<MouseRecord>) {
     const { emit, context } = options
     function mouseMove() {
         const evt = (e: MouseEvent) => {
@@ -398,7 +392,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord
     }
 }
 
-function DOMRecordWatcher(options: WatcherOptions<DOMRecord>) {
+function DOMWatcher(options: WatcherOptions<DOMRecord>) {
     const { emit, context } = options
     const Watcher = new MutationObserver(callback => mutationCallback(callback, emit))
 
@@ -414,7 +408,7 @@ function DOMRecordWatcher(options: WatcherOptions<DOMRecord>) {
     listenerStore.add(() => Watcher.disconnect())
 }
 
-function FormElementRecordWatcher(options: WatcherOptions<FormElementRecord>) {
+function FormElementWatcher(options: WatcherOptions<FormElementRecord>) {
     listenInputs(options)
 
     // for sys write in input
@@ -445,30 +439,41 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
             case 'input':
             case 'change':
                 const target = (e.target as unknown) as HTMLInputElement
-                const str = target.value
-                let newValue = ''
-                const patches: ReturnType<typeof getStrDiffPatches> = []
-                if (str === target.oldValue) {
+                const inputType = target.getAttribute('type') || 'text'
+
+                let key = 'value'
+                let value: any = target.value || ''
+                let newValue: any = ''
+                let patches: ReturnType<typeof getStrDiffPatches> = []
+
+                if (value === target.oldValue) {
                     return
                 }
-                if (str.length <= 20 || !target.oldValue) {
-                    newValue = str
-                } else {
-                    patches.push(...getStrDiffPatches(target.oldValue, str))
+
+                if (inputType === 'checkbox' || inputType === 'radio') {
+                    key = 'checked'
+                    newValue = target.checked
+                } else if (!inputType || inputType === 'text' || inputType === 'textarea') {
+                    if (value.length <= 20 || !target.oldValue) {
+                        newValue = value
+                    } else {
+                        patches.push(...getStrDiffPatches(target.oldValue, value))
+                    }
                 }
 
                 data = {
                     type: RecordType.FORM_EL_UPDATE,
                     data: {
-                        type: FormElementEvent.INPUT,
+                        type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
                         id: nodeStore.getNodeId(e.target as Node)!,
-                        value: !patches.length ? newValue : '',
+                        key,
+                        value: !patches.length ? newValue : value,
                         patches
                     },
                     time: getTime().toString()
                 }
 
-                target.oldValue = str
+                target.oldValue = value
                 break
             case 'focus':
                 data = {
@@ -510,8 +515,8 @@ function kidnapInputs(options: WatcherOptions<FormElementRecord>) {
     const handles = elementList.map(item => {
         return () => {
             const [target, key] = item
-            const original = Object.getOwnPropertyDescriptor(target, key)
-            Object.defineProperty(target, key, {
+            const original = (context as any).Object.getOwnPropertyDescriptor(target, key)
+            ;(context as any).Object.defineProperty(target, key, {
                 set: function(value: string | boolean) {
                     setTimeout(() => {
                         handleEvent.call(this, key, value)
@@ -524,7 +529,7 @@ function kidnapInputs(options: WatcherOptions<FormElementRecord>) {
 
             listenerStore.add(() => {
                 if (original) {
-                    Object.defineProperty(target, key, original)
+                    ;(context as any).Object.defineProperty(target, key, original)
                 }
             })
         }
@@ -548,10 +553,12 @@ function kidnapInputs(options: WatcherOptions<FormElementRecord>) {
     }
 }
 
-export const watchers = {
-    WindowRecordWatcher,
-    ScrollRecordWatcher,
-    MouseRecordWatcher,
-    DOMRecordWatcher,
-    FormElementRecordWatcher
+const watchers = {
+    WindowWatcher,
+    ScrollWatcher,
+    MouseWatcher,
+    DOMWatcher,
+    FormElementWatcher
 }
+
+export default watchers

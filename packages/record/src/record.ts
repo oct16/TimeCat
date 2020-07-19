@@ -1,4 +1,4 @@
-import { watchers } from './watcher'
+import watchers from './watcher'
 import { recordAudio } from './audio'
 import { RecordData, RecordOptions, SnapshotData, ValueOf, WatcherOptions } from '@timecat/share'
 import { listenerStore, getDBOperator } from '@timecat/utils'
@@ -35,22 +35,22 @@ async function startRecord(options: RecordOptions) {
     const db = await getDBOperator
 
     const allRecorders = getRecorders(options)
-    let activeRecorders = allRecorders
+    let iframeRecorders = allRecorders
 
     // is record iframe, switch context
     if (!options || !options.context) {
         db.clear()
     } else {
-        activeRecorders = [
+        iframeRecorders = [
             getSnapshotData,
-            watchers.MouseRecordWatcher,
-            watchers.DOMRecordWatcher,
-            watchers.FormElementRecordWatcher,
-            watchers.ScrollRecordWatcher
+            watchers.MouseWatcher,
+            watchers.DOMWatcher,
+            watchers.FormElementWatcher,
+            watchers.ScrollWatcher
         ]
     }
 
-    activeRecorders.forEach(task =>
+    iframeRecorders.forEach(task =>
         task({
             context: (options && options.context) || window,
             emit(data: RecordData | SnapshotData) {
