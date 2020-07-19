@@ -55,10 +55,6 @@ function stitchingLink(pre: string, next: string) {
     return pre + '/' + next
 }
 
-export function resolveToAbsolutePath(url: string, base: string) {
-    return new URL(url, base).href
-}
-
 export function completionCssHref(str: string) {
     return str.replace(/(url\()['"]?((\/{1,2})[^'"]*?)['"]?(?=\))/g, (a, b, c) => {
         let url: string = ''
@@ -74,12 +70,32 @@ export function completionCssHref(str: string) {
     })
 }
 
-export function completionAttrHref(str: string = '') {
+export function completionAttrHref(str: string) {
     if (str.startsWith('data')) {
         return str
     }
 
-    return resolveToAbsolutePath(str, href())
+    const reg = /^(\/{1,2}.*)/g
+    str = str.replace(reg, str => {
+        if (startsWithDoubleSlash(str)) {
+            return stitchingLink(protocol(), str.substring(2))
+        }
+
+        if (startsWithSlash(str)) {
+            return stitchingLink(origin(), str)
+        }
+        return str
+    })
+
+    if (!/^http/.test(str)) {
+        if (str.startsWith('./')) {
+            return stitchingLink(href(), str.substring(1))
+        } else {
+            return stitchingLink(origin(), str)
+        }
+    }
+
+    return str
 }
 
 export function isHideComment(node: Node | null) {
