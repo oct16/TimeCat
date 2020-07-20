@@ -14,7 +14,8 @@ import {
     ScrollWatcherData,
     VNode,
     VSNode,
-    SnapshotData
+    SnapshotData,
+    LocationRecordData
 } from '@timecat/share'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
@@ -97,7 +98,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             const curTop = target.scrollTop
 
             // prevent jump too long distance
-            const behavior = Math.abs(top - curTop) > window.__ReplayData__.snapshot.height * 3 ? 'auto' : 'smooth'
+            const behavior = Math.abs(top - curTop) > window.__ReplayData__.snapshot.data.height * 3 ? 'auto' : 'smooth'
             target.scrollTo({
                 top,
                 left,
@@ -167,7 +168,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                     } as UpdateNodeData
                 })
                 .concat(addedNodes.slice())
-
+                
             // Math Termial
             const n = addedList.length
             const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
@@ -233,6 +234,15 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                 }
             }
             break
+
+        case RecordType.LOCATION:
+            const { path, hash, contextNodeId } = data as LocationRecordData
+            const contextNode = nodeStore.getNode(contextNodeId)
+            
+            if (contextNode) {
+                const context = contextNode.ownerDocument!.defaultView!
+                context.__ReplayLocation__ = { ...context.__ReplayLocation__, ...{ path, hash } }
+            }
         default: {
             break
         }
