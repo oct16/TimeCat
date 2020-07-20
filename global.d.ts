@@ -44,6 +44,8 @@ interface Window {
 
     __ReplayOptions__: any
 
+    __ReplayLocation__: any
+
     webkitAudioContext?: typeof AudioContext
 
     timecat: {
@@ -55,4 +57,8 @@ interface Window {
         replay(options: { socketUrl: string } = {} as any): Promise<void>
         exportReplay(opts?: Opts): Promise<void>
     }
+}
+
+interface Event {
+    arguments: any
 }

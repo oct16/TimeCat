@@ -51,6 +51,7 @@ export enum RecordType {
     'MOUSE' = 'MOUSE',
     'DOM_UPDATE' = 'DOM_UPDATE',
     'FORM_EL_UPDATE' = 'FORM_EL_UPDATE',
+    'LOCATION' = 'LOCATION',
     'AUDIO' = 'AUDIO',
     'NONE' = 'NONE'
 }
@@ -187,6 +188,18 @@ export interface NONERecord {
     time: string
 }
 
+export interface LocationRecord {
+    type: RecordType.LOCATION
+    data: LocationRecordData
+    time: string
+}
+
+export interface LocationRecordData {
+    path?: string
+    hash?: string
+    contextNodeId: number
+}
+
 export type RecordEvent<T> = (e: T) => void
 
 export type RecordData =
@@ -197,6 +210,7 @@ export type RecordData =
     | ScrollRecord
     | AudioRecord
     | NONERecord
+    | LocationRecord
 
 export interface AudioData {
     src: string

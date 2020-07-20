@@ -1,6 +1,6 @@
 import { isDev } from './common'
 
-const snapshot = () => window.__ReplayData__ && window.__ReplayData__.snapshot
+const snapshot = () => window.__ReplayData__ && window.__ReplayData__.snapshot.data
 const origin = () => (snapshot() && snapshot().origin) || location.origin
 const protocol = () => origin().match(/.*?\/\//)![0] || location.protocol
 const href = () => origin() + ((snapshot() && snapshot().pathname) || location.pathname)
@@ -70,7 +70,7 @@ export function completionCssHref(str: string) {
     })
 }
 
-export function completionAttrHref(str: string) {
+export function completionAttrHref(str: string, node?: Element) {
     if (str.startsWith('data')) {
         return str
     }
@@ -91,11 +91,32 @@ export function completionAttrHref(str: string) {
         if (str.startsWith('./')) {
             return stitchingLink(href(), str.substring(1))
         } else {
-            return stitchingLink(origin(), str)
+            // Use the async way to get the Context by reference after the node is inserted into the iframe
+            if (node) {
+                setTimeout(() => updateNodeAttrHref(node as HTMLElement, str))
+            }
+
+            // prevent load source
+            return ''
         }
     }
 
     return str
+}
+
+function updateNodeAttrHref(node: HTMLElement, str: string) {
+    const doc = node.getRootNode() as Document
+    const context = doc.defaultView as Window
+
+    let { path } = context.__ReplayLocation__
+    path = path.replace(/(\/[\w\/]+)\/\w+\/{0,}/, '$1').replace(/\/*$/, '')
+
+    const attrs = node.getAttributeNames()
+    attrs
+        .filter(key => ~['src', 'href'].indexOf(key))
+        .forEach(key => {
+            node.setAttribute(key, stitchingLink(origin() + path, str))
+        })
 }
 
 export function isHideComment(node: Node | null) {
