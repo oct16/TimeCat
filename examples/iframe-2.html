@@ -7,10 +7,12 @@
         body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
+            text-align: center;
         }
 
         form {
-            padding: 10px;
+            display: inline-block;
+            padding: 10px 20px;
             border: 3px solid #f1f1f1;
         }
 
@@ -54,9 +56,6 @@
             border-radius: 50%;
         }
 
-        .container {
-            padding: 16px;
-        }
 
         span.psw {
             float: right;
@@ -82,18 +81,16 @@
     <h2>Iframe 2</h2>
 
     <form onsubmit="return false">
-        <div class="container">
-            <label for="uname"><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="uname" required>
+        <label for="uname"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="uname" required>
 
-            <label for="psw"><b>Password</b></label>
-            <input type="text" placeholder="Enter Password" name="psw" required>
+        <label for="psw"><b>Password</b></label>
+        <input type="text" placeholder="Enter Password" name="psw" required>
 
-            <button type="submit">Login</button>
-            <label>
-                <input type="checkbox" checked="checked" name="remember"> Remember me
-            </label>
-        </div>
+        <button type="submit">Login</button>
+        <label>
+            <input type="checkbox" checked="checked" name="remember"> Remember me
+        </label>
     </form>
 
 </body>
