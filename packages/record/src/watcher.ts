@@ -1,8 +1,3 @@
-declare interface HTMLInputElement {
-    oldValue: string
-    value: any
-}
-
 import { createFlatVNode } from '@timecat/virtual-dom'
 import {
     WindowRecord,
@@ -22,7 +17,8 @@ import {
     FormElementEvent,
     MouseEventType,
     VNode,
-    VSNode
+    VSNode,
+    WatcherOptions
 } from '@timecat/share'
 import {
     logger,
@@ -34,8 +30,7 @@ import {
     isExistingNode,
     debounce,
     isVNode,
-    getStrDiffPatches,
-    GS
+    getStrDiffPatches
 } from '@timecat/utils'
 
 function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
@@ -45,14 +40,16 @@ function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
     emit(data)
 }
 
-function registerEvent(
-    eventTypes: string[],
-    handleFn: (...args: any[]) => void,
-    listenerOptions: AddEventListenerOptions,
-    type: 'throttle' | 'debounce' = 'throttle',
-    optimizeOptions: { [key: string]: boolean },
-    waitTime = 500
-) {
+function registerEvent(options: {
+    context: Window
+    eventTypes: string[]
+    handleFn: (...args: any[]) => void
+    listenerOptions: AddEventListenerOptions
+    type: 'throttle' | 'debounce'
+    optimizeOptions: { [key: string]: boolean }
+    waitTime: number
+}) {
+    const { context, eventTypes, handleFn, listenerOptions, type, optimizeOptions, waitTime } = options
     let listenerHandle: (...args: any[]) => void
     if (type === 'throttle') {
         listenerHandle = throttle(handleFn, waitTime, optimizeOptions)
@@ -62,21 +59,21 @@ function registerEvent(
 
     eventTypes
         .map(type => (fn: (e: Event) => void) => {
-            GS.getWindow().addEventListener(type, fn, listenerOptions)
+            context.addEventListener(type, fn, listenerOptions)
         })
         .forEach(handle => handle(listenerHandle))
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            GS.getWindow().removeEventListener(type, listenerHandle, listenerOptions)
+            context.removeEventListener(type, listenerHandle, listenerOptions)
         })
     })
 }
 
-function WindowRecord(emit: RecordEvent<WindowRecord>) {
-    const width = () => window.innerWidth
-    const height = () => window.innerHeight
-
+function WindowWatcher(options: WatcherOptions<WindowRecord>) {
+    const { emit, context } = options
+    const width = () => context.innerWidth
+    const height = () => context.innerHeight
     function emitData(target: Element | Document) {
         emitterHook(emit, {
             type: RecordType.WINDOW,
@@ -89,7 +86,7 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
         })
     }
 
-    emitData(GS.getDocument())
+    emitData(context.document)
 
     function handleFn(e: Event) {
         const { type, target } = e
@@ -97,18 +94,25 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
             emitData(target as Element | Document)
         }
     }
-    registerEvent(['resize'], handleFn, { capture: true }, 'throttle', { trailing: true }, 500)
+    registerEvent({
+        context,
+        eventTypes: ['resize'],
+        handleFn,
+        listenerOptions: { capture: true },
+        type: 'throttle',
+        optimizeOptions: { trailing: true },
+        waitTime: 500
+    })
 }
 
-function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
-    // const getCompatibleDocument = () => GS.getDocument().documentElement
+function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
     const getCompatibleTarget = (target: Document) => (target.scrollingElement as HTMLElement) || target.documentElement
     const scrollTop = (target: Element | HTMLElement) => target.scrollTop
     const scrollLeft = (target: Element | HTMLElement) => target.scrollLeft
+    const { emit, context } = options
 
     function emitData(target: Element | Document) {
         const element = target instanceof HTMLElement ? target : getCompatibleTarget(target as Document)
-
         emitterHook(emit, {
             type: RecordType.SCROLL,
             data: {
@@ -120,7 +124,7 @@ function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
         })
     }
 
-    emitData(GS.getDocument())
+    emitData(context.document)
 
     function handleFn(e: Event) {
         const { type, target } = e
@@ -128,7 +132,16 @@ function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
             emitData(target as Element | Document)
         }
     }
-    registerEvent(['scroll'], handleFn, { capture: true }, 'throttle', { leading: false, trailing: false }, 500)
+
+    registerEvent({
+        context,
+        eventTypes: ['scroll'],
+        handleFn,
+        listenerOptions: { capture: true },
+        type: 'throttle',
+        optimizeOptions: { leading: false, trailing: false },
+        waitTime: 500
+    })
 }
 
 function getOffsetPosition(element: HTMLElement) {
@@ -145,7 +158,8 @@ function getOffsetPosition(element: HTMLElement) {
     return position
 }
 
-function MouseRecord(emit: RecordEvent<MouseRecord>) {
+function MouseWatcher(options: WatcherOptions<MouseRecord>) {
+    const { emit, context } = options
     function mouseMove() {
         const evt = (e: MouseEvent) => {
             const offsetPosition = getOffsetPosition(e.target as HTMLElement)
@@ -164,10 +178,10 @@ function MouseRecord(emit: RecordEvent<MouseRecord>) {
             trailing: true
         })
 
-        GS.getDocument().addEventListener(name, listenerHandle)
+        context.document.addEventListener(name, listenerHandle)
 
         listenerStore.add(() => {
-            GS.getDocument().removeEventListener(name, listenerHandle)
+            context.document.removeEventListener(name, listenerHandle)
         })
     }
 
@@ -190,9 +204,9 @@ function MouseRecord(emit: RecordEvent<MouseRecord>) {
         const name = 'click'
         const listenerHandle = throttle(evt, 250)
         listenerStore.add(() => {
-            GS.getDocument().removeEventListener(name, listenerHandle)
+            context.document.removeEventListener(name, listenerHandle)
         })
-        GS.getDocument().addEventListener(name, listenerHandle)
+        context.document.addEventListener(name, listenerHandle)
     }
 
     mouseMove()
@@ -378,10 +392,11 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord
     }
 }
 
-function DOMRecord(emit: RecordEvent<DOMRecord>) {
+function DOMWatcher(options: WatcherOptions<DOMRecord>) {
+    const { emit, context } = options
     const Watcher = new MutationObserver(callback => mutationCallback(callback, emit))
 
-    Watcher.observe(GS.getDocument().documentElement, {
+    Watcher.observe(context.document.documentElement, {
         attributeOldValue: true,
         attributes: true,
         characterData: true,
@@ -393,25 +408,27 @@ function DOMRecord(emit: RecordEvent<DOMRecord>) {
     listenerStore.add(() => Watcher.disconnect())
 }
 
-function FormElementRecord(emit: RecordEvent<FormElementRecord>) {
-    listenInputs(emit)
+function FormElementWatcher(options: WatcherOptions<FormElementRecord>) {
+    listenInputs(options)
 
     // for sys write in input
-    kidnapInputs(emit)
+    kidnapInputs(options)
 }
 
-function listenInputs(emit: RecordEvent<FormElementRecord>) {
+function listenInputs(options: WatcherOptions<FormElementRecord>) {
+    const { emit, context } = options
+
     const eventTypes = ['input', 'change', 'focus', 'blur']
 
     eventTypes
         .map(type => (fn: (e: InputEvent) => void) => {
-            GS.getDocument().addEventListener(type, fn, { once: false, passive: true, capture: true })
+            context.document.addEventListener(type, fn, { once: false, passive: true, capture: true })
         })
         .forEach(handle => handle(handleFn))
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            GS.getDocument().removeEventListener(type, handleFn, true)
+            context.document.removeEventListener(type, handleFn, true)
         })
     })
 
@@ -422,30 +439,41 @@ function listenInputs(emit: RecordEvent<FormElementRecord>) {
             case 'input':
             case 'change':
                 const target = (e.target as unknown) as HTMLInputElement
-                const str = target.value
-                let newValue = ''
-                const patches: ReturnType<typeof getStrDiffPatches> = []
-                if (str === target.oldValue) {
+                const inputType = target.getAttribute('type') || 'text'
+
+                let key = 'value'
+                let value: any = target.value || ''
+                let newValue: any = ''
+                let patches: ReturnType<typeof getStrDiffPatches> = []
+
+                if (value === target.oldValue) {
                     return
                 }
-                if (str.length <= 20 || !target.oldValue) {
-                    newValue = str
-                } else {
-                    patches.push(...getStrDiffPatches(target.oldValue, str))
+
+                if (inputType === 'checkbox' || inputType === 'radio') {
+                    key = 'checked'
+                    newValue = target.checked
+                } else if (!inputType || inputType === 'text' || inputType === 'textarea') {
+                    if (value.length <= 20 || !target.oldValue) {
+                        newValue = value
+                    } else {
+                        patches.push(...getStrDiffPatches(target.oldValue, value))
+                    }
                 }
 
                 data = {
                     type: RecordType.FORM_EL_UPDATE,
                     data: {
-                        type: FormElementEvent.INPUT,
+                        type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
                         id: nodeStore.getNodeId(e.target as Node)!,
-                        value: !patches.length ? newValue : '',
+                        key,
+                        value: !patches.length ? newValue : value,
                         patches
                     },
                     time: getTime().toString()
                 }
 
-                target.oldValue = str
+                target.oldValue = value
                 break
             case 'focus':
                 data = {
@@ -475,19 +503,20 @@ function listenInputs(emit: RecordEvent<FormElementRecord>) {
     }
 }
 
-function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
+function kidnapInputs(options: WatcherOptions<FormElementRecord>) {
+    const { emit, context } = options
     const elementList: [HTMLElement, string][] = [
-        [HTMLInputElement.prototype, 'value'],
-        [HTMLInputElement.prototype, 'checked'],
-        [HTMLSelectElement.prototype, 'value'],
-        [HTMLTextAreaElement.prototype, 'value']
+        [(context as any).HTMLInputElement.prototype, 'value'],
+        [(context as any).HTMLInputElement.prototype, 'checked'],
+        [(context as any).HTMLSelectElement.prototype, 'value'],
+        [(context as any).HTMLTextAreaElement.prototype, 'value']
     ]
 
     const handles = elementList.map(item => {
         return () => {
             const [target, key] = item
-            const original = Object.getOwnPropertyDescriptor(target, key)
-            Object.defineProperty(target, key, {
+            const original = (context as any).Object.getOwnPropertyDescriptor(target, key)
+            ;(context as any).Object.defineProperty(target, key, {
                 set: function(value: string | boolean) {
                     setTimeout(() => {
                         handleEvent.call(this, key, value)
@@ -500,7 +529,7 @@ function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
 
             listenerStore.add(() => {
                 if (original) {
-                    Object.defineProperty(target, key, original)
+                    ;(context as any).Object.defineProperty(target, key, original)
                 }
             })
         }
@@ -524,10 +553,12 @@ function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
     }
 }
 
-export const watchers = {
-    WindowRecord,
-    ScrollRecord,
-    MouseRecord,
-    DOMRecord,
-    FormElementRecord
+const watchers = {
+    WindowWatcher,
+    ScrollWatcher,
+    MouseWatcher,
+    DOMWatcher,
+    FormElementWatcher
 }
+
+export default watchers

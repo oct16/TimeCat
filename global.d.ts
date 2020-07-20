@@ -23,6 +23,7 @@ declare interface IDBDatabase {
 
 declare interface HTMLInputElement {
     oldValue: string
+    value: any
 }
 
 interface Window {
@@ -40,8 +41,6 @@ interface Window {
         snapshot: any
         records: any[]
     }
-
-    currentWindow: Window
 
     __ReplayOptions__: any
 

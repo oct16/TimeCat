@@ -1,12 +1,13 @@
-import { watchers } from './watcher'
+import watchers from './watcher'
 import { recordAudio } from './audio'
-import { RecordData, RecordEvent, RecordOptions, SnapshotData, ValueOf } from '@timecat/share'
-import { listenerStore, getDBOperator, GS } from '@timecat/utils'
+import { RecordData, RecordOptions, SnapshotData, ValueOf, WatcherOptions } from '@timecat/share'
+import { listenerStore, getDBOperator } from '@timecat/utils'
 import { snapshots } from '@timecat/snapshot'
 
-function getSnapshotData(emit: RecordEvent<SnapshotData>): void {
+function getSnapshotData(options: WatcherOptions<SnapshotData>): void {
     const { DOMSnapshot } = snapshots
-    const snapshot = DOMSnapshot()
+    const snapshot = DOMSnapshot(options.context || window)
+    const { emit } = options
     emit(snapshot)
 }
 
@@ -34,30 +35,31 @@ async function startRecord(options: RecordOptions) {
     const db = await getDBOperator
 
     const allRecorders = getRecorders(options)
-    let activeRecorders = allRecorders
+    let iframeRecorders = allRecorders
 
     // is record iframe, switch context
-    if (!options || !options.window) {
+    if (!options || !options.context) {
         db.clear()
-        GS.default()
     } else {
-        activeRecorders = [
+        iframeRecorders = [
             getSnapshotData,
-            watchers.MouseRecord,
-            watchers.DOMRecord,
-            watchers.FormElementRecord,
-            watchers.ScrollRecord
+            watchers.MouseWatcher,
+            watchers.DOMWatcher,
+            watchers.FormElementWatcher,
+            watchers.ScrollWatcher
         ]
-        GS.switch(options.window)
     }
 
-    activeRecorders.forEach(task =>
-        task((data: RecordData | SnapshotData) => {
-            if (options && options.emitter) {
-                options.emitter(data, db)
-                return
+    iframeRecorders.forEach(task =>
+        task({
+            context: (options && options.context) || window,
+            emit(data: RecordData | SnapshotData) {
+                if (options && options.emitter) {
+                    options.emitter(data, db)
+                    return
+                }
+                db.add(data)
             }
-            db.add(data)
         })
     )
 
@@ -65,7 +67,7 @@ async function startRecord(options: RecordOptions) {
 }
 
 export async function waitingFramesLoaded() {
-    const frames = window.currentWindow.frames
+    const frames = window.frames
     const tasks = Array.from(frames)
         .filter(frame => {
             try {
@@ -92,5 +94,5 @@ export async function waitingFramesLoaded() {
 
 export async function recordFrames() {
     const frames = await waitingFramesLoaded()
-    frames.forEach(frame => record({ window: frame }))
+    frames.forEach(frameWindow => record({ context: frameWindow }))
 }

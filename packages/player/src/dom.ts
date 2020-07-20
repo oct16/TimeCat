@@ -215,12 +215,12 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
 
             if (node) {
-                if (formType === FormElementEvent.INPUT) {
-                    if (value) {
-                        node.value = value!
-                    } else if (patches && patches.length) {
+                if (formType === FormElementEvent.INPUT || formType === FormElementEvent.CHANGE) {
+                    if (patches && patches.length) {
                         const newValue = revertStrByPatches(node.value, patches)
                         node.value = newValue
+                    } else if (key) {
+                        ;(node as any)[key] = value
                     }
                 } else if (formType === FormElementEvent.FOCUS) {
                     node.focus()

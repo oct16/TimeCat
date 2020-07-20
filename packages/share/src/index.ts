@@ -212,7 +212,7 @@ interface SubtitlesData {
 }
 
 export interface RecordOptions {
-    window?: Window
+    context?: Window
     audio?: boolean
     emitter?: (data: RecordData | SnapshotData, db: any) => void
     // emitter?: (data: RecordData, db: IndexedDBOperator) => void
@@ -237,3 +237,5 @@ export enum TransactionMode {
     'READWRITE' = 'readwrite',
     'VERSIONCHANGE' = 'versionchange'
 }
+
+export type WatcherOptions<T> = { context: Window; emit: RecordEvent<T> }
