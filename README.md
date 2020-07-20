@@ -258,7 +258,7 @@ Because the DOM Diff Patch is implemented with the MutationObserver, it is neces
 
 #### Compatibility of MutationObserver
 
-[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) shows that only in IE11 and later, Android 4.4 and later can be used, compatible with the old browser can be through [MutationObserver-shim](https://www.npmjs.com/package/mutationobserver-shim) to support, but using shim may cause some fatal bugs of the collected data. there is also a situation that some websites may block the MutationObserver API, we can restore the `` Native Code '' by creating an Iframe
+[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) shows that only in IE11 and later, Android 4.4 and later can be used, compatible with the old browser can be through [MutationObserver-shim](https://www.npmjs.com/package/mutationobserver-shim) to support, but using shim may cause some fatal bugs of the collected data. there is also a situation that some websites may block the MutationObserver API, we can restore the `Native Code` by creating an Iframe
 
 #### Canvas, Iframe, Video and other elements
 
