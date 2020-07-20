@@ -6,8 +6,7 @@ import {
     fmp,
     isSnapshot,
     classifyRecords,
-    isDev,
-    smoothScroll
+    isDev
 } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
@@ -15,6 +14,7 @@ import pako from 'pako'
 import io from 'socket.io-client'
 import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
+import smoothScroll from 'smoothscroll-polyfill'
 
 export async function replay(options: ReplayOptions = { autoplay: true }) {
     smoothScroll.polyfill()
