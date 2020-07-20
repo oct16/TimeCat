@@ -6,7 +6,8 @@ import {
     fmp,
     isSnapshot,
     classifyRecords,
-    isDev
+    isDev,
+    smoothScroll
 } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
@@ -16,11 +17,14 @@ import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions } f
 import { waitStart, removeStartPage, showStartMask } from './dom'
 
 export async function replay(options: ReplayOptions = { autoplay: true }) {
+    smoothScroll.polyfill()
     window.__ReplayOptions__ = options
     const replayData = await getReplayData()
 
     if (!replayData) {
-        throw new Error("window.__ReplayDataList__ not found, you should inject to the global or DB, see demos: https://oct16.github.io/TimeCat");
+        throw new Error(
+            'window.__ReplayDataList__ not found, you should inject to the global or DB, see demos: https://oct16.github.io/TimeCat'
+        )
     }
 
     const { records, audio } = replayData

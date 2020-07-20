@@ -17,6 +17,7 @@ import {
     SnapshotData,
     LocationRecordData
 } from '@timecat/share'
+import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
 import { setAttribute, createNode, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
@@ -168,7 +169,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                     } as UpdateNodeData
                 })
                 .concat(addedNodes.slice())
-                
+
             // Math Termial
             const n = addedList.length
             const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
@@ -238,7 +239,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
         case RecordType.LOCATION:
             const { path, hash, contextNodeId } = data as LocationRecordData
             const contextNode = nodeStore.getNode(contextNodeId)
-            
+
             if (contextNode) {
                 const context = contextNode.ownerDocument!.defaultView!
                 context.__ReplayLocation__ = { ...context.__ReplayLocation__, ...{ path, hash } }
@@ -287,11 +288,17 @@ export function createIframeDOM(contentDocument: Document, snapshotData: Snapsho
 }
 
 export function injectIframeContent(contentDocument: Document, snapshotData: SnapshotData['data']) {
-    const child = convertVNode(snapshotData.vNode)
-    if (child) {
+    const content = convertVNode(snapshotData.vNode)
+    if (content) {
+        const head = content.querySelector('head')
+        if (head) {
+            const style = document.createElement('style')
+            style.innerHTML = FIXED_CSS
+            head.appendChild(style)
+        }
         const documentElement = contentDocument.documentElement
-        child.scrollLeft = snapshotData.scrollLeft
-        child.scrollTop = snapshotData.scrollTop
-        contentDocument.replaceChild(child, documentElement)
+        content.scrollLeft = snapshotData.scrollLeft
+        content.scrollTop = snapshotData.scrollTop
+        contentDocument.replaceChild(content, documentElement)
     }
 }

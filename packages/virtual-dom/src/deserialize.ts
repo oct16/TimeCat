@@ -57,7 +57,7 @@ function createAttributes(vNode: VNode, node: Element): void {
         setAttribute(node as HTMLElement, name, val)
     }
     if (vNode.tag === 'a') {
-        setAttribute(node as HTMLElement, 'target', '_blank')
+        node.setAttribute('target', '_blank')
     }
 }
 

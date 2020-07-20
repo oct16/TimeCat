@@ -14,7 +14,7 @@ import {
 } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './tools/dom'
-import { recoverNative } from './tools/recover-native'
+import { recoverNative } from './polyfill/recover-native'
 import { nodeStore } from './store/node'
 
 type ScriptItem = { name?: string; src: string }

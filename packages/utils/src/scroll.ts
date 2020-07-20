@@ -1,7 +1,7 @@
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 
-export function disableScrolling(target: Window) {
+export function disableScrolling(target: Document) {
     var keys = { 37: 1, 38: 1, 39: 1, 40: 1 } as { [key: string]: number }
 
     function preventDefault(e: Event) {
