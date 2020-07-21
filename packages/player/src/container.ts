@@ -1,8 +1,7 @@
-import { convertVNode } from '@timecat/virtual-dom'
 import { filteringTemplate, disableScrolling, nodeStore, debounce } from '@timecat/utils'
 import HTML from './ui.html'
 import CSS from './ui.scss'
-import FIXED from './fixed.css'
+import { createIframeDOM, injectIframeContent } from './dom'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -14,8 +13,8 @@ export class ContainerComponent {
         this.init()
     }
 
-    getSnapshot() {
-        return window.__ReplayData__.snapshot
+    getSnapshotData() {
+        return window.__ReplayData__.snapshot.data
     }
 
     init() {
@@ -28,32 +27,14 @@ export class ContainerComponent {
     initSandbox() {
         this.sandBox = this.container.querySelector('#cat-sandbox') as HTMLIFrameElement
         this.sandBoxDoc = this.sandBox.contentDocument!
-        this.sandBoxDoc.open()
-
-        const doctype = this.getSnapshot().doctype
-        const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
-            doctype.systemId ? '"' + doctype.systemId + '"' : ''
-        }><html><head></head><body></body></html>`
-        this.sandBoxDoc.write(doc)
-        this.sandBoxDoc.close()
-        disableScrolling(this.sandBox.contentWindow!)
+        createIframeDOM(this.sandBoxDoc, this.getSnapshotData())
+        disableScrolling(this.sandBox.contentWindow!.document)
         this.setViewState()
     }
 
     setViewState() {
         nodeStore.reset()
-        const child = convertVNode(this.getSnapshot().vNode)
-
-        if (child) {
-            const [head] = child.getElementsByTagName('head')
-            if (head) {
-                head.insertBefore(this.createStyle('cat-css-fix', FIXED), head.firstChild)
-            }
-            const documentElement = this.sandBoxDoc.documentElement
-            child.scrollLeft = this.getSnapshot().scrollLeft
-            child.scrollTop = this.getSnapshot().scrollTop
-            this.sandBoxDoc.replaceChild(child, documentElement)
-        }
+        injectIframeContent(this.sandBoxDoc, this.getSnapshotData())
     }
 
     initTemplate() {
@@ -65,8 +46,8 @@ export class ContainerComponent {
         const parser = new DOMParser()
         const el = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
         el.id = id
-        el.style.width = this.getSnapshot().width + 'px'
-        el.style.height = this.getSnapshot().height + 'px'
+        el.style.width = this.getSnapshotData().width + 'px'
+        el.style.height = this.getSnapshotData().height + 'px'
         el.style.display = 'none'
         return (this.container = el)
     }
@@ -98,18 +79,23 @@ export class ContainerComponent {
             setWidth?: number,
             setHeight?: number
         ) {
-            const panelHeight = 40
-            const { width: targetWidth, height: targetHeight } = getPageSize(target)
-            const scaleX = maxWidth / (setWidth || targetWidth)
-            const scaleY = maxHeight / (setHeight || targetHeight)
-            const allowMaxHeight = maxHeight - panelHeight * scaleY
-            const allowScaleY = allowMaxHeight / (setHeight || targetHeight)
-            const scale = scaleX > allowScaleY ? allowScaleY : scaleX
-            const maxScale = scale > 1 ? 1 : scale
+            const panelHeight = 40 - 2 // subtract the gap
 
-            const left = Math.abs(Math.floor(((setWidth || targetWidth) * maxScale - maxWidth) / 2))
-            const top = Math.abs(Math.floor(((setHeight || targetHeight) * maxScale - allowMaxHeight) / 2))
-            target.style.transform = 'scale(' + maxScale + ')'
+            const { width: targetWidth, height: targetHeight } = getPageSize(target)
+
+            const scaleX = maxWidth / (setWidth || targetWidth)
+            const scaleY = maxHeight / ((setHeight || targetHeight) + panelHeight)
+
+            // max zoom 1
+            const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, 1)
+
+            const left =
+                ((setWidth || targetWidth) * scale - targetWidth) / 2 +
+                (maxWidth - (setWidth || targetWidth) * scale) / 2
+
+            const top = (maxHeight - targetHeight - panelHeight * scale) / 2
+
+            target.style.transform = `scale(${scale})`
             target.style.left = left + 'px'
             target.style.top = top + 'px'
 

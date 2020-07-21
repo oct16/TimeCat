@@ -14,13 +14,17 @@ import pako from 'pako'
 import io from 'socket.io-client'
 import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
+import smoothScroll from 'smoothscroll-polyfill'
 
 export async function replay(options: ReplayOptions = { autoplay: true }) {
+    smoothScroll.polyfill()
     window.__ReplayOptions__ = options
     const replayData = await getReplayData()
 
     if (!replayData) {
-        throw new Error("window.__ReplayDataList__ not found, you should inject to the global or DB, see demos: https://oct16.github.io/TimeCat");
+        throw new Error(
+            'window.__ReplayDataList__ not found, you should inject to the global or DB, see demos: https://oct16.github.io/TimeCat'
+        )
     }
 
     const { records, audio } = replayData

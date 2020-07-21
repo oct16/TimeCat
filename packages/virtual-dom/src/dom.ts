@@ -35,25 +35,25 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     value = String(value)
 
     if (name === 'href') {
-        value = completionAttrHref(String(value))
+        value = completionAttrHref(String(value), node)
     }
 
     if (name === 'background' || name === 'src') {
         if (value.startsWith('data:')) {
             // skip
         } else {
-            value = proxyResource(completionAttrHref(String(value)))
+            value = proxyResource(completionAttrHref(String(value), node))
         }
     }
 
     // The srcset attribute specifies the URL of the image to use in different situations
     if (name === 'srcset') {
         const srcArray = value.split(',')
-        value = srcArray.map(src => proxyResource(completionAttrHref(src.trim()))).toString()
+        value = srcArray.map(src => proxyResource(completionAttrHref(src.trim(), node))).toString()
     }
 
     if (value.startsWith('/')) {
-        value = completionAttrHref(value)
+        value = completionAttrHref(value, node)
     }
 
     return node.setAttribute(name, value)

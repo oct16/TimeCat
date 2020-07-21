@@ -14,7 +14,7 @@ import {
 } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './tools/dom'
-import { recoverNative } from './tools/recover-native'
+import { recoverNative } from './polyfill/recover-native'
 import { nodeStore } from './store/node'
 
 type ScriptItem = { name?: string; src: string }
@@ -219,7 +219,7 @@ async function makeCssInline(dataList: { snapshot: SnapshotData; records: Record
     for (let k = 0; k < dataList.length; k++) {
         const data = dataList[k]
         const { snapshot, records } = data
-        const tasks = [snapshot.vNode]
+        const tasks = [snapshot.data.vNode]
         let node
         while ((node = tasks.shift())) {
             if (isVNode(node)) {

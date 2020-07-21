@@ -47,7 +47,7 @@ export function toTimeStamp(timeStr: string) {
 }
 
 export function isSnapshot(frame: RecordData | SnapshotData) {
-    return !!(frame as SnapshotData).vNode
+    return (frame as SnapshotData).type === RecordType.SNAPSHOT && !(frame as SnapshotData).data.frameId
 }
 
 export function classifyRecords(data: (SnapshotData | RecordData)[]) {

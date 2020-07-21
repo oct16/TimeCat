@@ -23,6 +23,7 @@ declare interface IDBDatabase {
 
 declare interface HTMLInputElement {
     oldValue: string
+    value: any
 }
 
 interface Window {
@@ -43,6 +44,10 @@ interface Window {
 
     __ReplayOptions__: any
 
+    __ReplayLocation__: any
+
+    webkitAudioContext?: typeof AudioContext
+
     timecat: {
         record: (
             fn?: ((data: SnapshotData, db: IndexedDBOperator) => void) | undefined
@@ -52,4 +57,8 @@ interface Window {
         replay(options: { socketUrl: string } = {} as any): Promise<void>
         exportReplay(opts?: Opts): Promise<void>
     }
+}
+
+interface Event {
+    arguments: any
 }

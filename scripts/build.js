@@ -1,5 +1,7 @@
 const execa = require('execa')
+const chalk = require('chalk')
 const path = require('path')
+const fs = require('fs-extra')
 const extractor = require('@microsoft/api-extractor')
 const { Extractor, ExtractorConfig, ExtractorResult } = extractor
 
@@ -9,6 +11,7 @@ const target = 'timecat'
 const packagesDir = path.resolve(__dirname, '../packages')
 const packageDir = path.resolve(packagesDir, target)
 const resolve = p => path.resolve(packageDir, p)
+const destinationDir = path.resolve(__dirname, '../dist')
 
 run()
 
@@ -27,6 +30,9 @@ async function run() {
     )
 
     await extractAPI()
+    moveFiles()
+    generateDoc()
+    processEnd()
 }
 
 async function extractAPI() {
@@ -47,4 +53,17 @@ async function extractAPI() {
         )
         process.exitCode = 1
     }
+}
+
+function generateDoc() {
+    execa('npx', ['typedoc'])
+}
+
+function moveFiles() {
+    const target = resolve('dist')
+    fs.copySync(target, destinationDir)
+}
+
+function processEnd() {
+    console.log(chalk.green('The compiled file has been created in ' + destinationDir))
 }

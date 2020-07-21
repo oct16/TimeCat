@@ -51,13 +51,23 @@ function createProps(vNode: VNode, node: Element): void {
 }
 
 function createAttributes(vNode: VNode, node: Element): void {
-    const { attrs } = vNode
+    const attrs = getAttributes(vNode)
+
     for (const [name, val] of Object.entries(attrs)) {
         setAttribute(node as HTMLElement, name, val)
     }
     if (vNode.tag === 'a') {
-        setAttribute(node as HTMLElement, 'target', '_blank')
+        node.setAttribute('target', '_blank')
     }
+}
+
+function getAttributes(vNode: VNode) {
+    const attrs = { ...vNode.attrs }
+    if (vNode.tag === 'iframe') {
+        attrs['disabled-src'] = attrs.src
+        delete attrs.src
+    }
+    return attrs
 }
 
 export function createSpecialNode(vsNode: VSNode) {

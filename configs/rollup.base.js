@@ -13,40 +13,16 @@ function filteringTemplate(tpl) {
 }
 const examplesPath = path.resolve(__dirname, '../examples')
 
-
 const resolve = p => path.resolve(examplesPath, p)
 
 export const htmlExamples = () => {
-    return [
+    const files = fs.readdirSync(examplesPath)
+    return files.map(fileName =>
         html({
-            template: () => filteringTemplate(fs.readFileSync(resolve('index.html'), 'utf8'))
-        }),
-        html({
-            fileName: 'todo.html',
-            template: () => filteringTemplate(fs.readFileSync(resolve('todo.html'), 'utf8'))
-        }),
-        html({
-            fileName: 'tetris.html',
-            template: () => filteringTemplate(fs.readFileSync(resolve('tetris.html'), 'utf8'))
-        }),
-        html({
-            fileName: 'replay.html',
-            template: () => filteringTemplate(fs.readFileSync(resolve('player.html'), 'utf8'))
-        }),
-        html({
-            fileName: 'live.html',
-            template: () => filteringTemplate(fs.readFileSync(resolve('live.html'), 'utf8'))
-        }),
-        (() => {
-            if (fs.existsSync(resolve('test.html'))) {
-                return html({
-                    fileName: 'test.html',
-                    template: () => filteringTemplate(fs.readFileSync(resolve('test.html'), 'utf8'))
-                })
-            }
-            return null
-        })()
-    ].filter(Boolean)
+            fileName,
+            template: () => filteringTemplate(fs.readFileSync(resolve(fileName), 'utf8'))
+        })
+    )
 }
 
 export const env = () => {

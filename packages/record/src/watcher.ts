@@ -1,8 +1,3 @@
-declare interface HTMLInputElement {
-    oldValue: string
-    value: any
-}
-
 import { createFlatVNode } from '@timecat/virtual-dom'
 import {
     WindowRecord,
@@ -22,7 +17,9 @@ import {
     FormElementEvent,
     MouseEventType,
     VNode,
-    VSNode
+    VSNode,
+    WatcherOptions,
+    LocationRecord
 } from '@timecat/share'
 import {
     logger,
@@ -37,48 +34,47 @@ import {
     getStrDiffPatches
 } from '@timecat/utils'
 
-function emitterHook(emit: RecordEvent<RecordData>, data: any) {
+function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
     if (isDev) {
         // logger(data)
     }
     emit(data)
 }
 
-function registerEvent(
-    eventTypes: string[],
-    handleFn: (...args: any[]) => void,
-    opts: AddEventListenerOptions,
-    type = 'throttle',
-    waitTime = 500
-) {
+function registerEvent(options: {
+    context: Window
+    eventTypes: string[]
+    handleFn: (...args: any[]) => void
+    listenerOptions: AddEventListenerOptions
+    type: 'throttle' | 'debounce'
+    optimizeOptions: { [key: string]: boolean }
+    waitTime: number
+}) {
+    const { context, eventTypes, handleFn, listenerOptions, type, optimizeOptions, waitTime } = options
     let listenerHandle: (...args: any[]) => void
     if (type === 'throttle') {
-        listenerHandle = throttle(handleFn, waitTime, {
-            trailing: true
-        })
+        listenerHandle = throttle(handleFn, waitTime, optimizeOptions)
     } else {
-        listenerHandle = debounce(handleFn, waitTime, {
-            isImmediate: false
-        })
+        listenerHandle = debounce(handleFn, waitTime, optimizeOptions)
     }
 
     eventTypes
         .map(type => (fn: (e: Event) => void) => {
-            window.addEventListener(type, fn, opts)
+            context.addEventListener(type, fn, listenerOptions)
         })
         .forEach(handle => handle(listenerHandle))
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            window.removeEventListener(type, listenerHandle, opts)
+            context.removeEventListener(type, listenerHandle, listenerOptions)
         })
     })
 }
 
-function WindowRecord(emit: RecordEvent<WindowRecord>) {
-    const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-    const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
-
+function WindowWatcher(options: WatcherOptions<WindowRecord>) {
+    const { emit, context } = options
+    const width = () => context.innerWidth
+    const height = () => context.innerHeight
     function emitData(target: Element | Document) {
         emitterHook(emit, {
             type: RecordType.WINDOW,
@@ -91,7 +87,7 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
         })
     }
 
-    emitData(document)
+    emitData(context.document)
 
     function handleFn(e: Event) {
         const { type, target } = e
@@ -99,27 +95,37 @@ function WindowRecord(emit: RecordEvent<WindowRecord>) {
             emitData(target as Element | Document)
         }
     }
-    registerEvent(['resize'], handleFn, { capture: true })
+    registerEvent({
+        context,
+        eventTypes: ['resize'],
+        handleFn,
+        listenerOptions: { capture: true },
+        type: 'throttle',
+        optimizeOptions: { trailing: true },
+        waitTime: 500
+    })
 }
 
-function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
-    const scrollTop = (target: HTMLElement) => target.scrollTop
-    const scrollLeft = (target: HTMLElement) => target.scrollLeft
+function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
+    const getCompatibleTarget = (target: Document) => (target.scrollingElement as HTMLElement) || target.documentElement
+    const scrollTop = (target: Element | HTMLElement) => target.scrollTop
+    const scrollLeft = (target: Element | HTMLElement) => target.scrollLeft
+    const { emit, context } = options
 
     function emitData(target: Element | Document) {
-        const el = target instanceof Document ? document.documentElement : (target as HTMLElement)
+        const element = target instanceof HTMLElement ? target : getCompatibleTarget(target as Document)
         emitterHook(emit, {
             type: RecordType.SCROLL,
             data: {
-                id: nodeStore.getNodeId(target) || null, // if null, target is document
-                top: scrollTop(el),
-                left: scrollLeft(el)
+                id: nodeStore.getNodeId(element) || null, // if null, target is document
+                top: scrollTop(element),
+                left: scrollLeft(element)
             },
             time: getTime().toString()
         })
     }
 
-    emitData(document)
+    emitData(context.document)
 
     function handleFn(e: Event) {
         const { type, target } = e
@@ -127,18 +133,43 @@ function ScrollRecord(emit: RecordEvent<ScrollRecord>) {
             emitData(target as Element | Document)
         }
     }
-    registerEvent(['scroll'], handleFn, { capture: true })
+
+    registerEvent({
+        context,
+        eventTypes: ['scroll'],
+        handleFn,
+        listenerOptions: { capture: true },
+        type: 'throttle',
+        optimizeOptions: { leading: false, trailing: false },
+        waitTime: 500
+    })
 }
 
-function mouseWatcher(emit: RecordEvent<MouseRecord>) {
+function getOffsetPosition(element: HTMLElement) {
+    const doc = element.ownerDocument!
+    const frameElement = doc.defaultView!.frameElement as HTMLElement
+    const position = {
+        x: 0,
+        y: 0
+    }
+    if (frameElement) {
+        position.y += frameElement.offsetTop
+        position.x += frameElement.offsetLeft
+    }
+    return position
+}
+
+function MouseWatcher(options: WatcherOptions<MouseRecord>) {
+    const { emit, context } = options
     function mouseMove() {
         const evt = (e: MouseEvent) => {
+            const offsetPosition = getOffsetPosition(e.target as HTMLElement)
             emitterHook(emit, {
                 type: RecordType.MOUSE,
                 data: {
                     type: MouseEventType.MOVE,
-                    x: e.x,
-                    y: e.y
+                    x: e.x + offsetPosition.x,
+                    y: e.y + offsetPosition.y
                 },
                 time: getTime().toString()
             })
@@ -148,22 +179,24 @@ function mouseWatcher(emit: RecordEvent<MouseRecord>) {
             trailing: true
         })
 
-        document.addEventListener(name, listenerHandle)
+        context.document.addEventListener(name, listenerHandle)
 
         listenerStore.add(() => {
-            document.removeEventListener(name, listenerHandle)
+            context.document.removeEventListener(name, listenerHandle)
         })
     }
 
     function mouseClick() {
         const evt = (e: MouseEvent) => {
+            const offsetPosition = getOffsetPosition(e.target as HTMLElement)
+
             emitterHook(emit, {
                 type: RecordType.MOUSE,
                 data: {
                     type: MouseEventType.CLICK,
                     id: nodeStore.getNodeId(e.target as Element),
-                    x: e.x,
-                    y: e.y
+                    x: e.x + offsetPosition.x,
+                    y: e.y + offsetPosition.y
                 },
                 time: getTime().toString()
             })
@@ -172,9 +205,9 @@ function mouseWatcher(emit: RecordEvent<MouseRecord>) {
         const name = 'click'
         const listenerHandle = throttle(evt, 250)
         listenerStore.add(() => {
-            document.removeEventListener(name, listenerHandle)
+            context.document.removeEventListener(name, listenerHandle)
         })
-        document.addEventListener(name, listenerHandle)
+        context.document.addEventListener(name, listenerHandle)
     }
 
     mouseMove()
@@ -360,10 +393,11 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord
     }
 }
 
-function DOMRecord(emit: RecordEvent<DOMRecord>) {
+function DOMWatcher(options: WatcherOptions<DOMRecord>) {
+    const { emit, context } = options
     const Watcher = new MutationObserver(callback => mutationCallback(callback, emit))
 
-    Watcher.observe(document.documentElement, {
+    Watcher.observe(context.document.documentElement, {
         attributeOldValue: true,
         attributes: true,
         characterData: true,
@@ -375,25 +409,27 @@ function DOMRecord(emit: RecordEvent<DOMRecord>) {
     listenerStore.add(() => Watcher.disconnect())
 }
 
-function FormElementRecord(emit: RecordEvent<FormElementRecord>) {
-    listenInputs(emit)
+function FormElementWatcher(options: WatcherOptions<FormElementRecord>) {
+    listenInputs(options)
 
     // for sys write in input
-    kidnapInputs(emit)
+    kidnapInputs(options)
 }
 
-function listenInputs(emit: RecordEvent<FormElementRecord>) {
+function listenInputs(options: WatcherOptions<FormElementRecord>) {
+    const { emit, context } = options
+
     const eventTypes = ['input', 'change', 'focus', 'blur']
 
     eventTypes
         .map(type => (fn: (e: InputEvent) => void) => {
-            document.addEventListener(type, fn, { once: false, passive: true, capture: true })
+            context.document.addEventListener(type, fn, { once: false, passive: true, capture: true })
         })
         .forEach(handle => handle(handleFn))
 
     listenerStore.add(() => {
         eventTypes.forEach(type => {
-            document.removeEventListener(type, handleFn, true)
+            context.document.removeEventListener(type, handleFn, true)
         })
     })
 
@@ -404,30 +440,44 @@ function listenInputs(emit: RecordEvent<FormElementRecord>) {
             case 'input':
             case 'change':
                 const target = (e.target as unknown) as HTMLInputElement
-                const str = target.value
-                let newValue = ''
-                const patches: ReturnType<typeof getStrDiffPatches> = []
-                if (str === target.oldValue) {
-                    return
-                }
-                if (str.length <= 20 || !target.oldValue) {
-                    newValue = str
+                const inputType = target.getAttribute('type') || 'text'
+
+                let key = 'value'
+                let value: any = target.value || ''
+                let newValue: any = ''
+                let patches: ReturnType<typeof getStrDiffPatches> = []
+
+                if (inputType === 'checkbox' || inputType === 'radio') {
+                    if (eventType === 'input') {
+                        return
+                    }
+                    key = 'checked'
+                    newValue = target.checked
+                } else if (!inputType || inputType === 'text' || inputType === 'textarea') {
+                    if (value === target.oldValue) {
+                        return
+                    }
+                    if (value.length <= 20 || !target.oldValue) {
+                        newValue = value
+                    } else {
+                        patches.push(...getStrDiffPatches(target.oldValue, value))
+                    }
+                    target.oldValue = value
                 } else {
-                    patches.push(...getStrDiffPatches(target.oldValue, str))
+                    return
                 }
 
                 data = {
                     type: RecordType.FORM_EL_UPDATE,
                     data: {
-                        type: FormElementEvent.INPUT,
+                        type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
                         id: nodeStore.getNodeId(e.target as Node)!,
-                        value: !patches.length ? newValue : '',
+                        key,
+                        value: !patches.length ? newValue : value,
                         patches
                     },
                     time: getTime().toString()
                 }
-
-                target.oldValue = str
                 break
             case 'focus':
                 data = {
@@ -457,19 +507,20 @@ function listenInputs(emit: RecordEvent<FormElementRecord>) {
     }
 }
 
-function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
+function kidnapInputs(options: WatcherOptions<FormElementRecord>) {
+    const { emit, context } = options
     const elementList: [HTMLElement, string][] = [
-        [HTMLInputElement.prototype, 'value'],
-        [HTMLInputElement.prototype, 'checked'],
-        [HTMLSelectElement.prototype, 'value'],
-        [HTMLTextAreaElement.prototype, 'value']
+        [(context as any).HTMLInputElement.prototype, 'value'],
+        [(context as any).HTMLInputElement.prototype, 'checked'],
+        [(context as any).HTMLSelectElement.prototype, 'value'],
+        [(context as any).HTMLTextAreaElement.prototype, 'value']
     ]
 
     const handles = elementList.map(item => {
         return () => {
             const [target, key] = item
-            const original = Object.getOwnPropertyDescriptor(target, key)
-            Object.defineProperty(target, key, {
+            const original = (context as any).Object.getOwnPropertyDescriptor(target, key)
+            ;(context as any).Object.defineProperty(target, key, {
                 set: function(value: string | boolean) {
                     setTimeout(() => {
                         handleEvent.call(this, key, value)
@@ -482,7 +533,7 @@ function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
 
             listenerStore.add(() => {
                 if (original) {
-                    Object.defineProperty(target, key, original)
+                    ;(context as any).Object.defineProperty(target, key, original)
                 }
             })
         }
@@ -506,10 +557,63 @@ function kidnapInputs(emit: RecordEvent<FormElementRecord>) {
     }
 }
 
-export const watchers = {
-    WindowRecord,
-    ScrollRecord,
-    mouseWatcher,
-    DOMRecord,
-    FormElementRecord
+function LocationWatcher(options: WatcherOptions<LocationRecord>) {
+    const { emit, context } = options
+
+    function kidnapLocation(type: 'pushState' | 'replaceState') {
+        var original = context.history[type]
+        return function(this: any) {
+            const e = new Event(type)
+            e.arguments = arguments
+            context.dispatchEvent(e)
+            original.apply(this, arguments)
+        }
+    }
+
+    history.pushState = kidnapLocation('pushState')
+    history.replaceState = kidnapLocation('replaceState')
+
+    function pathHandle(e: Event) {
+        const contextNodeId = getContextNodeId(e)
+        const [data, title, path] = e.arguments
+        emit({
+            type: RecordType.LOCATION,
+            data: {
+                contextNodeId,
+                path
+            },
+            time: getTime().toString()
+        })
+    }
+    function hashHandle(e: HashChangeEvent) {
+        const contextNodeId = getContextNodeId(e)
+        const newHash = e.newURL.split('#')[1]
+        if (newHash) {
+            emit({
+                type: RecordType.LOCATION,
+                data: {
+                    contextNodeId,
+                    hash: newHash
+                },
+                time: getTime().toString()
+            })
+        }
+    }
+    function getContextNodeId(e: Event) {
+        return nodeStore.getNodeId((e.target as Window).document.documentElement)!
+    }
+    context.addEventListener('replaceState', pathHandle)
+    context.addEventListener('pushState', pathHandle)
+    context.addEventListener('hashchange', hashHandle)
 }
+
+const watchers = {
+    WindowWatcher,
+    ScrollWatcher,
+    MouseWatcher,
+    DOMWatcher,
+    FormElementWatcher,
+    LocationWatcher
+}
+
+export default watchers

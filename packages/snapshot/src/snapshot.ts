@@ -1,15 +1,20 @@
 import { createElement } from '@timecat/virtual-dom'
-import { InfoData, DOMSnapshotData, VNode } from '@timecat/share'
+import { InfoData, SnapshotData, VNode, RecordType } from '@timecat/share'
+import { nodeStore, getTime } from '@timecat/utils'
 
-function getInitInfo(): InfoData {
-    const { name, publicId, systemId } = window.document.doctype || {}
+function getInitInfo(context: Window): InfoData {
+    const { name, publicId, systemId } = context.document.doctype || {}
     const doctype = () => ({ name, publicId, systemId } as DocumentType)
-    const origin = () => window.location.origin
-    const pathname = () => window.location.pathname
-    const width = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-    const height = () => window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
-    const scrollTop = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-    const scrollLeft = () => window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft
+    const origin = () => context.location.origin
+    const pathname = () => context.location.pathname
+    const width = () => context.innerWidth
+    const height = () => context.innerHeight
+    const scrollTop = () => context.pageYOffset
+    const scrollLeft = () => context.pageXOffset
+
+    const getFrameElement = () => context.frameElement
+    const frameElement = getFrameElement()
+    const frameId = nodeStore.getNodeId(frameElement) || null
 
     return {
         doctype: doctype(),
@@ -18,17 +23,22 @@ function getInitInfo(): InfoData {
         scrollTop: scrollTop(),
         scrollLeft: scrollLeft(),
         width: width(),
-        height: height()
+        height: height(),
+        frameId
     }
 }
 
-function DOMSnapshot(): DOMSnapshotData {
+function DOMSnapshot(context: Window): SnapshotData {
     return {
-        vNode: createElement(document.documentElement) as VNode
+        type: RecordType.SNAPSHOT,
+        data: {
+            vNode: createElement(context.document.documentElement) as VNode,
+            ...getInitInfo(context)
+        },
+        time: getTime().toString()
     }
 }
 
 export const snapshots = {
-    getInitInfo,
     DOMSnapshot
 }

@@ -1,14 +1,13 @@
 body {
     margin: 0;
-    background-color: #f6f6f6;
+    background-color: #e2e2e2;
+    overflow: hidden;
 }
 
 #cat-main {
     box-shadow: 0 2px 3px rgba(26, 26, 26, .1);
-    transition: all 500ms ease-in-out;
-    -webkit-transition: all 500ms ease-in-out;
-    transform-origin: top left;
-    -webkit-transform-origin: top left;
+    transition: all .5s;
+    -webkit-transition: all .5s;
     opacity: 0;
     position: relative;
     overflow: visible;

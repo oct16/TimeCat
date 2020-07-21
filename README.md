@@ -17,10 +17,13 @@ TimeCat is a Web record solution, with a unique algorithm to provide ultra-high 
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
-### Progress
+### Milestone
+    07.20 Support Iframe (V1.1.0)
     06.07 Support Audio
-    05.24 Beta 1.0.0 Released
+    05.24 Released V1.0.0
     04.26 Live Mode    
+    03.31 Chrome Plugin Released
+    02.12 Departure
 
 ### Version 
 
@@ -30,6 +33,13 @@ TimeCat is a Web record solution, with a unique algorithm to provide ultra-high 
 
 | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari |
 | - | - | - | - |
+
+### Chrome Plugin
+
+Provides Chrome plugin and supports one-click record and export
+
+| <img src="./assets/logo.png" width="30">| [TimeCat-Chrome](https://chrome.google.com/webstore/detail/timecat-chrome/jgnkkambbdmhfdbdbkljlenddlbplhal?hl=en&authuser=0) |
+|--|--|
 
 ### Installation
 
@@ -163,7 +173,7 @@ I have though about the following aspects
 ...
 
 ---
-### Technical details of the Web Recorder
+### Technical details of the [TimeCat](https://github.com/oct16/timecat)
 
 ![Architecture](./assets/architecture.png)
 
@@ -251,7 +261,7 @@ Because the DOM Diff Patch is implemented with the MutationObserver, it is neces
 
 #### Compatibility of MutationObserver
 
-[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) shows that only in IE11 and later, Android 4.4 and later can be used, compatible with the old browser can be through [MutationObserver-shim](https://www.npmjs.com/package/mutationobserver-shim) to support, but using shim may cause some fatal bugs of the collected data. there is also a situation that some websites may block the MutationObserver API, we can restore the `` Native Code '' by creating an Iframe
+[Can I Use MutationObserver](https://caniuse.com/#search=mutationObserver) shows that only in IE11 and later, Android 4.4 and later can be used, compatible with the old browser can be through [MutationObserver-shim](https://www.npmjs.com/package/mutationobserver-shim) to support, but using shim may cause some fatal bugs of the collected data. there is also a situation that some websites may block the MutationObserver API, we can restore the `Native Code` by creating an Iframe
 
 #### Canvas, Iframe, Video and other elements
 
