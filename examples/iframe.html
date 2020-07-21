@@ -12,10 +12,20 @@
             padding-bottom: 20px;
             background: white;
             border: 3px solid grey;
+            text-align: center;
         }
 
         iframe {
-            margin: 0 20px;
+            max-width: 100%;
+            width: 280px;
+            display: inline-block;
+            margin: 30px
+        }
+
+        @media only screen and (max-width: 500px) {
+            iframe {
+                padding: 0;
+            }
         }
 
         .container {
@@ -66,14 +76,14 @@
         </div>
     </div>
 
-    <script src="http://localhost:4321/timecatjs.min.js"></script>
+    <script id="time-cat" src="./timecatjs.min.js"></script>
 
     <script>
         function resizeIframe(target) {
             target.height = target.contentDocument.documentElement.offsetHeight
         }
         window.onresize = function () {
-            resizeIframe();
+            setTimeout(() => resizeIframe(), 250)
         }
 
         const { record } = timecat

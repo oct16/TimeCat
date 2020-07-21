@@ -447,19 +447,24 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
                 let newValue: any = ''
                 let patches: ReturnType<typeof getStrDiffPatches> = []
 
-                if (value === target.oldValue) {
-                    return
-                }
-
                 if (inputType === 'checkbox' || inputType === 'radio') {
+                    if (eventType === 'input') {
+                        return
+                    }
                     key = 'checked'
                     newValue = target.checked
                 } else if (!inputType || inputType === 'text' || inputType === 'textarea') {
+                    if (value === target.oldValue) {
+                        return
+                    }
                     if (value.length <= 20 || !target.oldValue) {
                         newValue = value
                     } else {
                         patches.push(...getStrDiffPatches(target.oldValue, value))
                     }
+                    target.oldValue = value
+                } else {
+                    return
                 }
 
                 data = {
@@ -473,8 +478,6 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
                     },
                     time: getTime().toString()
                 }
-
-                target.oldValue = value
                 break
             case 'focus':
                 data = {

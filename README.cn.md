@@ -17,10 +17,13 @@ TimeCat 是一套网页录屏的解决方案，利用其独特的算法，提供
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome浏览器
 
-### Progress
+### Milestone
+    07.20 Support Iframe (V1.1.0)
     06.07 Support Audio
-    05.24 Beta 1.0.0 Released
+    05.24 Released V1.0.0
     04.26 Live Mode    
+    03.31 Chrome Plugin Released
+    02.12 Departure
 
 ### Version 
 
@@ -176,7 +179,7 @@ Web录屏器其实也借鉴这样的一种思路，工程上一般称之为Opera
 ....
 
 ---
-### Web录屏器的技术细节
+### [TimeCat](https://github.com/oct16/timecat) 的技术细节
 
 ![Architecture](./assets/architecture.png)
 

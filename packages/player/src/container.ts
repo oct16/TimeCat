@@ -28,7 +28,7 @@ export class ContainerComponent {
         this.sandBox = this.container.querySelector('#cat-sandbox') as HTMLIFrameElement
         this.sandBoxDoc = this.sandBox.contentDocument!
         createIframeDOM(this.sandBoxDoc, this.getSnapshotData())
-        disableScrolling(this.sandBox.contentWindow!)
+        disableScrolling(this.sandBox.contentWindow!.document)
         this.setViewState()
     }
 
