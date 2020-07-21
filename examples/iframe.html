@@ -83,7 +83,11 @@
             target.height = target.contentDocument.documentElement.offsetHeight
         }
         window.onresize = function () {
-            setTimeout(() => resizeIframe(), 250)
+            setTimeout(() => {
+                Array.from(window.frames).forEach(frame => {
+                    resizeIframe(frame.frameElement)
+                })
+            }, 250)
         }
 
         const { record } = timecat
