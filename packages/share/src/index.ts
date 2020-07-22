@@ -53,6 +53,7 @@ export enum RecordType {
     'FORM_EL_UPDATE' = 'FORM_EL_UPDATE',
     'LOCATION' = 'LOCATION',
     'AUDIO' = 'AUDIO',
+    'CANVAS' = 'CANVAS',
     'NONE' = 'NONE'
 }
 
@@ -199,6 +200,21 @@ export interface LocationRecordData {
     hash?: string
     contextNodeId: number
 }
+export interface CanvasRecord {
+    type: RecordType.CANVAS
+    data: CanvasMutationRecordData | CanvasInitRecordData
+    time: string
+}
+
+export interface CanvasMutationRecordData {
+    id: number
+    name: keyof CanvasRenderingContext2D
+    args: any[]
+}
+export interface CanvasInitRecordData {
+    id: number
+    src: string
+}
 
 export type RecordEvent<T> = (e: T) => void
 
@@ -211,6 +227,7 @@ export type RecordData =
     | AudioRecord
     | NONERecord
     | LocationRecord
+    | CanvasRecord
 
 export interface AudioData {
     src: string
