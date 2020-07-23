@@ -145,38 +145,49 @@ function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
     })
 }
 
-function getOffsetPosition(element: HTMLElement) {
-    const doc = element.ownerDocument!
-    const frameElement = doc?.defaultView?.frameElement as HTMLElement
-    const position = {
-        x: 0,
-        y: 0
+function getOffsetPosition(event: MouseEvent, context: Window) {
+    const { view, target, x, y } = event
+
+    if (view === context) {
+        const doc = (<HTMLElement>target).ownerDocument!
+
+        const position = {
+            x,
+            y
+        }
+
+        const frameElement = doc?.defaultView?.frameElement as HTMLElement
+        if (frameElement) {
+            position.y += frameElement.offsetTop
+            position.x += frameElement.offsetLeft
+        }
+
+        return position
     }
-    if (frameElement) {
-        position.y += frameElement.offsetTop
-        position.x += frameElement.offsetLeft
-    }
-    return position
+    return false
 }
 
 function MouseWatcher(options: WatcherOptions<MouseRecord>) {
     const { emit, context } = options
     function mouseMove() {
         const evt = (e: MouseEvent) => {
-            const offsetPosition = getOffsetPosition(e.target as HTMLElement)
-            emitterHook(emit, {
-                type: RecordType.MOUSE,
-                data: {
-                    type: MouseEventType.MOVE,
-                    x: e.x + offsetPosition.x,
-                    y: e.y + offsetPosition.y
-                },
-                time: getTime().toString()
-            })
+            const offsetPosition = getOffsetPosition(e, context)
+            if (offsetPosition) {
+                const { x, y } = offsetPosition
+                emitterHook(emit, {
+                    type: RecordType.MOUSE,
+                    data: {
+                        type: MouseEventType.MOVE,
+                        x,
+                        y
+                    },
+                    time: getTime().toString()
+                })
+            }
         }
         const name = 'mousemove'
-        const listenerHandle = throttle(evt, 300, {
-            trailing: true
+        const listenerHandle = throttle(evt, 350, {
+            trailing: false
         })
 
         context.document.addEventListener(name, listenerHandle)
@@ -188,18 +199,20 @@ function MouseWatcher(options: WatcherOptions<MouseRecord>) {
 
     function mouseClick() {
         const evt = (e: MouseEvent) => {
-            const offsetPosition = getOffsetPosition(e.target as HTMLElement)
-
-            emitterHook(emit, {
-                type: RecordType.MOUSE,
-                data: {
-                    type: MouseEventType.CLICK,
-                    id: nodeStore.getNodeId(e.target as Element),
-                    x: e.x + offsetPosition.x,
-                    y: e.y + offsetPosition.y
-                },
-                time: getTime().toString()
-            })
+            const offsetPosition = getOffsetPosition(e, context)
+            if (offsetPosition) {
+                const { x, y } = offsetPosition
+                emitterHook(emit, {
+                    type: RecordType.MOUSE,
+                    data: {
+                        type: MouseEventType.CLICK,
+                        id: nodeStore.getNodeId(e.target as Element),
+                        x,
+                        y
+                    },
+                    time: getTime().toString()
+                })
+            }
         }
 
         const name = 'click'
