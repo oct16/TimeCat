@@ -1,4 +1,4 @@
-import watchers from './watcher'
+import * as watchers from './watchers'
 import { recordAudio } from './audio'
 import { RecordData, RecordOptions, SnapshotData, ValueOf, WatcherOptions } from '@timecat/share'
 import { listenerStore, getDBOperator } from '@timecat/utils'
