@@ -1,6 +1,6 @@
 import { Recorder } from './audio-recorder'
 import { AudioRecord, RecordType, WatcherOptions } from '@timecat/share'
-import { getTime, listenerStore } from '@timecat/utils'
+import { getTime, uninstallStore } from '@timecat/utils'
 
 export function recordAudio(options: WatcherOptions<AudioRecord>) {
     const { emit } = options
@@ -12,7 +12,7 @@ export function recordAudio(options: WatcherOptions<AudioRecord>) {
 
     recorder.start()
 
-    listenerStore.add(() => {
+    uninstallStore.add(() => {
         recorder.stop()
     })
 
