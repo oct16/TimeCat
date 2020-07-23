@@ -147,7 +147,7 @@ function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
 
 function getOffsetPosition(element: HTMLElement) {
     const doc = element.ownerDocument!
-    const frameElement = doc.defaultView!.frameElement as HTMLElement
+    const frameElement = doc?.defaultView?.frameElement as HTMLElement
     const position = {
         x: 0,
         y: 0
@@ -605,6 +605,12 @@ function LocationWatcher(options: WatcherOptions<LocationRecord>) {
     context.addEventListener('replaceState', pathHandle)
     context.addEventListener('pushState', pathHandle)
     context.addEventListener('hashchange', hashHandle)
+
+    listenerStore.add(() => {
+        context.removeEventListener('replaceState', pathHandle)
+        context.removeEventListener('pushState', pathHandle)
+        context.removeEventListener('hashchange', hashHandle)
+    })
 }
 
 const watchers = {
