@@ -1,7 +1,7 @@
 import { RecordEvent, RecordData } from '@timecat/share'
-import { isDev } from './tools/common'
-import { debounce, throttle } from './tools/tool'
-import { listenerStore } from './store/listener'
+import { isDev, logger } from './common'
+import { debounce, throttle } from './tool'
+import { uninstallStore } from '../store/listener'
 
 export function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
     if (isDev) {
@@ -33,7 +33,7 @@ export function registerEvent(options: {
         })
         .forEach(handle => handle(listenerHandle))
 
-    listenerStore.add(() => {
+    uninstallStore.add(() => {
         eventTypes.forEach(type => {
             context.removeEventListener(type, listenerHandle, listenerOptions)
         })

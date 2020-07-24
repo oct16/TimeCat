@@ -1,7 +1,17 @@
-export * from './dom-watcher'
-export * from './form-element-watcher'
-export * from './location-watcher'
-export * from './mouse-watcher'
-export * from './scroll-watcher'
-export * from './window-watcher'
-export * from './canvas'
+import { DOMWatcher } from './dom'
+import { FormElementWatcher } from './form-element'
+import { LocationWatcher } from './location'
+import { MouseWatcher } from './mouse'
+import { ScrollWatcher } from './scroll'
+import { WindowWatcher } from './window'
+import { CanvasWatcher } from './canvas'
+
+export const watchers = {
+    DOMWatcher,
+    FormElementWatcher,
+    LocationWatcher,
+    MouseWatcher,
+    ScrollWatcher,
+    WindowWatcher,
+    CanvasWatcher
+}
