@@ -1,5 +1,6 @@
 export type ValueOf<T> = T[keyof T]
 export type ValueOfKey<T, K extends keyof T> = T[K]
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
 
 export interface InfoData {
     doctype: DocumentType
@@ -202,9 +203,11 @@ export interface LocationRecordData {
 }
 export interface CanvasRecord {
     type: RecordType.CANVAS
-    data: CanvasMutationRecordData | CanvasInitRecordData
+    data: CanvasRecordData
     time: string
 }
+
+export type CanvasRecordData = CanvasMutationRecordData | CanvasInitRecordData
 
 export interface CanvasMutationRecordData {
     id: number
