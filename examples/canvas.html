@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeCat Canvas Demo</title>
+    <style>
+        #replay {
+            border: 1px solid grey;
+            padding: 2px 10px;
+            margin: 10px;
+            color: red;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #replay.locked {
+            color: rgb(205, 203, 203);
+            border-color: rgb(205, 203, 203);
+        }
+
+
+        #replay.hide {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="400" height="400" style="border:1px solid grey"></canvas>
+    <br />
+    <!--hidden--><button id="replay" class="locked">Replay</button>
+
+    <script src="http://localhost:4321/timecatjs.min.js"></script>
+    <script>
+        const { record } = timecat
+        const ctrl = record()
+        const replayButton = document.getElementById('replay')
+        if (replayButton) {
+            setTimeout(() => {
+                replayButton.className = ''
+            }, 5000);
+            replayButton.addEventListener('click', () => {
+                if (replayButton.className) {
+                    return
+                }
+                replayButton.className = 'hide'
+                ctrl.unsubscribe()
+                window.open('replay.html')
+            })
+        }
+    </script>
+    <script>
+        setTimeout(() => {
+            drawCanvas()
+        }, 1000)
+
+        function drawCanvas() {
+            var canvas = document.getElementById('myCanvas')
+            var context = canvas.getContext('2d')
+            var flag = 1
+            var i = 0
+            var r = 180
+            function animate() {
+                window.requestAnimationFrame(animate)
+                draw()
+            }
+
+            function draw() {
+                var dig = Math.PI / 120
+                var x = Math.sin(i * dig) * r + 200
+                var y = Math.cos(i * dig) * r + 200
+                context.fillStyle = flag ? 'rgb(10,255,255)' : 'rgb(255,100,0)'
+                context.beginPath()
+                context.arc(x, y, 3, 0, Math.PI * 2, true)
+                context.closePath()
+                context.fill()
+                i++
+                if (i > 240) {
+                    i = 0
+                    r = r - 20
+                    flag = !flag
+                    if (r <= 0) {
+                        context.clearRect(0, 0, canvas.width, canvas.height)
+                        r = 180
+                    }
+                }
+            }
+            animate()
+        }
+    </script>
+
+    <!--env-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-151180797-1');
+    </script>
+    <!--env-->
+</body>
+
+</html>

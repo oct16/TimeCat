@@ -252,18 +252,26 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             break
         }
         case RecordType.CANVAS: {
-            const { src, id, name, args } = data as UnionToIntersection<CanvasRecordData>
+            const { src, id, strokes } = data as UnionToIntersection<CanvasRecordData>
             const target = nodeStore.getNode(id) as HTMLCanvasElement
+            const ctx = target.getContext('2d')!
 
             if (src) {
                 const image = new Image()
                 image.src = src
-                const ctx = target.getContext('2d')
-                if (ctx) {
-                    image.onload = function(this: HTMLImageElement) {
-                        ctx.drawImage(this, 0, 0)
-                    }
+                image.onload = function(this: HTMLImageElement) {
+                    ctx.drawImage(this, 0, 0)
                 }
+            } else {
+                strokes.forEach(stroke => {
+                    const { name, args } = stroke
+                    if (Array.isArray(args)) {
+                        ;(ctx[name] as Function).apply(ctx, args)
+                    } else {
+                        const value = args
+                        ;(ctx[name] as Object) = value
+                    }
+                })
             }
         }
 

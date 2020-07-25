@@ -211,8 +211,10 @@ export type CanvasRecordData = CanvasMutationRecordData | CanvasInitRecordData
 
 export interface CanvasMutationRecordData {
     id: number
-    name: keyof CanvasRenderingContext2D
-    args: any[]
+    strokes: {
+        name: keyof CanvasRenderingContext2D
+        args: any[]
+    }[]
 }
 export interface CanvasInitRecordData {
     id: number
