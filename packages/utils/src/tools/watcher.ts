@@ -41,14 +41,15 @@ export function registerEvent(options: {
 }
 
 export function getOffsetPosition(event: MouseEvent, context: Window) {
-    const { view, target, x, y } = event
+    const { view, target, offsetX, offsetY } = event
+    const { left: targetOffsetLeft, top: targetOffsetTop } = (<HTMLElement>target).getBoundingClientRect()
 
     if (view === context) {
         const doc = (<HTMLElement>target).ownerDocument!
 
         const position = {
-            x,
-            y
+            x: offsetX + targetOffsetLeft,
+            y: offsetY + targetOffsetTop
         }
 
         const frameElement = doc?.defaultView?.frameElement as HTMLElement
