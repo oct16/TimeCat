@@ -256,8 +256,12 @@ async function makeCssInline(dataList: { snapshot: SnapshotData; records: Record
             } as VSNode
 
             delete attrs.href
-            node.tag = 'style'
+            Object.keys(attrs).forEach(key => {
+                delete attrs[key]
+            })
 
+            node.tag = 'style'
+            node.attrs.type = 'text/css'
             node.children.push(textNode)
         } catch (error) {
             // maybe cross

@@ -15,13 +15,22 @@ import {
     VNode,
     VSNode,
     SnapshotData,
-    LocationRecordData
+    LocationRecordData,
+    CanvasRecordData,
+    UnionToIntersection
 } from '@timecat/share'
 import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
 import { setAttribute, createNode, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
 
+
+/**
+ * if return true then revert
+ * @param data 
+ * @param orderSet 
+ * @returns true | undefined 
+ */
 function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     const { parentId, nextId, node } = data
     const parentNode = nodeStore.getNode(parentId!)
@@ -32,17 +41,18 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
         if (nextId) {
             // Must wait for the relation node inserted first
             if (orderSet.has(nextId)) {
-                return 'revert'
+                return true
             }
 
             nextNode = findNextNode(nextId)
             if (!nextNode) {
-                return 'revert'
+                return true
             }
         }
         const n = node as VNode | VSNode
 
-        let insertNode: Node
+        let insertNode: Node | null
+
         if (typeof node === 'number') {
             insertNode = nodeStore.getNode(node)!
 
@@ -50,14 +60,16 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
                 orderSet.delete(node)
             }
         } else if (isVNode(n)) {
-            insertNode = createNode(n as VNode)
+            insertNode = convertVNode(n as VNode)
         } else {
             insertNode = createSpecialNode(n as VSNode)
         }
 
-        parentNode.insertBefore(insertNode, nextNode)
+        if (insertNode) {
+            parentNode.insertBefore(insertNode, nextNode)
+        }
     } else {
-        return 'revert'
+        return true
     }
 }
 
@@ -121,7 +133,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             }
             break
         }
-        case RecordType.MOUSE:
+        case RecordType.MOUSE: {
             const { x, y, type } = data as MouseRecordData
             if (type === MouseEventType.MOVE) {
                 this.pointer.move(x, y)
@@ -129,7 +141,8 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                 this.pointer.click(x, y)
             }
             break
-        case RecordType.DOM_UPDATE:
+        }
+        case RecordType.DOM_UPDATE: {
             // Reduce the delay caused by interactive animation
             await delay(200)
             const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
@@ -178,8 +191,8 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             while (addedList.length) {
                 const addData = addedList.shift()
                 if (addData) {
-                    const revertSignal = insertOrMoveNode(addData, orderSet)
-                    if (revertSignal === 'revert') {
+                    if (insertOrMoveNode(addData, orderSet)) {
+                        // revert here
                         if (revertCount++ < maxRevertCount) {
                             addedList.push(addData)
                         }
@@ -210,7 +223,8 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                 }
             })
             break
-        case RecordType.FORM_EL_UPDATE:
+        }
+        case RecordType.FORM_EL_UPDATE: {
             // Reduce the delay caused by interactive animation
             await delay(200)
             const { id, key, type: formType, value, patches } = data as FormElementWatcherData
@@ -234,9 +248,10 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                     }
                 }
             }
-            break
 
-        case RecordType.LOCATION:
+            break
+        }
+        case RecordType.LOCATION: {
             const { path, hash, contextNodeId } = data as LocationRecordData
             const contextNode = nodeStore.getNode(contextNodeId)
 
@@ -244,6 +259,32 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                 const context = contextNode.ownerDocument!.defaultView!
                 context.__ReplayLocation__ = { ...context.__ReplayLocation__, ...{ path, hash } }
             }
+            break
+        }
+        case RecordType.CANVAS: {
+            const { src, id, strokes } = data as UnionToIntersection<CanvasRecordData>
+            const target = nodeStore.getNode(id) as HTMLCanvasElement
+            const ctx = target.getContext('2d')!
+
+            if (src) {
+                const image = new Image()
+                image.src = src
+                image.onload = function(this: HTMLImageElement) {
+                    ctx.drawImage(this, 0, 0)
+                }
+            } else {
+                strokes.forEach(stroke => {
+                    const { name, args } = stroke
+                    if (Array.isArray(args)) {
+                        ;(ctx[name] as Function).apply(ctx, args)
+                    } else {
+                        const value = args
+                        ;(ctx[name] as Object) = value
+                    }
+                })
+            }
+        }
+
         default: {
             break
         }

@@ -404,5 +404,20 @@ The RollUp packer can generate multiple formats, such as `UMD` and `ESM`, etc. L
 
 #### Thanks
 
-Thanks to Ali's XREPLAY for inspiration 
+Thanks to Ali's XREPLAY for inspiration   
 Thanks to RRWEB for technical sharing
+
+
+#### Maintainers
+
+[@oct16](https://github.com/oct16)
+
+#### Contributing
+
+Feel free to dive in! [Open an issue](https://github.com/oct16/TimeCat/issues/new) or submit PRs.
+
+Standard Readme follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct/) Code of Conduct.
+
+#### License
+
+[GPL-3.0](LICENSE)

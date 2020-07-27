@@ -108,8 +108,10 @@ function updateNodeAttrHref(node: HTMLElement, str: string) {
     const doc = node.getRootNode() as Document
     const context = doc.defaultView as Window
 
-    let { path } = context.__ReplayLocation__
-    path = path.replace(/(\/[\w\/]+)\/\w+\/{0,}/, '$1').replace(/\/*$/, '')
+    let path = context?.__ReplayLocation__?.path || ''
+    if (path) {
+        path = path.replace(/(\/[\w\/]+)\/\w+\/{0,}/, '$1').replace(/\/*$/, '')
+    }
 
     const attrs = node.getAttributeNames()
     attrs

@@ -146,7 +146,7 @@ function getPatches(changes: diff.Change[]) {
                 return ret
             } else if (rm) {
                 const ret = {
-                    index: index,
+                    index,
                     type: 'rm',
                     len
                 }

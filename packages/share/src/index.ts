@@ -1,5 +1,6 @@
 export type ValueOf<T> = T[keyof T]
 export type ValueOfKey<T, K extends keyof T> = T[K]
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
 
 export interface InfoData {
     doctype: DocumentType
@@ -53,6 +54,7 @@ export enum RecordType {
     'FORM_EL_UPDATE' = 'FORM_EL_UPDATE',
     'LOCATION' = 'LOCATION',
     'AUDIO' = 'AUDIO',
+    'CANVAS' = 'CANVAS',
     'NONE' = 'NONE'
 }
 
@@ -199,6 +201,25 @@ export interface LocationRecordData {
     hash?: string
     contextNodeId: number
 }
+export interface CanvasRecord {
+    type: RecordType.CANVAS
+    data: CanvasRecordData
+    time: string
+}
+
+export type CanvasRecordData = CanvasMutationRecordData | CanvasInitRecordData
+
+export interface CanvasMutationRecordData {
+    id: number
+    strokes: {
+        name: keyof CanvasRenderingContext2D
+        args: any[]
+    }[]
+}
+export interface CanvasInitRecordData {
+    id: number
+    src: string
+}
 
 export type RecordEvent<T> = (e: T) => void
 
@@ -211,6 +232,7 @@ export type RecordData =
     | AudioRecord
     | NONERecord
     | LocationRecord
+    | CanvasRecord
 
 export interface AudioData {
     src: string

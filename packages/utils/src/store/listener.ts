@@ -1,1 +1,1 @@
-export const listenerStore = new Set<Function>()
+export const uninstallStore = new Set<Function>()

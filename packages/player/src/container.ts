@@ -61,8 +61,8 @@ export class ContainerComponent {
         setTimeout(() => (this.container.style.opacity = '1'))
         this.container.style.display = 'block'
 
-        function triggerResize(w?: number, h?: number) {
-            resizeHandle(({ target: window } as unknown) as Event, w, h)
+        function triggerResize(setWidth?: number, setHeight?: number) {
+            resizeHandle(({ target: window } as unknown) as Event, setWidth, setHeight)
         }
 
         function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
@@ -90,10 +90,10 @@ export class ContainerComponent {
             const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, 1)
 
             const left =
-                ((setWidth || targetWidth) * scale - targetWidth) / 2 +
+                ((setWidth || targetWidth) * scale - (setWidth || targetWidth)) / 2 +
                 (maxWidth - (setWidth || targetWidth) * scale) / 2
 
-            const top = (maxHeight - targetHeight - panelHeight * scale) / 2
+            const top = (maxHeight - (setHeight || targetHeight) - panelHeight * scale) / 2
 
             target.style.transform = `scale(${scale})`
             target.style.left = left + 'px'

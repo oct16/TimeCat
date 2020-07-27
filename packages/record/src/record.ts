@@ -1,7 +1,7 @@
-import watchers from './watcher'
+import { watchers } from './watchers'
 import { recordAudio } from './audio'
 import { RecordData, RecordOptions, SnapshotData, ValueOf, WatcherOptions } from '@timecat/share'
-import { listenerStore, getDBOperator } from '@timecat/utils'
+import { uninstallStore, getDBOperator } from '@timecat/utils'
 import { snapshots } from '@timecat/snapshot'
 
 function getSnapshotData(options: WatcherOptions<SnapshotData>): void {
@@ -26,7 +26,7 @@ export const record = (options: RecordOptions) => {
     startRecord(options)
     return {
         unsubscribe: () => {
-            Array.from(listenerStore.values()).forEach(un => un())
+            Array.from(uninstallStore.values()).forEach(un => un())
         }
     }
 }
