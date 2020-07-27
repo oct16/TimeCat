@@ -24,12 +24,11 @@ import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
 import { setAttribute, createNode, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
 
-
 /**
  * if return true then revert
- * @param data 
- * @param orderSet 
- * @returns true | undefined 
+ * @param data
+ * @param orderSet
+ * @returns true | undefined
  */
 function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     const { parentId, nextId, node } = data
@@ -252,12 +251,12 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             break
         }
         case RecordType.LOCATION: {
-            const { path, hash, contextNodeId } = data as LocationRecordData
+            const { path, hash, href, contextNodeId } = data as LocationRecordData
             const contextNode = nodeStore.getNode(contextNodeId)
 
             if (contextNode) {
                 const context = contextNode.ownerDocument!.defaultView!
-                context.__ReplayLocation__ = { ...context.__ReplayLocation__, ...{ path, hash } }
+                context.__ReplayLocation__ = { ...context.__ReplayLocation__, ...{ path, hash, href } }
             }
             break
         }

@@ -17,42 +17,32 @@ export function LocationWatcher(options: WatcherOptions<LocationRecord>) {
     history.pushState = kidnapLocation('pushState')
     history.replaceState = kidnapLocation('replaceState')
 
-    function pathHandle(e: Event) {
+    function locationHandle(e: Event) {
         const contextNodeId = getContextNodeId(e)
         const [data, title, path] = e.arguments
+        const { href, hash } = context.location
         emit({
             type: RecordType.LOCATION,
             data: {
                 contextNodeId,
+                href,
+                hash,
                 path
             },
             time: getTime().toString()
         })
     }
-    function hashHandle(e: HashChangeEvent) {
-        const contextNodeId = getContextNodeId(e)
-        const newHash = e.newURL.split('#')[1]
-        if (newHash) {
-            emit({
-                type: RecordType.LOCATION,
-                data: {
-                    contextNodeId,
-                    hash: newHash
-                },
-                time: getTime().toString()
-            })
-        }
-    }
+
     function getContextNodeId(e: Event) {
         return nodeStore.getNodeId((e.target as Window).document.documentElement)!
     }
-    context.addEventListener('replaceState', pathHandle)
-    context.addEventListener('pushState', pathHandle)
-    context.addEventListener('hashchange', hashHandle)
+    context.addEventListener('replaceState', locationHandle)
+    context.addEventListener('pushState', locationHandle)
+    context.addEventListener('hashchange', locationHandle)
 
     uninstallStore.add(() => {
-        context.removeEventListener('replaceState', pathHandle)
-        context.removeEventListener('pushState', pathHandle)
-        context.removeEventListener('hashchange', hashHandle)
+        context.removeEventListener('replaceState', locationHandle)
+        context.removeEventListener('pushState', locationHandle)
+        context.removeEventListener('hashchange', locationHandle)
     })
 }
