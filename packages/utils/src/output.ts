@@ -192,7 +192,6 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     }
 
     const extractedData = await makeCssInline(data) // some link cross origin
-
     const jsonStrData = JSON.stringify(extractedData)
 
     const zipArray = pako.gzip(jsonStrData)
@@ -215,7 +214,6 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
 
 async function makeCssInline(dataList: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }[]) {
     const extractLinkList: VNode[] = []
-
     for (let k = 0; k < dataList.length; k++) {
         const data = dataList[k]
         const { snapshot, records } = data
@@ -248,7 +246,8 @@ async function makeCssInline(dataList: { snapshot: SnapshotData; records: Record
 
         try {
             // try to extract css
-            const cssValue = await fetch(href).then(res => res.text())
+            const cssURL = new URL(href, location.origin).href
+            const cssValue = await fetch(cssURL).then(res => res.text())
             const textNode = {
                 id: nodeStore.createNodeId(),
                 type: Node.TEXT_NODE,
@@ -262,6 +261,7 @@ async function makeCssInline(dataList: { snapshot: SnapshotData; records: Record
 
             node.tag = 'style'
             node.attrs.type = 'text/css'
+            node.attrs['css-url'] = cssURL
             node.children.push(textNode)
         } catch (error) {
             // maybe cross

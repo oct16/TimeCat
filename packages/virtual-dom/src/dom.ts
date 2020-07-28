@@ -1,4 +1,4 @@
-import { completionAttrHref, completionCssHref, proxyResource } from '@timecat/utils'
+import { completeAttrHref, completeCssHref, proxyResource } from '@timecat/utils'
 
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null): void {
     if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -6,7 +6,7 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     }
     if (name === 'style') {
         if (typeof value === 'string') {
-            node.style.cssText = completionCssHref(value)
+            node.style.cssText = completeCssHref(value)
         } else if (value !== null && typeof value === 'object') {
             for (const [k, v] of Object.entries(value)) {
                 node.style[k as any] = v as any
@@ -35,25 +35,25 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     value = String(value)
 
     if (name === 'href') {
-        value = completionAttrHref(String(value), node)
+        value = completeAttrHref(String(value), node)
     }
 
     if (name === 'background' || name === 'src') {
         if (value.startsWith('data:')) {
             // skip
         } else {
-            value = proxyResource(completionAttrHref(String(value), node))
+            value = proxyResource(completeAttrHref(String(value), node))
         }
     }
 
     // The srcset attribute specifies the URL of the image to use in different situations
     if (name === 'srcset') {
         const srcArray = value.split(',')
-        value = srcArray.map(src => proxyResource(completionAttrHref(src.trim(), node))).toString()
+        value = srcArray.map(src => proxyResource(completeAttrHref(src.trim(), node))).toString()
     }
 
     if (value.startsWith('/')) {
-        value = completionAttrHref(value, node)
+        value = completeAttrHref(value, node)
     }
 
     return node.setAttribute(name, value)

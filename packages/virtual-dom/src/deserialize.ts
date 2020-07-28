@@ -1,5 +1,5 @@
 import { setAttribute } from './dom'
-import { nodeStore, isDev, isHideComment, completionCssHref } from '@timecat/utils'
+import { nodeStore, isDev, isHideComment, completeCssHref } from '@timecat/utils'
 import { VNode, VSNode } from '@timecat/share'
 
 export function convertVNode(vNode: VNode | VSNode | null, parent?: VNode): Element | null {
@@ -12,7 +12,7 @@ export function convertVNode(vNode: VNode | VSNode | null, parent?: VNode): Elem
     }
     if (vNode.type === Node.TEXT_NODE) {
         if (parent && parent.tag === 'style') {
-            vs.value = completionCssHref(vs.value)
+            vs.value = completeCssHref(vs.value, parent)
         }
         return createText(vs)
     }

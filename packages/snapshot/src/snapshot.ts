@@ -5,8 +5,7 @@ import { nodeStore, getTime } from '@timecat/utils'
 function getInitInfo(context: Window): InfoData {
     const { name, publicId, systemId } = context.document.doctype || {}
     const doctype = () => ({ name, publicId, systemId } as DocumentType)
-    const origin = () => context.location.origin
-    const pathname = () => context.location.pathname
+    const href = () => context.location.href
     const width = () => context.innerWidth
     const height = () => context.innerHeight
     const scrollTop = () => context.pageYOffset
@@ -18,8 +17,7 @@ function getInitInfo(context: Window): InfoData {
 
     return {
         doctype: doctype(),
-        origin: origin(),
-        pathname: pathname(),
+        href: href(),
         scrollTop: scrollTop(),
         scrollLeft: scrollLeft(),
         width: width(),

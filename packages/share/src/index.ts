@@ -4,8 +4,7 @@ export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) ex
 
 export interface InfoData {
     doctype: DocumentType
-    origin: string
-    pathname: string
+    href: string
     width: number
     height: number
     scrollLeft: number
@@ -197,8 +196,9 @@ export interface LocationRecord {
 }
 
 export interface LocationRecordData {
-    path?: string
-    hash?: string
+    href: string
+    path: string
+    hash: string
     contextNodeId: number
 }
 export interface CanvasRecord {
