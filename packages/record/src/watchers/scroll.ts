@@ -3,12 +3,13 @@ import { WatcherOptions, ScrollRecord, RecordType } from '@timecat/share'
 
 export function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
     const getCompatibleTarget = (target: Document) => (target.scrollingElement as HTMLElement) || target.documentElement
-    const scrollTop = (target: Element | HTMLElement) => target.scrollTop
-    const scrollLeft = (target: Element | HTMLElement) => target.scrollLeft
+    const scrollTop = (target: HTMLElement) => target.scrollTop
+    const scrollLeft = (target: HTMLElement) => target.scrollLeft
     const { emit, context } = options
 
     function emitData(target: Element | Document) {
         const element = target instanceof HTMLElement ? target : getCompatibleTarget(target as Document)
+
         emitterHook(emit, {
             type: RecordType.SCROLL,
             data: {
@@ -19,8 +20,8 @@ export function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
             time: getTime().toString()
         })
     }
-
-    emitData(context.document)
+    const { scrollingElement } = context.document
+    emitData(scrollingElement || document)
 
     function handleFn(e: Event) {
         const { type, target } = e
@@ -35,7 +36,7 @@ export function ScrollWatcher(options: WatcherOptions<ScrollRecord>) {
         handleFn,
         listenerOptions: { capture: true },
         type: 'throttle',
-        optimizeOptions: { leading: false, trailing: false },
-        waitTime: 500
+        optimizeOptions: { leading: true, trailing: true },
+        waitTime: 300
     })
 }

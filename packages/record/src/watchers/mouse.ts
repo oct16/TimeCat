@@ -21,7 +21,7 @@ export function MouseWatcher(options: WatcherOptions<MouseRecord>) {
         }
         const name = 'mousemove'
         const listenerHandle = throttle(evt, 350, {
-            trailing: false
+            trailing: true, leading: true
         })
 
         context.document.addEventListener(name, listenerHandle)

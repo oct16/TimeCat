@@ -39,11 +39,13 @@ const getAttr = (el: HTMLElement & { checked: boolean }) => {
 function getExtra(node: Element, isSVG?: boolean) {
     const { tagName } = node
     const extra: VNode['extra'] = {}
+    const props: VNode['extra']['props'] = {}
+
     if (isSVG || tagName.toLowerCase() === 'svg') {
         extra.isSVG = true
     }
+
     if (tagName === 'INPUT') {
-        const props: VNode['extra']['props'] = {}
         const { checked, value } = node as any
         if (value !== undefined) {
             props.value = value
@@ -51,10 +53,22 @@ function getExtra(node: Element, isSVG?: boolean) {
         if (checked !== undefined) {
             props.checked = checked
         }
-        if (Object.keys(props).length) {
-            extra.props = props
+    }
+
+    // find the scrolled elements
+    const scrollLeft = node.scrollLeft
+    const scrollTop = node.scrollTop
+    if (scrollTop || scrollLeft) {
+        props.scroll = {
+            left: scrollLeft,
+            top: scrollTop
         }
     }
+
+    if (Object.keys(props).length) {
+        extra.props = props
+    }
+
     return extra
 }
 

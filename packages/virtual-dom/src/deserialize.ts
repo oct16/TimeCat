@@ -45,7 +45,17 @@ function createProps(vNode: VNode, node: Element): void {
     const { props } = vNode.extra
     if (props) {
         for (let [key, val] of Object.entries(props)) {
-            ;(node as any)[key] = val
+            if (key === 'scroll') {
+                const { left, top } = val as { top: number; left: number }
+                // TODO
+                // when the inserted element onload?
+                setTimeout(() => {
+                    node.scrollTop = top
+                    node.scrollLeft = left
+                }, 1000)
+            } else {
+                ;(node as any)[key] = val
+            }
         }
     }
 }

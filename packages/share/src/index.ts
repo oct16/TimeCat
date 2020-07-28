@@ -23,7 +23,10 @@ export interface SnapshotData {
 type Attrs = { [key: string]: string }
 
 type Extra = {
-    props?: { [key: string]: string | number | boolean }
+    props?: {
+        [key: string]: string | number | boolean | Object | undefined
+        scroll?: { top: number; left: number }
+    }
     isSVG?: boolean
 }
 
