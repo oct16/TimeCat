@@ -45,7 +45,7 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
                     }
                     key = 'checked'
                     newValue = target.checked
-                } else if (!inputType || inputType === 'text' || inputType === 'textarea') {
+                } else {
                     if (value === target.oldValue) {
                         return
                     }
@@ -55,8 +55,6 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
                         patches.push(...getStrDiffPatches(target.oldValue, value))
                     }
                     target.oldValue = value
-                } else {
-                    return
                 }
 
                 data = {
