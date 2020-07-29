@@ -9,7 +9,12 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
             node.style.cssText = completeCssHref(value)
         } else if (value !== null && typeof value === 'object') {
             for (const [k, v] of Object.entries(value)) {
-                node.style[k as any] = v as any
+                if (k[0] === '-') {
+                    node.style.setProperty(k, v as any)
+                }
+                else {
+                    node.style[k as any] = v as any
+                }
             }
         }
         return
