@@ -250,13 +250,6 @@
     
     <script id="time-cat" src="./timecatjs.min.js"></script>
     <script>
-
-        const number = document.querySelector('number')
-        const button = document.querySelector('button')
-        button.addEventListener('click', () => {
-            number.innerHTML = Number(number.innerHTML) + 1
-        })
-
         const { record } = timecat
         const host = window.parent
         const player = host.document.getElementById('player').contentWindow
