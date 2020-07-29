@@ -71,7 +71,10 @@ const { record, replay } = window.timecat
 ```ts
 // record page
 interface RecordOptions {
+    mode?: 'live' | 'default' // mode
+    context?: Window  // record context
     audio?: boolean // if your want record audio
+    // callback data here
     emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
 
@@ -97,10 +100,12 @@ ctrl.unsubscribe()
 ```ts
 // replay record
 interface ReplayOptions {
-    socketUrl?: string // if live mode
+    mode?: 'live' | 'default' // mode
+    // receive data in live mode
+    receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string // if cross domain
     autoplay?: boolean // autoplay when data loaded
-}
+}****
 
 replay(ReplayOptions)
 ```
@@ -125,10 +130,9 @@ exportReplay(ExportOptions)
 
 ### TimeCat -- 不可思议的Web录屏器
 
-如果你爱打游戏，一定打过魔兽争霸3（暴露年纪🤣），你也许会对游戏导出的录像文件感到好奇，明明打了一个小时游戏，为什么录像才几百KB呢？不过很快你又会发现另一个问题，在每次导入录像的时候都需要重新加载一次地图，否则就不能播放，这又是为什么呢？
+如果你爱打游戏，一定打过魔兽争霸3（暴露年纪🤣），你也许会对游戏导出的录像文件感到好奇，明明打了一个小时游戏，为什么录像才几百KB？不过很快你又会发现另一个问题，在每次导入录像的时候都需要重新加载一次地图，否则就不能播放？
 
-
-其实录像记录的数据不是一个视频文件，而是带着时间戳的一系列动作，导入地图的时候，实际相当于初始了一个状态，在这个状态的基础上，只需要对之前的动作进行还原，也就还原了之前的游戏过程，这就是repl的基本原理了
+录像记录的数据不是一个视频文件，而是带着时间戳的一系列动作，导入地图的时候，实际相当于初始了一个状态，在这个状态的基础上，只需要对之前的动作进行还原，也就还原了之前的游戏过程，这就是repl的基本原理了
 
 > 相关问题：[《魔兽争霸》的录像，为什么长达半小时的录像大小只有几百 KB？](https://www.zhihu.com/question/25431134)
 
