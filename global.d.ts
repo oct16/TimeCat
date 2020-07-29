@@ -42,6 +42,7 @@ interface Window {
         records: any[]
     }
 
+    __RecordOptions__: any
     __ReplayOptions__: any
 
     __ReplayLocation__: any

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeCat Mirror Player Demo</title>
+</head>
+
+<body>
+    <script id="time-cat" src="./timecatjs.min.js"></script>
+    <script>
+        const { replay } = timecat
+        replay({
+            mode: 'live',
+            receiver: send => window.addEventListener('message', e => send(e.data))
+        })
+    </script>
+</body>
+
+</html>

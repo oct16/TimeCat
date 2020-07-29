@@ -251,6 +251,7 @@ interface SubtitlesData {
 }
 
 export interface RecordOptions {
+    mode?: 'live' | 'default'
     context?: Window
     audio?: boolean
     emitter?: (data: RecordData | SnapshotData, db: any) => void
@@ -266,7 +267,8 @@ export interface RecorderOptions {
 export type IRecorderStatus = 'PAUSE' | 'RECORDING' | 'STOP'
 
 export interface ReplayOptions {
-    socketUrl?: string
+    mode?: 'live' | 'default'
+    receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string
     autoplay?: boolean
 }

@@ -11,14 +11,17 @@ import {
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
-import io from 'socket.io-client'
 import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
 import smoothScroll from 'smoothscroll-polyfill'
 
-export async function replay(options: ReplayOptions = { autoplay: true }) {
-    smoothScroll.polyfill()
+const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
+
+export async function replay(options: ReplayOptions) {
+    options = Object.assign(defaultReplayOptions, options)
+
     window.__ReplayOptions__ = options
+    smoothScroll.polyfill()
     const replayData = await getReplayData()
 
     if (!replayData) {
@@ -116,13 +119,12 @@ function dispatchEvent(type: string, data: RecordData) {
     window.dispatchEvent(event)
 }
 
-async function getAsyncDataFromSocket(
-    uri: string
+async function dataReceiver(
+    receiver: (sender: (data: SnapshotData | RecordData) => void) => void
 ): Promise<Array<{ snapshot: SnapshotData; records: RecordData[]; audio: AudioData }>> {
-    var socket = io(uri)
     return await new Promise(resolve => {
         let initialized = false
-        socket.on('record-data', (data: SnapshotData | RecordData) => {
+        receiver(data => {
             if (initialized) {
                 dispatchEvent('record-data', data as RecordData)
             } else {
@@ -154,10 +156,10 @@ async function getDataFromDB() {
 }
 
 async function getReplayData() {
-    const { socketUrl } = window.__ReplayOptions__
+    const { receiver } = window.__ReplayOptions__
 
     const replayDataList =
-        (socketUrl && (await getAsyncDataFromSocket(socketUrl))) ||
+        (receiver && (await dataReceiver(receiver))) ||
         getGZipData() ||
         (await getDataFromDB()) ||
         window.__ReplayDataList__

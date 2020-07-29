@@ -228,6 +228,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             await delay(200)
             const { id, key, type: formType, value, patches } = data as FormElementWatcherData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
+            const { mode } = window.__ReplayOptions__
 
             if (node) {
                 if (formType === FormElementEvent.INPUT || formType === FormElementEvent.CHANGE) {
@@ -238,6 +239,9 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                         ;(node as any)[key] = value
                     }
                 } else if (formType === FormElementEvent.FOCUS) {
+                    if (mode === 'live') {
+                        return
+                    }
                     node.focus()
                 } else if (formType === FormElementEvent.BLUR) {
                     node.blur()

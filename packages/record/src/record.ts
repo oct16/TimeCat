@@ -4,6 +4,8 @@ import { RecordData, RecordOptions, SnapshotData, ValueOf, WatcherOptions } from
 import { uninstallStore, getDBOperator } from '@timecat/utils'
 import { snapshots } from '@timecat/snapshot'
 
+const defaultRecordOpts = { mode: 'default' } as RecordOptions
+
 function getSnapshotData(options: WatcherOptions<SnapshotData>): void {
     const { DOMSnapshot } = snapshots
     const snapshot = DOMSnapshot(options.context || window)
@@ -12,6 +14,11 @@ function getSnapshotData(options: WatcherOptions<SnapshotData>): void {
 }
 
 function getRecorders(options: RecordOptions) {
+    options = Object.assign(defaultRecordOpts, options)
+
+    const context = options.context || window
+    context.__RecordOptions__ = options
+
     const recorders: Array<typeof getSnapshotData | ValueOf<typeof watchers> | typeof recordAudio> = [
         getSnapshotData,
         ...Object.values(watchers)
