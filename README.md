@@ -71,7 +71,10 @@ const { record, replay } = window.timecat
 ```ts
 // record page
 interface RecordOptions {
+    mode?: 'live' | 'default' // mode
+    context?: Window  // record context
     audio?: boolean // if your want record audio
+    // callback data here
     emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
 
@@ -97,7 +100,9 @@ ctrl.unsubscribe()
 ```ts
 // replay record
 interface ReplayOptions {
-    socketUrl?: string // if live mode
+    mode?: 'live' | 'default' // mode
+    // receive data in live mode
+    receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string // if cross domain
     autoplay?: boolean // autoplay when data loaded
 }
