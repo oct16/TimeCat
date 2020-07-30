@@ -57,7 +57,7 @@ async function addNoneFrame() {
 
     if (count) {
         DBOperator.add({
-            type: 'NONE',
+            type: RecordType.NONE,
             data: null,
             time: getTime().toString()
         } as NONERecord)
@@ -228,7 +228,7 @@ async function makeCssInline(dataList: { snapshot: SnapshotData; records: Record
 
         for (let i = 0; i < records.length; i++) {
             const record = records[i]
-            if (record.type === RecordType.DOM_UPDATE) {
+            if (record.type === RecordType.DOM) {
                 const { addedNodes } = record.data
                 for (let j = 0; j < addedNodes.length; j++) {
                     const node = addedNodes[j].node

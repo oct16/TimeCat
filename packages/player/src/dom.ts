@@ -140,7 +140,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
 
             const node = nodeStore.getNode(id) as HTMLElement
             const { left, top } = node?.getBoundingClientRect() || {}
-            
+
             if (type === MouseEventType.MOVE) {
                 this.pointer.move(x + left, y + top)
             } else if (type === MouseEventType.CLICK) {
@@ -148,7 +148,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             }
             break
         }
-        case RecordType.DOM_UPDATE: {
+        case RecordType.DOM: {
             // Reduce the delay caused by interactive animation
             await delay(200)
             const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
@@ -230,7 +230,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
             })
             break
         }
-        case RecordType.FORM_EL_UPDATE: {
+        case RecordType.FORM_EL: {
             // Reduce the delay caused by interactive animation
             await delay(200)
             const { id, key, type: formType, value, patches } = data as FormElementWatcherData
