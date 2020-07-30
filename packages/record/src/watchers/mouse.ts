@@ -7,11 +7,12 @@ export function MouseWatcher(options: WatcherOptions<MouseRecord>) {
         const evt = (e: MouseEvent) => {
             const offsetPosition = getOffsetPosition(e, context)
             if (offsetPosition) {
-                const { x, y } = offsetPosition
+                const { x, y, id } = offsetPosition
                 emitterHook(emit, {
                     type: RecordType.MOUSE,
                     data: {
                         type: MouseEventType.MOVE,
+                        id,
                         x,
                         y
                     },
@@ -21,7 +22,8 @@ export function MouseWatcher(options: WatcherOptions<MouseRecord>) {
         }
         const name = 'mousemove'
         const listenerHandle = throttle(evt, 350, {
-            trailing: true, leading: true
+            trailing: true,
+            leading: true
         })
 
         context.document.addEventListener(name, listenerHandle)
@@ -35,12 +37,12 @@ export function MouseWatcher(options: WatcherOptions<MouseRecord>) {
         const evt = (e: MouseEvent) => {
             const offsetPosition = getOffsetPosition(e, context)
             if (offsetPosition) {
-                const { x, y } = offsetPosition
+                const { x, y, id } = offsetPosition
                 emitterHook(emit, {
                     type: RecordType.MOUSE,
                     data: {
                         type: MouseEventType.CLICK,
-                        id: nodeStore.getNodeId(e.target as Element),
+                        id,
                         x,
                         y
                     },

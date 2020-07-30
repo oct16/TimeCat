@@ -2,6 +2,7 @@ import { RecordEvent, RecordData } from '@timecat/share'
 import { isDev, logger } from './common'
 import { debounce, throttle } from './tool'
 import { uninstallStore } from '../store/listener'
+import { nodeStore } from '../store/node'
 
 export function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
     if (isDev) {
@@ -43,15 +44,25 @@ export function registerEvent(options: {
 export function getOffsetPosition(event: MouseEvent, context: Window) {
     const { mode } = context.__RecordOptions__
 
-    const { view, target, offsetX, offsetY } = event
-    const { left: targetOffsetLeft, top: targetOffsetTop } = (<HTMLElement>target).getBoundingClientRect()
+    const { view, target, offsetX: x, offsetY: y } = event
 
     if (view === context) {
         const doc = (<HTMLElement>target).ownerDocument!
 
+        function isInline(target: HTMLElement) {
+            return context.getComputedStyle(target).display === 'inline'
+        }
+
+        let node = target as HTMLElement
+
+        while (isInline(node as HTMLElement)) {
+            node = node.parentElement!
+        }
+
         const position = {
-            x: offsetX + targetOffsetLeft,
-            y: offsetY + targetOffsetTop
+            id: nodeStore.getNodeId(node),
+            x: event.offsetX,
+            y: event.offsetY
         }
 
         const frameElement = doc?.defaultView?.frameElement as HTMLElement
