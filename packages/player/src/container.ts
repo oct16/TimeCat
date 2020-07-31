@@ -109,8 +109,8 @@ export class ContainerComponent {
 
         function getPageSize(target: HTMLElement) {
             return {
-                width: parseInt(target.style.width),
-                height: parseInt(target.style.height)
+                width: parseInt(target.style.width, 10),
+                height: parseInt(target.style.height, 10)
             }
         }
 
