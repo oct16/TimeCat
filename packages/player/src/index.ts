@@ -60,8 +60,8 @@ export async function replay(options: ReplayOptions) {
                 type: ProgressTypes.INFO,
                 data: {
                     frame: 0,
-                    curTime: startTime,
-                    startTime,
+                    curTime: Number(startTime),
+                    startTime: Number(startTime),
                     endTime,
                     length: records.length
                 }

@@ -116,13 +116,13 @@ export class PlayerComponent {
     }
 
     streamHandle(this: PlayerComponent, e: CustomEvent) {
-        const frame = e.detail as RecordData
+        const frame = e.detail as RecordData | SnapshotData
         if (isSnapshot(frame)) {
-            window.__ReplayData__.snapshot = frame
+            window.__ReplayData__.snapshot = frame as SnapshotData
             this.c.setViewState()
             return
         }
-        this.execFrame(frame)
+        this.execFrame(frame as RecordData)
     }
 
     initViewState() {

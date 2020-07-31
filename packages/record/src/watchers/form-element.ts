@@ -58,7 +58,7 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
                 }
 
                 data = {
-                    type: RecordType.FORM_EL_UPDATE,
+                    type: RecordType.FORM_EL,
                     data: {
                         type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
                         id: nodeStore.getNodeId(e.target as Node)!,
@@ -71,7 +71,7 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
                 break
             case 'focus':
                 data = {
-                    type: RecordType.FORM_EL_UPDATE,
+                    type: RecordType.FORM_EL,
                     data: {
                         type: FormElementEvent.FOCUS,
                         id: nodeStore.getNodeId(e.target as Node)!
@@ -81,7 +81,7 @@ function listenInputs(options: WatcherOptions<FormElementRecord>) {
                 break
             case 'blur':
                 data = {
-                    type: RecordType.FORM_EL_UPDATE,
+                    type: RecordType.FORM_EL,
                     data: {
                         type: FormElementEvent.BLUR,
                         id: nodeStore.getNodeId(e.target as Node)!
@@ -140,7 +140,7 @@ function kidnapInputs(options: WatcherOptions<FormElementRecord>) {
         }
 
         emit({
-            type: RecordType.FORM_EL_UPDATE,
+            type: RecordType.FORM_EL,
             data,
             time: getTime().toString()
         })

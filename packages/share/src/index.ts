@@ -48,28 +48,28 @@ export interface VNode {
 }
 
 export enum RecordType {
-    'SNAPSHOT' = 'SNAPSHOT',
-    'WINDOW' = 'WINDOW',
-    'SCROLL' = 'SCROLL',
-    'MOUSE' = 'MOUSE',
-    'DOM_UPDATE' = 'DOM_UPDATE',
-    'FORM_EL_UPDATE' = 'FORM_EL_UPDATE',
-    'LOCATION' = 'LOCATION',
-    'AUDIO' = 'AUDIO',
-    'CANVAS' = 'CANVAS',
-    'NONE' = 'NONE'
+    'SNAPSHOT',
+    'WINDOW',
+    'SCROLL',
+    'MOUSE',
+    'DOM',
+    'FORM_EL',
+    'LOCATION',
+    'AUDIO',
+    'CANVAS',
+    'NONE'
 }
 
 export enum FormElementEvent {
-    'PROP' = 'PROP',
-    'INPUT' = 'INPUT',
-    'CHANGE' = 'CHANGE',
-    'FOCUS' = 'FOCUS',
-    'BLUR' = 'BLUR'
+    'PROP',
+    'INPUT',
+    'CHANGE',
+    'FOCUS',
+    'BLUR'
 }
 export enum MouseEventType {
-    'MOVE' = 'MOVE',
-    'CLICK' = 'click'
+    'MOVE',
+    'CLICK'
 }
 
 export interface WindowRecord {
@@ -108,7 +108,7 @@ export interface MouseRecordData {
     id?: number
 }
 export interface DOMRecord {
-    type: RecordType.DOM_UPDATE
+    type: RecordType.DOM
     data: DOMWatcherData
     time: string
 }
@@ -152,7 +152,7 @@ export interface DOMUpdateDataType {
 }
 
 export interface FormElementRecord {
-    type: RecordType.FORM_EL_UPDATE
+    type: RecordType.FORM_EL
     data: FormElementWatcherData
     time: string
 }

@@ -187,7 +187,7 @@ function mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord
 
     if (Object.values(data).some(item => item.length)) {
         emitterHook(emit, {
-            type: RecordType.DOM_UPDATE,
+            type: RecordType.DOM,
             data,
             time: getTime().toString()
         })
