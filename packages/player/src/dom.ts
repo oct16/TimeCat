@@ -274,6 +274,9 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
         case RecordType.CANVAS: {
             const { src, id, strokes } = data as UnionToIntersection<CanvasRecordData>
             const target = nodeStore.getNode(id) as HTMLCanvasElement
+            if (!target) {
+                return
+            }
             const ctx = target.getContext('2d')!
 
             if (src) {
@@ -283,15 +286,35 @@ export async function updateDom(this: PlayerComponent, Record: RecordData | Snap
                     ctx.drawImage(this, 0, 0)
                 }
             } else {
-                strokes.forEach(stroke => {
-                    const { name, args } = stroke
-                    if (Array.isArray(args)) {
-                        ;(ctx[name] as Function).apply(ctx, args)
-                    } else {
-                        const value = args
-                        ;(ctx[name] as Object) = value
+                async function createChain() {
+                    function splitStrokes(strokesArray: UnionToIntersection<CanvasRecordData>['strokes'][]) {
+                        const result: UnionToIntersection<CanvasRecordData>['strokes'][] = []
+                        strokesArray.forEach(strokes => {
+                            const len = strokes.length
+                            const pivot = Math.floor(len / 2)
+                            result.push(...[strokes.splice(0, pivot), strokes])
+                        })
+                        return result
                     }
-                })
+
+                    // TODO expect stroke smooth (elapsed time)
+                    for (const strokesArray of splitStrokes(splitStrokes([strokes]))) {
+                        // await delay(0) // have problem here
+                        for (const stroke of strokesArray) {
+                            const { name, args } = stroke
+                            if (Array.isArray(args)) {
+                                if (name === 'drawImage') {
+                                    args[0] = nodeStore.getNode(args[0])
+                                }
+                                ;(ctx[name] as Function).apply(ctx, args)
+                            } else {
+                                const value = args
+                                ;(ctx[name] as Object) = value
+                            }
+                        }
+                    }
+                }
+                createChain()
             }
         }
 

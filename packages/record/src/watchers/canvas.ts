@@ -1,9 +1,5 @@
-// TODO
-// support inject mode
-// uninstall watcher
-
-import { emitterHook, nodeStore, getTime } from '@timecat/utils'
-import { WatcherOptions, CanvasRecord, RecordType, ValueOf } from '@timecat/share'
+import { emitterHook, nodeStore, getTime, uninstallStore } from '@timecat/utils'
+import { WatcherOptions, CanvasRecord, RecordType } from '@timecat/share'
 
 type Prop = keyof CanvasRenderingContext2D
 
@@ -22,6 +18,46 @@ export function CanvasWatcher(options: WatcherOptions<CanvasRecord>) {
         })
     })
 
+    const ctxProto = CanvasRenderingContext2D.prototype
+    const names = Object.getOwnPropertyNames(ctxProto)
+
+    names.forEach(name => {
+        const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
+        const method = original.value
+
+        if (name === 'canvas') {
+            return
+        }
+
+        Object.defineProperty(ctxProto, name, {
+            get() {
+                const context = this
+                const id = nodeStore.getNodeId(this.canvas)!
+
+                return typeof method === 'function'
+                    ? function() {
+                          const args = [...arguments]
+                          if (name === 'drawImage') {
+                              args[0] = id
+                          }
+                          aggregateDataEmitter(id, name, args)
+                          return method.apply(context, arguments)
+                      }
+                    : null
+            },
+            set: function(value: any) {
+                const id = nodeStore.getNodeId(this.canvas)!
+                aggregateDataEmitter(id, name, value)
+
+                return original.set?.apply(this, arguments)
+            }
+        })
+
+        uninstallStore.add(() => {
+            Object.defineProperty(ctxProto, name, original)
+        })
+    })
+
     const aggregateDataEmitter = aggregateManager((id: number, strokes: { name: Prop; args: any[] }[]) => {
         emitterHook(emit, {
             type: RecordType.CANVAS,
@@ -33,71 +69,49 @@ export function CanvasWatcher(options: WatcherOptions<CanvasRecord>) {
         })
     }, 200)
 
-    const canvasPrototype = HTMLCanvasElement.prototype
-    const original = Object.getOwnPropertyDescriptor(canvasPrototype, 'getContext')!
+    // TODO prevent loop
+    function aggregateManager(func: Function, wait: number): any {
+        const tasks = Object.create(null) as { [key: number]: { name: Prop; args: any[] }[] }
+        const timeouts = Object.create(null) as { [key: number]: number }
 
-    canvasPrototype.getContext = function(...args: any[]) {
-        return (proxy(original.value.call(this, args)) as unknown) as any
-    }
+        const blockInstances = [CanvasGradient]
 
-    function proxy(ctx: CanvasRenderingContext2D) {
-        const id = nodeStore.getNodeId(ctx.canvas)!
+        return function(this: any, id: number, prop: Prop, args: any) {
+            const context = this
 
-        const proxyHandler = {
-            get: function(target: CanvasRenderingContext2D, prop: Prop) {
-                const method = target[prop] as () => ValueOf<CanvasRenderingContext2D>
-                return function() {
-                    aggregateDataEmitter(id, prop, [...arguments])
-                    return method.apply(ctx, arguments)
-                }
-            },
-            set: function(target: CanvasRenderingContext2D, prop: Prop, value: any) {
-                aggregateDataEmitter(id, prop, value)
-                return Reflect.set(target, prop, value)
+            function emitData(id: number) {
+                const timeout = timeouts[id]
+                clearTimeout(timeout)
+                timeouts[id] = 0
+                const strokes = tasks[id].slice()
+                // TODO have problem here
+                const clearIndex = strokes.reverse().findIndex(stroke => {
+                    if (stroke.name === 'clearRect') {
+                        return true
+                    }
+                })
+                const aSliceOfShit = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
+                tasks[id].length = 0
+                func.call(context, id, aSliceOfShit)
             }
-        }
 
-        return new Proxy(ctx, proxyHandler)
-    }
-}
+            if (!tasks[id]) {
+                tasks[id] = []
+            }
 
-function aggregateManager(func: Function, wait: number): any {
-    const tasks = {} as { [key: number]: { name: Prop; args: any[] }[] }
-    const timeouts = {} as { [key: number]: number }
+            if (!blockInstances.some(instance => args instanceof instance)) {
+                tasks[id].push({
+                    name: prop,
+                    args
+                })
+            }
 
-    return function(this: any, id: number, prop: Prop, args: any) {
-        const context = this
-
-        function emitData(id: number) {
-            const timeout = timeouts[id]
-            clearTimeout(timeout)
-            timeouts[id] = 0
-            const strokes = tasks[id].slice()
-            const clearIndex = strokes.reverse().findIndex(stroke => {
-                if (stroke.name === 'clearRect') {
-                    return true
-                }
-            })
-
-            const aSliceOfShit = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
-            tasks[id].length = 0
-            func.call(context, id, aSliceOfShit)
-        }
-
-        if (!tasks[id]) {
-            tasks[id] = []
-        }
-
-        tasks[id].push({
-            name: prop,
-            args
-        })
-
-        if (!timeouts[id]) {
-            const timeout = window.setTimeout(() => {
-                emitData(id)
-            }, wait)
-            timeouts[id] = timeout
+            if (!timeouts[id]) {
+                const timeout = window.setTimeout(() => {
+                    emitData(id)
+                }, wait)
+                timeouts[id] = timeout
+            }
         }
     }
 }

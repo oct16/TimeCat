@@ -37,29 +37,8 @@
     <br />
     <!--hidden--><button id="replay" class="locked">Replay</button>
 
-    <script id="time-cat" src="./timecatjs.min.js"></script>
     <script>
-        const { record } = timecat
-        const ctrl = record()
-        const replayButton = document.getElementById('replay')
-        if (replayButton) {
-            setTimeout(() => {
-                replayButton.className = ''
-            }, 5000);
-            replayButton.addEventListener('click', () => {
-                if (replayButton.className) {
-                    return
-                }
-                replayButton.className = 'hide'
-                ctrl.unsubscribe()
-                window.open('replay.html')
-            })
-        }
-    </script>
-    <script>
-        setTimeout(() => {
-            drawCanvas()
-        }, 1000)
+        drawCanvas()
 
         function drawCanvas() {
             var canvas = document.getElementById('myCanvas')
@@ -96,6 +75,25 @@
         }
     </script>
 
+    <script id="time-cat" src="./timecatjs.min.js"></script>
+    <script>
+        const { record } = timecat
+        const ctrl = record()
+        const replayButton = document.getElementById('replay')
+        if (replayButton) {
+            setTimeout(() => {
+                replayButton.className = ''
+            }, 5000);
+            replayButton.addEventListener('click', () => {
+                if (replayButton.className) {
+                    return
+                }
+                replayButton.className = 'hide'
+                ctrl.unsubscribe()
+                window.open('replay.html')
+            })
+        }
+    </script>
     <!--env-->
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
