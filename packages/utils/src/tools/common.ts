@@ -4,7 +4,6 @@ import {
     VSNode,
     SnapshotData,
     RecordData,
-    AudioData,
     AudioRecord,
     AudioStrList,
     RecorderOptions,
@@ -51,7 +50,7 @@ export function isSnapshot(frame: RecordData | SnapshotData) {
 }
 
 export function classifyRecords(data: (SnapshotData | RecordData)[]) {
-    const dataList: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }[] = []
+    const dataList: ReplayData[] = []
 
     function isAudioBufferStr(frame: AudioRecord) {
         return frame.data.type === 'base64'
@@ -60,7 +59,7 @@ export function classifyRecords(data: (SnapshotData | RecordData)[]) {
         return (frame as RecordData).type === RecordType.AUDIO
     }
 
-    let dataBasket: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }
+    let dataBasket: ReplayData
     data.forEach(item => {
         if (isSnapshot(item)) {
             dataBasket = {

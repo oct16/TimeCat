@@ -29,18 +29,9 @@ declare interface HTMLInputElement {
 interface Window {
     __ReplayStrData__: string
 
-    __ReplayDataList__: Array<{
-        snapshot: SnapshotData
-        records: RecordData[]
-        audio: AudioData
-    }>
+    __ReplayDataList__: ReplayData[]
 
-    __ReplayData__: {
-        index: number
-        snapshot: SnapshotData
-        records: RecordData[]
-        audio: AudioData
-    }
+    __ReplayData__: ReplayData
 
     __RecordOptions__: RecordOptions
     __ReplayOptions__: ReplayOptions
@@ -62,6 +53,13 @@ interface Window {
 
 interface Event {
     arguments: any
+}
+
+declare interface ReplayData {
+    index?: number
+    snapshot: SnapshotData
+    records: RecordData[]
+    audio: AudioData
 }
 
 declare interface LocationRecordData {

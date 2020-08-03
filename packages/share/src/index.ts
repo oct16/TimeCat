@@ -271,6 +271,15 @@ export interface ReplayOptions {
     receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string
     autoplay?: boolean
+    replayDataList?: ReplayData[]
+    replayDataListName?: string
+}
+
+export interface ReplayData {
+    index?: number
+    snapshot: SnapshotData
+    records: RecordData[]
+    audio: AudioData
 }
 
 export enum TransactionMode {
