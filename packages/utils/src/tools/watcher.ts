@@ -4,7 +4,7 @@ import { debounce, throttle } from './tool'
 import { uninstallStore } from '../store/listener'
 import { nodeStore } from '../store/node'
 
-export function emitterHook(emit: RecordEvent<RecordData>, data: RecordData) {
+export function emitterHook<T extends RecordData | SnapshotData>(emit: RecordEvent<T>, data: T) {
     if (isDev) {
         // logger(data)
     }

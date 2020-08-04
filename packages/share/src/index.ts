@@ -20,8 +20,6 @@ export interface SnapshotData {
     time: string
 }
 
-type Attrs = { [key: string]: string }
-
 type Extra = {
     props?: {
         [key: string]: string | number | boolean | Object | undefined
@@ -31,6 +29,8 @@ type Extra = {
 }
 
 type Children = (VNode | VSNode)[]
+
+type Attrs = { [key: string]: string }
 
 export interface VSNode {
     id: number
@@ -224,7 +224,7 @@ export interface CanvasInitRecordData {
     src: string
 }
 
-export type RecordEvent<T> = (e: T) => void
+export type RecordEvent<T extends RecordData | SnapshotData> = (e: T) => void
 
 export type RecordData =
     | FormElementRecord
@@ -288,4 +288,7 @@ export enum TransactionMode {
     'VERSIONCHANGE' = 'versionchange'
 }
 
-export type WatcherOptions<T> = { context: Window; emit: RecordEvent<T> }
+export type WatcherOptions<T extends RecordData | SnapshotData> = { context: Window; emit: RecordEvent<T> }
+export interface Constructable<T> {
+    new (...args: any): T
+}

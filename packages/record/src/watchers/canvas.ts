@@ -1,65 +1,74 @@
-import { emitterHook, nodeStore, getTime, uninstallStore } from '@timecat/utils'
+import { nodeStore, getTime, uninstallStore } from '@timecat/utils'
 import { WatcherOptions, CanvasRecord, RecordType } from '@timecat/share'
+import { Watcher } from './watcher'
 
 type Prop = keyof CanvasRenderingContext2D
 
-export function CanvasWatcher(options: WatcherOptions<CanvasRecord>) {
-    const { emit, context } = options
-    const canvasElements = document.getElementsByTagName('canvas')
-    Array.from(canvasElements).forEach(canvas => {
-        var dataURL = canvas.toDataURL()
-        emitterHook(emit, {
-            type: RecordType.CANVAS,
-            data: {
-                id: nodeStore.getNodeId(canvas)!,
-                src: dataURL
-            },
-            time: getTime().toString()
+export class CanvasWatcher extends Watcher<CanvasRecord> {
+    constructor(options: WatcherOptions<CanvasRecord>) {
+        super(options)
+        this.init()
+    }
+
+    init() {
+        const self = this
+        const canvasElements = document.getElementsByTagName('canvas')
+        Array.from(canvasElements).forEach(canvas => {
+            var dataURL = canvas.toDataURL()
+            this.emitterHook({
+                type: RecordType.CANVAS,
+                data: {
+                    id: nodeStore.getNodeId(canvas)!,
+                    src: dataURL
+                },
+                time: getTime().toString()
+            })
         })
-    })
 
-    const ctxProto = CanvasRenderingContext2D.prototype
-    const names = Object.getOwnPropertyNames(ctxProto)
+        const ctxProto = CanvasRenderingContext2D.prototype
+        const names = Object.getOwnPropertyNames(ctxProto)
 
-    names.forEach(name => {
-        const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
-        const method = original.value
+        names.forEach(name => {
+            const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
+            const method = original.value
 
-        if (name === 'canvas') {
-            return
-        }
-
-        Object.defineProperty(ctxProto, name, {
-            get() {
-                const context = this
-                const id = nodeStore.getNodeId(this.canvas)!
-
-                return typeof method === 'function'
-                    ? function() {
-                          const args = [...arguments]
-                          if (name === 'drawImage') {
-                              args[0] = id
-                          }
-                          aggregateDataEmitter(id, name, args)
-                          return method.apply(context, arguments)
-                      }
-                    : null
-            },
-            set: function(value: any) {
-                const id = nodeStore.getNodeId(this.canvas)!
-                aggregateDataEmitter(id, name, value)
-
-                return original.set?.apply(this, arguments)
+            if (name === 'canvas') {
+                return
             }
-        })
 
-        uninstallStore.add(() => {
-            Object.defineProperty(ctxProto, name, original)
-        })
-    })
+            Object.defineProperty(ctxProto, name, {
+                get() {
+                    const context = this
+                    const id = nodeStore.getNodeId(this.canvas)!
 
-    const aggregateDataEmitter = aggregateManager((id: number, strokes: { name: Prop; args: any[] }[]) => {
-        emitterHook(emit, {
+                    return typeof method === 'function'
+                        ? function() {
+                              const args = [...arguments]
+                              if (name === 'drawImage') {
+                                  args[0] = id
+                              }
+
+                              self.aggregateDataEmitter(id, name, args)
+                              return method.apply(context, arguments)
+                          }
+                        : null
+                },
+                set: function(value: any) {
+                    const id = nodeStore.getNodeId(this.canvas)!
+                    self.aggregateDataEmitter(id, name, value)
+
+                    return original.set?.apply(this, arguments)
+                }
+            })
+
+            uninstallStore.add(() => {
+                Object.defineProperty(ctxProto, name, original)
+            })
+        })
+    }
+
+    aggregateDataEmitter = this.aggregateManager((id: number, strokes: { name: Prop; args: any[] }[]) => {
+        this.emitterHook({
             type: RecordType.CANVAS,
             data: {
                 id,
@@ -67,10 +76,9 @@ export function CanvasWatcher(options: WatcherOptions<CanvasRecord>) {
             },
             time: getTime().toString()
         })
-    }, 200)
+    }, 100)
 
-    // TODO prevent loop
-    function aggregateManager(func: Function, wait: number): any {
+    aggregateManager(func: Function, wait: number): any {
         const tasks = Object.create(null) as { [key: number]: { name: Prop; args: any[] }[] }
         const timeouts = Object.create(null) as { [key: number]: number }
 
