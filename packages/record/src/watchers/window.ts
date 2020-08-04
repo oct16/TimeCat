@@ -13,12 +13,10 @@ export class WindowWatcher extends Watcher<WindowRecord> {
 
     init() {
         this.emitData(this.context.document)
-        const context = this.context
-        const handleFn = this.handleFn
         this.registerEvent({
-            context,
+            context: this.context,
             eventTypes: ['resize'],
-            handleFn,
+            handleFn: this.handleFn.bind(this),
             listenerOptions: { capture: true },
             type: 'throttle',
             optimizeOptions: { trailing: true },

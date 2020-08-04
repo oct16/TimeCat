@@ -27,6 +27,13 @@ declare interface HTMLInputElement {
 }
 
 interface Window {
+    HTMLElement: typeof HTMLElement
+    HTMLInputElement: typeof HTMLInputElement
+    HTMLInputElement: typeof HTMLInputElement
+    HTMLSelectElement: typeof HTMLSelectElement
+    HTMLTextAreaElement: typeof HTMLTextAreaElement
+    Object: typeof Object
+
     __ReplayStrData__: string
 
     __ReplayDataList__: ReplayData[]

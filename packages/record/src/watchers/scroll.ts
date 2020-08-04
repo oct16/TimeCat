@@ -15,12 +15,10 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
     init() {
         const { scrollingElement } = this.context.document
         this.emitData(scrollingElement || document)
-        const context = this.context
-        const handleFn = this.handleFn
         this.registerEvent({
-            context,
+            context: this.context,
             eventTypes: ['scroll'],
-            handleFn,
+            handleFn: () => this.handleFn,
             listenerOptions: { capture: true },
             type: 'throttle',
             optimizeOptions: { leading: true, trailing: true },
@@ -29,7 +27,8 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
     }
 
     emitData(target: Element | Document) {
-        const element = target instanceof HTMLElement ? target : this.getCompatibleTarget(target as Document)
+        const element =
+            target instanceof this.context.HTMLElement ? target : this.getCompatibleTarget(target as Document)
 
         this.emitterHook({
             type: RecordType.SCROLL,

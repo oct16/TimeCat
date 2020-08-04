@@ -109,17 +109,17 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         const self = this
 
         const elementList: [HTMLElement, string][] = [
-            [(context as any).HTMLInputElement.prototype, 'value'],
-            [(context as any).HTMLInputElement.prototype, 'checked'],
-            [(context as any).HTMLSelectElement.prototype, 'value'],
-            [(context as any).HTMLTextAreaElement.prototype, 'value']
+            [context.HTMLInputElement.prototype, 'value'],
+            [context.HTMLInputElement.prototype, 'checked'],
+            [context.HTMLSelectElement.prototype, 'value'],
+            [context.HTMLTextAreaElement.prototype, 'value']
         ]
 
         const handles = elementList.map(item => {
             return () => {
                 const [target, key] = item
-                const original = (context as any).Object.getOwnPropertyDescriptor(target, key)
-                ;(context as any).Object.defineProperty(target, key, {
+                const original = context.Object.getOwnPropertyDescriptor(target, key)
+                context.Object.defineProperty(target, key, {
                     set: function(value: string | boolean) {
                         setTimeout(() => {
                             handleEvent.call(this, key, value)
@@ -132,7 +132,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
 
                 uninstallStore.add(() => {
                     if (original) {
-                        ;(context as any).Object.defineProperty(target, key, original)
+                        context.Object.defineProperty(target, key, original)
                     }
                 })
             }
