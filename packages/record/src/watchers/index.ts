@@ -5,6 +5,7 @@ import { MouseWatcher } from './mouse'
 import { ScrollWatcher } from './scroll'
 import { WindowWatcher } from './window'
 import { CanvasWatcher } from './canvas'
+import { TerminateWatcher } from './terminate'
 
 export const watchers = {
     DOMWatcher,
@@ -13,5 +14,6 @@ export const watchers = {
     MouseWatcher,
     ScrollWatcher,
     WindowWatcher,
-    CanvasWatcher
+    CanvasWatcher,
+    TerminateWatcher
 }

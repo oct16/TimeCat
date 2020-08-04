@@ -269,6 +269,7 @@ declare type RecordData =
     | NONERecord
     | LocationRecord
     | CanvasRecord
+    | TerminateRecord
 
 declare interface RecorderOptions {
     sampleBits: 8 | 16
@@ -293,7 +294,8 @@ declare enum RecordType {
     'LOCATION' = 6,
     'AUDIO' = 7,
     'CANVAS' = 8,
-    'NONE' = 9
+    'NONE' = 9,
+    'TERMINATE' = 10
 }
 
 declare interface RemoveUpdateData {
@@ -364,4 +366,10 @@ declare interface WindowWatcherData {
     id: number | null
     width: number
     height: number
+}
+
+declare interface TerminateRecord {
+    type: RecordType.TERMINATE
+    data: null
+    time: string
 }

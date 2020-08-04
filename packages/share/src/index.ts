@@ -57,7 +57,8 @@ export enum RecordType {
     'LOCATION',
     'AUDIO',
     'CANVAS',
-    'NONE'
+    'NONE',
+    'TERMINATE'
 }
 
 export enum FormElementEvent {
@@ -72,6 +73,11 @@ export enum MouseEventType {
     'CLICK'
 }
 
+export interface TerminateRecord {
+    type: RecordType.TERMINATE
+    data: null
+    time: string
+}
 export interface WindowRecord {
     type: RecordType.WINDOW
     data: WindowWatcherData
@@ -236,6 +242,7 @@ export type RecordData =
     | NONERecord
     | LocationRecord
     | CanvasRecord
+    | TerminateRecord
 
 export interface AudioData {
     src: string
