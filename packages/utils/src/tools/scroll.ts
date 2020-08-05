@@ -2,7 +2,7 @@
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 
 export function disableScrolling(target: Document) {
-    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 } as { [key: string]: number }
+    const keys = { 37: 1, 38: 1, 39: 1, 40: 1 } as { [key: string]: number }
 
     function preventDefault(e: Event) {
         e.preventDefault()
@@ -16,7 +16,7 @@ export function disableScrolling(target: Document) {
     }
 
     // modern Chrome requires { passive: false } when adding event
-    var supportsPassive = false
+    let supportsPassive = false
     try {
         target.addEventListener(
             'test' as any,
@@ -29,8 +29,8 @@ export function disableScrolling(target: Document) {
         )
     } catch (e) {}
 
-    var wheelOpt = supportsPassive ? ({ passive: false } as EventListenerOptions) : false
-    var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel'
+    const wheelOpt = supportsPassive ? ({ passive: false } as EventListenerOptions) : false
+    const wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel'
 
     // call this to Disable
     function disableScroll() {

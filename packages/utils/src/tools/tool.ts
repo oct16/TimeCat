@@ -35,7 +35,7 @@ export function objectEquals(x: any, y: any): boolean {
     }
 
     // recursive object equality check
-    var p = Object.keys(x)
+    const p = Object.keys(x)
     return (
         Object.keys(y).every(function(i) {
             return p.indexOf(i) !== -1
@@ -51,22 +51,22 @@ export function throttle(
     wait: number,
     options: { leading?: boolean; trailing?: boolean } = { leading: false, trailing: false }
 ): any {
-    var context: any
-    var args: any
-    var result: any
-    var timeout: any = null
-    var previous = 0
+    let context: any
+    let args: any
+    let result: any
+    let timeout: any = null
+    let previous = 0
 
-    var later = function() {
+    const later = function() {
         previous = options.leading === false ? 0 : Date.now()
         timeout = null
         result = func.apply(context, args)
         if (!timeout) context = args = null
     }
     return function(this: any) {
-        var now = Date.now()
+        const now = Date.now()
         if (!previous && options.leading === false) previous = now
-        var remaining = wait - (now - previous)
+        const remaining = wait - (now - previous)
         context = this
         args = arguments
         if (remaining <= 0 || remaining > wait) {

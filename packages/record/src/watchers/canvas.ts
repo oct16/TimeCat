@@ -14,7 +14,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
         const self = this
         const canvasElements = document.getElementsByTagName('canvas')
         Array.from(canvasElements).forEach(canvas => {
-            var dataURL = canvas.toDataURL()
+            const dataURL = canvas.toDataURL()
             this.emitterHook({
                 type: RecordType.CANVAS,
                 data: {

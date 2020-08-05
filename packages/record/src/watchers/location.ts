@@ -26,7 +26,7 @@ export class LocationWatcher extends Watcher<LocationRecord> {
     }
 
     kidnapLocation(type: 'pushState' | 'replaceState') {
-        var original = this.context.history[type]
+        const original = this.context.history[type]
 
         return function(this: any) {
             const e = new Event(type)

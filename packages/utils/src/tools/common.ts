@@ -103,7 +103,7 @@ export function isVNode(n: VNode | VSNode) {
 }
 
 export function download(src: Blob | string, name: string) {
-    var tag = document.createElement('a')
+    const tag = document.createElement('a')
     tag.download = name
     if (typeof src === 'string') {
         tag.href = src
