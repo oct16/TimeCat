@@ -1,17 +1,10 @@
 import { watchers } from './watchers'
-import { recordAudio } from './audio'
-import { RecordData, RecordOptions, SnapshotData, ValueOf, WatcherOptions } from '@timecat/share'
+import { RecordAudio } from './audio'
+import { RecordData, RecordOptions, SnapshotData, ValueOf } from '@timecat/share'
 import { uninstallStore, getDBOperator } from '@timecat/utils'
-import { snapshots } from '@timecat/snapshot'
+import { Snapshot } from './snapshot'
 
 const defaultRecordOpts = { mode: 'default' } as RecordOptions
-
-function getSnapshotData(options: WatcherOptions<SnapshotData>): void {
-    const { DOMSnapshot } = snapshots
-    const snapshot = DOMSnapshot(options.context || window)
-    const { emit } = options
-    emit(snapshot)
-}
 
 function getRecorders(options: RecordOptions) {
     options = Object.assign(defaultRecordOpts, options)
@@ -19,12 +12,12 @@ function getRecorders(options: RecordOptions) {
     const context = options.context || window
     context.__RecordOptions__ = options
 
-    const recorders: Array<typeof getSnapshotData | ValueOf<typeof watchers> | typeof recordAudio> = [
-        getSnapshotData,
+    const recorders: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot> = [
+        Snapshot,
         ...Object.values(watchers)
     ]
     if (options && options.audio) {
-        recorders.push(recordAudio)
+        recorders.push(RecordAudio)
     }
     return recorders
 }
@@ -42,14 +35,14 @@ async function startRecord(options: RecordOptions) {
     const db = await getDBOperator
 
     const allRecorders = getRecorders(options)
-    let iframeRecorders = allRecorders
+    let iframeWatchers = allRecorders
 
     // is record iframe, switch context
     if (!options || !options.context) {
         db.clear()
     } else {
-        iframeRecorders = [
-            getSnapshotData,
+        iframeWatchers = [
+            Snapshot,
             watchers.MouseWatcher,
             watchers.DOMWatcher,
             watchers.FormElementWatcher,
@@ -57,8 +50,8 @@ async function startRecord(options: RecordOptions) {
         ]
     }
 
-    iframeRecorders.forEach(task =>
-        task({
+    iframeWatchers.forEach(watcher => {
+        new watcher({
             context: (options && options.context) || window,
             emit(data: RecordData | SnapshotData) {
                 if (options && options.emitter) {
@@ -68,7 +61,7 @@ async function startRecord(options: RecordOptions) {
                 db.add(data)
             }
         })
-    )
+    })
 
     await recordFrames()
 }

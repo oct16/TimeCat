@@ -20,8 +20,6 @@ export interface SnapshotData {
     time: string
 }
 
-type Attrs = { [key: string]: string }
-
 type Extra = {
     props?: {
         [key: string]: string | number | boolean | Object | undefined
@@ -31,6 +29,8 @@ type Extra = {
 }
 
 type Children = (VNode | VSNode)[]
+
+type Attrs = { [key: string]: string }
 
 export interface VSNode {
     id: number
@@ -57,7 +57,8 @@ export enum RecordType {
     'LOCATION',
     'AUDIO',
     'CANVAS',
-    'NONE'
+    'NONE',
+    'TERMINATE'
 }
 
 export enum FormElementEvent {
@@ -72,6 +73,11 @@ export enum MouseEventType {
     'CLICK'
 }
 
+export interface TerminateRecord {
+    type: RecordType.TERMINATE
+    data: null
+    time: string
+}
 export interface WindowRecord {
     type: RecordType.WINDOW
     data: WindowWatcherData
@@ -224,7 +230,7 @@ export interface CanvasInitRecordData {
     src: string
 }
 
-export type RecordEvent<T> = (e: T) => void
+export type RecordEvent<T extends RecordData | SnapshotData> = (e: T) => void
 
 export type RecordData =
     | FormElementRecord
@@ -236,6 +242,7 @@ export type RecordData =
     | NONERecord
     | LocationRecord
     | CanvasRecord
+    | TerminateRecord
 
 export interface AudioData {
     src: string
@@ -271,6 +278,15 @@ export interface ReplayOptions {
     receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string
     autoplay?: boolean
+    replayDataList?: ReplayData[]
+    replayDataListName?: string
+}
+
+export interface ReplayData {
+    index?: number
+    snapshot: SnapshotData
+    records: RecordData[]
+    audio: AudioData
 }
 
 export enum TransactionMode {
@@ -279,4 +295,7 @@ export enum TransactionMode {
     'VERSIONCHANGE' = 'versionchange'
 }
 
-export type WatcherOptions<T> = { context: Window; emit: RecordEvent<T> }
+export type WatcherOptions<T extends RecordData | SnapshotData> = { context: Window; emit: RecordEvent<T> }
+export interface Constructable<T> {
+    new (...args: any): T
+}

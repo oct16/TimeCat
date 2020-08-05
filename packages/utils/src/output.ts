@@ -143,7 +143,7 @@ async function getDataFromDB(exportOptions?: ExportOptions) {
 }
 
 function extract(
-    replayDataList: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }[],
+    replayDataList: ReplayData[],
     exportOptions?: ExportOptions
 ) {
     return replayDataList.map(replayData => {
@@ -212,7 +212,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     injectScripts(html, [{ src: replayData }])
 }
 
-async function makeCssInline(dataList: { snapshot: SnapshotData; records: RecordData[]; audio: AudioData }[]) {
+async function makeCssInline(dataList: ReplayData[]) {
     const extractLinkList: VNode[] = []
     for (let k = 0; k < dataList.length; k++) {
         const data = dataList[k]

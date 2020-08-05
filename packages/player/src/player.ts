@@ -153,7 +153,7 @@ export class PlayerComponent {
             return
         }
 
-        const nextIndex = rData.index + 1
+        const nextIndex = rData.index! + 1
         if (nextIndex > list.length - 1) {
             return
         }

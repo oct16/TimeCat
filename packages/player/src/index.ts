@@ -11,7 +11,7 @@ import {
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
-import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions } from '@timecat/share'
+import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions, ReplayData } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
 import smoothScroll from 'smoothscroll-polyfill'
 
@@ -22,7 +22,8 @@ export async function replay(options: ReplayOptions) {
 
     window.__ReplayOptions__ = options
     smoothScroll.polyfill()
-    const replayData = await getReplayData()
+
+    const replayData = await getReplayData(options)
 
     if (!replayData) {
         throw new Error(
@@ -103,15 +104,12 @@ function getGZipData() {
     const str = pako.ungzip(codeArray, {
         to: 'string'
     })
-    const replayData = JSON.parse(str) as Array<{
-        snapshot: SnapshotData
-        records: RecordData[]
-        audio: AudioData
-    }>
+    const replayDataList = JSON.parse(str) as ReplayData[]
+
     if (isDev) {
-        ;(window as any).data = replayData
+        ;(window as any).data = replayDataList
     }
-    return replayData
+    return replayDataList
 }
 
 function dispatchEvent(type: string, data: RecordData) {
@@ -121,7 +119,7 @@ function dispatchEvent(type: string, data: RecordData) {
 
 async function dataReceiver(
     receiver: (sender: (data: SnapshotData | RecordData) => void) => void
-): Promise<Array<{ snapshot: SnapshotData; records: RecordData[]; audio: AudioData }>> {
+): Promise<ReplayData[]> {
     return await new Promise(resolve => {
         let initialized = false
         receiver(data => {
@@ -155,10 +153,11 @@ async function getDataFromDB() {
     return null
 }
 
-async function getReplayData() {
-    const { receiver } = window.__ReplayOptions__
+async function getReplayData(options: ReplayOptions) {
+    const { receiver } = options
 
     const replayDataList =
+        options.replayDataList ||
         (receiver && (await dataReceiver(receiver))) ||
         getGZipData() ||
         (await getDataFromDB()) ||

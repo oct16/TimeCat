@@ -27,20 +27,18 @@ declare interface HTMLInputElement {
 }
 
 interface Window {
+    HTMLElement: typeof HTMLElement
+    HTMLInputElement: typeof HTMLInputElement
+    HTMLInputElement: typeof HTMLInputElement
+    HTMLSelectElement: typeof HTMLSelectElement
+    HTMLTextAreaElement: typeof HTMLTextAreaElement
+    Object: typeof Object
+
     __ReplayStrData__: string
 
-    __ReplayDataList__: Array<{
-        snapshot: SnapshotData
-        records: RecordData[]
-        audio: AudioData
-    }>
+    __ReplayDataList__: ReplayData[]
 
-    __ReplayData__: {
-        index: number
-        snapshot: SnapshotData
-        records: RecordData[]
-        audio: AudioData
-    }
+    __ReplayData__: ReplayData
 
     __RecordOptions__: RecordOptions
     __ReplayOptions__: ReplayOptions
@@ -62,6 +60,13 @@ interface Window {
 
 interface Event {
     arguments: any
+}
+
+declare interface ReplayData {
+    index?: number
+    snapshot: SnapshotData
+    records: RecordData[]
+    audio: AudioData
 }
 
 declare interface LocationRecordData {
@@ -264,6 +269,7 @@ declare type RecordData =
     | NONERecord
     | LocationRecord
     | CanvasRecord
+    | TerminateRecord
 
 declare interface RecorderOptions {
     sampleBits: 8 | 16
@@ -288,7 +294,8 @@ declare enum RecordType {
     'LOCATION' = 6,
     'AUDIO' = 7,
     'CANVAS' = 8,
-    'NONE' = 9
+    'NONE' = 9,
+    'TERMINATE' = 10
 }
 
 declare interface RemoveUpdateData {
@@ -359,4 +366,10 @@ declare interface WindowWatcherData {
     id: number | null
     width: number
     height: number
+}
+
+declare interface TerminateRecord {
+    type: RecordType.TERMINATE
+    data: null
+    time: string
 }
