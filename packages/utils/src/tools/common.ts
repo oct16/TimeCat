@@ -1,4 +1,5 @@
 import diff from 'diff'
+import { radix64 } from './radix64'
 import {
     VNode,
     VSNode,
@@ -16,8 +17,12 @@ export function logger(data: any) {
     console.log('record', data)
 }
 
-export function getTime() {
-    return performance.timing.navigationStart + performance.now()
+export function getTime(): number {
+    return ~~performance.timing.navigationStart + performance.now()
+}
+
+export function getRadix64TimeStr() {
+    return radix64.btoa(getTime())
 }
 
 export function getRandomCode() {
