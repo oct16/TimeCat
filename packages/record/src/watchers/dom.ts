@@ -1,5 +1,5 @@
 import { createFlatVNode } from '@timecat/virtual-dom'
-import { getTime, nodeStore, uninstallStore, isVNode, isExistingNode } from '@timecat/utils'
+import { isVNode, isExistingNode } from '@timecat/utils'
 import {
     WatcherOptions,
     RecordEvent,
@@ -33,7 +33,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             childList: true,
             subtree: true
         })
-        uninstallStore.add(() => Watcher.disconnect())
+        this.uninstall(() => Watcher.disconnect())
     }
 
     mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord>) {
@@ -46,16 +46,16 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         const attrNodesArray: { key: string; node: Node; oldValue: string | null }[] = []
 
         const textNodesSet: Set<Node> = new Set()
-
+        const context = this
         function deepAdd(n: Node, target?: Node) {
-            const id = nodeStore.getNodeId(n)
+            const id = context.getNodeId(n)
             if (id) {
                 if (target) {
                     // if exist, go to move and delete in removedSet
                     moveNodesSet.add(n)
                     removeNodesMap.delete(n)
 
-                    const targetId = nodeStore.getNodeId(target)
+                    const targetId = context.getNodeId(target)
                     if (targetId) {
                         // mark as entry
                         moveMarkSet.add(targetId + '@' + id)
@@ -79,8 +79,8 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 return
             }
 
-            const id = nodeStore.getNodeId(n)
-            const pId = nodeStore.getNodeId(n.parentNode!)
+            const id = context.getNodeId(n)
+            const pId = context.getNodeId(n.parentNode!)
 
             // shaking node if it hasn't joined the tree
             if (addNodesSet.has(n)) {
@@ -122,7 +122,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         const addedVNodesMap: Map<number, VNode> = new Map()
 
         addNodesSet.forEach(node => {
-            const parentId = nodeStore.getNodeId(node.parentNode!)!
+            const parentId = this.getNodeId(node.parentNode!)!
 
             const parentVn = addedVNodesMap.get(parentId)
 
@@ -136,7 +136,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
             addedNodes.push({
                 parentId,
-                nextId: nodeStore.getNodeId(node.nextSibling!) || null,
+                nextId: this.getNodeId(node.nextSibling!) || null,
                 node: vn
             })
 
@@ -147,18 +147,18 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
         const movedNodes: movedNodesData[] = []
         moveNodesSet.forEach(node => {
-            const nodeId = nodeStore.getNodeId(node)!
+            const nodeId = this.getNodeId(node)!
             movedNodes.push({
-                parentId: nodeStore.getNodeId(node.parentNode!)!,
-                nextId: nodeStore.getNodeId(node.nextSibling!) || null,
+                parentId: this.getNodeId(node.parentNode!)!,
+                nextId: this.getNodeId(node.nextSibling!) || null,
                 id: nodeId
             })
         })
 
         const removedNodes: RemoveUpdateData[] = []
         removeNodesMap.forEach((parent, node) => {
-            const id = nodeStore.getNodeId(node)!
-            const parentId = nodeStore.getNodeId(parent)!
+            const id = this.getNodeId(node)!
+            const parentId = this.getNodeId(parent)!
 
             if (parentId) {
                 removedNodes.push({
@@ -176,7 +176,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                     if (oldValue === value) {
                         return null
                     }
-                    const id = nodeStore.getNodeId(node)
+                    const id = this.getNodeId(node)
                     return {
                         id,
                         key,
@@ -190,8 +190,8 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             .map(textNode => {
                 if (isExistingNode(textNode) && textNode.parentNode) {
                     return {
-                        id: nodeStore.getNodeId(textNode),
-                        parentId: nodeStore.getNodeId(textNode.parentNode as Element),
+                        id: this.getNodeId(textNode),
+                        parentId: this.getNodeId(textNode.parentNode as Element),
                         value: textNode.textContent
                     } as CharacterDataUpdateData
                 }
@@ -210,7 +210,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             this.emitterHook({
                 type: RecordType.DOM,
                 data,
-                time: getTime().toString()
+                time: this.getRadix64TimeStr()
             })
         }
     }

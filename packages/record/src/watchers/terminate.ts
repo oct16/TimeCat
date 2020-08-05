@@ -1,4 +1,3 @@
-import { getTime, uninstallStore } from '@timecat/utils'
 import { WatcherOptions, TerminateRecord, RecordType } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -11,7 +10,7 @@ export class TerminateWatcher extends Watcher<TerminateRecord> {
     init() {
         this.context.addEventListener('beforeunload', this.handleFn)
 
-        uninstallStore.add(() => {
+        this.uninstall(() => {
             this.context.removeEventListener('beforeunload', this.handleFn)
         })
     }
@@ -26,7 +25,7 @@ export class TerminateWatcher extends Watcher<TerminateRecord> {
         this.emitterHook({
             type: RecordType.TERMINATE,
             data: null,
-            time: getTime().toString()
+            time: this.getRadix64TimeStr()
         })
     }
 }

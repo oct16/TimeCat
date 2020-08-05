@@ -1,5 +1,5 @@
 import { WatcherOptions, RecordEvent } from '@timecat/share'
-import { uninstallStore, debounce, throttle, isDev, logger } from '@timecat/utils'
+import { uninstallStore, debounce, throttle, isDev, logger, getRadix64TimeStr, nodeStore } from '@timecat/utils'
 
 export class Watcher<T extends RecordData | SnapshotData> {
     context: Window
@@ -13,9 +13,17 @@ export class Watcher<T extends RecordData | SnapshotData> {
         this.emit = emit
     }
 
+    getRadix64TimeStr = getRadix64TimeStr
+    getNode = nodeStore.getNode.bind(nodeStore)
+    getNodeId = nodeStore.getNodeId.bind(nodeStore)
+
+    uninstall(fn: Function) {
+        uninstallStore.add(fn)
+    }
+
     emitterHook(data: T, callback?: (data: T) => T) {
         if (isDev) {
-            // logger(data)
+            logger(data)
         }
 
         if (callback) {
@@ -48,7 +56,7 @@ export class Watcher<T extends RecordData | SnapshotData> {
             })
             .forEach(handle => handle(listenerHandle))
 
-        uninstallStore.add(() => {
+        this.uninstall(() => {
             eventTypes.forEach(type => {
                 context.removeEventListener(type, listenerHandle, listenerOptions)
             })

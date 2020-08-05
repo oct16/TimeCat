@@ -1,5 +1,5 @@
 import diff from 'diff'
-import { radix64 } from './radix64'
+import { radix64 } from '../performance/radix64'
 import {
     VNode,
     VSNode,
@@ -14,11 +14,11 @@ import {
 export const isDev = process.env.NODE_ENV === 'development'
 
 export function logger(data: any) {
-    console.log('record', data)
+    // console.log('record', data)
 }
 
 export function getTime(): number {
-    return ~~performance.timing.navigationStart + performance.now()
+    return Math.floor(performance.timing.navigationStart + performance.now())
 }
 
 export function getRadix64TimeStr() {

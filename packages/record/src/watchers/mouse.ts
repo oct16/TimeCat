@@ -1,4 +1,4 @@
-import { getTime, throttle, uninstallStore, nodeStore } from '@timecat/utils'
+import { throttle } from '@timecat/utils'
 import { WatcherOptions, MouseRecord, RecordType, MouseEventType } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -26,7 +26,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
                         x,
                         y
                     },
-                    time: getTime().toString()
+                    time: this.getRadix64TimeStr()
                 })
             }
         }
@@ -38,7 +38,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
 
         this.context.document.addEventListener(name, listenerHandle)
 
-        uninstallStore.add(() => {
+        this.uninstall(() => {
             this.context.document.removeEventListener(name, listenerHandle)
         })
     }
@@ -56,14 +56,14 @@ export class MouseWatcher extends Watcher<MouseRecord> {
                         x,
                         y
                     },
-                    time: getTime().toString()
+                    time: this.getRadix64TimeStr()
                 })
             }
         }
 
         const name = 'click'
         const listenerHandle = throttle(evt, 250)
-        uninstallStore.add(() => {
+        this.uninstall(() => {
             this.context.document.removeEventListener(name, listenerHandle)
         })
         this.context.document.addEventListener(name, listenerHandle)
@@ -88,7 +88,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             }
 
             const position = {
-                id: nodeStore.getNodeId(node),
+                id: this.getNodeId(node),
                 x: event.offsetX,
                 y: event.offsetY
             }

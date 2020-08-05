@@ -1,6 +1,6 @@
 import { createElement } from '@timecat/virtual-dom'
 import { InfoData, SnapshotData, VNode, RecordType } from '@timecat/share'
-import { nodeStore, getTime } from '@timecat/utils'
+import { nodeStore, getRadix64TimeStr } from '@timecat/utils'
 
 function getInitInfo(context: Window): InfoData {
     const { name, publicId, systemId } = context.document.doctype || {}
@@ -33,7 +33,7 @@ function DOMSnapshot(context: Window): SnapshotData {
             vNode: createElement(context.document.documentElement) as VNode,
             ...getInitInfo(context)
         },
-        time: getTime().toString()
+        time: getRadix64TimeStr()
     }
 }
 

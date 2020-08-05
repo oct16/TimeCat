@@ -6,12 +6,13 @@ import {
     fmp,
     isSnapshot,
     classifyRecords,
-    isDev
+    isDev,
+    radix64
 } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
-import { SnapshotData, ReplayOptions, RecordData, AudioData, RecorderOptions, ReplayData } from '@timecat/share'
+import { SnapshotData, ReplayOptions, RecordData, RecorderOptions, ReplayData } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
 import smoothScroll from 'smoothscroll-polyfill'
 
@@ -156,12 +157,14 @@ async function getDataFromDB() {
 async function getReplayData(options: ReplayOptions) {
     const { receiver } = options
 
-    const replayDataList =
+    const rawReplayDataList =
         options.replayDataList ||
         (receiver && (await dataReceiver(receiver))) ||
         getGZipData() ||
         (await getDataFromDB()) ||
         window.__ReplayDataList__
+
+    const replayDataList = decodeDataList(rawReplayDataList)
 
     if (replayDataList) {
         window.__ReplayDataList__ = replayDataList
@@ -174,4 +177,16 @@ async function getReplayData(options: ReplayOptions) {
         return window.__ReplayData__
     }
     return null
+}
+
+function decodeDataList(list: ReplayData[]): ReplayData[] {
+    const { atob } = radix64
+    list.forEach(data => {
+        const { records, snapshot } = data
+        snapshot.time = snapshot.time.length < 8 ? atob.call(radix64, snapshot.time) + '' : snapshot.time
+        records.forEach(record => {
+            record.time = record.time.length < 8 ? atob.call(radix64, record.time) + '' : record.time
+        })
+    })
+    return list
 }

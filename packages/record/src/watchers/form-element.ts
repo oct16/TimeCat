@@ -1,4 +1,4 @@
-import { getTime, nodeStore, uninstallStore, getStrDiffPatches } from '@timecat/utils'
+import { getStrDiffPatches } from '@timecat/utils'
 import { WatcherOptions, FormElementEvent, RecordType, FormElementRecord } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -26,7 +26,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
             })
             .forEach(handle => handle(handleFn.bind(this)))
 
-        uninstallStore.add(() => {
+        this.uninstall(() => {
             eventTypes.forEach(type => {
                 context.document.removeEventListener(type, handleFn.bind(this), true)
             })
@@ -68,12 +68,12 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                         type: RecordType.FORM_EL,
                         data: {
                             type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
-                            id: nodeStore.getNodeId(e.target as Node)!,
+                            id: this.getNodeId(e.target as Node)!,
                             key,
                             value: !patches.length ? newValue : value,
                             patches
                         },
-                        time: getTime().toString()
+                        time: this.getRadix64TimeStr()
                     }
                     break
                 case 'focus':
@@ -81,9 +81,9 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                         type: RecordType.FORM_EL,
                         data: {
                             type: FormElementEvent.FOCUS,
-                            id: nodeStore.getNodeId(e.target as Node)!
+                            id: this.getNodeId(e.target as Node)!
                         },
-                        time: getTime().toString()
+                        time: this.getRadix64TimeStr()
                     }
                     break
                 case 'blur':
@@ -91,9 +91,9 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                         type: RecordType.FORM_EL,
                         data: {
                             type: FormElementEvent.BLUR,
-                            id: nodeStore.getNodeId(e.target as Node)!
+                            id: this.getNodeId(e.target as Node)!
                         },
-                        time: getTime().toString()
+                        time: this.getRadix64TimeStr()
                     }
                     break
                 default:
@@ -130,7 +130,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                     }
                 })
 
-                uninstallStore.add(() => {
+                this.uninstall(() => {
                     if (original) {
                         context.Object.defineProperty(target, key, original)
                     }
@@ -143,7 +143,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         function handleEvent(this: HTMLElement, key: string, value: string) {
             const data = {
                 type: FormElementEvent.PROP,
-                id: nodeStore.getNodeId(this)!,
+                id: self.getNodeId(this)!,
                 key,
                 value
             }
@@ -151,7 +151,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
             self.emitterHook({
                 type: RecordType.FORM_EL,
                 data,
-                time: getTime().toString()
+                time: self.getRadix64TimeStr()
             })
         }
     }
