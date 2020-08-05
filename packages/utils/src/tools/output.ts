@@ -1,6 +1,6 @@
 import { TPL, pacmanCss } from './tpl'
-import { getDBOperator } from './store/idb'
-import { isDev, classifyRecords, download, getRandomCode, getTime, isVNode } from './tools/common'
+import { getDBOperator } from '../store/idb'
+import { isDev, classifyRecords, download, getRandomCode, getTime, isVNode } from './common'
 import pako from 'pako'
 import {
     VNode,
@@ -13,9 +13,9 @@ import {
     RecordType
 } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
-import { getScript } from './tools/dom'
-import { recoverNative } from './polyfill/recover-native'
-import { nodeStore } from './store/node'
+import { getScript } from './dom'
+import { recoverNative } from '../polyfill/recover-native'
+import { nodeStore } from '../store/node'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }

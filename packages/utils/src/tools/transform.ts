@@ -1,5 +1,5 @@
 import { RecorderOptions } from '@timecat/share'
-import { download, isDev } from './tools/common'
+import { download, isDev } from './common'
 
 function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
     const { sampleBits } = opts

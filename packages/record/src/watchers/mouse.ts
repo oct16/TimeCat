@@ -1,4 +1,4 @@
-import { getOffsetPosition, getTime, throttle, uninstallStore } from '@timecat/utils'
+import { getTime, throttle, uninstallStore, nodeStore } from '@timecat/utils'
 import { WatcherOptions, MouseRecord, RecordType, MouseEventType } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -15,7 +15,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
 
     mouseMove() {
         const evt = (e: MouseEvent) => {
-            const offsetPosition = getOffsetPosition(e, this.context)
+            const offsetPosition = this.getOffsetPosition(e, this.context)
             if (offsetPosition) {
                 const { x, y, id } = offsetPosition
                 this.emitterHook({
@@ -45,7 +45,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
 
     mouseClick() {
         const evt = (e: MouseEvent) => {
-            const offsetPosition = getOffsetPosition(e, this.context)
+            const offsetPosition = this.getOffsetPosition(e, this.context)
             if (offsetPosition) {
                 const { x, y, id } = offsetPosition
                 this.emitterHook({
@@ -67,5 +67,40 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             this.context.document.removeEventListener(name, listenerHandle)
         })
         this.context.document.addEventListener(name, listenerHandle)
+    }
+
+    getOffsetPosition(event: MouseEvent, context: Window) {
+        const { mode } = context.__RecordOptions__
+
+        const { view, target, offsetX: x, offsetY: y } = event
+
+        if (view === context) {
+            const doc = (<HTMLElement>target).ownerDocument!
+
+            function isInline(target: HTMLElement) {
+                return context.getComputedStyle(target).display === 'inline'
+            }
+
+            let node = target as HTMLElement
+
+            while (isInline(node as HTMLElement)) {
+                node = node.parentElement!
+            }
+
+            const position = {
+                id: nodeStore.getNodeId(node),
+                x: event.offsetX,
+                y: event.offsetY
+            }
+
+            const frameElement = doc?.defaultView?.frameElement as HTMLElement
+            if (frameElement && mode === 'default') {
+                position.y += frameElement.offsetTop
+                position.x += frameElement.offsetLeft
+            }
+
+            return position
+        }
+        return false
     }
 }
