@@ -27,7 +27,7 @@ export class PointerComponent {
         if (this.pointer.hasAttribute('active')) {
             return
         }
-        delay(100)
+        await delay(100)
         setAttribute(this.pointer, 'active', '')
         await delay(400)
         setAttribute(this.pointer, 'active', null)
