@@ -305,9 +305,11 @@ declare interface RemoveUpdateData {
 
 declare interface ReplayOptions {
     mode?: 'live' | 'default'
+    fetch?: { url: string; options?: RequestInit }
     receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string
     autoplay?: boolean
+    replayDataList?: ReplayData[]
 }
 
 declare type ScriptItem = {

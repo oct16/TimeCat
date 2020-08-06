@@ -118,6 +118,10 @@ function dispatchEvent(type: string, data: RecordData) {
     window.dispatchEvent(event)
 }
 
+async function fetchData(input: RequestInfo, init?: RequestInit) {
+    return fetch(input, init).then(res => res.json())
+}
+
 async function dataReceiver(
     receiver: (sender: (data: SnapshotData | RecordData) => void) => void
 ): Promise<ReplayData[]> {
@@ -155,10 +159,11 @@ async function getDataFromDB() {
 }
 
 async function getReplayData(options: ReplayOptions) {
-    const { receiver } = options
+    const { receiver, replayDataList: data, fetch } = options
 
     const rawReplayDataList =
-        options.replayDataList ||
+        data ||
+        (fetch && (await fetchData(fetch.url, fetch.options))) ||
         (receiver && (await dataReceiver(receiver))) ||
         getGZipData() ||
         (await getDataFromDB()) ||
