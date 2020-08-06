@@ -1,6 +1,5 @@
 import { Recorder } from './audio-recorder'
 import { AudioRecord, RecordType, WatcherOptions } from '@timecat/share'
-import { getTime, uninstallStore } from '@timecat/utils'
 import { Watcher } from '../watchers/watcher'
 
 export class RecordAudio extends Watcher<AudioRecord> {
@@ -18,7 +17,7 @@ export class RecordAudio extends Watcher<AudioRecord> {
 
         recorder.start()
 
-        uninstallStore.add(() => {
+        this.uninstall(() => {
             recorder.stop()
         })
 
@@ -28,7 +27,7 @@ export class RecordAudio extends Watcher<AudioRecord> {
                 type: 'opts',
                 data: recorder.getOptions()
             },
-            time: getTime().toString()
+            time: this.getRadix64TimeStr()
         })
 
         recorder.onProgress = audioBase64Data => {
@@ -38,7 +37,7 @@ export class RecordAudio extends Watcher<AudioRecord> {
                     type: 'base64',
                     data: audioBase64Data
                 },
-                time: getTime().toString()
+                time: this.getRadix64TimeStr()
             })
         }
     }

@@ -1,4 +1,3 @@
-import { nodeStore, getTime, uninstallStore } from '@timecat/utils'
 import { WatcherOptions, CanvasRecord, RecordType } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -14,14 +13,14 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
         const self = this
         const canvasElements = document.getElementsByTagName('canvas')
         Array.from(canvasElements).forEach(canvas => {
-            var dataURL = canvas.toDataURL()
+            const dataURL = canvas.toDataURL()
             this.emitterHook({
                 type: RecordType.CANVAS,
                 data: {
-                    id: nodeStore.getNodeId(canvas)!,
+                    id: this.getNodeId(canvas)!,
                     src: dataURL
                 },
-                time: getTime().toString()
+                time: this.getRadix64TimeStr()
             })
         })
 
@@ -39,7 +38,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
             Object.defineProperty(ctxProto, name, {
                 get() {
                     const context = this
-                    const id = nodeStore.getNodeId(this.canvas)!
+                    const id = this.getNodeId(this.canvas)!
 
                     return typeof method === 'function'
                         ? function() {
@@ -54,14 +53,14 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                         : null
                 },
                 set: function(value: any) {
-                    const id = nodeStore.getNodeId(this.canvas)!
+                    const id = this.getNodeId(this.canvas)!
                     self.aggregateDataEmitter(id, name, value)
 
                     return original.set?.apply(this, arguments)
                 }
             })
 
-            uninstallStore.add(() => {
+            this.uninstall(() => {
                 Object.defineProperty(ctxProto, name, original)
             })
         })
@@ -74,7 +73,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                 id,
                 strokes
             },
-            time: getTime().toString()
+            time: this.getRadix64TimeStr()
         })
     }, 100)
 

@@ -1,4 +1,3 @@
-import { getTime, nodeStore } from '@timecat/utils'
 import { WatcherOptions, ScrollRecord, RecordType } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -33,11 +32,11 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
         this.emitterHook({
             type: RecordType.SCROLL,
             data: {
-                id: nodeStore.getNodeId(element) || null, // if null, target is document
+                id: this.getNodeId(element) || null, // if null, target is document
                 top: this.scrollTop(element),
                 left: this.scrollLeft(element)
             },
-            time: getTime().toString()
+            time: this.getRadix64TimeStr()
         })
     }
 

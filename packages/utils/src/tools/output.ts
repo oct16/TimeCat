@@ -1,6 +1,6 @@
 import { TPL, pacmanCss } from './tpl'
-import { getDBOperator } from './store/idb'
-import { isDev, classifyRecords, download, getRandomCode, getTime, isVNode } from './tools/common'
+import { getDBOperator } from '../store/idb'
+import { isDev, classifyRecords, download, getRandomCode, isVNode, getRadix64TimeStr } from './common'
 import pako from 'pako'
 import {
     VNode,
@@ -13,9 +13,9 @@ import {
     RecordType
 } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
-import { getScript } from './tools/dom'
-import { recoverNative } from './polyfill/recover-native'
-import { nodeStore } from './store/node'
+import { getScript } from './dom'
+import { recoverNative } from '../polyfill/recover-native'
+import { nodeStore } from '../store/node'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
@@ -59,7 +59,7 @@ async function addNoneFrame() {
         DBOperator.add({
             type: RecordType.NONE,
             data: null,
-            time: getTime().toString()
+            time: getRadix64TimeStr()
         } as NONERecord)
     }
 }
@@ -142,10 +142,7 @@ async function getDataFromDB(exportOptions?: ExportOptions) {
     return null
 }
 
-function extract(
-    replayDataList: ReplayData[],
-    exportOptions?: ExportOptions
-) {
+function extract(replayDataList: ReplayData[], exportOptions?: ExportOptions) {
     return replayDataList.map(replayData => {
         if (exportOptions && exportOptions.audioExternal) {
             replayData.audio = extractAudio(replayData.audio)

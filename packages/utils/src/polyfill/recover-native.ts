@@ -22,7 +22,7 @@ class RecoverNative {
             return target
         }
 
-        var pathArray = this.getMethodAtPath(path)
+        const pathArray = this.getMethodAtPath(path)
 
         let method = target
         pathArray.forEach(key => {
@@ -57,17 +57,17 @@ class RecoverNative {
      */
     private isNative(value: Function) {
         // Used to resolve the internal `[[Class]]` of values
-        var toString = Object.prototype.toString
+        const toString = Object.prototype.toString
 
         // Used to resolve the decompiled source of functions
-        var fnToString = Function.prototype.toString
+        const fnToString = Function.prototype.toString
 
         // Used to detect host constructors (Safari > 4; really typed array specific)
-        var reHostCtor = /^\[object .+?Constructor\]$/
+        const reHostCtor = /^\[object .+?Constructor\]$/
 
         // Compile a regexp using a common native method as a template.
         // We chose `Object#toString` because there's a good chance it is not being mucked with.
-        var reNative = RegExp(
+        const reNative = RegExp(
             '^' +
                 // Coerce `Object#toString` to a string
                 String(toString)
@@ -79,7 +79,7 @@ class RecoverNative {
                     .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') +
                 '$'
         )
-        var type = typeof value
+        const type = typeof value
         return type == 'function'
             ? // Use `Function#toString` to bypass the value's own `toString` method
               // and avoid being faked out.

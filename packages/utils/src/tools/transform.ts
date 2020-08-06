@@ -1,5 +1,5 @@
 import { RecorderOptions } from '@timecat/share'
-import { download, isDev } from './tools/common'
+import { download, isDev } from './common'
 
 function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
     const { sampleBits } = opts
@@ -102,8 +102,8 @@ function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRa
 }
 
 function writeUTFBytes(view: DataView, offset: number, string: string) {
-    var lng = string.length
-    for (var i = 0; i < lng; i++) {
+    const len = string.length
+    for (let i = 0; i < len; i++) {
         view.setUint8(offset + i, string.charCodeAt(i))
     }
 }

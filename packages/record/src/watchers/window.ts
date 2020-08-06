@@ -1,4 +1,3 @@
-import { getTime, nodeStore } from '@timecat/utils'
 import { WatcherOptions, WindowRecord, RecordType } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -35,11 +34,11 @@ export class WindowWatcher extends Watcher<WindowRecord> {
         this.emitterHook({
             type: RecordType.WINDOW,
             data: {
-                id: nodeStore.getNodeId(target) || null,
+                id: this.getNodeId(target) || null,
                 width: this.width(),
                 height: this.height()
             },
-            time: getTime().toString()
+            time: this.getRadix64TimeStr()
         })
     }
 }

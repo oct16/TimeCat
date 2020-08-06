@@ -1,4 +1,5 @@
 import diff from 'diff'
+import { radix64 } from '../performance/radix64'
 import {
     VNode,
     VSNode,
@@ -13,11 +14,15 @@ import {
 export const isDev = process.env.NODE_ENV === 'development'
 
 export function logger(data: any) {
-    console.log('record', data)
+    // console.log('record', data)
 }
 
-export function getTime() {
-    return performance.timing.navigationStart + performance.now()
+export function getTime(): number {
+    return Math.floor(performance.timing.navigationStart + performance.now())
+}
+
+export function getRadix64TimeStr() {
+    return radix64.btoa(getTime())
 }
 
 export function getRandomCode() {
@@ -98,7 +103,7 @@ export function isVNode(n: VNode | VSNode) {
 }
 
 export function download(src: Blob | string, name: string) {
-    var tag = document.createElement('a')
+    const tag = document.createElement('a')
     tag.download = name
     if (typeof src === 'string') {
         tag.href = src

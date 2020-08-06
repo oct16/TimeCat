@@ -1,4 +1,3 @@
-import { getTime, nodeStore, uninstallStore } from '@timecat/utils'
 import { WatcherOptions, LocationRecord, RecordType } from '@timecat/share'
 import { Watcher } from './watcher'
 
@@ -16,7 +15,7 @@ export class LocationWatcher extends Watcher<LocationRecord> {
 
         types.forEach(type => this.toggleListener('add', type, this.locationHandle))
 
-        uninstallStore.add(() => {
+        this.uninstall(() => {
             types.forEach(type => this.toggleListener('rm', type, this.locationHandle))
         })
     }
@@ -26,7 +25,7 @@ export class LocationWatcher extends Watcher<LocationRecord> {
     }
 
     kidnapLocation(type: 'pushState' | 'replaceState') {
-        var original = this.context.history[type]
+        const original = this.context.history[type]
 
         return function(this: any) {
             const e = new Event(type)
@@ -48,11 +47,11 @@ export class LocationWatcher extends Watcher<LocationRecord> {
                 hash,
                 path
             },
-            time: getTime().toString()
+            time: this.getRadix64TimeStr()
         })
     }
 
     getContextNodeId(e: Event) {
-        return nodeStore.getNodeId((e.target as Window).document.documentElement)!
+        return this.getNodeId((e.target as Window).document.documentElement)!
     }
 }
