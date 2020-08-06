@@ -275,11 +275,11 @@ export type IRecorderStatus = 'PAUSE' | 'RECORDING' | 'STOP'
 
 export interface ReplayOptions {
     mode?: 'live' | 'default'
+    fetch?: { url: string; options?: RequestInit }
     receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string
     autoplay?: boolean
     replayDataList?: ReplayData[]
-    replayDataListName?: string
 }
 
 export interface ReplayData {

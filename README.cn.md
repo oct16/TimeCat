@@ -101,6 +101,8 @@ ctrl.unsubscribe()
 // replay record
 interface ReplayOptions {
     mode?: 'live' | 'default' // mode
+    replayDataList?: ReplayData[] // data from options
+    fetch?: { url: string; options?: RequestInit } // data from server
     // receive data in live mode
     receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
     proxy?: string // if cross domain
