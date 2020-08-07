@@ -253,12 +253,6 @@ declare interface movedNodesData {
     nextId: number | null
 }
 
-declare interface NONERecord {
-    type: RecordType.NONE
-    data: null
-    time: string
-}
-
 declare type RecordData =
     | FormElementRecord
     | DOMRecord
@@ -266,7 +260,6 @@ declare type RecordData =
     | WindowRecord
     | ScrollRecord
     | AudioRecord
-    | NONERecord
     | LocationRecord
     | CanvasRecord
     | TerminateRecord
@@ -294,8 +287,7 @@ declare enum RecordType {
     'LOCATION' = 6,
     'AUDIO' = 7,
     'CANVAS' = 8,
-    'NONE' = 9,
-    'TERMINATE' = 10
+    'TERMINATE' = 9
 }
 
 declare interface RemoveUpdateData {

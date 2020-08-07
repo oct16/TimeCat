@@ -57,7 +57,6 @@ export enum RecordType {
     'LOCATION',
     'AUDIO',
     'CANVAS',
-    'NONE',
     'TERMINATE'
 }
 
@@ -192,12 +191,6 @@ export interface AudioStrList {
     data: string[]
 }
 
-export interface NONERecord {
-    type: RecordType.NONE
-    data: null
-    time: string
-}
-
 export interface LocationRecord {
     type: RecordType.LOCATION
     data: LocationRecordData
@@ -239,7 +232,6 @@ export type RecordData =
     | WindowRecord
     | ScrollRecord
     | AudioRecord
-    | NONERecord
     | LocationRecord
     | CanvasRecord
     | TerminateRecord

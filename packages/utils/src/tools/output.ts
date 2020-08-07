@@ -8,7 +8,7 @@ import {
     RecordData,
     AudioData,
     RecorderOptions,
-    NONERecord,
+    TerminateRecord,
     SnapshotData,
     RecordType
 } from '@timecat/share'
@@ -57,10 +57,10 @@ async function addNoneFrame() {
 
     if (count) {
         DBOperator.add({
-            type: RecordType.NONE,
+            type: RecordType.TERMINATE,
             data: null,
             time: getRadix64TimeStr()
-        } as NONERecord)
+        } as TerminateRecord)
     }
 }
 
