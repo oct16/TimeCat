@@ -14,7 +14,7 @@ import {
     DOMUpdateDataType,
     CharacterDataUpdateData
 } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
     constructor(options: WatcherOptions<DOMRecord>) {

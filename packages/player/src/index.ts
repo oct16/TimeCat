@@ -12,27 +12,34 @@ import {
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
-import { SnapshotData, ReplayOptions, RecordData, RecorderOptions, ReplayData } from '@timecat/share'
+import {
+    SnapshotRecord,
+    ReplayOptions,
+    RecordData,
+    RecorderOptions,
+    ReplayData,
+    ReplayPack,
+    RecordType,
+    ReplayHead
+} from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
 import smoothScroll from 'smoothscroll-polyfill'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
 
 export async function replay(options: ReplayOptions) {
-    options = Object.assign(defaultReplayOptions, options)
+    const opts = { ...defaultReplayOptions, ...options }
 
-    window.__ReplayOptions__ = options
+    window.__ReplayOptions__ = opts
     smoothScroll.polyfill()
 
-    const replayData = await getReplayData(options)
+    const replayPacks = await getReplayData(opts)
 
-    if (!replayData) {
-        throw new Error(
-            'window.__ReplayDataList__ not found, you should inject to the global or DB, see demos: https://oct16.github.io/TimeCat'
-        )
+    if (!replayPacks) {
+        return
     }
 
-    const { records, audio } = replayData
+    const { records, audio } = (window.__ReplayData__ = getFirstReplayData(replayPacks))
     const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
     const c = new ContainerComponent()
@@ -49,14 +56,20 @@ export async function replay(options: ReplayOptions) {
         if (records.length) {
             const firstRecord = records[0]
 
-            const replayList = window.__ReplayDataList__
+            const replayPacks = window.__ReplayPacks__ as ReplayPack[]
             const startTime = firstRecord.time
             const endTime =
-                replayList
-                    .map(r => r.records)
-                    .reduce((acc, records) => {
-                        return acc + (+records.slice(-1)[0].time - +records[0].time)
-                    }, 0) + +startTime
+                replayPacks.reduce((packAcc, pack) => {
+                    return (
+                        packAcc +
+                        pack.BODY.map((replayData: ReplayData) => replayData.records).reduce(
+                            (acc: number, records: RecordData[]) => {
+                                return acc + (+records.slice(-1)[0].time - +records[0].time)
+                            },
+                            0
+                        )
+                    )
+                }, 0) + +startTime
 
             reduxStore.dispatch({
                 type: ProgressTypes.INFO,
@@ -69,7 +82,7 @@ export async function replay(options: ReplayOptions) {
                 }
             })
 
-            if (options.autoplay || hasAudio) {
+            if (opts.autoplay || hasAudio) {
                 reduxStore.dispatch({
                     type: PlayerTypes.SPEED,
                     data: { speed: 1 }
@@ -86,11 +99,12 @@ export async function replay(options: ReplayOptions) {
     }
 }
 
+function getFirstReplayData(replayPacks: ReplayPack[]) {
+    return replayPacks[0].BODY[0]
+}
+
 function getGZipData() {
-    if (isDev) {
-        ;(window as any).pako = pako
-    }
-    const data = window.__ReplayStrData__
+    const data = window.__ReplayStrPacks__
     if (!data) {
         return null
     }
@@ -105,12 +119,9 @@ function getGZipData() {
     const str = pako.ungzip(codeArray, {
         to: 'string'
     })
-    const replayDataList = JSON.parse(str) as ReplayData[]
+    const packs = JSON.parse(str) as ReplayData[]
 
-    if (isDev) {
-        ;(window as any).data = replayDataList
-    }
-    return replayDataList
+    return packs
 }
 
 function dispatchEvent(type: string, data: RecordData) {
@@ -118,29 +129,43 @@ function dispatchEvent(type: string, data: RecordData) {
     window.dispatchEvent(event)
 }
 
-async function fetchData(input: RequestInfo, init?: RequestInit) {
+async function fetchData(input: RequestInfo, init?: RequestInit): Promise<ReplayPack[]> {
     return fetch(input, init).then(res => res.json())
 }
 
-async function dataReceiver(
-    receiver: (sender: (data: SnapshotData | RecordData) => void) => void
-): Promise<ReplayData[]> {
+async function dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<ReplayPack[]> {
+    let replayPack: ReplayPack
+    let HEAD: ReplayHead
+    const BODY: ReplayData[] = []
     return await new Promise(resolve => {
-        let initialized = false
         receiver(data => {
-            if (initialized) {
+            if (replayPack) {
                 dispatchEvent('record-data', data as RecordData)
             } else {
-                if (data && isSnapshot(data)) {
-                    resolve([
-                        {
-                            snapshot: data as SnapshotData,
+                if (!data) {
+                    return
+                }
+
+                if (data.type === RecordType.HEAD) {
+                    HEAD = data.data
+                } else if (data && isSnapshot(data)) {
+                    if (HEAD && BODY) {
+                        BODY.push({
+                            snapshot: data as SnapshotRecord,
                             records: [],
                             audio: { src: '', bufferStrList: [], subtitles: [], opts: {} as RecorderOptions }
+                        })
+
+                        replayPack = {
+                            HEAD,
+                            BODY
                         }
-                    ])
-                    fmp.observe()
-                    initialized = true
+
+                        resolve([replayPack])
+                        fmp.observe()
+                    }
+                } else {
+                    throw new Error('TimeCat Error: ReplayHead not found')
                 }
             }
         })
@@ -159,39 +184,40 @@ async function getDataFromDB() {
 }
 
 async function getReplayData(options: ReplayOptions) {
-    const { receiver, replayDataList: data, fetch } = options
+    const { receiver, replayPacks: data, fetch } = options
 
-    const rawReplayDataList =
+    const rawReplayPacks =
         data ||
         (fetch && (await fetchData(fetch.url, fetch.options))) ||
         (receiver && (await dataReceiver(receiver))) ||
         getGZipData() ||
         (await getDataFromDB()) ||
-        window.__ReplayDataList__
+        window.__ReplayPacks__
 
-    const replayDataList = decodeDataList(rawReplayDataList)
-
-    if (replayDataList) {
-        window.__ReplayDataList__ = replayDataList
-        window.__ReplayData__ = Object.assign(
-            {
-                index: 0
-            },
-            replayDataList[0]
-        )
-        return window.__ReplayData__
+    if (!rawReplayPacks) {
+        throw new Error('TimeCat Error: Replay data not found')
     }
+
+    const replayPacks = decodePacks(rawReplayPacks)
+
+    if (replayPacks) {
+        window.__ReplayPacks__ = replayPacks
+        return replayPacks
+    }
+
     return null
 }
 
-function decodeDataList(list: ReplayData[]): ReplayData[] {
+function decodePacks(packs: ReplayPack[]): ReplayPack[] {
     const { atob } = radix64
-    list.forEach(data => {
-        const { records, snapshot } = data
-        snapshot.time = snapshot.time.length < 8 ? atob.call(radix64, snapshot.time) + '' : snapshot.time
-        records.forEach(record => {
-            record.time = record.time.length < 8 ? atob.call(radix64, record.time) + '' : record.time
+    packs.forEach(pack => {
+        pack.BODY.forEach(data => {
+            const { records, snapshot } = data
+            snapshot.time = snapshot.time.length < 8 ? atob.call(radix64, snapshot.time) + '' : snapshot.time
+            records.forEach(record => {
+                record.time = record.time.length < 8 ? atob.call(radix64, record.time) + '' : record.time
+            })
         })
     })
-    return list
+    return packs
 }

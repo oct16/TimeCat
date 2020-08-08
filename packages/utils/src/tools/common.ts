@@ -3,12 +3,14 @@ import { radix64 } from '../performance/radix64'
 import {
     VNode,
     VSNode,
-    SnapshotData,
+    SnapshotRecord,
     RecordData,
     AudioRecord,
     AudioStrList,
     RecorderOptions,
-    RecordType
+    RecordType,
+    ReplayData,
+    ReplayPack
 } from '@timecat/share'
 
 export const isDev = process.env.NODE_ENV === 'development'
@@ -25,8 +27,8 @@ export function getRadix64TimeStr() {
     return radix64.btoa(getTime())
 }
 
-export function getRandomCode() {
-    const code = (Math.random() * 20 + 16).toString(36).substring(4, 10)
+export function getRandomCode(len: 6 | 7 | 8 = 8) {
+    const code = (Math.random() * 20 + 16).toString(36).substring(2, len + 2)
     return code.toUpperCase()
 }
 
@@ -50,47 +52,69 @@ export function toTimeStamp(timeStr: string) {
     return (+hour * 3600 + +min * 60 + +sec) * 1000
 }
 
-export function isSnapshot(frame: RecordData | SnapshotData) {
-    return (frame as SnapshotData).type === RecordType.SNAPSHOT && !(frame as SnapshotData).data.frameId
+export function isSnapshot(frame: RecordData) {
+    return (frame as SnapshotRecord).type === RecordType.SNAPSHOT && !(frame as SnapshotRecord).data.frameId
 }
 
-export function classifyRecords(data: (SnapshotData | RecordData)[]) {
-    const dataList: ReplayData[] = []
+export function classifyRecords(records: RecordData[]) {
+    const packs: ReplayPack[] = []
 
     function isAudioBufferStr(frame: AudioRecord) {
         return frame.data.type === 'base64'
     }
-    function isAudio(frame: RecordData | SnapshotData) {
-        return (frame as RecordData).type === RecordType.AUDIO
-    }
 
-    let dataBasket: ReplayData
-    data.forEach(item => {
-        if (isSnapshot(item)) {
-            dataBasket = {
-                snapshot: item as SnapshotData,
-                records: [],
-                audio: {
-                    src: '',
-                    bufferStrList: [],
-                    subtitles: [],
-                    opts: {} as RecorderOptions
+    let replayPack: ReplayPack
+    let replayData: ReplayData
+    records.forEach((record, index) => {
+        const next = records[index + 1]
+
+        switch (record.type) {
+            case RecordType.HEAD:
+                replayPack = {
+                    HEAD: record.data,
+                    BODY: []
                 }
-            }
-            dataList.push(dataBasket)
-        } else if (isAudio(item)) {
-            if (isAudioBufferStr(item as AudioRecord)) {
-                const audioData = item as AudioRecord
-                dataBasket.audio.bufferStrList.push(...(audioData.data as AudioStrList).data)
-            } else {
-                dataBasket.audio.opts = (item as AudioRecord).data.data as RecorderOptions
-            }
-        } else {
-            dataBasket.records.push(item as RecordData)
+                if (next && !(next.data as SnapshotRecord['data']).frameId) {
+                    if (replayPack) {
+                        packs.push(replayPack)
+                    }
+                }
+                break
+            case RecordType.SNAPSHOT:
+                if (!record.data.frameId) {
+                    replayData = {
+                        snapshot: record as SnapshotRecord,
+                        records: [],
+                        audio: {
+                            src: '',
+                            bufferStrList: [],
+                            subtitles: [],
+                            opts: {} as RecorderOptions
+                        }
+                    }
+                    if (replayData && replayPack) {
+                        replayPack.BODY.push(replayData)
+                    }
+                } else {
+                    replayData.records.push(record)
+                }
+                break
+            case RecordType.AUDIO:
+                if (isAudioBufferStr(record as AudioRecord)) {
+                    const audioData = record as AudioRecord
+                    replayData.audio.bufferStrList.push(...(audioData.data as AudioStrList).data)
+                } else {
+                    replayData.audio.opts = (record as AudioRecord).data.data as RecorderOptions
+                }
+                break
+
+            default:
+                replayData.records.push(record as RecordData)
+                break
         }
     })
 
-    return dataList
+    return packs
 }
 
 export async function delay(t = 200) {

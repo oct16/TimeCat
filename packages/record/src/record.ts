@@ -1,14 +1,13 @@
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, RecordOptions, SnapshotData, ValueOf } from '@timecat/share'
+import { RecordData, RecordOptions, SnapshotRecord, ValueOf } from '@timecat/share'
 import { uninstallStore, getDBOperator } from '@timecat/utils'
 import { Snapshot } from './snapshot'
+import { getHeadData } from './head'
 
 const defaultRecordOpts = { mode: 'default' } as RecordOptions
 
 function getRecorders(options: RecordOptions) {
-    options = Object.assign(defaultRecordOpts, options)
-
     const context = options.context || window
     context.__RecordOptions__ = options
 
@@ -23,7 +22,8 @@ function getRecorders(options: RecordOptions) {
 }
 
 export const record = (options: RecordOptions) => {
-    startRecord(options)
+    const opts = { ...defaultRecordOpts, ...options }
+    startRecord(opts)
     return {
         unsubscribe: () => {
             Array.from(uninstallStore.values()).forEach(un => un())
@@ -50,16 +50,27 @@ async function startRecord(options: RecordOptions) {
         ]
     }
 
+    function onEmit(options: RecordOptions) {
+        const { emitter } = options
+        return (data: RecordData) => {
+            if (!data) {
+                return
+            }
+            if (emitter) {
+                emitter(data, db)
+                return
+            }
+            db.addRecord(data)
+        }
+    }
+
+    const emit = onEmit(options)
+
+    emit(getHeadData())
     iframeWatchers.forEach(watcher => {
         new watcher({
             context: (options && options.context) || window,
-            emit(data: RecordData | SnapshotData) {
-                if (options && options.emitter) {
-                    options.emitter(data, db)
-                    return
-                }
-                db.add(data)
-            }
+            emit
         })
     })
 

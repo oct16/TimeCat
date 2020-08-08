@@ -9,8 +9,10 @@ import {
     AudioData,
     RecorderOptions,
     TerminateRecord,
-    SnapshotData,
-    RecordType
+    SnapshotRecord,
+    RecordType,
+    ReplayData,
+    ReplayPack
 } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './dom'
@@ -142,12 +144,15 @@ async function getDataFromDB(exportOptions?: ExportOptions) {
     return null
 }
 
-function extract(replayDataList: ReplayData[], exportOptions?: ExportOptions) {
-    return replayDataList.map(replayData => {
-        if (exportOptions && exportOptions.audioExternal) {
-            replayData.audio = extractAudio(replayData.audio)
-        }
-        return replayData
+function extract(replayDataList: ReplayPack[], exportOptions?: ExportOptions) {
+    return replayDataList.map(replayPack => {
+        replayPack.BODY.forEach(replayData => {
+            if (exportOptions && exportOptions.audioExternal) {
+                replayData.audio = extractAudio(replayData.audio)
+            }
+            return replayData
+        })
+        return replayPack
     })
 }
 
@@ -178,11 +183,7 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const data = (window.__ReplayDataList__ || (await getDataFromDB(exportOptions))) as {
-        snapshot: SnapshotData
-        records: RecordData[]
-        audio: AudioData
-    }[]
+    const data = (window.__ReplayPacks__ as ReplayPack[]) || (await getDataFromDB(exportOptions))
 
     if (!data) {
         return
@@ -204,12 +205,20 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
         outputStr += String.fromCharCode(num)
     }
 
-    const replayData = `var __ReplayStrData__ =  '${outputStr}'`
+    const replayData = `var __ReplayStrPacks__ =  '${outputStr}'`
 
     injectScripts(html, [{ src: replayData }])
 }
 
-async function makeCssInline(dataList: ReplayData[]) {
+async function makeCssInline(packs: ReplayPack[]) {
+    const dataList: ReplayData[] = []
+
+    packs.forEach(pack => {
+        pack.BODY.forEach(data => {
+            dataList.push(data)
+        })
+    })
+
     const extractLinkList: VNode[] = []
     for (let k = 0; k < dataList.length; k++) {
         const data = dataList[k]
@@ -264,7 +273,7 @@ async function makeCssInline(dataList: ReplayData[]) {
             // maybe cross
         }
     }
-    return dataList
+    return packs
 }
 
 function extractLink(node: VNode, extractLinkList: VNode[]) {

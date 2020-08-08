@@ -12,7 +12,7 @@ export interface InfoData {
     frameId: number | null
 }
 
-export interface SnapshotData {
+export interface SnapshotRecord {
     type: RecordType.SNAPSHOT
     data: {
         vNode: VNode
@@ -48,6 +48,7 @@ export interface VNode {
 }
 
 export enum RecordType {
+    'HEAD',
     'SNAPSHOT',
     'WINDOW',
     'SCROLL',
@@ -223,9 +224,11 @@ export interface CanvasInitRecordData {
     src: string
 }
 
-export type RecordEvent<T extends RecordData | SnapshotData> = (e: T) => void
+export type RecordEvent<T extends RecordData> = (e: T) => void
 
 export type RecordData =
+    | HeadRecord
+    | SnapshotRecord
     | FormElementRecord
     | DOMRecord
     | MouseRecord
@@ -253,7 +256,7 @@ export interface RecordOptions {
     mode?: 'live' | 'default'
     context?: Window
     audio?: boolean
-    emitter?: (data: RecordData | SnapshotData, db: any) => void
+    emitter?: (data: RecordData, db: any) => void
     // emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
 
@@ -265,29 +268,54 @@ export interface RecorderOptions {
 
 export type IRecorderStatus = 'PAUSE' | 'RECORDING' | 'STOP'
 
-export interface ReplayOptions {
-    mode?: 'live' | 'default'
-    fetch?: { url: string; options?: RequestInit }
-    receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
-    proxy?: string
-    autoplay?: boolean
-    replayDataList?: ReplayData[]
-}
-
-export interface ReplayData {
-    index?: number
-    snapshot: SnapshotData
-    records: RecordData[]
-    audio: AudioData
-}
-
 export enum TransactionMode {
     'READONLY' = 'readonly',
     'READWRITE' = 'readwrite',
     'VERSIONCHANGE' = 'versionchange'
 }
 
-export type WatcherOptions<T extends RecordData | SnapshotData> = { context: Window; emit: RecordEvent<T> }
+export type WatcherOptions<T extends RecordData | HeadRecord> = {
+    context: Window
+    emit: RecordEvent<T>
+}
+
 export interface Constructable<T> {
     new (...args: any): T
+}
+
+export interface ReplayOptions {
+    mode?: 'live' | 'default'
+    fetch?: { url: string; options?: RequestInit }
+    receiver?: (sender: (data: RecordData) => void) => void
+    proxy?: string
+    autoplay?: boolean
+    replayPacks?: ReplayPack[]
+}
+
+export interface ReplayPack {
+    HEAD: ReplayHead
+    BODY: ReplayData[]
+}
+
+export interface ReplayData {
+    index?: number
+    snapshot: SnapshotRecord
+    records: RecordData[]
+    audio: AudioData
+}
+
+export interface ReplayHead {
+    href: string
+    sessionId: string
+    userAgent: string
+    platform: string
+    beginTime: string
+    endTime?: string
+    version: string
+}
+
+export interface HeadRecord {
+    type: RecordType.HEAD
+    data: ReplayHead
+    time: string
 }

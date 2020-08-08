@@ -13,7 +13,7 @@ import {
 } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData } from '@timecat/share'
+import { RecordData, AudioData, SnapshotRecord, ReplayPack } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animationFrame'
 
@@ -116,9 +116,9 @@ export class PlayerComponent {
     }
 
     streamHandle(this: PlayerComponent, e: CustomEvent) {
-        const frame = e.detail as RecordData | SnapshotData
+        const frame = e.detail as RecordData
         if (isSnapshot(frame)) {
-            window.__ReplayData__.snapshot = frame as SnapshotData
+            window.__ReplayData__.snapshot = frame as SnapshotRecord
             this.c.setViewState()
             return
         }
@@ -126,8 +126,9 @@ export class PlayerComponent {
     }
 
     initViewState() {
-        const { __ReplayDataList__: list } = window
-        const firstData = list[0]
+        const { __ReplayPacks__: packs } = window
+        const firstPack = packs[0] as ReplayPack
+        const firstData = firstPack.BODY[0]
         this.recordDataList = firstData.records
 
         this.audioData = firstData.audio

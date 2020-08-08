@@ -1,5 +1,5 @@
 import { WatcherOptions, TerminateRecord, RecordType } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class TerminateWatcher extends Watcher<TerminateRecord> {
     constructor(options: WatcherOptions<TerminateRecord>) {

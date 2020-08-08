@@ -1,5 +1,5 @@
 import { createElement } from '@timecat/virtual-dom'
-import { InfoData, SnapshotData, VNode, RecordType } from '@timecat/share'
+import { InfoData, SnapshotRecord, VNode, RecordType } from '@timecat/share'
 import { nodeStore, getRadix64TimeStr } from '@timecat/utils'
 
 function getInitInfo(context: Window): InfoData {
@@ -26,7 +26,7 @@ function getInitInfo(context: Window): InfoData {
     }
 }
 
-function DOMSnapshot(context: Window): SnapshotData {
+function DOMSnapshot(context: Window): SnapshotRecord {
     return {
         type: RecordType.SNAPSHOT,
         data: {

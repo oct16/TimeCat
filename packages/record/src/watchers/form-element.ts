@@ -1,6 +1,6 @@
 import { getStrDiffPatches } from '@timecat/utils'
 import { WatcherOptions, FormElementEvent, RecordType, FormElementRecord } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class FormElementWatcher extends Watcher<FormElementRecord> {
     constructor(options: WatcherOptions<FormElementRecord>) {

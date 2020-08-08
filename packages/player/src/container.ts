@@ -13,7 +13,7 @@ export class ContainerComponent {
         this.init()
     }
 
-    getSnapshotData() {
+    getSnapshotRecord() {
         return window.__ReplayData__.snapshot.data
     }
 
@@ -27,14 +27,14 @@ export class ContainerComponent {
     initSandbox() {
         this.sandBox = this.container.querySelector('#cat-sandbox') as HTMLIFrameElement
         this.sandBoxDoc = this.sandBox.contentDocument!
-        createIframeDOM(this.sandBoxDoc, this.getSnapshotData())
+        createIframeDOM(this.sandBoxDoc, this.getSnapshotRecord())
         disableScrolling(this.sandBox.contentWindow!.document)
         this.setViewState()
     }
 
     setViewState() {
         nodeStore.reset()
-        injectIframeContent(this.sandBoxDoc, this.getSnapshotData())
+        injectIframeContent(this.sandBoxDoc, this.getSnapshotRecord())
     }
 
     initTemplate() {
@@ -46,8 +46,8 @@ export class ContainerComponent {
         const parser = new DOMParser()
         const el = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
         el.id = id
-        el.style.width = this.getSnapshotData().width + 'px'
-        el.style.height = this.getSnapshotData().height + 'px'
+        el.style.width = this.getSnapshotRecord().width + 'px'
+        el.style.height = this.getSnapshotRecord().height + 'px'
         el.style.display = 'none'
         return (this.container = el)
     }

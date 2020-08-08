@@ -1,7 +1,7 @@
-import { WatcherOptions, RecordEvent } from '@timecat/share'
+import { WatcherOptions, RecordEvent, RecordData } from '@timecat/share'
 import { uninstallStore, debounce, throttle, isDev, logger, getRadix64TimeStr, nodeStore } from '@timecat/utils'
 
-export class Watcher<T extends RecordData | SnapshotData> {
+export class Watcher<T extends RecordData> {
     context: Window
     emit: RecordEvent<T>
     options: WatcherOptions<T>

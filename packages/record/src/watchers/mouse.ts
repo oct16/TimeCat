@@ -1,6 +1,6 @@
 import { throttle } from '@timecat/utils'
 import { WatcherOptions, MouseRecord, RecordType, MouseEventType } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class MouseWatcher extends Watcher<MouseRecord> {
     constructor(options: WatcherOptions<MouseRecord>) {

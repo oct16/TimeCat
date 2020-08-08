@@ -1,5 +1,5 @@
 import { WatcherOptions, CanvasRecord, RecordType } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 type Prop = keyof CanvasRenderingContext2D
 
