@@ -36,7 +36,6 @@ interface Window {
 
     __ReplayStrPacks__: string
 
-    __ReplayDataList__: any
     __ReplayPacks__: any
 
     __ReplayData__: any
