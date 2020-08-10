@@ -293,8 +293,8 @@ export interface ReplayOptions {
 }
 
 export interface ReplayPack {
-    HEAD: ReplayHead
-    BODY: ReplayData[]
+    head: ReplayHead
+    body: ReplayData[]
 }
 
 export interface ReplayData {

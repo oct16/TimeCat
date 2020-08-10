@@ -62,12 +62,11 @@ export async function replay(options: ReplayOptions) {
                 replayPacks.reduce((packAcc, pack) => {
                     return (
                         packAcc +
-                        pack.BODY.map((replayData: ReplayData) => replayData.records).reduce(
-                            (acc: number, records: RecordData[]) => {
+                        pack.body
+                            .map((replayData: ReplayData) => replayData.records)
+                            .reduce((acc: number, records: RecordData[]) => {
                                 return acc + (+records.slice(-1)[0].time - +records[0].time)
-                            },
-                            0
-                        )
+                            }, 0)
                     )
                 }, 0) + +startTime
 
@@ -100,7 +99,7 @@ export async function replay(options: ReplayOptions) {
 }
 
 function getFirstReplayData(replayPacks: ReplayPack[]) {
-    return replayPacks[0].BODY[0]
+    return replayPacks[0].body[0]
 }
 
 function getGZipData() {
@@ -135,8 +134,8 @@ async function fetchData(input: RequestInfo, init?: RequestInit): Promise<Replay
 
 async function dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<ReplayPack[]> {
     let replayPack: ReplayPack
-    let HEAD: ReplayHead
-    const BODY: ReplayData[] = []
+    let head: ReplayHead
+    const body: ReplayData[] = []
     return await new Promise(resolve => {
         receiver(data => {
             if (replayPack) {
@@ -147,18 +146,18 @@ async function dataReceiver(receiver: (sender: (data: RecordData) => void) => vo
                 }
 
                 if (data.type === RecordType.HEAD) {
-                    HEAD = data.data
+                    head = data.data
                 } else if (data && isSnapshot(data)) {
-                    if (HEAD && BODY) {
-                        BODY.push({
+                    if (head && body) {
+                        body.push({
                             snapshot: data as SnapshotRecord,
                             records: [],
                             audio: { src: '', bufferStrList: [], subtitles: [], opts: {} as RecorderOptions }
                         })
 
                         replayPack = {
-                            HEAD,
-                            BODY
+                            head,
+                            body
                         }
 
                         resolve([replayPack])
@@ -211,7 +210,7 @@ async function getReplayData(options: ReplayOptions) {
 function decodePacks(packs: ReplayPack[]): ReplayPack[] {
     const { atob } = radix64
     packs.forEach(pack => {
-        pack.BODY.forEach(data => {
+        pack.body.forEach(data => {
             const { records, snapshot } = data
             snapshot.time = snapshot.time.length < 8 ? atob.call(radix64, snapshot.time) + '' : snapshot.time
             records.forEach(record => {

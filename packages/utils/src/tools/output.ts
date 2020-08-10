@@ -146,7 +146,7 @@ async function getDataFromDB(exportOptions?: ExportOptions) {
 
 function extract(replayDataList: ReplayPack[], exportOptions?: ExportOptions) {
     return replayDataList.map(replayPack => {
-        replayPack.BODY.forEach(replayData => {
+        replayPack.body.forEach(replayData => {
             if (exportOptions && exportOptions.audioExternal) {
                 replayData.audio = extractAudio(replayData.audio)
             }
@@ -214,7 +214,7 @@ async function makeCssInline(packs: ReplayPack[]) {
     const dataList: ReplayData[] = []
 
     packs.forEach(pack => {
-        pack.BODY.forEach(data => {
+        pack.body.forEach(data => {
             dataList.push(data)
         })
     })

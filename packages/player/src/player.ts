@@ -128,7 +128,7 @@ export class PlayerComponent {
     initViewState() {
         const { __ReplayPacks__: packs } = window
         const firstPack = packs[0] as ReplayPack
-        const firstData = firstPack.BODY[0]
+        const firstData = firstPack.body[0]
         this.records = firstData.records
 
         this.audioData = firstData.audio
@@ -165,8 +165,8 @@ export class PlayerComponent {
 
         function getNextData(curData: ReplayData) {
             for (let i = 0; i < packs.length; i++) {
-                const body = packs[i].BODY
-                const nextPackBody = packs[i + 1]?.BODY
+                const body = packs[i].body
+                const nextPackBody = packs[i + 1]?.body
                 for (let j = 0; j < body.length; j++) {
                     if (curData === body[j]) {
                         const next = body[j + 1]
