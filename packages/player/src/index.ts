@@ -7,7 +7,8 @@ import {
     isSnapshot,
     classifyRecords,
     isDev,
-    radix64
+    radix64,
+    logError
 } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
@@ -164,7 +165,7 @@ async function dataReceiver(receiver: (sender: (data: RecordData) => void) => vo
                         fmp.observe()
                     }
                 } else {
-                    throw new Error('TimeCat Error: ReplayHead not found')
+                    throw logError('ReplayHead not found')
                 }
             }
         })
@@ -194,7 +195,7 @@ async function getReplayData(options: ReplayOptions) {
         window.__ReplayPacks__
 
     if (!rawReplayPacks) {
-        throw new Error('TimeCat Error: Replay data not found')
+        throw logError('Replay data not found')
     }
 
     const replayPacks = decodePacks(rawReplayPacks)

@@ -1,7 +1,7 @@
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordOptions, ValueOf } from '@timecat/share'
-import { uninstallStore, getDBOperator } from '@timecat/utils'
+import { uninstallStore, getDBOperator, logError } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 
@@ -85,7 +85,7 @@ export async function waitingFramesLoaded() {
                 const frameElement = frame.frameElement
                 return frameElement.getAttribute('src')
             } catch (e) {
-                console.error(`TimeCat Error: ${e.message}`)
+                logError(e)
                 return false
             }
         })

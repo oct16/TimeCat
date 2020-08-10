@@ -19,6 +19,16 @@ export function logger(data: any) {
     // console.log('record', data)
 }
 
+function logErrorOverload(e: Error): string
+function logErrorOverload(msg: string): string
+function logErrorOverload(e: Error | string): string {
+    const msg = (e as Error).message || (e as string)
+    console.error(`TimeCat Error: ${msg}`)
+    return msg
+}
+
+export const logError = logErrorOverload
+
 export function getTime(): number {
     return Math.floor(performance.timing.navigationStart + performance.now())
 }
@@ -71,8 +81,8 @@ export function classifyRecords(records: RecordData[]) {
         switch (record.type) {
             case RecordType.HEAD:
                 replayPack = {
-                    HEAD: record.data,
-                    BODY: []
+                    head: record.data,
+                    body: []
                 }
                 if (next && !(next.data as SnapshotRecord['data']).frameId) {
                     if (replayPack) {
@@ -93,7 +103,7 @@ export function classifyRecords(records: RecordData[]) {
                         }
                     }
                     if (replayData && replayPack) {
-                        replayPack.BODY.push(replayData)
+                        replayPack.body.push(replayData)
                     }
                 } else {
                     replayData.records.push(record)
