@@ -1,4 +1,4 @@
-import { SnapshotData, TransactionMode, RecordData } from '@timecat/share'
+import { SnapshotRecord, TransactionMode, RecordData } from '@timecat/share'
 
 export class IndexedDBOperator {
     db: IDBDatabase
@@ -49,9 +49,13 @@ export class IndexedDBOperator {
         return this.withIDBStore(TransactionMode.READWRITE)
     }
 
-    async add(data: SnapshotData | RecordData) {
+    async add(data: any) {
         const store = await this.getStore()
         store.add(data)
+    }
+
+    async addRecord(data: RecordData) {
+        await this.add(data)
     }
 
     async clear() {
@@ -59,10 +63,10 @@ export class IndexedDBOperator {
         store.clear()
     }
 
-    async readAllRecords(): Promise<(SnapshotData | RecordData)[] | null> {
+    async readAllRecords(): Promise<RecordData[] | null> {
         const store = await this.getStore()
 
-        const records: (SnapshotData | RecordData)[] = []
+        const records: RecordData[] = []
         // This would be store.getAll(), but it isn't supported by IE now.
         return new Promise(resolve => {
             store.openCursor().onsuccess = event => {
@@ -75,7 +79,7 @@ export class IndexedDBOperator {
                 }
                 resolve(records)
             }
-        }).then((arr: (SnapshotData | RecordData)[]) => (arr.length ? arr : null))
+        }).then((arr: RecordData[]) => (arr.length ? arr : null))
     }
 
     async count(): Promise<number> {

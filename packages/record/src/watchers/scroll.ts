@@ -1,5 +1,5 @@
 import { WatcherOptions, ScrollRecord, RecordType } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class ScrollWatcher extends Watcher<ScrollRecord> {
     constructor(options: WatcherOptions<ScrollRecord>) {

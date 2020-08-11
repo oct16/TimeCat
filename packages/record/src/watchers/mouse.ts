@@ -1,6 +1,6 @@
-import { throttle } from '@timecat/utils'
+import { throttle, isExistingNode } from '@timecat/utils'
 import { WatcherOptions, MouseRecord, RecordType, MouseEventType } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class MouseWatcher extends Watcher<MouseRecord> {
     constructor(options: WatcherOptions<MouseRecord>) {
@@ -48,6 +48,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             const offsetPosition = this.getOffsetPosition(e, this.context)
             if (offsetPosition) {
                 const { x, y, id } = offsetPosition
+
                 this.emitterHook({
                     type: RecordType.MOUSE,
                     data: {
@@ -72,7 +73,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
     getOffsetPosition(event: MouseEvent, context: Window) {
         const { mode } = context.__RecordOptions__
 
-        const { view, target, offsetX: x, offsetY: y } = event
+        const { view, target, offsetX, offsetY } = event
 
         if (view === context) {
             const doc = (<HTMLElement>target).ownerDocument!
@@ -82,15 +83,18 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             }
 
             let node = target as HTMLElement
-
-            while (isInline(node as HTMLElement)) {
-                node = node.parentElement!
+            let id: number | undefined = undefined
+            if (isExistingNode(node)) {
+                while (isInline(node as HTMLElement)) {
+                    node = node.parentElement!
+                }
+                id = this.getNodeId(node)
             }
 
             const position = {
-                id: this.getNodeId(node),
-                x: event.offsetX,
-                y: event.offsetY
+                id,
+                x: offsetX,
+                y: offsetY
             }
 
             const frameElement = doc?.defaultView?.frameElement as HTMLElement

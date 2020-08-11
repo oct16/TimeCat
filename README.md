@@ -104,7 +104,7 @@ interface ReplayOptions {
     replayDataList?: ReplayData[] // data from options
     fetch?: { url: string; options?: RequestInit } // data from server
     // receive data in live mode
-    receiver?: (sender: (data: RecordData | SnapshotData) => void) => void
+    receiver?: (sender: (data: RecordData) => void) => void
     proxy?: string // if cross domain
     autoplay?: boolean // autoplay when data loaded
 }

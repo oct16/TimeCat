@@ -45,7 +45,3 @@ class NodeStore {
 }
 
 export const nodeStore = new NodeStore()
-
-if (isDev) {
-    ;(window as any).ns = nodeStore
-}

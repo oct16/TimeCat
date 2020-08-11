@@ -1,5 +1,5 @@
 import { WatcherOptions, WindowRecord, RecordType } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class WindowWatcher extends Watcher<WindowRecord> {
     constructor(options: WatcherOptions<WindowRecord>) {

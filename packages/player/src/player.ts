@@ -13,7 +13,7 @@ import {
 } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData } from '@timecat/share'
+import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animationFrame'
 
@@ -25,9 +25,9 @@ export class PlayerComponent {
     audioNode: HTMLAudioElement
 
     progressState: ProgressState
-    recordDataList: RecordData[]
+    records: RecordData[]
     speed = 0
-    index = 0
+    recordIndex = 0
     frameIndex = 0
     lastPercentage = 0
     isFirstTimePlay = true
@@ -61,7 +61,7 @@ export class PlayerComponent {
 
         this.initViewState()
 
-        if (!this.recordDataList.length) {
+        if (!this.records.length) {
             // is live mode
             window.addEventListener('record-data', this.streamHandle.bind(this))
         } else {
@@ -116,9 +116,9 @@ export class PlayerComponent {
     }
 
     streamHandle(this: PlayerComponent, e: CustomEvent) {
-        const frame = e.detail as RecordData | SnapshotData
+        const frame = e.detail as RecordData
         if (isSnapshot(frame)) {
-            window.__ReplayData__.snapshot = frame as SnapshotData
+            window.__ReplayData__.snapshot = frame as SnapshotRecord
             this.c.setViewState()
             return
         }
@@ -126,50 +126,72 @@ export class PlayerComponent {
     }
 
     initViewState() {
-        const { __ReplayDataList__: list } = window
-        const firstData = list[0]
-        this.recordDataList = firstData.records
+        const { __ReplayPacks__: packs } = window
+        const firstPack = packs[0] as ReplayPack
+        const firstData = firstPack.body[0]
+        this.records = firstData.records
 
         this.audioData = firstData.audio
         this.initAudio()
 
         // live mode
-        if (!this.recordDataList.length) {
+        if (!this.records.length) {
             return
         }
 
         this.subtitlesIndex = 0
         this.broadcaster.cleanText()
 
-        this.curViewEndTime = +this.recordDataList.slice(-1)[0].time
+        this.curViewEndTime = +this.records.slice(-1)[0].time
         this.curViewDiffTime = 0
-        window.__ReplayData__ = { index: 0, ...firstData }
+        window.__ReplayData__ = firstData
     }
 
     async switchNextView(delayTime?: number) {
-        const { __ReplayData__: rData, __ReplayDataList__: list } = window
+        const { __ReplayData__: rData, __ReplayPacks__: packs } = window as {
+            __ReplayData__: ReplayData
+            __ReplayPacks__: ReplayPack[]
+        }
 
-        if (!this.recordDataList) {
+        if (!this.records) {
             return
         }
 
-        const nextIndex = rData.index! + 1
-        if (nextIndex > list.length - 1) {
+        const nextData = getNextData(rData)
+
+        if (!nextData) {
             return
         }
 
-        const nextData = list[nextIndex]
+        function getNextData(curData: ReplayData) {
+            for (let i = 0; i < packs.length; i++) {
+                const body = packs[i].body
+                const nextPackBody = packs[i + 1]?.body
+                for (let j = 0; j < body.length; j++) {
+                    if (curData === body[j]) {
+                        const next = body[j + 1]
+                        if (next) {
+                            return next
+                        } else if (nextPackBody.length) {
+                            return nextPackBody[0]
+                        }
+                        return null
+                    }
+                }
+            }
+            return null
+        }
 
-        const curEndTime = +this.recordDataList.slice(-1)[0].time
+        const curEndTime = +this.records.slice(-1)[0].time
         const nextStartTime = +nextData.records[0].time
         this.curViewDiffTime += nextStartTime - curEndTime
 
-        window.__ReplayData__ = { index: nextIndex, ...nextData }
-        this.recordDataList = nextData.records
+        window.__ReplayData__ = nextData
+        this.records = nextData.records
         this.audioData = nextData.audio
         this.initAudio()
-        this.curViewEndTime = +this.recordDataList.slice(-1)[0].time
-        this.index = 0
+        this.curViewEndTime = +this.records.slice(-1)[0].time
+        this.recordIndex = 0
 
         if (delayTime) {
             await delay(delayTime)
@@ -180,7 +202,7 @@ export class PlayerComponent {
 
     play() {
         this.playAudio()
-        if (this.index === 0) {
+        if (this.recordIndex === 0) {
             this.progress.resetThumb()
             if (!this.isFirstTimePlay) {
                 // Indicates the second times play
@@ -287,11 +309,11 @@ export class PlayerComponent {
 
         let data: RecordData
         while (
-            this.index < this.recordDataList.length &&
-            +(data = this.recordDataList[this.index]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
+            this.recordIndex < this.records.length &&
+            +(data = this.records[this.recordIndex]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
         ) {
             this.execFrame.call(this, data)
-            this.index++
+            this.recordIndex++
         }
 
         if (this.audioData && this.audioData.subtitles.length) {
@@ -326,7 +348,7 @@ export class PlayerComponent {
 
     stop() {
         this.speed = 0
-        this.index = 0
+        this.recordIndex = 0
         this.frameIndex = 0
         this.lastPercentage = 0
         this.elapsedTime = 0 // unit: sec

@@ -34,9 +34,17 @@
             "timecat": [
                 "packages/timecat/src"
             ],
+            "pkg": [
+                "./package.json"
+            ],
             "*": [
                 "types/*"
             ]
         }
-    }
+    },
+    "include": [
+        "packages/**/*",
+        "types/**/*",
+        "package.json"
+    ]
 }

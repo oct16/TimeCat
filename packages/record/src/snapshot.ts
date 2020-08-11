@@ -1,9 +1,9 @@
-import { Watcher } from './watchers/watcher'
-import { SnapshotData, WatcherOptions } from '@timecat/share'
+import { Watcher } from './watcher'
+import { SnapshotRecord, WatcherOptions } from '@timecat/share'
 import { snapshots } from '@timecat/snapshot'
 
-export class Snapshot extends Watcher<SnapshotData> {
-    constructor(options: WatcherOptions<SnapshotData>) {
+export class Snapshot extends Watcher<SnapshotRecord> {
+    constructor(options: WatcherOptions<SnapshotRecord>) {
         super(options)
         this.init()
     }

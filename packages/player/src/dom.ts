@@ -14,10 +14,10 @@ import {
     ScrollWatcherData,
     VNode,
     VSNode,
-    SnapshotData,
     LocationRecordData,
     CanvasRecordData,
-    UnionToIntersection
+    UnionToIntersection,
+    SnapshotRecord
 } from '@timecat/share'
 import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
@@ -72,24 +72,16 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     }
 }
 
-function isChildNode(parentNode: Node, childNode: Node) {
-    if (isElementNode(parentNode)) {
-        const childNodes = parentNode.childNodes
-        return [...childNodes].indexOf(childNode as ChildNode) !== -1
-    }
-    return false
-}
-
 function findNextNode(nextId: number | null): Node | null {
     return nextId ? nodeStore.getNode(nextId) : null
 }
 
-export async function updateDom(this: PlayerComponent, Record: RecordData | SnapshotData) {
+export async function updateDom(this: PlayerComponent, Record: RecordData) {
     const { type, data } = Record
     switch (type) {
         case RecordType.SNAPSHOT: {
-            const snapshotData = data as SnapshotData['data']
-            const { frameId, vNode } = snapshotData
+            const snapshotData = data as SnapshotRecord['data']
+            const { frameId } = snapshotData
 
             if (frameId) {
                 const iframeNode = nodeStore.getNode(frameId) as HTMLIFrameElement
@@ -352,7 +344,7 @@ export async function waitStart(): Promise<void> {
     })
 }
 
-export function createIframeDOM(contentDocument: Document, snapshotData: SnapshotData['data']) {
+export function createIframeDOM(contentDocument: Document, snapshotData: SnapshotRecord['data']) {
     contentDocument.open()
     const doctype = snapshotData.doctype
     const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
@@ -361,7 +353,7 @@ export function createIframeDOM(contentDocument: Document, snapshotData: Snapsho
     contentDocument.write(doc)
 }
 
-export function injectIframeContent(contentDocument: Document, snapshotData: SnapshotData['data']) {
+export function injectIframeContent(contentDocument: Document, snapshotData: SnapshotRecord['data']) {
     const content = convertVNode(snapshotData.vNode)
     if (content) {
         const head = content.querySelector('head')

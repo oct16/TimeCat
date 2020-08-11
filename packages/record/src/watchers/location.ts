@@ -1,5 +1,5 @@
 import { WatcherOptions, LocationRecord, RecordType } from '@timecat/share'
-import { Watcher } from './watcher'
+import { Watcher } from '../watcher'
 
 export class LocationWatcher extends Watcher<LocationRecord> {
     constructor(options: WatcherOptions<LocationRecord>) {

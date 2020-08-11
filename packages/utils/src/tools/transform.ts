@@ -33,10 +33,6 @@ export function encodeWAV(data: Float32Array[], opts: RecorderOptions) {
         type: 'audio/wav'
     })
 
-    if (isDev) {
-        ;(window as any).downloadWAV = () => download(blob, 'test-wav.wav')
-    }
-
     return blob
 }
 
