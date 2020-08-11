@@ -79,7 +79,9 @@ export class ContainerComponent {
             setWidth?: number,
             setHeight?: number
         ) {
-            const panelHeight = 40 - 2 // subtract the gap
+            const { mode: replayMode } = window.__ReplayOptions__ || {}
+
+            const panelHeight = replayMode === 'live' ? 0 : 40 - 2 // subtract the gap
 
             const { width: targetWidth, height: targetHeight } = getPageSize(target)
 
