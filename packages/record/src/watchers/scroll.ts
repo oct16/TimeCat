@@ -17,7 +17,7 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
         this.registerEvent({
             context: this.context,
             eventTypes: ['scroll'],
-            handleFn: () => this.handleFn,
+            handleFn: this.handleFn.bind(this),
             listenerOptions: { capture: true },
             type: 'throttle',
             optimizeOptions: { leading: true, trailing: true },
