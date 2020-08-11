@@ -305,13 +305,16 @@ export interface ReplayData {
 }
 
 export interface ReplayHead {
+    version: string
     href: string
     sessionId: string
     userAgent: string
     platform: string
     beginTime: string
     endTime?: string
-    version: string
+    extra?: {
+        [key: string]: string
+    }
 }
 
 export interface HeadRecord {
