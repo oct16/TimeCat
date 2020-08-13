@@ -30,7 +30,8 @@
         "f": "npx code-formatter --path packages",
         "doc": "npx typedoc",
         "embed": "cp packages/timecat/dist/timecatjs.min.js ../TimeCatChrome/src/assets/",
-        "count": "find ./packages -type f -not -path **/*.spec.ts -not -path **/global.* -not -path './node_modules/*' -not -path '**/dist/*'  -name '*.ts' | xargs wc -l"
+        "count": "find ./packages -type f -not -path **/*.spec.ts -not -path **/global.* -not -path './node_modules/*' -not -path '**/dist/*'  -name '*.ts' | xargs wc -l",
+        "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
     },
     "devDependencies": {
         "@microsoft/api-extractor": "^7.8.9",
@@ -80,5 +81,13 @@
     "homepage": "https://github.com/oct16/TimeCat#readme",
     "files": [
         "lib"
-    ]
+    ],
+    "dependencies": {
+        "@typescript-eslint/eslint-plugin": "^3.9.0",
+        "@typescript-eslint/parser": "^3.9.0",
+        "eslint": "^7.6.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "prettier": "^2.0.5"
+    }
 }
