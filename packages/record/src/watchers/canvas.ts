@@ -40,7 +40,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                     const id = self.getNodeId(this.canvas)!
 
                     return typeof method === 'function'
-                        ? function() {
+                        ? function () {
                               const args = [...arguments]
                               if (name === 'drawImage') {
                                   args[0] = id
@@ -51,7 +51,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                           }
                         : null
                 },
-                set: function(value: any) {
+                set: function (value: any) {
                     const id = self.getNodeId(this.canvas)!
                     self.aggregateDataEmitter(id, name, value)
 
@@ -82,7 +82,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
 
         const blockInstances = [CanvasGradient]
 
-        return function(this: any, id: number, prop: Prop, args: any) {
+        return function (this: any, id: number, prop: Prop, args: any) {
             const context = this
 
             function emitData(id: number) {

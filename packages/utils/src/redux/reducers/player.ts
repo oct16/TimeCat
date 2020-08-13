@@ -1,4 +1,4 @@
-let initState = {
+const initState = {
     speed: 0
 }
 

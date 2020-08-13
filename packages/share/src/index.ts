@@ -118,7 +118,7 @@ export interface DOMRecord {
     data: DOMWatcherData
     time: string
 }
-export interface DOMWatcherData extends DOMUpdateDataType {}
+export type DOMWatcherData = DOMUpdateDataType
 
 export interface AttributesUpdateData {
     id: number

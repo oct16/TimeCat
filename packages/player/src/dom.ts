@@ -97,7 +97,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
 
         case RecordType.SCROLL: {
             const { top, left, id } = data as ScrollWatcherData
-            let target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
+            const target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
 
             const curTop = target.scrollTop
 
@@ -274,7 +274,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             if (src) {
                 const image = new Image()
                 image.src = src
-                image.onload = function(this: HTMLImageElement) {
+                image.onload = function (this: HTMLImageElement) {
                     ctx.drawImage(this, 0, 0)
                 }
             } else {

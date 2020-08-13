@@ -31,7 +31,7 @@
         "doc": "npx typedoc",
         "embed": "cp packages/timecat/dist/timecatjs.min.js ../TimeCatChrome/src/assets/",
         "count": "find ./packages -type f -not -path **/*.spec.ts -not -path **/global.* -not -path './node_modules/*' -not -path '**/dist/*'  -name '*.ts' | xargs wc -l",
-        "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
+        "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix"
     },
     "devDependencies": {
         "@microsoft/api-extractor": "^7.8.9",
@@ -46,7 +46,6 @@
         "@types/node": "^13.9.2",
         "@types/pako": "^1.0.1",
         "@types/smoothscroll-polyfill": "^0.3.1",
-        "@types/socket.io-client": "^1.4.32",
         "@zerollup/ts-transform-paths": "^1.7.17",
         "diff": "^4.0.2",
         "execa": "^4.0.0",
@@ -65,11 +64,16 @@
         "rollup-plugin-typescript2": "^0.26.0",
         "rollup-plugin-visualizer": "^4.0.4",
         "smoothscroll-polyfill": "^0.4.4",
-        "socket.io": "^2.3.0",
         "ts-jest": "^26.1.0",
         "ttypescript": "^1.5.10",
         "typedoc": "^0.17.7",
-        "typescript": "^4.0.0-beta"
+        "typescript": "^3.9.7",
+        "@typescript-eslint/eslint-plugin": "^3.9.0",
+        "@typescript-eslint/parser": "^3.9.0",
+        "eslint": "^7.6.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "prettier": "^2.0.5"
     },
     "repository": {
         "type": "git",
@@ -82,12 +86,5 @@
     "files": [
         "lib"
     ],
-    "dependencies": {
-        "@typescript-eslint/eslint-plugin": "^3.9.0",
-        "@typescript-eslint/parser": "^3.9.0",
-        "eslint": "^7.6.0",
-        "eslint-config-prettier": "^6.11.0",
-        "eslint-plugin-prettier": "^3.1.4",
-        "prettier": "^2.0.5"
-    }
+    "dependencies": {}
 }

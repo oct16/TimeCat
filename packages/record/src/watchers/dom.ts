@@ -128,7 +128,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
             const isParentSVG = parentVn && parentVn.extra.isSVG
 
-            let vn = addedSiblingMap.get(node)!
+            const vn = addedSiblingMap.get(node)!
 
             if (isParentSVG && isVNode(vn)) {
                 ;(vn as VNode).extra.isSVG = true

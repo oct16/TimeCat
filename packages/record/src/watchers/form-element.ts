@@ -37,9 +37,9 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                     const inputType = target.getAttribute('type') || 'text'
 
                     let key = 'value'
-                    let value: any = target.value || ''
+                    const value: any = target.value || ''
                     let newValue: any = ''
-                    let patches: ReturnType<typeof getStrDiffPatches> = []
+                    const patches: ReturnType<typeof getStrDiffPatches> = []
 
                     if (inputType === 'checkbox' || inputType === 'radio') {
                         if (eventType === 'input') {
@@ -115,7 +115,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                 const [target, key] = item
                 const original = context.Object.getOwnPropertyDescriptor(target, key)
                 context.Object.defineProperty(target, key, {
-                    set: function(value: string | boolean) {
+                    set: function (value: string | boolean) {
                         setTimeout(() => {
                             handleEvent.call(this, key, value)
                         })

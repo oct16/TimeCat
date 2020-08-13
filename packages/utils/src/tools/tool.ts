@@ -37,10 +37,10 @@ export function objectEquals(x: any, y: any): boolean {
     // recursive object equality check
     const p = Object.keys(x)
     return (
-        Object.keys(y).every(function(i) {
+        Object.keys(y).every(function (i) {
             return p.indexOf(i) !== -1
         }) &&
-        p.every(function(i) {
+        p.every(function (i) {
             return objectEquals(x[i], y[i])
         })
     )
@@ -57,13 +57,13 @@ export function throttle(
     let timeout: any = null
     let previous = 0
 
-    const later = function() {
+    const later = function () {
         previous = options.leading === false ? 0 : Date.now()
         timeout = null
         result = func.apply(context, args)
         if (!timeout) context = args = null
     }
-    return function(this: any) {
+    return function (this: any) {
         const now = Date.now()
         if (!previous && options.leading === false) previous = now
         const remaining = wait - (now - previous)
@@ -99,10 +99,10 @@ export function debounce<F extends Procedure>(
 ): (this: ThisParameterType<F>, ...args: Parameters<F>) => void {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
 
-    return function(this: ThisParameterType<F>, ...args: Parameters<F>) {
+    return function (this: ThisParameterType<F>, ...args: Parameters<F>) {
         const context = this
 
-        const doLater = function() {
+        const doLater = function () {
             timeoutId = undefined
             if (!options.isImmediate) {
                 func.apply(context, args)

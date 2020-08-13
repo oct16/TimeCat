@@ -76,7 +76,7 @@ export function completeAttrHref(str: string, node?: Element) {
             const doc = node.getRootNode() as Document
             const context = doc.defaultView as Window
 
-            let { href, path } = context?.__ReplayLocation__ || {}
+            const { href, path } = context?.__ReplayLocation__ || {}
 
             if (path && href) {
                 const relationHref = new URL(path, href)

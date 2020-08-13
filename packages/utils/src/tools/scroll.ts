@@ -22,7 +22,7 @@ export function disableScrolling(target: Document) {
             'test' as any,
             () => {},
             Object.defineProperty({}, 'passive', {
-                get: function() {
+                get: function () {
                     supportsPassive = true
                 }
             })

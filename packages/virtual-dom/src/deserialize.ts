@@ -8,13 +8,13 @@ export function convertVNode(vNode: VNode | VSNode | null, parent?: VNode): Elem
     }
     const vs = vNode as VSNode
     if (vNode.type === Node.COMMENT_NODE) {
-        return createCommentNode(vs)
+        return createCommentNode(vs) as Element
     }
     if (vNode.type === Node.TEXT_NODE) {
         if (parent && parent.tag === 'style') {
             vs.value = completeCssHref(vs.value, parent)
         }
-        return createText(vs)
+        return createText(vs) as Element
     }
     const vn = vNode as VNode
     const output = createNode(vn)
@@ -44,7 +44,7 @@ function travel(vNode: VNode, node: Element): void {
 function createProps(vNode: VNode, node: Element): void {
     const { props } = vNode.extra
     if (props) {
-        for (let [key, val] of Object.entries(props)) {
+        for (const [key, val] of Object.entries(props)) {
             if (key === 'scroll') {
                 const { left, top } = val as { top: number; left: number }
                 // TODO
@@ -165,16 +165,14 @@ function transformTagName(tag: string) {
 
 function createText(vs: VSNode) {
     const { value, id } = vs
-    let output: Element | Node
-    output = document.createTextNode(value)
+    const output: Node = document.createTextNode(value)
     nodeStore.updateNode(id, output)
-    return output as Element
+    return output
 }
 
 function createCommentNode(vs: VSNode) {
     const { value, id } = vs
-    let output: Element | Node
-    output = document.createComment(value)
+    const output: Node = document.createComment(value)
     nodeStore.updateNode(id, output)
-    return output as Element
+    return output
 }

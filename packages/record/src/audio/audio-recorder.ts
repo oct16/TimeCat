@@ -37,7 +37,7 @@ export class Recorder {
 
         this.mediaNode = this.audioContext.createMediaStreamSource(this.mediaStream)
 
-        let createScript = this.audioContext.createScriptProcessor
+        const createScript = this.audioContext.createScriptProcessor
 
         this.processNode = createScript.call(this.audioContext, 4096, this.opts.channelCount, this.opts.channelCount)
 

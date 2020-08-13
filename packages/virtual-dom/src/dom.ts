@@ -11,8 +11,7 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
             for (const [k, v] of Object.entries(value)) {
                 if (k[0] === '-') {
                     node.style.setProperty(k, v as any)
-                }
-                else {
+                } else {
                     node.style[k as any] = v as any
                 }
             }

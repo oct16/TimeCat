@@ -73,7 +73,7 @@ function getExtra(node: Element, isSVG?: boolean) {
 }
 
 const extraAttr = (attr: Attr) => {
-    let { name, value } = attr
+    const { name, value } = attr
     if (name === 'href' || name === 'src') {
         if (value.startsWith('#/')) {
             return []
