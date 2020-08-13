@@ -23,14 +23,9 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         eventTypes
             .map(type => (fn: (e: InputEvent) => void) => {
                 context.document.addEventListener(type, fn, { once: false, passive: true, capture: true })
+                context.document.removeEventListener(type, fn, true)
             })
-            .forEach(handle => handle(handleFn.bind(this)))
-
-        this.uninstall(() => {
-            eventTypes.forEach(type => {
-                context.document.removeEventListener(type, handleFn.bind(this), true)
-            })
-        })
+            .forEach(call => call(handleFn.bind(this)))
 
         function handleFn(this: FormElementWatcher, e: InputEvent) {
             const eventType = e.type

@@ -30,7 +30,6 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
         names.forEach(name => {
             const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
             const method = original.value
-
             if (name === 'canvas') {
                 return
             }
@@ -38,7 +37,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
             Object.defineProperty(ctxProto, name, {
                 get() {
                     const context = this
-                    const id = this.getNodeId(this.canvas)!
+                    const id = self.getNodeId(this.canvas)!
 
                     return typeof method === 'function'
                         ? function() {
@@ -53,7 +52,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                         : null
                 },
                 set: function(value: any) {
-                    const id = this.getNodeId(this.canvas)!
+                    const id = self.getNodeId(this.canvas)!
                     self.aggregateDataEmitter(id, name, value)
 
                     return original.set?.apply(this, arguments)

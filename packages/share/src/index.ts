@@ -276,6 +276,7 @@ export enum TransactionMode {
 
 export type WatcherOptions<T extends RecordData | HeadRecord> = {
     context: Window
+    reverseStore: Set<Function>
     emit: RecordEvent<T>
 }
 

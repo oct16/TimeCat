@@ -1,5 +1,5 @@
 import { WatcherOptions, RecordEvent, RecordData } from '@timecat/share'
-import { uninstallStore, debounce, throttle, isDev, logger, getRadix64TimeStr, nodeStore } from '@timecat/utils'
+import { debounce, throttle, isDev, logger, getRadix64TimeStr, nodeStore } from '@timecat/utils'
 
 export class Watcher<T extends RecordData> {
     context: Window
@@ -18,7 +18,7 @@ export class Watcher<T extends RecordData> {
     getNodeId = nodeStore.getNodeId.bind(nodeStore)
 
     uninstall(fn: Function) {
-        uninstallStore.add(fn)
+        this.options.reverseStore.add(fn)
     }
 
     emitterHook(data: T, callback?: (data: T) => T) {
