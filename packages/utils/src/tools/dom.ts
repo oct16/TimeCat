@@ -30,14 +30,6 @@ export function filteringScriptTag(str: string) {
     return str.replace(reg, '<\\/script>')
 }
 
-function startsWithSlash(str: string) {
-    return /^\/(?!\/)/.test(str)
-}
-
-function startsWithDoubleSlash(str: string) {
-    return /^\/\//.test(str)
-}
-
 export function proxyResource(url: string) {
     const { proxy } = window.__ReplayOptions__
 

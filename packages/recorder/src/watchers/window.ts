@@ -11,7 +11,7 @@ export class WindowWatcher extends Watcher<WindowRecord> {
     height = () => this.context.innerHeight
 
     init() {
-        this.emitData(this.context.document)
+        this.emitData(this.wrapData(this.context.document))
         this.registerEvent({
             context: this.context,
             eventTypes: ['resize'],
@@ -26,12 +26,12 @@ export class WindowWatcher extends Watcher<WindowRecord> {
     handleFn(e: Event) {
         const { type, target } = e
         if (type === 'resize') {
-            this.emitData(target as Element | Document)
+            this.emitData(this.wrapData(target as Element | Document))
         }
     }
 
-    emitData(target: Element | Document) {
-        this.emitterHook({
+    wrapData(target: Element | Document): WindowRecord {
+        return {
             type: RecordType.WINDOW,
             data: {
                 id: this.getNodeId(target) || null,
@@ -39,6 +39,6 @@ export class WindowWatcher extends Watcher<WindowRecord> {
                 height: this.height()
             },
             time: this.getRadix64TimeStr()
-        })
+        }
     }
 }

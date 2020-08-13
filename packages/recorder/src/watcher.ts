@@ -1,7 +1,7 @@
 import { WatcherOptions, RecordEvent, RecordData } from '@timecat/share'
 import { debounce, throttle, isDev, logger, getRadix64TimeStr, nodeStore } from '@timecat/utils'
 
-export class Watcher<T extends RecordData> {
+export abstract class Watcher<T extends RecordData> {
     context: Window
     emit: RecordEvent<T>
     options: WatcherOptions<T>
@@ -13,15 +13,17 @@ export class Watcher<T extends RecordData> {
         this.emit = emit
     }
 
+    abstract init(): void
+
     getRadix64TimeStr = getRadix64TimeStr
-    getNode = nodeStore.getNode.bind(nodeStore)
-    getNodeId = nodeStore.getNodeId.bind(nodeStore)
+    getNode = (id: number): Node => nodeStore.getNode.call(nodeStore, id)
+    getNodeId = (n: Node): number => nodeStore.getNodeId.call(nodeStore, n)
 
     uninstall(fn: Function) {
         this.options.reverseStore.add(fn)
     }
 
-    emitterHook(data: T, callback?: (data: T) => T) {
+    emitData(data: T, callback?: (data: T) => T) {
         if (isDev) {
             logger(data)
         }

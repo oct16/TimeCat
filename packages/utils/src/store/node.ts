@@ -1,4 +1,3 @@
-import { isDev } from '../tools/common'
 class NodeStore {
     private static nodeId = 1
     private nodeMap: Map<number, Node>

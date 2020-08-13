@@ -1,4 +1,4 @@
-import { SnapshotRecord, TransactionMode, RecordData } from '@timecat/share'
+import { TransactionMode, RecordData } from '@timecat/share'
 
 export class IndexedDBOperator {
     db: IDBDatabase

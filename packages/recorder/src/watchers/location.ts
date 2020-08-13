@@ -37,7 +37,7 @@ export class LocationWatcher extends Watcher<LocationRecord> {
 
     locationHandle(e: Event) {
         const contextNodeId = this.getContextNodeId(e)
-        const [data, title, path] = e.arguments
+        const [, , path] = e.arguments
         const { href, hash } = this.context.location
         this.emit({
             type: RecordType.LOCATION,

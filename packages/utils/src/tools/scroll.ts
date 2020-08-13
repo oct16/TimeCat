@@ -41,12 +41,12 @@ export function disableScrolling(target: Document) {
     }
 
     // call this to Enable
-    function enableScroll() {
-        target.removeEventListener('DOMMouseScroll', preventDefault, false)
-        target.removeEventListener(wheelEvent as any, preventDefault, wheelOpt)
-        target.removeEventListener('touchmove', preventDefault, wheelOpt)
-        target.removeEventListener('keydown', preventDefaultForScrollKeys, false)
-    }
+    // function enableScroll() {
+    //     target.removeEventListener('DOMMouseScroll', preventDefault, false)
+    //     target.removeEventListener(wheelEvent as any, preventDefault, wheelOpt)
+    //     target.removeEventListener('touchmove', preventDefault, wheelOpt)
+    //     target.removeEventListener('keydown', preventDefaultForScrollKeys, false)
+    // }
 
     disableScroll()
 }

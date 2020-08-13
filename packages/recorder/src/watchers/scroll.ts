@@ -13,7 +13,7 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
 
     init() {
         const { scrollingElement } = this.context.document
-        this.emitData(scrollingElement || document)
+        this.emitData(this.wrapData(scrollingElement || document))
         this.registerEvent({
             context: this.context,
             eventTypes: ['scroll'],
@@ -25,11 +25,11 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
         })
     }
 
-    emitData(target: Element | Document) {
+    wrapData(target: Element | Document): ScrollRecord {
         const element =
             target instanceof this.context.HTMLElement ? target : this.getCompatibleTarget(target as Document)
 
-        this.emitterHook({
+        return {
             type: RecordType.SCROLL,
             data: {
                 id: this.getNodeId(element) || null, // if null, target is document
@@ -37,13 +37,13 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
                 left: this.scrollLeft(element)
             },
             time: this.getRadix64TimeStr()
-        })
+        }
     }
 
     handleFn(e: Event) {
         const { type, target } = e
         if (type === 'scroll') {
-            this.emitData(target as Element | Document)
+            this.emitData(this.wrapData(target as Element | Document))
         }
     }
 }

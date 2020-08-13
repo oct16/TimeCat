@@ -22,7 +22,7 @@ import {
 import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
-import { setAttribute, createNode, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
+import { setAttribute, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
 
 /**
  * if return true then revert

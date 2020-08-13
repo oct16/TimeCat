@@ -95,7 +95,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                     break
             }
 
-            this.emitterHook(data)
+            this.emitData(data)
         }
     }
 
@@ -143,7 +143,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                 value
             }
 
-            self.emitterHook({
+            self.emitData({
                 type: RecordType.FORM_EL,
                 data,
                 time: self.getRadix64TimeStr()

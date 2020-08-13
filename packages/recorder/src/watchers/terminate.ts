@@ -15,17 +15,17 @@ export class TerminateWatcher extends Watcher<TerminateRecord> {
         })
     }
 
-    handleFn(e: Event) {
+    handleFn() {
         // do some sync job
         // navigator.sendBeacon(url, data)
-        // this.emitData(...)
+        // this.emitData(this.wrapData())
     }
 
-    emitData() {
-        this.emitterHook({
+    wrapData() {
+        return {
             type: RecordType.TERMINATE,
             data: null,
             time: this.getRadix64TimeStr()
-        })
+        }
     }
 }

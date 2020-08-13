@@ -2,7 +2,6 @@ import { createFlatVNode } from '@timecat/virtual-dom'
 import { isVNode, isExistingNode } from '@timecat/utils'
 import {
     WatcherOptions,
-    RecordEvent,
     RecordType,
     DOMRecord,
     VNode,
@@ -23,7 +22,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
     }
 
     init() {
-        const Watcher = new MutationObserver(callback => this.mutationCallback(callback, this.emit))
+        const Watcher = new MutationObserver(callback => this.mutationCallback(callback))
 
         Watcher.observe(this.context.document.documentElement, {
             attributeOldValue: true,
@@ -36,7 +35,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         this.uninstall(() => Watcher.disconnect())
     }
 
-    mutationCallback(records: MutationRecord[], emit: RecordEvent<DOMRecord>) {
+    mutationCallback(records: MutationRecord[]) {
         const addNodesSet: Set<Node> = new Set()
         const removeNodesMap: Map<Node, Node> = new Map()
         const moveNodesSet: Set<Node> = new Set()
@@ -207,7 +206,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         } as DOMUpdateDataType
 
         if (Object.values(data).some(item => item.length)) {
-            this.emitterHook({
+            this.emitData({
                 type: RecordType.DOM,
                 data,
                 time: this.getRadix64TimeStr()

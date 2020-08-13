@@ -21,7 +21,7 @@ export class RecordAudio extends Watcher<AudioRecord> {
             recorder.stop()
         })
 
-        this.emitterHook({
+        this.emitData({
             type: RecordType.AUDIO,
             data: {
                 type: 'opts',
@@ -31,7 +31,7 @@ export class RecordAudio extends Watcher<AudioRecord> {
         })
 
         recorder.onProgress = audioBase64Data => {
-            this.emitterHook({
+            this.emitData({
                 type: RecordType.AUDIO,
                 data: {
                     type: 'base64',

@@ -5,11 +5,9 @@ import pako from 'pako'
 import {
     VNode,
     VSNode,
-    RecordData,
     AudioData,
     RecorderOptions,
     TerminateRecord,
-    SnapshotRecord,
     RecordType,
     ReplayData,
     ReplayPack

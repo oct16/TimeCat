@@ -11,7 +11,7 @@ export class Snapshot extends Watcher<SnapshotRecord> {
 
     init() {
         const snapshot = this.DOMSnapshot(this.options.context || window)
-        this.emitterHook(snapshot)
+        this.emitData(snapshot)
     }
 
     DOMSnapshot(context: Window): SnapshotRecord {

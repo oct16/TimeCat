@@ -18,7 +18,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             const offsetPosition = this.getOffsetPosition(e, this.context)
             if (offsetPosition) {
                 const { x, y, id } = offsetPosition
-                this.emitterHook({
+                this.emitData({
                     type: RecordType.MOUSE,
                     data: {
                         type: MouseEventType.MOVE,
@@ -49,7 +49,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             if (offsetPosition) {
                 const { x, y, id } = offsetPosition
 
-                this.emitterHook({
+                this.emitData({
                     type: RecordType.MOUSE,
                     data: {
                         type: MouseEventType.CLICK,
