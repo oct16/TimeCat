@@ -47,15 +47,11 @@ export class MouseWatcher extends Watcher<MouseRecord> {
         const evt = (e: MouseEvent) => {
             const offsetPosition = this.getOffsetPosition(e, this.context)
             if (offsetPosition) {
-                const { x, y, id } = offsetPosition
-
                 this.emitData({
                     type: RecordType.MOUSE,
                     data: {
                         type: MouseEventType.CLICK,
-                        id,
-                        x,
-                        y
+                        ...offsetPosition
                     },
                     time: this.getRadix64TimeStr()
                 })
@@ -73,13 +69,33 @@ export class MouseWatcher extends Watcher<MouseRecord> {
     getOffsetPosition(event: MouseEvent, context: Window) {
         const { mode } = context.__RecordOptions__
 
-        const { view, target, offsetX, offsetY } = event
+        const { view, target, x, y, offsetX, offsetY } = event
 
         if (view === context) {
             const doc = (<HTMLElement>target).ownerDocument!
 
             function isInline(target: HTMLElement) {
                 return context.getComputedStyle(target).display === 'inline'
+            }
+
+            // https://stackoverflow.com/questions/8270612/get-element-moz-transformrotate-value-in-jquery
+            function getRotate(node: HTMLElement) {
+                if (!isExistingNode(node)) {
+                    return 0
+                }
+                const computedStyle = context.getComputedStyle(node)
+                const matrix = computedStyle['transform']
+
+                let angle: number
+                if (matrix !== 'none') {
+                    const values = matrix.split('(')[1].split(')')[0].split(',')
+                    const a = Number(values[0])
+                    const b = Number(values[1])
+                    angle = Math.round(Math.atan2(b, a) * (180 / Math.PI))
+                } else {
+                    angle = 0
+                }
+                return angle < 0 ? angle + 360 : angle
             }
 
             let node = target as HTMLElement
@@ -91,11 +107,14 @@ export class MouseWatcher extends Watcher<MouseRecord> {
                 id = this.getNodeId(node)
             }
 
-            const position = {
-                id,
-                x: offsetX,
-                y: offsetY
-            }
+            const deg = getRotate(node)
+            const position = deg
+                ? { x, y } // downgrading
+                : {
+                      id,
+                      x: offsetX,
+                      y: offsetY
+                  }
 
             const frameElement = doc?.defaultView?.frameElement as HTMLElement
             if (frameElement && mode === 'default') {

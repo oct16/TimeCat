@@ -126,12 +126,16 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.MOUSE: {
             const { x, y, id, type } = data as MouseRecordData
-            if (!id) {
-                return
-            }
 
-            const node = nodeStore.getNode(id) as HTMLElement
-            const { left, top } = node?.getBoundingClientRect() || {}
+            let left = 0,
+                top = 0
+
+            if (id) {
+                const node = nodeStore.getNode(id) as HTMLElement
+                const { left: l, top: t } = node?.getBoundingClientRect() || {}
+                left = l
+                top = t
+            }
 
             if (type === MouseEventType.MOVE) {
                 this.pointer.move(x + left, y + top)
