@@ -1,15 +1,27 @@
 {
     "name": "@timecat/player",
     "version": "1.0.0",
-    "description": "",
-    "main": "dist/index.esm.js",
-    "types": "dist/index.d.ts",
+    "description": "@timecat/player",
+    "main": "index.js",
+    "module": "dist/player.esm.js",
+    "types": "dist/player.d.ts",
+    "unpkg": "dist/player/global.js",
+    "jsdelivr": "dist/player/global.js",
+    "files": [
+        "index.js",
+        "dist"
+    ],
     "scripts": {},
+    "buildOptions": {
+        "formats": [
+            "global",
+            "esm",
+            "cjs"
+        ]
+    },
     "dependencies": {
         "@timecat/utils": "^1.0.0",
-        "@timecat/record": "^1.0.0",
         "@timecat/virtual-dom": "^1.0.0",
-        "@timecat/snapshot": "^1.0.0",
         "@timecat/share": "^1.0.0"
     },
     "author": "",

@@ -53,7 +53,7 @@ $ npm i timecatjs -D
 Add script tags in your browser and use the global variable ``timecat``
 
 
-- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs@latest/lib/timecatjs.min.js) 
+- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs@latest/lib/timecat.global.js) 
 - [UNPKG](https://unpkg.com/timecatjs)
 
 ### Usage

@@ -1,8 +1,9 @@
 {
+    "private": true,
     "name": "@timecat/share",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/index.esm.js",
+    "main": "src/index.ts",
     "types": "dist/index.d.ts",
     "scripts": {},
     "author": "",

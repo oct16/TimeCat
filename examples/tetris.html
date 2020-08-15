@@ -57,14 +57,14 @@
     </div>
     <!--hidden--><button id="replay" class="locked">Replay</button>
     <script type="text/javascript" src="https://chvin.github.io/react-tetris/app-1.0.1.js"></script>
-    <script id="time-cat" src="./timecatjs.min.js"></script>
+    <script id="time-cat" src="./timecat.global.js"></script>
 
     <script>
-        const { record } = timecat
-        ctrl = record()
-        handleReplay(ctrl)
+        const { Recorder } = timecat
+        const r = new Recorder()
+        handleReplay(r)
 
-        function handleReplay(ctrl) {
+        function handleReplay(r) {
             function isPC() {
                 var userAgentInfo = navigator.userAgent;
                 var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
@@ -84,7 +84,7 @@
                         return
                     }
                     replayButton.className = 'hide'
-                    ctrl.unsubscribe()
+                    r.unsubscribe()
                     if (isPC()) {
                         window.open('replay.html')
                     } else {
@@ -105,17 +105,6 @@
                 }
             })
     </script>
-
-    <!--env-->
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'UA-151180797-1');
-    </script>
-    <!--env-->
 </body>
 
 </html>

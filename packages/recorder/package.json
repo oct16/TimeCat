@@ -1,14 +1,27 @@
 {
-    "name": "@timecat/record",
+    "name": "@timecat/recorder",
     "version": "1.0.0",
-    "description": "",
-    "main": "dist/index.esm.js",
-    "types": "dist/index.d.ts",
+    "description": "@timecat/recorder",
+    "main": "index.js",
+    "module": "dist/recorder.esm.js",
+    "types": "dist/recorder.d.ts",
+    "unpkg": "dist/recorder/global.js",
+    "jsdelivr": "dist/recorder/global.js",
+    "files": [
+        "index.js",
+        "dist"
+    ],
     "scripts": {},
+    "buildOptions": {
+        "formats": [
+            "global",
+            "esm",
+            "cjs"
+        ]
+    },
     "dependencies": {
         "@timecat/utils": "^1.0.0",
         "@timecat/virtual-dom": "^1.0.0",
-        "@timecat/snapshot": "^1.0.0",
         "@timecat/share": "^1.0.0"
     },
     "author": "",

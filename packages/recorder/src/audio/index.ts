@@ -1,4 +1,4 @@
-import { Recorder } from './audio-recorder'
+import { AudioRecorder } from './audio-recorder'
 import { AudioRecord, RecordType, WatcherOptions } from '@timecat/share'
 import { Watcher } from '../watcher'
 
@@ -9,7 +9,7 @@ export class RecordAudio extends Watcher<AudioRecord> {
     }
 
     init() {
-        const recorder = new Recorder({
+        const recorder = new AudioRecorder({
             sampleBits: 8,
             sampleRate: 8000,
             channelCount: 1

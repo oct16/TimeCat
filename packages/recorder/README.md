@@ -1,1 +1,1 @@
-## @timecat/record
+## @timecat/recorder

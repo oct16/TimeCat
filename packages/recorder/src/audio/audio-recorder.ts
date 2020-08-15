@@ -1,7 +1,7 @@
 import { RecorderOptions, IRecorderStatus } from '@timecat/share'
 import { float32ArrayToBase64 } from '@timecat/utils'
 
-export class Recorder {
+export class AudioRecorder {
     static defaultRecordOptions = {
         sampleBits: 8,
         sampleRate: 8000,
@@ -20,7 +20,7 @@ export class Recorder {
 
     onProgress: ((audioBase64Data: string[]) => void) | null
 
-    constructor(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
+    constructor(opts: Partial<RecorderOptions> = AudioRecorder.defaultRecordOptions) {
         this.setOptions(opts)
     }
 
@@ -28,7 +28,7 @@ export class Recorder {
         return this.opts
     }
 
-    setOptions(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
+    setOptions(opts: Partial<RecorderOptions> = AudioRecorder.defaultRecordOptions) {
         this.opts = { ...this.opts, ...opts }
     }
 
@@ -44,7 +44,7 @@ export class Recorder {
         this.processNode.connect(this.audioContext.destination)
         this.processNode.onaudioprocess = onAudioProcess.bind(this)
 
-        function onAudioProcess(this: Recorder, event: AudioProcessingEvent) {
+        function onAudioProcess(this: AudioRecorder, event: AudioProcessingEvent) {
             const inputBuffer = event.inputBuffer
 
             // 1 channel, temporarily
@@ -77,7 +77,7 @@ export class Recorder {
         })
     }
 
-    public async start(opts: Partial<RecorderOptions> = Recorder.defaultRecordOptions) {
+    public async start(opts: Partial<RecorderOptions> = AudioRecorder.defaultRecordOptions) {
         this.setOptions(opts)
         this.mediaStream = await this.initRecorder()
         this.mediaStream && this.beginRecord()

@@ -2,7 +2,7 @@
  * Reference: https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint
  * TODO FMP (first Meaningful Paint) TODO
  */
-class FMP {
+export class FMP {
     interval = 1000
     len = 0
     resolved = false
@@ -58,5 +58,3 @@ class FMP {
         this.listener.push(fn)
     }
 }
-
-export const fmp = new FMP()
