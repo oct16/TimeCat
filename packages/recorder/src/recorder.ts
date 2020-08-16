@@ -11,6 +11,7 @@ export class Recorder {
 
     constructor(options: RecordOptions) {
         this.record(options)
+        this.listenVisibleChange(options)
     }
 
     public unsubscribe() {
@@ -44,7 +45,9 @@ export class Recorder {
 
         // is record iframe, switch context
         if (!options || !options.context) {
-            db.clear()
+            if (!options.skip) {
+                db.clear()
+            }
         } else {
             iframeWatchers = [
                 Snapshot,
@@ -112,5 +115,26 @@ export class Recorder {
     private async recordFrames() {
         const frames = await this.waitingFramesLoaded()
         frames.forEach(frameWindow => this.record({ context: frameWindow }))
+    }
+
+    listenVisibleChange(this: Recorder, options: RecordOptions) {
+        if (typeof document.hidden !== 'undefined') {
+            const hidden = 'hidden'
+            const visibilityChange = 'visibilitychange'
+
+            function handleVisibilityChange(this: Recorder) {
+                if (document[hidden]) {
+                    this.unsubscribe()
+                } else {
+                    this.record({ ...options, skip: true })
+                }
+            }
+
+            document.addEventListener(visibilityChange, handleVisibilityChange.bind(this), false)
+
+            this.reverseStore.add(() =>
+                document.removeEventListener(visibilityChange, handleVisibilityChange.bind(this), false)
+            )
+        }
     }
 }

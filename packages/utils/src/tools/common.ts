@@ -10,7 +10,8 @@ import {
     RecorderOptions,
     RecordType,
     ReplayData,
-    ReplayPack
+    ReplayPack,
+    ReplayHead
 } from '@timecat/share'
 
 export const isDev = process.env.NODE_ENV === 'development'
@@ -73,15 +74,25 @@ export function classifyRecords(records: RecordData[]) {
         return frame.data.type === 'base64'
     }
 
+    function isSameHEAD(head: ReplayHead, compare: ReplayHead) {
+        return head.href === compare.href // && head.sessionId === compare.sessionId
+    }
+
     let replayPack: ReplayPack
     let replayData: ReplayData
     records.forEach((record, index) => {
         const next = records[index + 1]
-
         switch (record.type) {
             case RecordType.HEAD:
+                const headData = record.data
+                const lastHEAD = replayPack && replayPack.head
+
+                if (lastHEAD && isSameHEAD(headData, lastHEAD)) {
+                    break
+                }
+
                 replayPack = {
-                    head: record.data,
+                    head: headData,
                     body: []
                 }
                 if (next && !(next.data as SnapshotRecord['data']).frameId) {

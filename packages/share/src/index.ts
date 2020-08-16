@@ -256,6 +256,7 @@ export interface RecordOptions {
     mode?: 'live' | 'default'
     context?: Window
     audio?: boolean
+    skip?: boolean
     emitter?: (data: RecordData, db: any) => void
     // emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
