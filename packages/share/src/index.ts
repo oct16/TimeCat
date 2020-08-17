@@ -257,8 +257,7 @@ export interface RecordOptions {
     context?: Window
     audio?: boolean
     skip?: boolean
-    emitter?: (data: RecordData, db: any) => void
-    // emitter?: (data: RecordData, db: IndexedDBOperator) => void
+    onData?: (data: RecordData, db: any) => RecordData | void
 }
 
 export interface RecorderOptions {

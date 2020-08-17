@@ -255,7 +255,7 @@
         const player = host.document.getElementById('player').contentWindow
         const r = new Recorder({
             mode: 'live',
-            emitter: (data, db) => {
+            onData: (data, db) => {
                 player.postMessage(data)
             }
         })

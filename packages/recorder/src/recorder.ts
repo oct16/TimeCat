@@ -59,16 +59,19 @@ export class Recorder {
         }
 
         function onEmit(options: RecordOptions) {
-            const { emitter } = options
+            const { onData } = options
             return (data: RecordData) => {
                 if (!data) {
                     return
                 }
-                if (emitter) {
-                    emitter(data, db)
-                    return
+                let ret
+                if (onData) {
+                    ret = onData(data, db)
+                    if (!ret) {
+                        return
+                    }
                 }
-                db.addRecord(data)
+                db.addRecord(ret || data)
             }
         }
 
