@@ -118,7 +118,7 @@ export interface DOMRecord {
     data: DOMWatcherData
     time: string
 }
-export interface DOMWatcherData extends DOMUpdateDataType {}
+export type DOMWatcherData = DOMUpdateDataType
 
 export interface AttributesUpdateData {
     id: number
@@ -256,6 +256,7 @@ export interface RecordOptions {
     mode?: 'live' | 'default'
     context?: Window
     audio?: boolean
+    skip?: boolean
     emitter?: (data: RecordData, db: any) => void
     // emitter?: (data: RecordData, db: IndexedDBOperator) => void
 }
@@ -276,6 +277,7 @@ export enum TransactionMode {
 
 export type WatcherOptions<T extends RecordData | HeadRecord> = {
     context: Window
+    reverseStore: Set<Function>
     emit: RecordEvent<T>
 }
 

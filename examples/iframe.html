@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    <script id="time-cat" src="./timecatjs.min.js"></script>
+    <script id="time-cat" src="./timecat.global.js"></script>
 
     <script>
         function resizeIframe(target) {
@@ -99,8 +99,8 @@
             }, 250)
         }
 
-        const { record } = timecat
-        const ctrl = record()
+        const { Recorder } = timecat
+        const r = new Recorder()
         const replayButton = document.getElementById('replay')
         if (replayButton) {
             setTimeout(() => {
@@ -111,7 +111,7 @@
                     return
                 }
                 replayButton.className = 'hide'
-                ctrl.unsubscribe()
+                r.unsubscribe()
                 window.open('replay.html')
             })
         }
@@ -123,18 +123,6 @@
             number.innerHTML = Number(number.innerHTML) + 1
         })
     </script>
-
-
-    <!--env-->
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'UA-151180797-1');
-    </script>
-    <!--env-->
 </body>
 
 </html>

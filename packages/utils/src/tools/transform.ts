@@ -1,5 +1,4 @@
 import { RecorderOptions } from '@timecat/share'
-import { download, isDev } from './common'
 
 function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
     const { sampleBits } = opts
@@ -10,14 +9,14 @@ function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
 
     if (sampleBits === 8) {
         for (let i = 0; i < bufferData.length; i++, offset++) {
-            let s = Math.max(-1, Math.min(1, bufferData[i]))
+            const s = Math.max(-1, Math.min(1, bufferData[i]))
             let val = s < 0 ? s * 128 : s * 127
             val = +val + 128
             data.setInt8(offset, val)
         }
     } else {
         for (let i = 0; i < bufferData.length; i++, offset += 2) {
-            let s = Math.max(-1, Math.min(1, bufferData[i]))
+            const s = Math.max(-1, Math.min(1, bufferData[i]))
             data.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, isLittleEndian)
         }
     }
@@ -29,7 +28,7 @@ export function encodeWAV(data: Float32Array[], opts: RecorderOptions) {
     const PMC = encodePCM(mergeArray(data), opts)
     const arrayBuffer = createWavFile(PMC, opts)
 
-    let blob = new Blob([arrayBuffer], {
+    const blob = new Blob([arrayBuffer], {
         type: 'audio/wav'
     })
 
@@ -37,9 +36,9 @@ export function encodeWAV(data: Float32Array[], opts: RecorderOptions) {
 }
 
 function mergeArray(list: Float32Array[]) {
-    let length = list.length * list[0].length
-    let data = new Float32Array(length),
-        offset = 0
+    const length = list.length * list[0].length
+    const data = new Float32Array(length)
+    let offset = 0
     for (let i = 0; i < list.length; i++) {
         data.set(list[i], offset)
         offset += list[i].length
@@ -49,7 +48,7 @@ function mergeArray(list: Float32Array[]) {
 
 function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRate }: RecorderOptions) {
     const WAV_HEAD_SIZE = 44
-    let buffer = new ArrayBuffer(WAV_HEAD_SIZE + audioData.byteLength)
+    const buffer = new ArrayBuffer(WAV_HEAD_SIZE + audioData.byteLength)
     const isLittleEndian = true
     // control buffer
     const view = new DataView(buffer)
@@ -85,7 +84,7 @@ function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRa
     // view.setUint32(40, audioData.length * 2, isLittleEndian)
 
     // write PCM
-    let length = audioData.byteLength
+    const length = audioData.byteLength
     let offset = 44
     // let volume = 1
     for (let i = 0; i < length; i++) {

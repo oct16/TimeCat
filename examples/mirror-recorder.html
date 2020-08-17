@@ -247,13 +247,13 @@
         app.$mount('.todoapp')
 
     </script>
-    
-    <script id="time-cat" src="./timecatjs.min.js"></script>
+
+    <script id="time-cat" src="./timecat.global.js"></script>
     <script>
-        const { record } = timecat
+        const { Recorder } = timecat
         const host = window.parent
         const player = host.document.getElementById('player').contentWindow
-        const ctrl = record({
+        const r = new Recorder({
             mode: 'live',
             emitter: (data, db) => {
                 player.postMessage(data)

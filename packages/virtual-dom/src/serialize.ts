@@ -22,7 +22,7 @@ const getVNodeByEl = (el: Element, isSVG?: boolean): VNode | VSNode => {
 
 const getAttr = (el: HTMLElement & { checked: boolean }) => {
     const resAttr: { [key: string]: string } = {}
-    const { attributes, tagName } = el
+    const { attributes } = el
     if (attributes && attributes.length) {
         return Object.values(attributes).reduce((ret: { [key: string]: string }, attr) => {
             const [name, value] = extraAttr(attr)
@@ -73,7 +73,7 @@ function getExtra(node: Element, isSVG?: boolean) {
 }
 
 const extraAttr = (attr: Attr) => {
-    let { name, value } = attr
+    const { name, value } = attr
     if (name === 'href' || name === 'src') {
         if (value.startsWith('#/')) {
             return []

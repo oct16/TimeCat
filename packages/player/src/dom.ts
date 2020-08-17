@@ -22,7 +22,7 @@ import {
 import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
-import { setAttribute, createNode, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
+import { setAttribute, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
 
 /**
  * if return true then revert
@@ -97,7 +97,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
 
         case RecordType.SCROLL: {
             const { top, left, id } = data as ScrollWatcherData
-            let target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
+            const target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
 
             const curTop = target.scrollTop
 
@@ -126,12 +126,16 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.MOUSE: {
             const { x, y, id, type } = data as MouseRecordData
-            if (!id) {
-                return
-            }
 
-            const node = nodeStore.getNode(id) as HTMLElement
-            const { left, top } = node?.getBoundingClientRect() || {}
+            let left = 0,
+                top = 0
+
+            if (id) {
+                const node = nodeStore.getNode(id) as HTMLElement
+                const { left: l, top: t } = node?.getBoundingClientRect() || {}
+                left = l
+                top = t
+            }
 
             if (type === MouseEventType.MOVE) {
                 this.pointer.move(x + left, y + top)
@@ -274,7 +278,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             if (src) {
                 const image = new Image()
                 image.src = src
-                image.onload = function(this: HTMLImageElement) {
+                image.onload = function (this: HTMLImageElement) {
                     ctx.drawImage(this, 0, 0)
                 }
             } else {

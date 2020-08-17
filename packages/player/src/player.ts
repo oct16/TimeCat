@@ -90,13 +90,7 @@ export class PlayerComponent {
         }
 
         if (this.audioData.src) {
-            this.audioBlobUrl =
-                location.href
-                    .split('/')
-                    .slice(0, -1)
-                    .join('/') +
-                '/' +
-                this.audioData.src
+            this.audioBlobUrl = location.href.split('/').slice(0, -1).join('/') + '/' + this.audioData.src
         } else {
             const bufferStrList = this.audioData.bufferStrList
             if (!bufferStrList.length) {

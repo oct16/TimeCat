@@ -5,11 +5,9 @@ import pako from 'pako'
 import {
     VNode,
     VSNode,
-    RecordData,
     AudioData,
     RecorderOptions,
     TerminateRecord,
-    SnapshotRecord,
     RecordType,
     ReplayData,
     ReplayPack
@@ -112,7 +110,7 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
 
 async function injectScripts(html: Document, scripts?: ScriptItem[]) {
     if (scripts) {
-        for (let scriptItem of scripts) {
+        for (const scriptItem of scripts) {
             const { src, name } = scriptItem
             let scriptContent = src
             const script = document.createElement('script')
@@ -193,7 +191,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     const jsonStrData = JSON.stringify(extractedData)
 
     const zipArray = pako.gzip(jsonStrData)
-    let outputStr: string = ''
+    let outputStr = ''
 
     for (let i = 0; i < zipArray.length; i++) {
         let num = zipArray[i]

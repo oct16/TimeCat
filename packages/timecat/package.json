@@ -1,14 +1,28 @@
 {
     "name": "timecat",
     "version": "1.0.0",
-    "description": "",
-    "main": "dist/index.esm.js",
-    "types": "dist/index.d.ts",
+    "description": "timecat",
+    "main": "index.js",
+    "module": "dist/timecat.esm.js",
+    "types": "dist/timecat.d.ts",
+    "unpkg": "dist/timecat/global.js",
+    "jsdelivr": "dist/timecat/global.js",
+    "files": [
+        "index.js",
+        "dist"
+    ],
     "scripts": {},
     "author": "",
     "license": "ISC",
+    "buildOptions": {
+        "formats": [
+            "global",
+            "esm",
+            "cjs"
+        ]
+    },
     "dependencies": {
-        "@timecat/record": "^1.0.0",
+        "@timecat/recorder": "^1.0.0",
         "@timecat/player": "^1.0.0",
         "@timecat/utils": "^1.0.0"
     },

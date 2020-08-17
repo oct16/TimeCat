@@ -15,7 +15,7 @@ A Magical Web Recorder 🖥 网页录屏器
 
 TimeCat 是一套网页录屏的解决方案，利用其独特的算法，提供超高性能，超高压缩比的网页无损录制。可以广泛运作于监控系统，行为分析，案例复盘，远程教育，低流量视频协同等场景
 
-[🖥 DEMO](https://oct16.github.io/TimeCat) Chrome浏览器
+[🖥 DEMO](https://timecat.xxxxoo.com/) Chrome浏览器
 
 ### Milestone
     07.20 Support Iframe (V1.1.0)
@@ -53,7 +53,7 @@ $ npm i timecatjs -D
 Add script tags in your browser and use the global variable ``timecat``
 
 
-- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs@latest/lib/timecatjs.min.js) 
+- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs@latest/lib/timecat.global.js) 
 - [UNPKG](https://unpkg.com/timecatjs)
 
 ### Usage
@@ -128,7 +128,7 @@ exportReplay(ExportOptions)
 
 ### API Documentation
 
-[TYPEDOC](https://oct16.github.io/TimeCat/docs/globals.html)
+[TYPEDOC](https://timecat.xxxxoo.com/docs/globals.html)
 
 ### TimeCat -- 不可思议的Web录屏器
 

@@ -57,13 +57,13 @@ export function createStore(reducer: Reducer, initState: States = {}) {
     function getState(): StateMap
 
     function getState<T extends keyof StateMap>(name?: T): StateMap[T]
-    
+
     function getState<T extends keyof StateMap>(name?: T) {
         const s = state as StateMap
         if (name) {
             return s[name] as StateMap[T]
         }
-        return s 
+        return s
     }
 
     function getTypeInTopics(type: TopicName): TopicName | undefined {
@@ -72,7 +72,7 @@ export function createStore(reducer: Reducer, initState: States = {}) {
             progress: Object.keys(ProgressTypes)
         }
 
-        for (let [key, enums] of Object.entries(topics)) {
+        for (const [key, enums] of Object.entries(topics)) {
             if (enums.includes(type)) {
                 return key as TopicName
             }

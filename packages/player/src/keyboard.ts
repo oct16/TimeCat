@@ -35,7 +35,7 @@ export class KeyboardComponent {
         this.detectWindowIsActive()
     }
 
-    dispatchPlay(speed: number = 0) {
+    dispatchPlay(speed = 0) {
         reduxStore.dispatch({
             type: PlayerTypes.SPEED,
             data: {
