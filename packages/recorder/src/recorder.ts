@@ -1,7 +1,7 @@
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordOptions, ValueOf } from '@timecat/share'
-import { getDBOperator, logError } from '@timecat/utils'
+import { getDBOperator, logError, Transmitter } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 
@@ -10,8 +10,14 @@ export class Recorder {
     private reverseStore: Set<Function> = new Set()
 
     constructor(options: RecordOptions) {
-        this.record(options)
-        this.listenVisibleChange(options)
+        const opts = { ...Recorder.defaultRecordOpts, ...options }
+
+        // TODO: Plugin module
+        if (opts && opts.uploadUrl) {
+            new Transmitter(opts.uploadUrl)
+        }
+        this.record(opts)
+        this.listenVisibleChange(opts)
     }
 
     public unsubscribe() {
@@ -33,8 +39,7 @@ export class Recorder {
     }
 
     public record(options: RecordOptions) {
-        const opts = { ...Recorder.defaultRecordOpts, ...options }
-        this.startRecord(opts)
+        this.startRecord(options)
     }
 
     private async startRecord(options: RecordOptions) {

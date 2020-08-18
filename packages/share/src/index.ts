@@ -226,6 +226,8 @@ export interface CanvasInitRecordData {
 
 export type RecordEvent<T extends RecordData> = (e: T) => void
 
+export type DBRecordData = { id: number } & RecordData
+
 export type RecordData =
     | HeadRecord
     | SnapshotRecord
@@ -257,6 +259,7 @@ export interface RecordOptions {
     context?: Window
     audio?: boolean
     skip?: boolean
+    uploadUrl?: string
     onData?: (data: RecordData, db: any) => RecordData | void
 }
 
