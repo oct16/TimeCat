@@ -8,10 +8,10 @@ export class LocationWatcher extends Watcher<LocationRecord> {
     }
 
     init() {
-        history.pushState = this.kidnapLocation('pushState')
-        history.replaceState = this.kidnapLocation('replaceState')
+        this.context.history.pushState = this.kidnapLocation('pushState')
+        this.context.history.replaceState = this.kidnapLocation('replaceState')
 
-        const types = ['replaceState', 'pushState', 'hashchange']
+        const types = ['replaceState', 'pushState', 'popstate', 'hashchange']
 
         types.forEach(type => this.toggleListener('add', type, this.locationHandle))
 
@@ -24,20 +24,22 @@ export class LocationWatcher extends Watcher<LocationRecord> {
         this.context[methodType === 'add' ? 'addEventListener' : 'removeEventListener'](type, handle)
     }
 
-    kidnapLocation(type: 'pushState' | 'replaceState') {
-        const original = this.context.history[type]
+    kidnapLocation = (type: 'pushState' | 'replaceState') => {
+        const ctx = this.context;
+        const original = ctx.history[type];
 
         return function (this: any) {
-            const e = new Event(type)
-            e.arguments = arguments
-            this.context.dispatchEvent(e)
-            original.apply(this, arguments)
-        }
+            const result = original.apply(this, arguments);
+            const e = new Event(type);
+            e.arguments = arguments;
+            ctx.dispatchEvent(e);
+            return result;
+        };
     }
 
-    locationHandle(e: Event) {
+    locationHandle = (e: Event) => {
         const contextNodeId = this.getContextNodeId(e)
-        const [, , path] = e.arguments
+        const [, , path] = e.arguments || [, , this.context?.location?.pathname]
         const { href, hash } = this.context.location
         this.emit({
             type: RecordType.LOCATION,
