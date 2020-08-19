@@ -1,7 +1,5 @@
 module.exports = {
-    testEnvironment: 'jsdom',
     preset: 'ts-jest',
-    roots: ['<rootDir>/test'],
     rootDir: __dirname,
     transform: {
         '^.+\\.tsx?$': 'ts-jest'
@@ -9,12 +7,13 @@ module.exports = {
     coverageDirectory: 'coverage',
     coverageReporters: ['html', 'lcov', 'text'],
     watchPathIgnorePatterns: ['/node_modules/', '/dist/', '/.git/'],
-    modulePaths: ['packages', 'test'],
-    testRegex: '(/unit/.*|(\\.|/)(test|spec))\\.tsx?$',
+    // testRegex: '(/unit/.*|(\\.|/)(test|spec))\\.tsx?$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
     moduleNameMapper: {
         '^@timecat/(.*?)$': '<rootDir>/packages/$1/src',
         'packages/(.*)$': '<rootDir>/packages/$1'
     },
+    testMatch: ['<rootDir>/packages/**/__tests__/**/*spec.[jt]s?(x)'],
+    testPathIgnorePatterns: process.env.SKIP_E2E ? ['/node_modules/', '/examples/__tests__'] : ['/node_modules/'],
     verbose: true
 }

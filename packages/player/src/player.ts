@@ -15,7 +15,7 @@ import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
-import { AnimationFrame } from './animationFrame'
+import { AnimationFrame } from './animation-frame'
 
 export class PlayerComponent {
     c: ContainerComponent

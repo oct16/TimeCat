@@ -34,11 +34,29 @@
         "test": "jest",
         "embed": "cp packages/timecat/dist/timecat.global.js ../TimeCatChrome/src/assets/",
         "count": "git ls-files --exclude-standard -- ':!:**/*.[pjs][npv]g' ':!:.eslintrc' ':!: examples/*' ':!:.gitignore' ':!:README.*' ':!:LICENSE' ':!:yarn.lock' | xargs wc -l",
+        "ls-lint": "ls-lint",
         "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix",
         "preinstall": "node ./scripts/checkYarn.js"
     },
+    "gitHooks": {
+        "pre-commit": "ls-lint && lint-staged",
+        "commit-msg": "node ./scripts/verifyCommit.js"
+    },
+    "lint-staged": {
+        "*.js": [
+            "prettier --write"
+        ],
+        "*.ts?(x)": [
+            "eslint",
+            "prettier --parser=typescript --write"
+        ]
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
     "dependencies": {},
     "devDependencies": {
+        "@ls-lint/ls-lint": "^1.9.2",
         "@microsoft/api-extractor": "^7.8.9",
         "@rollup/plugin-commonjs": "^11.0.2",
         "@rollup/plugin-html": "^0.1.1",
@@ -65,8 +83,10 @@
         "fs-extra": "^8.1.0",
         "jest": "^26.0.1",
         "koa": "^2.13.0",
+        "lint-staged": "^10.2.11",
         "minimist": "^1.2.5",
         "pako": "^1.0.11",
+        "pre-commit": "^1.2.2",
         "prettier": "^2.0.5",
         "rollup": "^1.32.0",
         "rollup-plugin-scss": "^2.5.0",
@@ -76,7 +96,8 @@
         "rollup-plugin-visualizer": "^4.0.4",
         "smoothscroll-polyfill": "^0.4.4",
         "ts-jest": "^26.1.0",
-        "typescript": "^3.9.7"
+        "typescript": "^3.9.7",
+        "yorkie": "^2.0.0"
     },
     "repository": {
         "type": "git",
