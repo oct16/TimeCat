@@ -15,6 +15,7 @@
     "author": "",
     "license": "ISC",
     "buildOptions": {
+        "name": "timecat",
         "formats": [
             "global",
             "esm",

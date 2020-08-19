@@ -27,7 +27,7 @@ import smoothScroll from 'smoothscroll-polyfill'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
 
-export class Replay {
+export default class Player {
     fmp: FMP
     constructor(options: ReplayOptions) {
         this.init(options)
