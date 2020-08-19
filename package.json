@@ -38,9 +38,11 @@
         "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix",
         "preinstall": "node ./scripts/checkYarn.js"
     },
-    "gitHooks": {
-        "pre-commit": "ls-lint && lint-staged",
-        "commit-msg": "node ./scripts/verifyCommit.js"
+    "husky": {
+        "hooks": {
+            "pre-commit": "ls-lint && lint-staged",
+            "commit-msg": "node ./scripts/verifyCommit.js"
+        }
     },
     "lint-staged": {
         "*.js": [
@@ -54,7 +56,6 @@
     "engines": {
         "node": ">=10.0.0"
     },
-    "dependencies": {},
     "devDependencies": {
         "@ls-lint/ls-lint": "^1.9.2",
         "@microsoft/api-extractor": "^7.8.9",
@@ -81,12 +82,12 @@
         "eslint-plugin-prettier": "^3.1.4",
         "execa": "^4.0.0",
         "fs-extra": "^8.1.0",
+        "husky": "^4.2.5",
         "jest": "^26.0.1",
         "koa": "^2.13.0",
         "lint-staged": "^10.2.11",
         "minimist": "^1.2.5",
         "pako": "^1.0.11",
-        "pre-commit": "^1.2.2",
         "prettier": "^2.0.5",
         "rollup": "^1.32.0",
         "rollup-plugin-scss": "^2.5.0",
@@ -96,8 +97,7 @@
         "rollup-plugin-visualizer": "^4.0.4",
         "smoothscroll-polyfill": "^0.4.4",
         "ts-jest": "^26.1.0",
-        "typescript": "^3.9.7",
-        "yorkie": "^2.0.0"
+        "typescript": "^3.9.7"
     },
     "repository": {
         "type": "git",
