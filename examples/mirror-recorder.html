@@ -252,11 +252,14 @@
     <script>
         const { Recorder } = timecat
         const host = window.parent
-        const player = host.document.getElementById('player').contentWindow
-        const r = new Recorder({
+        const players = host.document.querySelectorAll('.player')
+        new Recorder({
             mode: 'live',
             onData: (data, db) => {
-                player.postMessage(data)
+                players.forEach(player => {
+                    const playerWindow = player.contentWindow
+                    playerWindow.postMessage(data)
+                })
             }
         })
     </script>
