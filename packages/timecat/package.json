@@ -5,8 +5,8 @@
     "main": "index.js",
     "module": "dist/timecat.esm.js",
     "types": "dist/timecat.d.ts",
-    "unpkg": "dist/timecat/global.js",
-    "jsdelivr": "dist/timecat/global.js",
+    "unpkg": "dist/timecat.global.js",
+    "jsdelivr": "dist/timecat.global.js",
     "files": [
         "index.js",
         "dist"
@@ -26,6 +26,5 @@
         "@timecat/recorder": "^1.0.0",
         "@timecat/player": "^1.0.0",
         "@timecat/utils": "^1.0.0"
-    },
-    "devDependencies": {}
+    }
 }

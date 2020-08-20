@@ -88,7 +88,7 @@ async function build(target) {
         if (extractorResult.succeeded) {
             // concat additional d.ts to rolled-up dts
             const typesDir = path.resolve(pkgDir, 'types')
-            if (fs.exists(typesDir)) {
+            if (fs.existsSync(typesDir)) {
                 const dtsPath = path.resolve(pkgDir, pkg.types)
                 const existing = await fs.readFile(dtsPath, 'utf-8')
                 const typeFiles = await fs.readdir(typesDir)

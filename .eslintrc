@@ -20,6 +20,9 @@
                 "plugin:node/recommended"
             ],
             "rules": {
+                "no-unused-vars": [
+                    "warn"
+                ],
                 "no-process-exit": [
                     "off"
                 ]

@@ -5,8 +5,8 @@
     "main": "index.js",
     "module": "dist/recorder.esm.js",
     "types": "dist/recorder.d.ts",
-    "unpkg": "dist/recorder/global.js",
-    "jsdelivr": "dist/recorder/global.js",
+    "unpkg": "dist/recorder.global.js",
+    "jsdelivr": "dist/recorder.global.js",
     "files": [
         "index.js",
         "dist"
@@ -20,7 +20,7 @@
             "cjs"
         ]
     },
-    "dependencies": {
+    "devDependencies": {
         "@timecat/utils": "^1.0.0",
         "@timecat/virtual-dom": "^1.0.0",
         "@timecat/share": "^1.0.0"
