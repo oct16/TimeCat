@@ -101,7 +101,7 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
     if (!scriptList.some(item => item.name === 'time-cat-init')) {
         scriptList.push({
             name: 'time-cat-init',
-            src: `timecat.replay(${JSON.stringify(options)})`
+            src: `new timecat.Player(${JSON.stringify(options)})`
         })
     }
 

@@ -176,7 +176,8 @@ export default class Player {
                             }
                         }
                     } else {
-                        throw logError('ReplayHead not found')
+                        return
+                        // logError('ReplayHead not found')
                     }
                 }
             })
