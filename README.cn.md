@@ -18,6 +18,7 @@ TimeCat 是一套网页录屏的解决方案，利用其独特的算法，提供
 [🖥 DEMO](https://timecat.xxxxoo.com/) Chrome浏览器
 
 ### Milestone
+    08.20 Released V1.2.0
     07.20 Support Iframe (V1.1.0)
     06.07 Support Audio
     05.24 Released V1.0.0
@@ -53,7 +54,7 @@ $ npm i timecatjs -D
 Add script tags in your browser and use the global variable ``timecat``
 
 
-- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs@latest/lib/timecat.global.js) 
+- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs) 
 - [UNPKG](https://unpkg.com/timecatjs)
 
 ### Usage
@@ -61,29 +62,36 @@ Add script tags in your browser and use the global variable ``timecat``
 ###### Import SDK
 ```ts
 // from module
-import { record, replay } from 'timecatjs';
+import { Recorder, Player } from 'timecatjs';
+ // or
+import Recorder from '@timecat/recorder'
+import Player from '@timecat/player'
 
 // from cdn
-const { record, replay } = window.timecat
+const { Recorder, Player } = window.timecat
 ```
 
 ###### Record Data
 ```ts
 // record page
 interface RecordOptions {
+
     mode?: 'live' | 'default' // mode
     context?: Window  // record context
     audio?: boolean // if your want record audio
+    uploadUrl?: string // will post PackData to server
     // callback data here
-    emitter?: (data: RecordData, db: IndexedDBOperator) => void
+    onData?: (data: RecordData, db: IndexedDBOperator) => RecordData | void
 }
 
 // default use IndexedDB to save records
-const ctrl = record(RecordOptions)
+const recorder = new Recorder(RecordOptions)
 
 // if you wanna send the records to server
-const ctrl = record({
-    emitter: (data, db) => fetch(<Server URL>, {
+const recorder = new recorder({
+    uploadUrl: <Server URL>
+    // or custom
+    onData: (data, db) => fetch(<Server URL>, {
             body: JSON.stringify(data),
             method: 'POST',
             ContentType: 'application/json'
@@ -91,7 +99,7 @@ const ctrl = record({
 })
 
 // if you want stop record
-ctrl.unsubscribe()
+recorder.unsubscribe()
 ```
 - [Record Example](https://github.com/oct16/TimeCat/blob/073c467afc644ce37e4f51937c28eb5000b2a92c/examples/todo.html#L258) 
 
@@ -101,21 +109,24 @@ ctrl.unsubscribe()
 // replay record
 interface ReplayOptions {
     mode?: 'live' | 'default' // mode
-    replayPacks?: replayPack[] // data from options
+    replayDataList?: ReplayData[] // data from options
     fetch?: { url: string; options?: RequestInit } // data from server
     // receive data in live mode
     receiver?: (sender: (data: RecordData) => void) => void
     proxy?: string // if cross domain
     autoplay?: boolean // autoplay when data loaded
-}****
+}
 
-replay(ReplayOptions)
+new Player(ReplayOptions)
 ```
 - [Replay example](https://github.com/oct16/TimeCat/blob/4c91fe2e9dc3786921cd23288e26b421f6ea0848/examples/player.html#L14)
 
 
 ###### Export
 ```ts
+
+import { exportReplay } from 'timecatjs'
+
 // export html file
 interface ExportOptions {
     scripts?: ScriptItem[] // inject script in html
@@ -123,12 +134,10 @@ interface ExportOptions {
     audioExternal?: boolean // export audio as a file, default is inline
     dataExternal?: boolean // export data json as a file, default is inline
 }
+
 exportReplay(ExportOptions)
 ```
 
-### API Documentation
-
-[TYPEDOC](https://timecat.xxxxoo.com/docs/globals.html)
 
 ### TimeCat -- 不可思议的Web录屏器
 
