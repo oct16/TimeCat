@@ -91,6 +91,10 @@ async function runSteps() {
         console.log(`(skipped)`)
     }
 
+    // commit
+    step('\nCommit release message')
+    await run('git', ['commit', '-am', `release: ${targetVersion}`])
+
     // publish packages
     step('\nPublishing packages...')
     for (const pkg of packages) {

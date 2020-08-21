@@ -1,6 +1,6 @@
 {
     "private": true,
-    "name": "timecatjs",
+    "name": "timecat",
     "author": "oct16",
     "version": "1.2.0-alpha.1",
     "description": "TimeCat Web Recorder",
