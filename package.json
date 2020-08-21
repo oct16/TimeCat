@@ -32,6 +32,7 @@
         "live": "node scripts/live.js",
         "test": "jest",
         "embed": "cp packages/timecat/dist/timecat.global.prod.js ../TimeCatChrome/src/assets/",
+        "gh": "node scripts/gh.js",
         "count": "git ls-files --exclude-standard -- ':!:**/*.[pjs][npv]g' ':!:.eslintrc' ':!: examples/*' ':!:.gitignore' ':!:README.*' ':!:LICENSE' ':!:yarn.lock' | xargs wc -l",
         "ls-lint": "ls-lint",
         "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix",
