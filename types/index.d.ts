@@ -47,7 +47,7 @@ interface Window {
 
     webkitAudioContext?: typeof AudioContext
 
-    timecat: {
+    TimeCat: {
         record: (
             options: RecordOptions
         ) => {
