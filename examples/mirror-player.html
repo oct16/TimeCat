@@ -10,7 +10,7 @@
 <body>
     <script id="time-cat" src="./timecat.global.js"></script>
     <script>
-        const { Player } = timecat
+        const { Player } = TimeCat
         new Player({
             mode: 'live',
             receiver: send => window.addEventListener('message', e => send(e.data))

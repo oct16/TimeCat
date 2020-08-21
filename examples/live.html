@@ -18,7 +18,7 @@
     <script id="time-cat-init">
 
         const socket = io('http://localhost:9528');
-        const { Player } = timecat
+        const { Player } = TimeCat
         new Player({
             mode: 'live',
             receiver: send => socket.on('record-data', (e) => send(e))
