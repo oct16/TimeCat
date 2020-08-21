@@ -26,9 +26,9 @@
         ]
     },
     "devDependencies": {
-        "@timecat/utils": "^1.0.0",
-        "@timecat/virtual-dom": "^1.0.0",
-        "@timecat/share": "^1.0.0"
+        "@timecat/utils": "1.2.0-alpha.2",
+        "@timecat/virtual-dom": "1.2.0-alpha.2",
+        "@timecat/share": "1.2.0-alpha.2"
     },
     "author": "",
     "license": "ISC"
