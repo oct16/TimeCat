@@ -10,7 +10,7 @@ import {
     movedNodesData,
     RemoveUpdateData,
     AttributesUpdateData,
-    DOMUpdateDataType,
+    DOMRecordData,
     CharacterDataUpdateData
 } from '@timecat/share'
 import { Watcher } from '../watcher'
@@ -203,7 +203,13 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             removedNodes,
             attrs,
             texts
-        } as DOMUpdateDataType
+        } as DOMRecordData
+
+        Object.keys(data).forEach((type: keyof DOMRecordData) => {
+            if (!data[type]!.length) {
+                delete data[type]
+            }
+        })
 
         if (Object.values(data).some(item => item.length)) {
             this.emitData({

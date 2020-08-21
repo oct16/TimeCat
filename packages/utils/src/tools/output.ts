@@ -234,10 +234,12 @@ async function makeCssInline(packs: ReplayPack[]) {
             const record = records[i]
             if (record.type === RecordType.DOM) {
                 const { addedNodes } = record.data
-                for (let j = 0; j < addedNodes.length; j++) {
-                    const node = addedNodes[j].node
-                    if (isVNode(node as VNode)) {
-                        extractLink(node as VNode, extractLinkList)
+                if (addedNodes) {
+                    for (let j = 0; j < addedNodes.length; j++) {
+                        const node = addedNodes[j].node
+                        if (isVNode(node as VNode)) {
+                            extractLink(node as VNode, extractLinkList)
+                        }
                     }
                 }
             }

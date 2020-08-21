@@ -118,7 +118,7 @@ export interface DOMRecord {
     data: DOMWatcherData
     time: string
 }
-export type DOMWatcherData = DOMUpdateDataType
+export type DOMWatcherData = DOMUpdateData
 
 export interface AttributesUpdateData {
     id: number
@@ -149,12 +149,12 @@ export interface RemoveUpdateData {
     id: number
 }
 
-export interface DOMUpdateDataType {
-    addedNodes: UpdateNodeData[]
-    movedNodes: movedNodesData[]
-    removedNodes: RemoveUpdateData[]
-    attrs: AttributesUpdateData[]
-    texts: CharacterDataUpdateData[]
+export interface DOMUpdateData {
+    addedNodes?: UpdateNodeData[]
+    movedNodes?: movedNodesData[]
+    removedNodes?: RemoveUpdateData[]
+    attrs?: AttributesUpdateData[]
+    texts?: CharacterDataUpdateData[]
 }
 
 export interface FormElementRecord {
