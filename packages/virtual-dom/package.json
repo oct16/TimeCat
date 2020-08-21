@@ -1,14 +1,14 @@
 {
     "private": true,
     "name": "@timecat/virtual-dom",
-    "version": "1.2.0-alpha.1",
+    "version": "1.2.0-alpha.2",
     "description": "",
     "main": "src/index.ts",
     "types": "dist/index.d.ts",
     "scripts": {},
     "dependencies": {
-        "@timecat/utils": "1.2.0-alpha.1",
-        "@timecat/share": "1.2.0-alpha.1"
+        "@timecat/utils": "1.2.0-alpha.2",
+        "@timecat/share": "1.2.0-alpha.2"
     },
     "author": "",
     "license": "ISC"

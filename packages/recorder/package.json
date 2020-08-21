@@ -1,6 +1,6 @@
 {
     "name": "@timecat/recorder",
-    "version": "1.2.0-alpha.1",
+    "version": "1.2.0-alpha.2",
     "description": "@timecat/recorder",
     "main": "index.js",
     "module": "dist/recorder.esm.js",
