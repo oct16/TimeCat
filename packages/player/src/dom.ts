@@ -102,7 +102,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             const curTop = target.scrollTop
 
             // prevent jump too long distance
-            const behavior = Math.abs(top - curTop) > window.__ReplayData__.snapshot.data.height * 3 ? 'auto' : 'smooth'
+            const behavior = Math.abs(top - curTop) > window.G_REPLAY_DATA.snapshot.data.height * 3 ? 'auto' : 'smooth'
             target.scrollTo({
                 top,
                 left,
@@ -236,7 +236,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             await delay(200)
             const { id, key, type: formType, value, patches } = data as FormElementRecordData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
-            const { mode } = window.__ReplayOptions__
+            const { mode } = window.G_REPLAY_OPTIONS
 
             if (node) {
                 if (formType === FormElementEvent.INPUT || formType === FormElementEvent.CHANGE) {
@@ -268,7 +268,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
 
             if (contextNode) {
                 const context = contextNode.ownerDocument!.defaultView!
-                context.__ReplayLocation__ = { ...context.__ReplayLocation__, ...{ path, hash, href } }
+                context.G_REPLAY_LOCATION = { ...context.G_REPLAY_LOCATION, ...{ path, hash, href } }
             }
             break
         }

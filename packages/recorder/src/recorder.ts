@@ -26,7 +26,7 @@ export class Recorder {
 
     private getRecorders(options: RecordOptions) {
         const context = options.context || window
-        context.__RecordOptions__ = options
+        context.G_RECORD_OPTIONS = options
 
         const recorders: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot> = [
             Snapshot,

@@ -36,7 +36,7 @@ export default class Player {
     async init(options: ReplayOptions) {
         const opts = { ...defaultReplayOptions, ...options }
 
-        window.__ReplayOptions__ = opts
+        window.G_REPLAY_OPTIONS = opts
         smoothScroll.polyfill()
 
         const replayPacks = await this.getReplayData(opts)
@@ -45,7 +45,7 @@ export default class Player {
             return
         }
 
-        const { records, audio } = (window.__ReplayData__ = this.getFirstReplayData(replayPacks))
+        const { records, audio } = (window.G_REPLAY_DATA = this.getFirstReplayData(replayPacks))
         const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
         const c = new ContainerComponent()
@@ -64,7 +64,7 @@ export default class Player {
             if (records.length) {
                 const firstRecord = records[0]
 
-                const replayPacks = window.__ReplayPacks__ as ReplayPack[]
+                const replayPacks = window.G_REPLAY_PACKS as ReplayPack[]
                 const startTime = firstRecord.time
                 const endTime =
                     replayPacks.reduce((packAcc, pack) => {
@@ -111,7 +111,7 @@ export default class Player {
     }
 
     getGZipData() {
-        const data = window.__ReplayStrPacks__
+        const data = window.G_REPLAY_STR_PACKS
         if (!data) {
             return null
         }
@@ -204,7 +204,7 @@ export default class Player {
             (receiver && (await this.dataReceiver(receiver))) ||
             this.getGZipData() ||
             (await this.getDataFromDB()) ||
-            window.__ReplayPacks__
+            window.G_REPLAY_PACKS
 
         if (!rawReplayPacks) {
             throw logError('Replay data not found')
@@ -213,7 +213,7 @@ export default class Player {
         const replayPacks = this.decodePacks(rawReplayPacks)
 
         if (replayPacks) {
-            window.__ReplayPacks__ = replayPacks
+            window.G_REPLAY_PACKS = replayPacks
             return replayPacks
         }
 

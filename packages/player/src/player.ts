@@ -112,7 +112,7 @@ export class PlayerComponent {
     streamHandle(this: PlayerComponent, e: CustomEvent) {
         const frame = e.detail as RecordData
         if (isSnapshot(frame)) {
-            window.__ReplayData__.snapshot = frame as SnapshotRecord
+            window.G_REPLAY_DATA.snapshot = frame as SnapshotRecord
             this.c.setViewState()
             return
         }
@@ -120,7 +120,7 @@ export class PlayerComponent {
     }
 
     initViewState() {
-        const { __ReplayPacks__: packs } = window
+        const { G_REPLAY_PACKS: packs } = window
         const firstPack = packs[0] as ReplayPack
         const firstData = firstPack.body[0]
         this.records = firstData.records
@@ -138,13 +138,13 @@ export class PlayerComponent {
 
         this.curViewEndTime = +this.records.slice(-1)[0].time
         this.curViewDiffTime = 0
-        window.__ReplayData__ = firstData
+        window.G_REPLAY_DATA = firstData
     }
 
     async switchNextView(delayTime?: number) {
-        const { __ReplayData__: rData, __ReplayPacks__: packs } = window as {
-            __ReplayData__: ReplayData
-            __ReplayPacks__: ReplayPack[]
+        const { G_REPLAY_DATA: rData, G_REPLAY_PACKS: packs } = window as {
+            G_REPLAY_DATA: ReplayData
+            G_REPLAY_PACKS: ReplayPack[]
         }
 
         if (!this.records) {
@@ -180,7 +180,7 @@ export class PlayerComponent {
         const nextStartTime = +nextData.records[0].time
         this.curViewDiffTime += nextStartTime - curEndTime
 
-        window.__ReplayData__ = nextData
+        window.G_REPLAY_DATA = nextData
         this.records = nextData.records
         this.audioData = nextData.audio
         this.initAudio()
