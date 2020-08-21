@@ -5,8 +5,8 @@
     "main": "index.js",
     "module": "dist/recorder.esm.js",
     "types": "dist/recorder.d.ts",
-    "unpkg": "dist/recorder.global.js",
-    "jsdelivr": "dist/recorder.global.js",
+    "unpkg": "dist/recorder.global.prod.js",
+    "jsdelivr": "dist/recorder.global.prod.js",
     "files": [
         "index.js",
         "dist"

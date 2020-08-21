@@ -5,8 +5,8 @@
     "main": "index.js",
     "module": "dist/player.esm.js",
     "types": "dist/player.d.ts",
-    "unpkg": "dist/player.global.js",
-    "jsdelivr": "dist/player.global.js",
+    "unpkg": "dist/player.global.prod.js",
+    "jsdelivr": "dist/player.global.prod.js",
     "files": [
         "index.js",
         "dist"
