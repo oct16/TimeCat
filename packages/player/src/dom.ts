@@ -1,17 +1,17 @@
 import {
     RecordData,
     MouseRecordData,
-    FormElementWatcherData,
+    FormElementRecordData,
     RecordType,
     MouseEventType,
     CharacterDataUpdateData,
     AttributesUpdateData,
     FormElementEvent,
-    WindowWatcherData,
+    WindowRecordData,
     UpdateNodeData,
     RemoveUpdateData,
-    DOMUpdateData,
-    ScrollWatcherData,
+    DOMRecordData,
+    ScrollRecordData,
     VNode,
     VSNode,
     LocationRecordData,
@@ -96,7 +96,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
 
         case RecordType.SCROLL: {
-            const { top, left, id } = data as ScrollWatcherData
+            const { top, left, id } = data as ScrollRecordData
             const target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
 
             const curTop = target.scrollTop
@@ -112,7 +112,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             break
         }
         case RecordType.WINDOW: {
-            const { width, height, id } = data as WindowWatcherData
+            const { width, height, id } = data as WindowRecordData
             let target: HTMLElement
             if (id) {
                 target = nodeStore.getNode(id) as HTMLElement
@@ -147,7 +147,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         case RecordType.DOM: {
             // Reduce the delay caused by interactive animation
             await delay(200)
-            const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMUpdateData
+            const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMRecordData
             removedNodes &&
                 removedNodes.forEach((data: RemoveUpdateData) => {
                     const { parentId, id } = data
@@ -234,7 +234,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         case RecordType.FORM_EL: {
             // Reduce the delay caused by interactive animation
             await delay(200)
-            const { id, key, type: formType, value, patches } = data as FormElementWatcherData
+            const { id, key, type: formType, value, patches } = data as FormElementRecordData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
             const { mode } = window.__ReplayOptions__
 

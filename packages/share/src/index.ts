@@ -14,9 +14,7 @@ export interface InfoData {
 
 export interface SnapshotRecord {
     type: RecordType.SNAPSHOT
-    data: {
-        vNode: VNode
-    } & InfoData
+    data: { vNode: VNode } & InfoData
     time: string
 }
 
@@ -80,11 +78,11 @@ export interface TerminateRecord {
 }
 export interface WindowRecord {
     type: RecordType.WINDOW
-    data: WindowWatcherData
+    data: WindowRecordData
     time: string
 }
 
-export interface WindowWatcherData {
+export interface WindowRecordData {
     id: number | null
     width: number
     height: number
@@ -92,11 +90,11 @@ export interface WindowWatcherData {
 
 export interface ScrollRecord {
     type: RecordType.SCROLL
-    data: ScrollWatcherData
+    data: ScrollRecordData
     time: string
 }
 
-export interface ScrollWatcherData {
+export interface ScrollRecordData {
     id: number | null
     top: number
     left: number
@@ -115,10 +113,9 @@ export interface MouseRecordData {
 }
 export interface DOMRecord {
     type: RecordType.DOM
-    data: DOMWatcherData
+    data: DOMRecordData
     time: string
 }
-export type DOMWatcherData = DOMUpdateData
 
 export interface AttributesUpdateData {
     id: number
@@ -149,7 +146,7 @@ export interface RemoveUpdateData {
     id: number
 }
 
-export interface DOMUpdateData {
+export interface DOMRecordData {
     addedNodes?: UpdateNodeData[]
     movedNodes?: movedNodesData[]
     removedNodes?: RemoveUpdateData[]
@@ -159,11 +156,11 @@ export interface DOMUpdateData {
 
 export interface FormElementRecord {
     type: RecordType.FORM_EL
-    data: FormElementWatcherData
+    data: FormElementRecordData
     time: string
 }
 
-export interface FormElementWatcherData {
+export interface FormElementRecordData {
     type: FormElementEvent
     id: number
     key?: string
