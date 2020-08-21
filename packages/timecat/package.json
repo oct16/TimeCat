@@ -11,11 +11,16 @@
         "index.js",
         "dist"
     ],
+    "keywords": [
+        "timecat",
+        "recorder",
+        "player"
+    ],
     "scripts": {},
     "author": "",
     "license": "ISC",
     "buildOptions": {
-        "name": "timecat",
+        "name": "TimeCat",
         "formats": [
             "global",
             "esm",

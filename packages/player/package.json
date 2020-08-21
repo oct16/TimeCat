@@ -11,6 +11,11 @@
         "index.js",
         "dist"
     ],
+    "keywords": [
+        "timecat",
+        "recorder",
+        "player"
+    ],
     "scripts": {},
     "buildOptions": {
         "name": "Player",
