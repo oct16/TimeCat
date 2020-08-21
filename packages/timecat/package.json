@@ -1,6 +1,6 @@
 {
     "name": "timecatjs",
-    "version": "1.2.0-alpha.0",
+    "version": "1.2.0-alpha.1",
     "description": "timecat",
     "main": "index.js",
     "module": "dist/timecat.esm.js",
@@ -23,8 +23,8 @@
         ]
     },
     "dependencies": {
-        "@timecat/recorder": "1.2.0-alpha.0",
-        "@timecat/player": "1.2.0-alpha.0",
-        "@timecat/utils": "1.2.0-alpha.0"
+        "@timecat/recorder": "1.2.0-alpha.1",
+        "@timecat/player": "1.2.0-alpha.1",
+        "@timecat/utils": "1.2.0-alpha.1"
     }
 }
