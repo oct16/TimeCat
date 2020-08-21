@@ -5,7 +5,7 @@ A Magical Web Recorder 🖥 网页录屏器
 </h6>
 <h6 align="center">
 
-![GitHub issues](https://img.shields.io/github/issues-raw/oct16/TimeCat) ![GitHub last commit](https://img.shields.io/github/last-commit/oct16/timecat) ![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)
+[![GitHub issues](https://img.shields.io/github/issues-raw/oct16/TimeCat)](https://github.com/oct16/TimeCat/issues) ![GitHub last commit](https://img.shields.io/github/last-commit/oct16/timecat) [![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)](https://www.npmjs.com/package/timecatjs)
 
 <h6>
 
@@ -28,7 +28,7 @@ TimeCat is a Web record solution, with a unique algorithm to provide ultra-high 
 
 ### Version 
 
-![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)
+[![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)](https://www.npmjs.com/package/timecatjs)
 
 ###### Browsers Support
 
@@ -51,11 +51,16 @@ $ npm i timecatjs -D
 
 ###### Import in Browser
 
-Add script tags in your browser and use the global variable ``timecat``
-
+Add script tags in your browser and use the global variable ``TimeCat``
 
 - [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs) 
-- [UNPKG](https://unpkg.com/timecatjs)
+  - `https://cdn.jsdelivr.net/npm/timecatjs`
+  - `https://cdn.jsdelivr.net/npm/@timecat/recorder`
+  - `https://cdn.jsdelivr.net/npm/@timecat/player`
+- [UNPKG](https://unpkg.com/timecatjs) 
+  - `https://unpkg.com/timecatjs`
+  - `https://unpkg.com/@timecat/recorder`
+  - `https://unpkg.com/@timecat/player`
 
 ### Usage
 
@@ -68,14 +73,13 @@ import Recorder from '@timecat/recorder'
 import Player from '@timecat/player'
 
 // from cdn
-const { Recorder, Player } = window.timecat
+const { Recorder, Player } = window.TimeCat
 ```
 
 ###### Record Data
 ```ts
 // record page
 interface RecordOptions {
-
     mode?: 'live' | 'default' // mode
     context?: Window  // record context
     audio?: boolean // if your want record audio
