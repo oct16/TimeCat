@@ -34,6 +34,10 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     const { parentId, nextId, node } = data
     const parentNode = nodeStore.getNode(parentId!)
 
+    const findNextNode = (nextId: number | null): Node | null => {
+        return nextId ? nodeStore.getNode(nextId) : null
+    }
+
     if (parentNode && isElementNode(parentNode)) {
         let nextNode: Node | null = null
 
@@ -70,10 +74,6 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     } else {
         return true
     }
-}
-
-function findNextNode(nextId: number | null): Node | null {
-    return nextId ? nodeStore.getNode(nextId) : null
 }
 
 export async function updateDom(this: PlayerComponent, Record: RecordData) {
@@ -146,7 +146,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.DOM: {
             // Reduce the delay caused by interactive animation
-            await delay(200)
+            await actionDelay()
             const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMRecordData
             removedNodes &&
                 removedNodes.forEach((data: RemoveUpdateData) => {
@@ -233,7 +233,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.FORM_EL: {
             // Reduce the delay caused by interactive animation
-            await delay(200)
+            await actionDelay()
             const { id, key, type: formType, value, patches } = data as FormElementRecordData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
             const { mode } = window.G_REPLAY_OPTIONS
@@ -273,6 +273,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             break
         }
         case RecordType.CANVAS: {
+            await actionDelay()
             const { src, id, strokes } = data as UnionToIntersection<CanvasRecordData>
             const target = nodeStore.getNode(id) as HTMLCanvasElement
             if (!target) {
@@ -288,8 +289,9 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                 }
             } else {
                 async function createChain() {
-                    function splitStrokes(strokesArray: UnionToIntersection<CanvasRecordData>['strokes'][]) {
-                        const result: UnionToIntersection<CanvasRecordData>['strokes'][] = []
+                    type Strokes = UnionToIntersection<CanvasRecordData>['strokes']
+                    function splitStrokes(strokesArray: Strokes[]) {
+                        const result: Strokes[] = []
                         strokesArray.forEach(strokes => {
                             const len = strokes.length
                             const pivot = Math.floor(len / 2)
@@ -309,8 +311,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                                 }
                                 ;(ctx[name] as Function).apply(ctx, args)
                             } else {
-                                const value = args
-                                ;(ctx[name] as Object) = value
+                                ;(ctx[name] as Object) = args
                             }
                         }
                     }
@@ -376,4 +377,9 @@ export function injectIframeContent(contentDocument: Document, snapshotData: Sna
         content.scrollTop = snapshotData.scrollTop
         contentDocument.replaceChild(content, documentElement)
     }
+}
+
+// waiting for mouse or scroll transform animation finish
+async function actionDelay() {
+    return delay(200)
 }

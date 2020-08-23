@@ -74,7 +74,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
             },
             time: this.getRadix64TimeStr()
         })
-    }, 100)
+    }, 30)
 
     aggregateManager(func: Function, wait: number): any {
         const tasks = Object.create(null) as { [key: number]: { name: Prop; args: any[] }[] }

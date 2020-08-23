@@ -31,7 +31,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             }
         }
         const name = 'mousemove'
-        const listenerHandle = throttle(evt, 350, {
+        const listenerHandle = throttle(evt, 300, {
             trailing: true,
             leading: true
         })

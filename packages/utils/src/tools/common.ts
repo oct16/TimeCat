@@ -138,7 +138,7 @@ export function classifyRecords(records: RecordData[]) {
     return packs
 }
 
-export async function delay(t = 200) {
+export async function delay(t = 200): Promise<void> {
     return new Promise(r => {
         setTimeout(() => r(), t)
     })

@@ -75,8 +75,8 @@ function downloadFiles(html: Document) {
 }
 
 function downloadAudios() {
-    if (window.__ReplayData__) {
-        const replayData = window.__ReplayData__
+    if (window.G_REPLAY_DATA) {
+        const replayData = window.G_REPLAY_DATA
         if (replayData.audio) {
             const { src } = replayData.audio
             download(src, src)
@@ -181,7 +181,7 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const data = (window.__ReplayPacks__ as ReplayPack[]) || (await getDataFromDB(exportOptions))
+    const data = (window.G_REPLAY_PACKS as ReplayPack[]) || (await getDataFromDB(exportOptions))
 
     if (!data) {
         return
@@ -203,7 +203,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
         outputStr += String.fromCharCode(num)
     }
 
-    const replayData = `var __ReplayStrPacks__ =  '${outputStr}'`
+    const replayData = `var G_REPLAY_STR_PACKS =  '${outputStr}'`
 
     injectScripts(html, [{ src: replayData }])
 }
