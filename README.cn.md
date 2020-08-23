@@ -52,14 +52,14 @@ $ npm i timecatjs -D
 
 Add script tags in your browser and use the global variable ``TimeCat``
 
-- [jsDelivr](https://cdn.jsdelivr.net/npm/timecatjs) 
-  - `https://cdn.jsdelivr.net/npm/timecatjs`
-  - `https://cdn.jsdelivr.net/npm/@timecat/recorder`
-  - `https://cdn.jsdelivr.net/npm/@timecat/player`
-- [UNPKG](https://unpkg.com/timecatjs) 
-  - `https://unpkg.com/timecatjs`
-  - `https://unpkg.com/@timecat/recorder`
-  - `https://unpkg.com/@timecat/player`
+- **jsDelivr**
+  - https://cdn.jsdelivr.net/npm/timecatjs
+  - https://cdn.jsdelivr.net/npm/@timecat/recorder
+  - https://cdn.jsdelivr.net/npm/@timecat/player
+- **UNPKG**
+  - https://unpkg.com/timecatjs
+  - https://unpkg.com/@timecat/recorder
+  - https://unpkg.com/@timecat/player
 
 ### Usage
 
