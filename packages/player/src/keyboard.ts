@@ -120,7 +120,7 @@ export class KeyboardComponent {
             })
         }
 
-        const replayOptions = window.__ReplayOptions__
+        const replayOptions = window.G_REPLAY_OPTIONS
         exportReplay({
             ...replayOptions,
             scripts: scriptList

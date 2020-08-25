@@ -101,7 +101,7 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
     if (!scriptList.some(item => item.name === 'time-cat-init')) {
         scriptList.push({
             name: 'time-cat-init',
-            src: `timecat.replay(${JSON.stringify(options)})`
+            src: `new TimeCat.Player(${JSON.stringify(options)})`
         })
     }
 
@@ -234,10 +234,12 @@ async function makeCssInline(packs: ReplayPack[]) {
             const record = records[i]
             if (record.type === RecordType.DOM) {
                 const { addedNodes } = record.data
-                for (let j = 0; j < addedNodes.length; j++) {
-                    const node = addedNodes[j].node
-                    if (isVNode(node as VNode)) {
-                        extractLink(node as VNode, extractLinkList)
+                if (addedNodes) {
+                    for (let j = 0; j < addedNodes.length; j++) {
+                        const node = addedNodes[j].node
+                        if (isVNode(node as VNode)) {
+                            extractLink(node as VNode, extractLinkList)
+                        }
                     }
                 }
             }

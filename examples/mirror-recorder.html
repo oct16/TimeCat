@@ -250,13 +250,16 @@
 
     <script id="time-cat" src="./timecat.global.js"></script>
     <script>
-        const { Recorder } = timecat
+        const { Recorder } = TimeCat
         const host = window.parent
-        const player = host.document.getElementById('player').contentWindow
-        const r = new Recorder({
+        const players = host.document.querySelectorAll('.player')
+        new Recorder({
             mode: 'live',
-            emitter: (data, db) => {
-                player.postMessage(data)
+            onData: (data, db) => {
+                players.forEach(player => {
+                    const playerWindow = player.contentWindow
+                    playerWindow.postMessage(data)
+                })
             }
         })
     </script>

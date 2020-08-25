@@ -1,7 +1,7 @@
 import { isDev } from './common'
 import { VNode } from '@timecat/share'
 
-const snapshot = () => window.__ReplayData__ && window.__ReplayData__.snapshot.data
+const snapshot = () => window.G_REPLAY_DATA && window.G_REPLAY_DATA.snapshot.data
 
 const href = () => snapshot().href
 
@@ -31,7 +31,7 @@ export function filteringScriptTag(str: string) {
 }
 
 export function proxyResource(url: string) {
-    const { proxy } = window.__ReplayOptions__
+    const { proxy } = window.G_REPLAY_OPTIONS
 
     if (proxy) {
         const proxyUrl = stitchingLink(proxy, url)
@@ -68,7 +68,7 @@ export function completeAttrHref(str: string, node?: Element) {
             const doc = node.getRootNode() as Document
             const context = doc.defaultView as Window
 
-            const { href, path } = context?.__ReplayLocation__ || {}
+            const { href, path } = context?.G_REPLAY_LOCATION || {}
 
             if (path && href) {
                 const relationHref = new URL(path, href)

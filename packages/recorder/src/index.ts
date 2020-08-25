@@ -1,1 +1,2 @@
-export * from './recorder'
+import { Recorder } from './recorder'
+export default Recorder

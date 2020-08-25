@@ -10,10 +10,18 @@
 
 <body>
     <script id="time-cat" src="./timecat.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"
+        integrity="sha512-v8ng/uGxkge3d1IJuEo6dJP8JViyvms0cly9pnbfRxT6/31c3dRWxIiwGnMSWwZjHKOuY3EVmijs7k1jz/9bLA=="
+        crossorigin="anonymous"></script>
+
+
     <script id="time-cat-init">
-        new timecat.Replay({
-            socketUrl: 'http://localhost:9528',
-            // proxy: 'https://yacdn.org/serve/'
+
+        const socket = io('http://localhost:9528');
+        const { Player } = TimeCat
+        new Player({
+            mode: 'live',
+            receiver: send => socket.on('record-data', (e) => send(e))
         })
     </script>
 </body>

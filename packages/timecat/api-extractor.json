@@ -3,7 +3,8 @@
  */
 {
     "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
-    "mainEntryPointFilePath": "./dist/packages/<unscopedPackageName>/src/index.d.ts",
+    // "mainEntryPointFilePath": "./dist/packages/<unscopedPackageName>/src/index.d.ts",
+    "mainEntryPointFilePath": "./dist/packages/timecat/src/index.d.ts",
     "bundledPackages": [],
     "compiler": {},
     "apiReport": {
@@ -13,6 +14,7 @@
         "enabled": false
     },
     "dtsRollup": {
+        "untrimmedFilePath": "",
         "publicTrimmedFilePath": "./dist/<unscopedPackageName>.d.ts",
         "enabled": true
     },

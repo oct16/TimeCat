@@ -60,7 +60,7 @@
     <script id="time-cat" src="./timecat.global.js"></script>
 
     <script>
-        const { Recorder } = timecat
+        const { Recorder } = TimeCat
         const r = new Recorder()
         handleReplay(r)
 
@@ -104,6 +104,17 @@
                     node.parentElement.removeChild(node)
                 }
             })
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
+    <script>
+        if (!~['localhost', '127.0.0.1'].indexOf(document.location.hostname)) {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'UA-151180797-1');
+        }
     </script>
 </body>
 

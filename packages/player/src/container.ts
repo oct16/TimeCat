@@ -14,7 +14,7 @@ export class ContainerComponent {
     }
 
     getSnapshotRecord() {
-        return window.__ReplayData__.snapshot.data
+        return window.G_REPLAY_DATA.snapshot.data
     }
 
     init() {
@@ -79,7 +79,7 @@ export class ContainerComponent {
             setWidth?: number,
             setHeight?: number
         ) {
-            const { mode: replayMode } = window.__ReplayOptions__ || {}
+            const { mode: replayMode } = window.G_REPLAY_OPTIONS || {}
 
             const panelHeight = replayMode === 'live' ? 0 : 40 - 2 // subtract the gap
 

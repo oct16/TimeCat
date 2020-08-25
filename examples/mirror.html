@@ -16,11 +16,12 @@
             padding-bottom: 20px;
             background: white;
             text-align: center;
+            white-space: nowrap;
         }
 
         iframe {
             max-width: 100%;
-            width: 500px;
+            width: 400px;
             display: inline-block;
             margin: 10px;
             border: 2px solid grey;
@@ -28,7 +29,17 @@
 
         }
 
+        iframe.player {
+            margin-left: 0;
+            margin-right: 0;
+            width: 250px;
+        }
+
         @media only screen and (max-width: 500px) {
+            .iframe-container {
+                white-space: normal;
+            }
+
             iframe {
                 padding: 0;
             }
@@ -52,7 +63,9 @@
             <iframe id="recorder" src="./mirror-recorder.html" align="top" onload="resizeIframe(this)"
                 frameborder="0"></iframe>
 
-            <iframe id="player" src="./mirror-player.html" align="top" onload="resizeIframe(this)"
+            <iframe class="player" src="./mirror-player.html" align="top" onload="resizeIframe(this)"
+                frameborder="0"></iframe>
+            <iframe class="player" src="./mirror-player.html" align="top" onload="resizeIframe(this)"
                 frameborder="0"></iframe>
         </div>
     </div>
@@ -67,6 +80,17 @@
                     resizeIframe(frame.frameElement)
                 })
             }, 250)
+        }
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
+    <script>
+        if (!~['localhost', '127.0.0.1'].indexOf(document.location.hostname)) {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'UA-151180797-1');
         }
     </script>
 </body>

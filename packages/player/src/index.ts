@@ -27,7 +27,7 @@ import smoothScroll from 'smoothscroll-polyfill'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
 
-export class Replay {
+export default class Player {
     fmp: FMP
     constructor(options: ReplayOptions) {
         this.init(options)
@@ -36,7 +36,7 @@ export class Replay {
     async init(options: ReplayOptions) {
         const opts = { ...defaultReplayOptions, ...options }
 
-        window.__ReplayOptions__ = opts
+        window.G_REPLAY_OPTIONS = opts
         smoothScroll.polyfill()
 
         const replayPacks = await this.getReplayData(opts)
@@ -45,7 +45,7 @@ export class Replay {
             return
         }
 
-        const { records, audio } = (window.__ReplayData__ = this.getFirstReplayData(replayPacks))
+        const { records, audio } = (window.G_REPLAY_DATA = this.getFirstReplayData(replayPacks))
         const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
         const c = new ContainerComponent()
@@ -64,7 +64,7 @@ export class Replay {
             if (records.length) {
                 const firstRecord = records[0]
 
-                const replayPacks = window.__ReplayPacks__ as ReplayPack[]
+                const replayPacks = window.G_REPLAY_PACKS as ReplayPack[]
                 const startTime = firstRecord.time
                 const endTime =
                     replayPacks.reduce((packAcc, pack) => {
@@ -111,7 +111,7 @@ export class Replay {
     }
 
     getGZipData() {
-        const data = window.__ReplayStrPacks__
+        const data = window.G_REPLAY_STR_PACKS
         if (!data) {
             return null
         }
@@ -176,7 +176,8 @@ export class Replay {
                             }
                         }
                     } else {
-                        throw logError('ReplayHead not found')
+                        return
+                        // logError('ReplayHead not found')
                     }
                 }
             })
@@ -203,7 +204,7 @@ export class Replay {
             (receiver && (await this.dataReceiver(receiver))) ||
             this.getGZipData() ||
             (await this.getDataFromDB()) ||
-            window.__ReplayPacks__
+            window.G_REPLAY_PACKS
 
         if (!rawReplayPacks) {
             throw logError('Replay data not found')
@@ -212,7 +213,7 @@ export class Replay {
         const replayPacks = this.decodePacks(rawReplayPacks)
 
         if (replayPacks) {
-            window.__ReplayPacks__ = replayPacks
+            window.G_REPLAY_PACKS = replayPacks
             return replayPacks
         }
 

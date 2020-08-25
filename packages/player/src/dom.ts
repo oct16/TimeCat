@@ -1,17 +1,17 @@
 import {
     RecordData,
     MouseRecordData,
-    FormElementWatcherData,
+    FormElementRecordData,
     RecordType,
     MouseEventType,
     CharacterDataUpdateData,
     AttributesUpdateData,
     FormElementEvent,
-    WindowWatcherData,
+    WindowRecordData,
     UpdateNodeData,
     RemoveUpdateData,
-    DOMUpdateDataType,
-    ScrollWatcherData,
+    DOMRecordData,
+    ScrollRecordData,
     VNode,
     VSNode,
     LocationRecordData,
@@ -96,13 +96,13 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
 
         case RecordType.SCROLL: {
-            const { top, left, id } = data as ScrollWatcherData
+            const { top, left, id } = data as ScrollRecordData
             const target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
 
             const curTop = target.scrollTop
 
             // prevent jump too long distance
-            const behavior = Math.abs(top - curTop) > window.__ReplayData__.snapshot.data.height * 3 ? 'auto' : 'smooth'
+            const behavior = Math.abs(top - curTop) > window.G_REPLAY_DATA.snapshot.data.height * 3 ? 'auto' : 'smooth'
             target.scrollTo({
                 top,
                 left,
@@ -112,7 +112,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             break
         }
         case RecordType.WINDOW: {
-            const { width, height, id } = data as WindowWatcherData
+            const { width, height, id } = data as WindowRecordData
             let target: HTMLElement
             if (id) {
                 target = nodeStore.getNode(id) as HTMLElement
@@ -132,9 +132,9 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
 
             if (id) {
                 const node = nodeStore.getNode(id) as HTMLElement
-                const { left: l, top: t } = node?.getBoundingClientRect() || {}
-                left = l
-                top = t
+                const { left: nodeLeft, top: nodeTop } = node?.getBoundingClientRect() || {}
+                left = nodeLeft
+                top = nodeTop
             }
 
             if (type === MouseEventType.MOVE) {
@@ -147,24 +147,25 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         case RecordType.DOM: {
             // Reduce the delay caused by interactive animation
             await delay(200)
-            const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMUpdateDataType
-            removedNodes.forEach((data: RemoveUpdateData) => {
-                const { parentId, id } = data
-                const parentNode = nodeStore.getNode(parentId)
-                const node = nodeStore.getNode(id)
-                if (node && parentNode && parentNode.contains(node)) {
-                    parentNode.removeChild(node as Node)
-                }
-            })
+            const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMRecordData
+            removedNodes &&
+                removedNodes.forEach((data: RemoveUpdateData) => {
+                    const { parentId, id } = data
+                    const parentNode = nodeStore.getNode(parentId)
+                    const node = nodeStore.getNode(id)
+                    if (node && parentNode && parentNode.contains(node)) {
+                        parentNode.removeChild(node as Node)
+                    }
+                })
 
-            const movedList = movedNodes.slice()
+            const orderSet: Set<number> = new Set()
+            const movedList = (movedNodes && movedNodes.slice()) || []
 
             // node1 -> node2 -> node3
             // insert node2 first
             // insert node1 last
             // => if nextId equal id, insert id first
 
-            const orderSet: Set<number> = new Set()
             movedList.forEach(data => {
                 // Is there a relations between two nodes
                 if (data.nextId) {
@@ -183,55 +184,59 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                         nextId
                     } as UpdateNodeData
                 })
-                .concat(addedNodes.slice())
+                .concat((addedNodes && addedNodes.slice()) || [])
 
             // Math Termial
-            const n = addedList.length
-            const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
-            let revertCount = 0
+            if (addedList) {
+                const n = addedList.length
+                const maxRevertCount = n > 0 ? (n * n + n) / 2 : 0
+                let revertCount = 0
 
-            while (addedList.length) {
-                const addData = addedList.shift()
-                if (addData) {
-                    if (insertOrMoveNode(addData, orderSet)) {
-                        // revert here
-                        if (revertCount++ < maxRevertCount) {
-                            addedList.push(addData)
+                while (addedList.length) {
+                    const addData = addedList.shift()
+                    if (addData) {
+                        if (insertOrMoveNode(addData, orderSet)) {
+                            // revert here
+                            if (revertCount++ < maxRevertCount) {
+                                addedList.push(addData)
+                            }
                         }
                     }
                 }
             }
 
-            attrs.forEach((attr: AttributesUpdateData) => {
-                const { id, key, value } = attr
-                const node = nodeStore.getNode(id) as HTMLElement
+            attrs &&
+                attrs.forEach((attr: AttributesUpdateData) => {
+                    const { id, key, value } = attr
+                    const node = nodeStore.getNode(id) as HTMLElement
 
-                if (node) {
-                    setAttribute(node as HTMLElement, key, value)
-                }
-            })
-
-            texts.forEach((text: CharacterDataUpdateData) => {
-                const { id, value, parentId } = text
-                const parentNode = nodeStore.getNode(parentId) as HTMLElement
-                const node = nodeStore.getNode(id) as HTMLElement
-
-                if (parentNode && node) {
-                    if (isExistingNode(node)) {
-                        node.textContent = value
-                        return
+                    if (node) {
+                        setAttribute(node as HTMLElement, key, value)
                     }
-                    parentNode.innerText = value
-                }
-            })
+                })
+
+            texts &&
+                texts.forEach((text: CharacterDataUpdateData) => {
+                    const { id, value, parentId } = text
+                    const parentNode = nodeStore.getNode(parentId) as HTMLElement
+                    const node = nodeStore.getNode(id) as HTMLElement
+
+                    if (parentNode && node) {
+                        if (isExistingNode(node)) {
+                            node.textContent = value
+                            return
+                        }
+                        parentNode.innerText = value
+                    }
+                })
             break
         }
         case RecordType.FORM_EL: {
             // Reduce the delay caused by interactive animation
             await delay(200)
-            const { id, key, type: formType, value, patches } = data as FormElementWatcherData
+            const { id, key, type: formType, value, patches } = data as FormElementRecordData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
-            const { mode } = window.__ReplayOptions__
+            const { mode } = window.G_REPLAY_OPTIONS
 
             if (node) {
                 if (formType === FormElementEvent.INPUT || formType === FormElementEvent.CHANGE) {
@@ -263,7 +268,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
 
             if (contextNode) {
                 const context = contextNode.ownerDocument!.defaultView!
-                context.__ReplayLocation__ = { ...context.__ReplayLocation__, ...{ path, hash, href } }
+                context.G_REPLAY_LOCATION = { ...context.G_REPLAY_LOCATION, ...{ path, hash, href } }
             }
             break
         }
