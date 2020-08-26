@@ -1,10 +1,13 @@
 {
-    "private": true,
+    "private": false,
     "name": "@timecat/share",
     "version": "1.2.0-alpha.2",
     "description": "",
-    "main": "src/index.ts",
-    "types": "dist/index.d.ts",
+    "main": "index.js",
+    "module": "dist/share.esm.js",
+    "types": "dist/share.d.ts",
+    "unpkg": "dist/share.global.prod.js",
+    "jsdelivr": "dist/share.global.prod.js",
     "scripts": {},
     "author": "",
     "license": "ISC"
