@@ -23,7 +23,6 @@ import {
     ReplayHead
 } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
-import smoothScroll from 'smoothscroll-polyfill'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
 
@@ -37,7 +36,6 @@ export default class Player {
         const opts = { ...defaultReplayOptions, ...options }
 
         window.G_REPLAY_OPTIONS = opts
-        smoothScroll.polyfill()
 
         const replayPacks = await this.getReplayData(opts)
 
