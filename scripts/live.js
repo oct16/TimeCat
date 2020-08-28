@@ -4,6 +4,7 @@ const Koa = require('koa')
 const io = require('socket.io')(socketPort)
 const app = new Koa()
 
+io.set('origins', '*')
 io.on('connection', socket => {
     console.log('Socket Connection')
 
