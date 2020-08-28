@@ -1,10 +1,11 @@
 const appPort = 9527
 const socketPort = 9528
 const Koa = require('koa')
-const io = require('socket.io')(socketPort)
+const socket = require('socket.io')
+const io = socket(socketPort)
 const app = new Koa()
 
-io.set('origins', '*')
+io.set('origins', '*:*')
 io.on('connection', socket => {
     console.log('Socket Connection')
 
