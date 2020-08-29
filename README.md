@@ -18,7 +18,7 @@ TimeCat is a Web record solution, with a unique algorithm to provide ultra-high 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
 ### Milestone
-    08.20 Released V1.2.0
+    08.20 Released V1.2.0-alpha
     07.20 Support Iframe (V1.1.0)
     06.07 Support Audio
     05.24 Released V1.0.0
@@ -113,7 +113,7 @@ recorder.unsubscribe()
 // replay record
 interface ReplayOptions {
     mode?: 'live' | 'default' // mode
-    replayDataList?: ReplayData[] // data from options
+    replayPacks?: ReplayPack[] // data from options
     fetch?: { url: string; options?: RequestInit } // data from server
     // receive data in live mode
     receiver?: (sender: (data: RecordData) => void) => void
