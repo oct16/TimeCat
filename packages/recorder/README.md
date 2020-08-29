@@ -1,5 +1,7 @@
 # @TimeCat/recorder
 
+#### CDN [jsDelivr](https://www.jsdelivr.com/package/npm/@timecat/recorder)
+
 #### More details to see 🏘️ [TimeCat Homepage](https://github.com/oct16/timecat#readme)
 
 ## Which dist file to use?

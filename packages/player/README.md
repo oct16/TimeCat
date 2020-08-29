@@ -1,5 +1,7 @@
 # @TimeCat/player
 
+#### CDN [jsDelivr](https://www.jsdelivr.com/package/npm/@timecat/player)
+
 #### More details to see 🏘️ [TimeCat Homepage](https://github.com/oct16/timecat#readme)
 
 ## Which dist file to use?
