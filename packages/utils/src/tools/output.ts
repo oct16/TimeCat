@@ -142,8 +142,8 @@ async function getDataFromDB(exportOptions?: ExportOptions) {
     return null
 }
 
-function extract(replayDataList: ReplayPack[], exportOptions?: ExportOptions) {
-    return replayDataList.map(replayPack => {
+function extract(replayPacks: ReplayPack[], exportOptions?: ExportOptions) {
+    return replayPacks.map(replayPack => {
         replayPack.body.forEach(replayData => {
             if (exportOptions && exportOptions.audioExternal) {
                 replayData.audio = extractAudio(replayData.audio)
