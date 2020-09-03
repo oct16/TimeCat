@@ -94,31 +94,54 @@ export class KeyboardComponent {
     }
 
     async export() {
-        const SDKScript = document.getElementById('time-cat') as HTMLScriptElement
-        const initScript = document.getElementById('time-cat-init') as HTMLScriptElement
+        const SDKScript = document.getElementById('timecat') as HTMLScriptElement
+        const initScript = document.getElementById('timecat-init') as HTMLScriptElement
         const scriptList = []
+        const scripts = document.querySelectorAll('script')
+
+        function detectSDKSrc() {
+            // TODO Support ESM module
+            return Array.from(scripts)
+                .map(script => script.src)
+                .find(src => /(timecat)(\.prod)?\.global\.js/.test(src))
+        }
+
+        function detectSDKContent() {
+            return Array.from(scripts)
+                .map(script => script.textContent)
+                .find(content => content?.trim().startsWith('var TimeCat'))
+        }
+
+        function detectInitScriptContent() {
+            return Array.from(scripts)
+                .map(script => script.textContent)
+                .find(content => {
+                    if (content) {
+                        return /new\s(TimeCat\.)?Player/.test(content)
+                    }
+                })
+        }
 
         async function getScriptSource(scriptElement: HTMLScriptElement) {
+            if (!scriptElement) {
+                return
+            }
             return (
                 scriptElement.textContent || (await getRawScriptContent(scriptElement.src.trim())) || scriptElement.src
             )
         }
 
-        if (SDKScript) {
-            const source = await getScriptSource(SDKScript)
-            scriptList.push({
-                name: 'time-cat',
-                src: source
-            })
-        }
+        const SDKSource = (await getScriptSource(SDKScript)) || detectSDKSrc() || detectSDKContent()
+        scriptList.push({
+            name: 'timecat',
+            src: SDKSource
+        })
 
-        if (initScript) {
-            const source = await getScriptSource(initScript)
-            scriptList.push({
-                name: 'time-cat-init',
-                src: source
-            })
-        }
+        const source = (await getScriptSource(initScript)) || detectInitScriptContent()
+        scriptList.push({
+            name: 'timecat-init',
+            src: source
+        })
 
         const replayOptions = window.G_REPLAY_OPTIONS
         exportReplay({

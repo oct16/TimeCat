@@ -77,9 +77,9 @@ function downloadFiles(html: Document) {
 function downloadAudios() {
     if (window.G_REPLAY_DATA) {
         const replayData = window.G_REPLAY_DATA
-        if (replayData.audio) {
-            const { src } = replayData.audio
-            download(src, src)
+        const audioSrc = replayData?.audio?.src
+        if (audioSrc) {
+            download(audioSrc, audioSrc)
             return
         }
     }
@@ -98,9 +98,9 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
     const options = { autoplay }
     const scriptList = scripts || ([] as ScriptItem[])
 
-    if (!scriptList.some(item => item.name === 'time-cat-init')) {
+    if (!scriptList.some(item => item.name === 'timecat-init')) {
         scriptList.push({
-            name: 'time-cat-init',
+            name: 'timecat-init',
             src: `new TimeCat.Player(${JSON.stringify(options)})`
         })
     }
