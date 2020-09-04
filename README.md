@@ -18,7 +18,7 @@ TimeCat is a Web record solution, with a unique algorithm to provide ultra-high 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
 ### Milestone
-    08.20 Released V1.2.0-alpha
+    08.20 Prerelease V1.2.0-alpha
     07.20 Support Iframe (V1.1.0)
     06.07 Support Audio
     05.24 Released V1.0.0
