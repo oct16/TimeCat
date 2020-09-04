@@ -156,10 +156,10 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
         const removedNodes: RemoveUpdateData[] = []
         removeNodesMap.forEach((parent, node) => {
-            const id = this.getNodeId(node)!
-            const parentId = this.getNodeId(parent)!
+            const id = this.getNodeId(node)
+            const parentId = this.getNodeId(parent)
 
-            if (parentId) {
+            if (id && parentId) {
                 removedNodes.push({
                     parentId,
                     id
