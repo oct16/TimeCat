@@ -75,7 +75,7 @@ export function classifyRecords(records: RecordData[]) {
     }
 
     function isSameHEAD(head: ReplayHead, compare: ReplayHead) {
-        return head.href === compare.href // && head.sessionId === compare.sessionId
+        return head.href === compare.href // && head.relatedId === compare.relatedId
     }
 
     let replayPack: ReplayPack

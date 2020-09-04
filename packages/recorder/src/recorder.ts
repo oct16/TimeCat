@@ -1,7 +1,7 @@
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, RecordOptions, ValueOf } from '@timecat/share'
-import { getDBOperator, logError, Transmitter } from '@timecat/utils'
+import { RecordData, RecordOptions, ValueOf, RecordType } from '@timecat/share'
+import { getDBOperator, logError, Transmitter, getRadix64TimeStr } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 
@@ -82,11 +82,23 @@ export class Recorder {
 
         const emit = onEmit(options)
 
-        emit(getHeadData())
+        const headData = getHeadData()
+        const relatedId = headData.relatedId
+        if (options.context) {
+            options.context.G_RECORD_RELATED_ID = relatedId
+        }
+        emit({
+            type: RecordType.HEAD,
+            data: headData,
+            relatedId: relatedId,
+            time: getRadix64TimeStr()
+        })
+
         iframeWatchers.forEach(watcher => {
             new watcher({
                 context: (options && options.context) || window,
                 reverseStore: this.reverseStore,
+                relatedId: relatedId,
                 emit
             })
         })

@@ -21,23 +21,15 @@ export class RecordAudio extends Watcher<AudioRecord> {
             recorder.stop()
         })
 
-        this.emitData({
-            type: RecordType.AUDIO,
-            data: {
-                type: 'opts',
-                data: recorder.getOptions()
-            },
-            time: this.getRadix64TimeStr()
+        this.emitData(RecordType.AUDIO, {
+            type: 'opts',
+            data: recorder.getOptions()
         })
 
         recorder.onProgress = audioBase64Data => {
-            this.emitData({
-                type: RecordType.AUDIO,
-                data: {
-                    type: 'base64',
-                    data: audioBase64Data
-                },
-                time: this.getRadix64TimeStr()
+            this.emitData(RecordType.AUDIO, {
+                type: 'base64',
+                data: audioBase64Data
             })
         }
     }

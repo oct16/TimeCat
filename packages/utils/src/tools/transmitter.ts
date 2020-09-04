@@ -61,9 +61,6 @@ export class Transmitter {
 
     async uploadToDB(records: RecordData[]): Promise<boolean> {
         return await fetch(this.uploadUrl, {
-            headers: {
-                'content-type': 'application/json'
-            },
             method: 'POST',
             body: JSON.stringify(records)
         }).then(() => true)

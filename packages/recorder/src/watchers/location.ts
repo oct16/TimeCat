@@ -25,31 +25,27 @@ export class LocationWatcher extends Watcher<LocationRecord> {
     }
 
     kidnapLocation = (type: 'pushState' | 'replaceState') => {
-        const ctx = this.context;
-        const original = ctx.history[type];
+        const ctx = this.context
+        const original = ctx.history[type]
 
         return function (this: any) {
-            const result = original.apply(this, arguments);
-            const e = new Event(type);
-            e.arguments = arguments;
-            ctx.dispatchEvent(e);
-            return result;
-        };
+            const result = original.apply(this, arguments)
+            const e = new Event(type)
+            e.arguments = arguments
+            ctx.dispatchEvent(e)
+            return result
+        }
     }
 
     locationHandle = (e: Event) => {
         const contextNodeId = this.getContextNodeId(e)
         const [, , path] = e.arguments || [, , this.context?.location?.pathname]
         const { href, hash } = this.context.location
-        this.emit({
-            type: RecordType.LOCATION,
-            data: {
-                contextNodeId,
-                href,
-                hash,
-                path
-            },
-            time: this.getRadix64TimeStr()
+        this.emitData(RecordType.LOCATION, {
+            contextNodeId,
+            href,
+            hash,
+            path
         })
     }
 

@@ -31,7 +31,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
 
         function handleFn(this: FormElementWatcher, e: InputEvent) {
             const eventType = e.type
-            let data!: FormElementRecord
+            let data!: FormElementRecord['data']
             switch (eventType) {
                 case 'input':
                 case 'change':
@@ -62,42 +62,30 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                     }
 
                     data = {
-                        type: RecordType.FORM_EL,
-                        data: {
-                            type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
-                            id: this.getNodeId(e.target as Node)!,
-                            key,
-                            value: !patches.length ? newValue : value,
-                            patches
-                        },
-                        time: this.getRadix64TimeStr()
+                        type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
+                        id: this.getNodeId(e.target as Node)!,
+                        key,
+                        value: !patches.length ? newValue : value,
+                        patches
                     }
                     break
                 case 'focus':
                     data = {
-                        type: RecordType.FORM_EL,
-                        data: {
-                            type: FormElementEvent.FOCUS,
-                            id: this.getNodeId(e.target as Node)!
-                        },
-                        time: this.getRadix64TimeStr()
+                        type: FormElementEvent.FOCUS,
+                        id: this.getNodeId(e.target as Node)!
                     }
                     break
                 case 'blur':
                     data = {
-                        type: RecordType.FORM_EL,
-                        data: {
-                            type: FormElementEvent.BLUR,
-                            id: this.getNodeId(e.target as Node)!
-                        },
-                        time: this.getRadix64TimeStr()
+                        type: FormElementEvent.BLUR,
+                        id: this.getNodeId(e.target as Node)!
                     }
                     break
                 default:
                     break
             }
 
-            this.emitData(data)
+            this.emitData(RecordType.FORM_EL, data)
         }
     }
 
@@ -145,11 +133,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                 value
             }
 
-            self.emitData({
-                type: RecordType.FORM_EL,
-                data,
-                time: self.getRadix64TimeStr()
-            })
+            self.emitData(RecordType.FORM_EL, data)
         }
     }
 }

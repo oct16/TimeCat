@@ -1,21 +1,22 @@
-import { WatcherOptions, RecordEvent, RecordData } from '@timecat/share'
+import { WatcherOptions, RecordEvent, RecordData, RecordType, BaseRecord } from '@timecat/share'
 import { debounce, throttle, isDev, logger, getRadix64TimeStr, nodeStore } from '@timecat/utils'
 
 export abstract class Watcher<T extends RecordData> {
+    relatedId: string
     context: Window
-    emit: RecordEvent<T>
+    emit: RecordEvent<RecordData>
     options: WatcherOptions<T>
 
     constructor(options: WatcherOptions<T>) {
-        const { emit, context } = options
+        const { emit, context, relatedId } = options
         this.options = options
+        this.relatedId = relatedId
         this.context = context
         this.emit = emit
     }
 
     abstract init(): void
 
-    getRadix64TimeStr = getRadix64TimeStr
     getNode = (id: number): Node => nodeStore.getNode.call(nodeStore, id)
     getNodeId = (n: Node): number => nodeStore.getNodeId.call(nodeStore, n)
 
@@ -23,7 +24,14 @@ export abstract class Watcher<T extends RecordData> {
         this.options.reverseStore.add(fn)
     }
 
-    emitData(data: T, callback?: (data: T) => T) {
+    emitData(type: RecordType, record: RecordData['data'], callback?: (data: RecordData) => T) {
+        const data = {
+            type,
+            data: record,
+            relatedId: this.relatedId,
+            time: getRadix64TimeStr()
+        } as RecordData
+
         if (isDev) {
             logger(data)
         }

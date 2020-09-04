@@ -10,18 +10,14 @@ export class Snapshot extends Watcher<SnapshotRecord> {
     }
 
     init() {
-        const snapshot = this.DOMSnapshot(this.options.context || window)
-        this.emitData(snapshot)
+        const snapshotData = this.DOMSnapshotData(this.options.context || window)
+        this.emitData(RecordType.SNAPSHOT, snapshotData)
     }
 
-    DOMSnapshot(context: Window): SnapshotRecord {
+    DOMSnapshotData(context: Window): SnapshotRecord['data'] {
         return {
-            type: RecordType.SNAPSHOT,
-            data: {
-                vNode: createElement(context.document.documentElement) as VNode,
-                ...this.getInitInfo(context)
-            },
-            time: this.getRadix64TimeStr()
+            vNode: createElement(context.document.documentElement) as VNode,
+            ...this.getInitInfo(context)
         }
     }
 

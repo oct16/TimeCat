@@ -29,6 +29,7 @@ export class IndexedDBOperator {
                 const objectStore = db.createObjectStore(storeName, { autoIncrement: true, keyPath: 'id' })
                 objectStore.createIndex('type', 'type', { unique: false })
                 objectStore.createIndex('data', 'data', { unique: false })
+                objectStore.createIndex('relatedId', 'relatedId', { unique: false })
                 objectStore.createIndex('time', 'time', { unique: false })
             }
         }

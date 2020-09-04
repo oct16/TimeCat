@@ -45,6 +45,7 @@ interface Window {
 
     G_REPLAY_LOCATION: any
 
+    G_RECORD_RELATED_ID: string
     webkitAudioContext?: typeof AudioContext
 
     TimeCat: {

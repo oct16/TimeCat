@@ -22,10 +22,6 @@ export class TerminateWatcher extends Watcher<TerminateRecord> {
     }
 
     wrapData() {
-        return {
-            type: RecordType.TERMINATE,
-            data: null,
-            time: this.getRadix64TimeStr()
-        }
+        return [RecordType.TERMINATE, null]
     }
 }

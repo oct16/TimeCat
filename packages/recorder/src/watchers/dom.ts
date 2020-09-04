@@ -212,11 +212,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         })
 
         if (Object.values(data).some(item => item.length)) {
-            this.emitData({
-                type: RecordType.DOM,
-                data,
-                time: this.getRadix64TimeStr()
-            })
+            this.emitData(RecordType.DOM, data)
         }
     }
 }

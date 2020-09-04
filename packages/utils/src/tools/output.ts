@@ -59,8 +59,9 @@ async function addNoneFrame() {
         DBOperator.add({
             type: RecordType.TERMINATE,
             data: null,
+            relatedId: window.G_RECORD_RELATED_ID,
             time: getRadix64TimeStr()
-        } as TerminateRecord)
+        })
     }
 }
 
