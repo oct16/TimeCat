@@ -253,7 +253,8 @@ export interface ReplayOptions {
     receiver?: (sender: (data: RecordData) => void) => void
     proxy?: string
     autoplay?: boolean
-    replayPacks?: ReplayPack[]
+    packs?: ReplayPack[]
+    records?: RecordData[]
 }
 
 export interface ReplayPack {

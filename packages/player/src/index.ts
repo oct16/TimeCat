@@ -194,10 +194,11 @@ export default class Player {
     }
 
     async getReplayData(options: ReplayOptions) {
-        const { receiver, replayPacks: data, fetch } = options
+        const { receiver, packs, records, fetch } = options
 
         const rawReplayPacks =
-            data ||
+            (records && classifyRecords(records)) ||
+            packs ||
             (fetch && (await this.fetchData(fetch.url, fetch.options))) ||
             (receiver && (await this.dataReceiver(receiver))) ||
             this.getGZipData() ||
