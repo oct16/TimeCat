@@ -2,7 +2,7 @@
     "private": true,
     "name": "timecat",
     "author": "oct16",
-    "version": "1.2.0-alpha.6",
+    "version": "1.2.0-alpha.7",
     "description": "TimeCat Web Recorder",
     "main": "lib/timecat.cjs.js",
     "module": "lib/timecat.esm.js",
