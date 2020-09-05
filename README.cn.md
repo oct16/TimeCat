@@ -112,7 +112,8 @@ recorder.unsubscribe()
 // replay record
 interface ReplayOptions {
     mode?: 'live' | 'default' // mode
-    replayPacks?: ReplayPack[] // data from options
+    records: ReplayData[]
+    packs?: ReplayPack[] // data from options
     fetch?: { url: string; options?: RequestInit } // data from server
     // receive data in live mode
     receiver?: (sender: (data: RecordData) => void) => void
