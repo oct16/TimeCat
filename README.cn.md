@@ -142,6 +142,7 @@ interface ExportOptions {
 exportReplay(ExportOptions)
 ```
 
+---
 
 ### TimeCat -- 不可思议的Web录屏器
 
@@ -440,10 +441,18 @@ Gzip的核心是Deflate, 而Deflate又是基于LZ77和哈夫曼树的，通过Gz
 
 [@oct16](https://github.com/oct16)
 
+开发中若遇到任何问题或有任何建议   
+请联系作者   
+<img src="assets/contactQR.jpg" width="150"/>
+
 #### 如何贡献
 非常欢迎你的加入！[提一个 Issue](https://github.com/oct16/TimeCat/issues/new) 或者提交一个 Pull Request。
 
 标准 Readme 遵循 [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct/)  行为规范。
+
+#### 捐助
+
+<img src="assets/donate.png" width="320"/>
 
 
 #### 使用许可
