@@ -26,13 +26,13 @@ import { waitStart, removeStartPage, showStartMask } from './dom'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
 
-export default class Player {
+export class Player {
     fmp: FMP
-    constructor(options: ReplayOptions) {
+    constructor(options?: ReplayOptions) {
         this.init(options)
     }
 
-    async init(options: ReplayOptions) {
+    async init(options?: ReplayOptions) {
         const opts = { ...defaultReplayOptions, ...options }
 
         window.G_REPLAY_OPTIONS = opts

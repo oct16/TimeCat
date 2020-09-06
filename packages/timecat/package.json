@@ -4,7 +4,7 @@
     "description": "timecat",
     "main": "index.js",
     "module": "dist/timecat.esm.js",
-    "types": "dist/timecat.d.ts",
+    "types": "dist/timecatjs.d.ts",
     "unpkg": "dist/timecat.global.prod.js",
     "jsdelivr": "dist/timecat.global.prod.js",
     "files": [

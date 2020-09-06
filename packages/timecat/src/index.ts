@@ -1,5 +1,5 @@
-import Recorder from '@timecat/recorder'
-import Player from '@timecat/player'
+import { Recorder } from '@timecat/recorder'
+import { Player } from '@timecat/player'
 
 const version = '__VERSION__'
 export { version }

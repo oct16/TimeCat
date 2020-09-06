@@ -9,7 +9,7 @@ export class Recorder {
     private static defaultRecordOpts = { mode: 'default' } as RecordOptions
     private reverseStore: Set<Function> = new Set()
 
-    constructor(options: RecordOptions) {
+    constructor(options?: RecordOptions) {
         const opts = { ...Recorder.defaultRecordOpts, ...options }
 
         // TODO: Plugin module
