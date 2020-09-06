@@ -213,13 +213,16 @@ interface SubtitlesData {
     text: string
 }
 
+export interface RecordInternalOptions extends RecordOptions {
+    context: Window
+    skip?: boolean
+}
+
 export interface RecordOptions {
     mode?: 'live' | 'default'
-    context?: Window
     audio?: boolean
-    skip?: boolean
+    write?: boolean
     uploadUrl?: string
-    onData?: (data: RecordData, db: any) => RecordData | void
 }
 
 export interface RecorderOptions {
@@ -249,7 +252,6 @@ export interface Constructable<T> {
 
 export interface ReplayOptions {
     mode?: 'live' | 'default'
-    fetch?: { url: string; options?: RequestInit }
     receiver?: (sender: (data: RecordData) => void) => void
     proxy?: string
     autoplay?: boolean

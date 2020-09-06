@@ -19,26 +19,37 @@ const { Recorder, Player } = window.TimeCat
 // record page
 interface RecordOptions {
     mode?: 'live' | 'default' // mode
-    context?: Window  // record context
+    write?: boolean // write data to indexedDB, default is true
     audio?: boolean // if your want record audio
-    uploadUrl?: string // will post PackData to server
-    // callback data here
-    onData?: (data: RecordData, db: IndexedDBOperator) => RecordData | void
 }
 
 // default use IndexedDB to save records
 const recorder = new Recorder(RecordOptions)
 
 // if you wanna send the records to server
-const recorder = new recorder({
-    uploadUrl: <Server URL>
-    // or custom
-    onData: (data, db) => fetch(<Server URL>, {
-            body: JSON.stringify(data),
-            method: 'POST',
-            ContentType: 'application/json'
-        })
+const recorder = new recorder()
+
+// receive data here
+recorder.onData((data: RecordData) => void)
+
+// The onData API called very frequently
+// You can push the data to a Array
+// Collect the amount of data and upload it
+
+// simple upload like this
+const records = []
+recorder.onData((data) => {
+    records.push(data)
 })
+
+// upload after collected
+fetch(<Server URL>, {
+        body: JSON.stringify(records),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 
 // if you want stop record
 recorder.unsubscribe()
@@ -53,9 +64,8 @@ interface ReplayOptions {
     mode?: 'live' | 'default' // mode
     records: ReplayData[]
     packs?: ReplayPack[] // data from options
-    fetch?: { url: string; options?: RequestInit } // data from server
     // receive data in live mode
-    receiver?: (sender: (data: RecordData) => void) => void
+    receiver?: ((data: RecordData) => void) => void
     proxy?: string // if cross domain
     autoplay?: boolean // autoplay when data loaded
 }

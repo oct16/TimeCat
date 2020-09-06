@@ -134,10 +134,6 @@ export class Player {
         window.dispatchEvent(event)
     }
 
-    async fetchData(input: RequestInfo, init?: RequestInit): Promise<ReplayPack[]> {
-        return fetch(input, init).then(res => res.json())
-    }
-
     async dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<ReplayPack[]> {
         let replayPack: ReplayPack
         let head: ReplayHead
@@ -194,12 +190,11 @@ export class Player {
     }
 
     async getReplayData(options: ReplayOptions) {
-        const { receiver, packs, records, fetch } = options
+        const { receiver, packs, records } = options
 
         const rawReplayPacks =
             (records && classifyRecords(records)) ||
             packs ||
-            (fetch && (await this.fetchData(fetch.url, fetch.options))) ||
             (receiver && (await this.dataReceiver(receiver))) ||
             this.getGZipData() ||
             (await this.getDataFromDB()) ||

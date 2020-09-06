@@ -1,13 +1,14 @@
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, RecordOptions, ValueOf, RecordType } from '@timecat/share'
+import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions } from '@timecat/share'
 import { getDBOperator, logError, Transmitter, getRadix64TimeStr } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 
 export class Recorder {
-    private static defaultRecordOpts = { mode: 'default' } as RecordOptions
+    private static defaultRecordOpts = { mode: 'default', write: true } as RecordOptions
     private reverseStore: Set<Function> = new Set()
+    private onDataCallback: Function
 
     constructor(options?: RecordOptions) {
         const opts = { ...Recorder.defaultRecordOpts, ...options }
@@ -16,8 +17,13 @@ export class Recorder {
         if (opts && opts.uploadUrl) {
             new Transmitter(opts.uploadUrl)
         }
+
         this.record(opts)
         this.listenVisibleChange(opts)
+    }
+
+    public onData(cb: (data: RecordData) => void) {
+        this.onDataCallback = cb
     }
 
     public unsubscribe() {
@@ -25,9 +31,6 @@ export class Recorder {
     }
 
     private getRecorders(options: RecordOptions) {
-        const context = options.context || window
-        context.G_RECORD_OPTIONS = options
-
         const recorders: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot> = [
             Snapshot,
             ...Object.values(watchers)
@@ -38,11 +41,15 @@ export class Recorder {
         return recorders
     }
 
-    public record(options: RecordOptions) {
-        this.startRecord(options)
+    public record(options: RecordOptions): void
+    public record(options: RecordInternalOptions): void
+
+    public record(options: RecordOptions): void {
+        this.startRecord(options as RecordInternalOptions)
     }
 
-    private async startRecord(options: RecordOptions) {
+    private async startRecord(options: RecordInternalOptions) {
+        options.context.G_RECORD_OPTIONS = options
         const db = await getDBOperator
 
         const allRecorders = this.getRecorders(options)
@@ -63,20 +70,18 @@ export class Recorder {
             ]
         }
 
-        function onEmit(options: RecordOptions) {
-            const { onData } = options
+        const onEmit = (options: RecordOptions) => {
+            const { write } = options
             return (data: RecordData) => {
                 if (!data) {
                     return
                 }
-                let ret
-                if (onData) {
-                    ret = onData(data, db)
-                    if (!ret) {
-                        return
-                    }
+
+                this.onDataCallback && this.onDataCallback(data)
+
+                if (write) {
+                    db.addRecord(data)
                 }
-                db.addRecord(ret || data)
             }
         }
 
@@ -137,7 +142,7 @@ export class Recorder {
         frames.forEach(frameWindow => this.record({ context: frameWindow }))
     }
 
-    listenVisibleChange(this: Recorder, options: RecordOptions) {
+    private listenVisibleChange(this: Recorder, options: RecordOptions) {
         if (typeof document.hidden !== 'undefined') {
             const hidden = 'hidden'
             const visibilityChange = 'visibilitychange'
@@ -146,7 +151,7 @@ export class Recorder {
                 if (document[hidden]) {
                     this.unsubscribe()
                 } else {
-                    this.record({ ...options, skip: true })
+                    this.record({ ...options, skip: true } as RecordInternalOptions)
                 }
             }
 
