@@ -83,6 +83,7 @@ function createConfig(format, output, plugins = []) {
         }
     }
     output.globals = {}
+    output.sourcemap = true
 
     const shouldEmitDeclarations = process.env.TYPES != null && !hasTSChecked
 
