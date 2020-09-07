@@ -67,7 +67,7 @@ export enum MouseEventType {
     'CLICK'
 }
 
-export type TerminateRecord = BaseRecord<TerminateRecord, null>
+export type TerminateRecord = BaseRecord<RecordType.TERMINATE, null>
 
 export type WindowRecord = BaseRecord<RecordType.WINDOW, WindowRecordData>
 

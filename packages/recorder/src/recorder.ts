@@ -1,17 +1,17 @@
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions } from '@timecat/share'
+import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions, TerminateRecord } from '@timecat/share'
 import { getDBOperator, logError, Transmitter, getRadix64TimeStr } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 
 export class Recorder {
-    private static defaultRecordOpts = { mode: 'default', write: true } as RecordOptions
+    private static defaultRecordOpts = { mode: 'default', write: true, context: window } as RecordOptions
     private reverseStore: Set<Function> = new Set()
     private onDataCallback: Function
 
     constructor(options?: RecordOptions) {
-        const opts = { ...Recorder.defaultRecordOpts, ...options }
+        const opts = { ...Recorder.defaultRecordOpts, ...options } as RecordInternalOptions
 
         // TODO: Plugin module
         if (opts && opts.uploadUrl) {
@@ -45,18 +45,18 @@ export class Recorder {
     public record(options: RecordInternalOptions): void
 
     public record(options: RecordOptions): void {
-        this.startRecord(options as RecordInternalOptions)
+        const opts = { ...Recorder.defaultRecordOpts, ...options } as RecordInternalOptions
+        this.startRecord((opts.context.G_RECORD_OPTIONS = opts))
     }
 
     private async startRecord(options: RecordInternalOptions) {
-        options.context.G_RECORD_OPTIONS = options
         const db = await getDBOperator
 
         const allRecorders = this.getRecorders(options)
         let iframeWatchers = allRecorders
 
         // is record iframe, switch context
-        if (!options || !options.context) {
+        if (options.context === window) {
             if (!options.skip) {
                 db.clear()
             }
@@ -101,7 +101,7 @@ export class Recorder {
 
         iframeWatchers.forEach(watcher => {
             new watcher({
-                context: (options && options.context) || window,
+                context: options && options.context,
                 reverseStore: this.reverseStore,
                 relatedId: relatedId,
                 emit
@@ -142,13 +142,22 @@ export class Recorder {
         frames.forEach(frameWindow => this.record({ context: frameWindow }))
     }
 
-    private listenVisibleChange(this: Recorder, options: RecordOptions) {
+    private listenVisibleChange(this: Recorder, options: RecordInternalOptions) {
         if (typeof document.hidden !== 'undefined') {
             const hidden = 'hidden'
             const visibilityChange = 'visibilitychange'
 
-            function handleVisibilityChange(this: Recorder) {
+            async function handleVisibilityChange(this: Recorder) {
                 if (document[hidden]) {
+                    const db = await getDBOperator
+                    const data = {
+                        type: RecordType.TERMINATE,
+                        data: null,
+                        relatedId: options.context.G_RECORD_RELATED_ID,
+                        time: getRadix64TimeStr()
+                    }
+                    db.addRecord(data as TerminateRecord)
+                    this.onDataCallback && this.onDataCallback(data)
                     this.unsubscribe()
                 } else {
                     this.record({ ...options, skip: true } as RecordInternalOptions)
