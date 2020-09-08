@@ -33,7 +33,6 @@ const outputConfigs = {
         format: `cjs`
     },
     global: {
-        name,
         file: resolve(`dist/${name}.global.js`),
         format: `iife`
     }
@@ -78,8 +77,13 @@ function createConfig(format, output, plugins = []) {
 
     if (isGlobalBuild) {
         output.name = packageOptions.name || name
+        if (name !== 'timecat') {
+            output.name = 'window'
+            output.extend = true
+        }
     }
     output.globals = {}
+    output.sourcemap = true
 
     const shouldEmitDeclarations = process.env.TYPES != null && !hasTSChecked
 

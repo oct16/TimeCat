@@ -14,13 +14,9 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
         const canvasElements = document.getElementsByTagName('canvas')
         Array.from(canvasElements).forEach(canvas => {
             const dataURL = canvas.toDataURL()
-            this.emitData({
-                type: RecordType.CANVAS,
-                data: {
-                    id: this.getNodeId(canvas)!,
-                    src: dataURL
-                },
-                time: this.getRadix64TimeStr()
+            this.emitData(RecordType.CANVAS, {
+                id: this.getNodeId(canvas)!,
+                src: dataURL
             })
         })
 
@@ -66,15 +62,11 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
     }
 
     aggregateDataEmitter = this.aggregateManager((id: number, strokes: { name: Prop; args: any[] }[]) => {
-        this.emitData({
-            type: RecordType.CANVAS,
-            data: {
-                id,
-                strokes
-            },
-            time: this.getRadix64TimeStr()
+        this.emitData(RecordType.CANVAS, {
+            id,
+            strokes
         })
-    }, 100)
+    }, 30)
 
     aggregateManager(func: Function, wait: number): any {
         const tasks = Object.create(null) as { [key: number]: { name: Prop; args: any[] }[] }

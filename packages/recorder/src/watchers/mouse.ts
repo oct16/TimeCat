@@ -8,30 +8,61 @@ export class MouseWatcher extends Watcher<MouseRecord> {
         this.init()
     }
 
+    scrolling: boolean
+    latestMove: { x: number; y: number; id?: number } | null
+
     init() {
         this.mouseMove()
         this.mouseClick()
+        this.detectScrolling()
+    }
+
+    detectScrolling() {
+        let timer: number
+        const evt = () => {
+            this.scrolling = true
+            clearTimeout(timer)
+            timer = this.context.setTimeout(() => {
+                this.scrolling = false
+
+                if (this.latestMove) {
+                    this.sendMoveData(this.latestMove)
+                    this.latestMove = null
+                }
+            }, 500)
+        }
+
+        const eventNames = ['mousewheel', 'scroll']
+        eventNames.forEach(name => {
+            this.context.document.addEventListener(name, evt, true)
+            this.uninstall(() => {
+                this.context.document.removeEventListener(name, evt, true)
+            })
+        })
+    }
+
+    sendMoveData(position: { x: number; y: number; id?: number }) {
+        const { x, y, id } = position
+        this.emitData(RecordType.MOUSE, {
+            type: MouseEventType.MOVE,
+            id,
+            x,
+            y
+        })
     }
 
     mouseMove() {
         const evt = (e: MouseEvent) => {
             const offsetPosition = this.getOffsetPosition(e, this.context)
-            if (offsetPosition) {
-                const { x, y, id } = offsetPosition
-                this.emitData({
-                    type: RecordType.MOUSE,
-                    data: {
-                        type: MouseEventType.MOVE,
-                        id,
-                        x,
-                        y
-                    },
-                    time: this.getRadix64TimeStr()
-                })
+            if (this.scrolling) {
+                this.latestMove = offsetPosition as { x: number; y: number; id?: number }
+                return
             }
+
+            offsetPosition && this.sendMoveData(offsetPosition)
         }
         const name = 'mousemove'
-        const listenerHandle = throttle(evt, 350, {
+        const listenerHandle = throttle(evt, 300, {
             trailing: true,
             leading: true
         })
@@ -47,13 +78,9 @@ export class MouseWatcher extends Watcher<MouseRecord> {
         const evt = (e: MouseEvent) => {
             const offsetPosition = this.getOffsetPosition(e, this.context)
             if (offsetPosition) {
-                this.emitData({
-                    type: RecordType.MOUSE,
-                    data: {
-                        type: MouseEventType.CLICK,
-                        ...offsetPosition
-                    },
-                    time: this.getRadix64TimeStr()
+                this.emitData(RecordType.MOUSE, {
+                    type: MouseEventType.CLICK,
+                    ...offsetPosition
                 })
             }
         }

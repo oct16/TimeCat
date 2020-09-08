@@ -59,8 +59,9 @@ async function addNoneFrame() {
         DBOperator.add({
             type: RecordType.TERMINATE,
             data: null,
+            relatedId: window.G_RECORD_RELATED_ID,
             time: getRadix64TimeStr()
-        } as TerminateRecord)
+        })
     }
 }
 
@@ -75,11 +76,11 @@ function downloadFiles(html: Document) {
 }
 
 function downloadAudios() {
-    if (window.__ReplayData__) {
-        const replayData = window.__ReplayData__
-        if (replayData.audio) {
-            const { src } = replayData.audio
-            download(src, src)
+    if (window.G_REPLAY_DATA) {
+        const replayData = window.G_REPLAY_DATA
+        const audioSrc = replayData?.audio?.src
+        if (audioSrc) {
+            download(audioSrc, audioSrc)
             return
         }
     }
@@ -98,9 +99,9 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
     const options = { autoplay }
     const scriptList = scripts || ([] as ScriptItem[])
 
-    if (!scriptList.some(item => item.name === 'time-cat-init')) {
+    if (!scriptList.some(item => item.name === 'timecat-init')) {
         scriptList.push({
-            name: 'time-cat-init',
+            name: 'timecat-init',
             src: `new TimeCat.Player(${JSON.stringify(options)})`
         })
     }
@@ -142,8 +143,8 @@ async function getDataFromDB(exportOptions?: ExportOptions) {
     return null
 }
 
-function extract(replayDataList: ReplayPack[], exportOptions?: ExportOptions) {
-    return replayDataList.map(replayPack => {
+function extract(replayPacks: ReplayPack[], exportOptions?: ExportOptions) {
+    return replayPacks.map(replayPack => {
         replayPack.body.forEach(replayData => {
             if (exportOptions && exportOptions.audioExternal) {
                 replayData.audio = extractAudio(replayData.audio)
@@ -181,7 +182,7 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const data = (window.__ReplayPacks__ as ReplayPack[]) || (await getDataFromDB(exportOptions))
+    const data = (window.G_REPLAY_PACKS as ReplayPack[]) || (await getDataFromDB(exportOptions))
 
     if (!data) {
         return
@@ -203,7 +204,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
         outputStr += String.fromCharCode(num)
     }
 
-    const replayData = `var __ReplayStrPacks__ =  '${outputStr}'`
+    const replayData = `var G_REPLAY_STR_PACKS =  '${outputStr}'`
 
     injectScripts(html, [{ src: replayData }])
 }

@@ -1,13 +1,16 @@
 {
-    "private": true,
+    "private": false,
     "name": "@timecat/utils",
-    "version": "1.2.0-alpha.2",
+    "version": "1.2.0-alpha.8",
     "description": "",
-    "main": "src/index.ts",
-    "types": "dist/index.d.ts",
+    "main": "index.js",
+    "module": "dist/utils.esm.js",
+    "types": "dist/utils.d.ts",
+    "unpkg": "dist/utils.global.prod.js",
+    "jsdelivr": "dist/utils.global.prod.js",
     "scripts": {},
     "dependencies": {
-        "@timecat/share": "1.2.0-alpha.2"
+        "@timecat/share": "1.2.0-alpha.8"
     },
     "author": "",
     "license": "ISC"

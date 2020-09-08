@@ -1,10 +1,10 @@
 {
     "name": "timecatjs",
-    "version": "1.2.0-alpha.2",
+    "version": "1.2.0-alpha.8",
     "description": "timecat",
     "main": "index.js",
     "module": "dist/timecat.esm.js",
-    "types": "dist/timecat.d.ts",
+    "types": "dist/timecatjs.d.ts",
     "unpkg": "dist/timecat.global.prod.js",
     "jsdelivr": "dist/timecat.global.prod.js",
     "files": [
@@ -28,8 +28,8 @@
         ]
     },
     "dependencies": {
-        "@timecat/recorder": "1.2.0-alpha.2",
-        "@timecat/player": "1.2.0-alpha.2",
-        "@timecat/utils": "1.2.0-alpha.2"
+        "@timecat/recorder": "1.2.0-alpha.8",
+        "@timecat/player": "1.2.0-alpha.8",
+        "@timecat/utils": "1.2.0-alpha.8"
     }
 }

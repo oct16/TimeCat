@@ -23,21 +23,19 @@ import {
     ReplayHead
 } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
-import smoothScroll from 'smoothscroll-polyfill'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
 
-export default class Player {
+export class Player {
     fmp: FMP
-    constructor(options: ReplayOptions) {
+    constructor(options?: ReplayOptions) {
         this.init(options)
     }
 
-    async init(options: ReplayOptions) {
+    async init(options?: ReplayOptions) {
         const opts = { ...defaultReplayOptions, ...options }
 
         window.G_REPLAY_OPTIONS = opts
-        smoothScroll.polyfill()
 
         const replayPacks = await this.getReplayData(opts)
 
@@ -196,10 +194,11 @@ export default class Player {
     }
 
     async getReplayData(options: ReplayOptions) {
-        const { receiver, replayPacks: data, fetch } = options
+        const { receiver, packs, records, fetch } = options
 
         const rawReplayPacks =
-            data ||
+            (records && classifyRecords(records)) ||
+            packs ||
             (fetch && (await this.fetchData(fetch.url, fetch.options))) ||
             (receiver && (await this.dataReceiver(receiver))) ||
             this.getGZipData() ||

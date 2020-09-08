@@ -26,6 +26,7 @@ async function run() {
         server: [resolvePackage('dist'), resolveRoot('examples')],
         port: 4321,
         notify: false,
-        open: false
+        open: false,
+        cors: true
     })
 }

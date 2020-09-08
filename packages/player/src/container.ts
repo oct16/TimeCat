@@ -2,6 +2,7 @@ import { filteringTemplate, disableScrolling, nodeStore, debounce } from '@timec
 import HTML from './ui.html'
 import CSS from './ui.scss'
 import { createIframeDOM, injectIframeContent } from './dom'
+import smoothScroll from 'smoothscroll-polyfill'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -27,9 +28,17 @@ export class ContainerComponent {
     initSandbox() {
         this.sandBox = this.container.querySelector('#cat-sandbox') as HTMLIFrameElement
         this.sandBoxDoc = this.sandBox.contentDocument!
+        this.setSmoothScroll(this.sandBox.contentWindow!)
         createIframeDOM(this.sandBoxDoc, this.getSnapshotRecord())
         disableScrolling(this.sandBox.contentWindow!.document)
         this.setViewState()
+    }
+
+    // use scroll polyfill if browser (e.g. ios safari) not support
+    setSmoothScroll(context: Window) {
+        smoothScroll.polyfill()
+        context.HTMLElement.prototype.scroll = window.scroll
+        context.HTMLElement.prototype.scrollTo = window.scrollTo
     }
 
     setViewState() {

@@ -75,7 +75,7 @@ export function classifyRecords(records: RecordData[]) {
     }
 
     function isSameHEAD(head: ReplayHead, compare: ReplayHead) {
-        return head.href === compare.href // && head.sessionId === compare.sessionId
+        return head.href === compare.href // && head.relatedId === compare.relatedId
     }
 
     let replayPack: ReplayPack
@@ -138,7 +138,7 @@ export function classifyRecords(records: RecordData[]) {
     return packs
 }
 
-export async function delay(t = 200) {
+export async function delay(t = 200): Promise<void> {
     return new Promise(r => {
         setTimeout(() => r(), t)
     })

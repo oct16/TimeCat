@@ -12,11 +12,7 @@ export interface InfoData {
     frameId: number | null
 }
 
-export interface SnapshotRecord {
-    type: RecordType.SNAPSHOT
-    data: { vNode: VNode } & InfoData
-    time: string
-}
+export type SnapshotRecord = BaseRecord<RecordType.SNAPSHOT, { vNode: VNode } & InfoData>
 
 type Extra = {
     props?: {
@@ -71,16 +67,9 @@ export enum MouseEventType {
     'CLICK'
 }
 
-export interface TerminateRecord {
-    type: RecordType.TERMINATE
-    data: null
-    time: string
-}
-export interface WindowRecord {
-    type: RecordType.WINDOW
-    data: WindowRecordData
-    time: string
-}
+export type TerminateRecord = BaseRecord<TerminateRecord, null>
+
+export type WindowRecord = BaseRecord<RecordType.WINDOW, WindowRecordData>
 
 export interface WindowRecordData {
     id: number | null
@@ -88,11 +77,7 @@ export interface WindowRecordData {
     height: number
 }
 
-export interface ScrollRecord {
-    type: RecordType.SCROLL
-    data: ScrollRecordData
-    time: string
-}
+export type ScrollRecord = BaseRecord<RecordType.SCROLL, ScrollRecordData>
 
 export interface ScrollRecordData {
     id: number | null
@@ -100,22 +85,15 @@ export interface ScrollRecordData {
     left: number
 }
 
-export interface MouseRecord {
-    type: RecordType.MOUSE
-    data: MouseRecordData
-    time: string
-}
+export type MouseRecord = BaseRecord<RecordType.MOUSE, MouseRecordData>
 export interface MouseRecordData {
     type: MouseEventType
     x: number
     y: number
     id?: number
 }
-export interface DOMRecord {
-    type: RecordType.DOM
-    data: DOMRecordData
-    time: string
-}
+
+export type DOMRecord = BaseRecord<RecordType.DOM, DOMRecordData>
 
 export interface AttributesUpdateData {
     id: number
@@ -154,11 +132,7 @@ export interface DOMRecordData {
     texts?: CharacterDataUpdateData[]
 }
 
-export interface FormElementRecord {
-    type: RecordType.FORM_EL
-    data: FormElementRecordData
-    time: string
-}
+export type FormElementRecord = BaseRecord<RecordType.FORM_EL, FormElementRecordData>
 
 export interface FormElementRecordData {
     type: FormElementEvent
@@ -175,11 +149,7 @@ interface FormElementStrPatches {
     len?: number | undefined
 }
 
-export interface AudioRecord {
-    type: RecordType.AUDIO
-    data: AudioStrList | AudioOptions
-    time: string
-}
+export type AudioRecord = BaseRecord<RecordType.AUDIO, AudioStrList | AudioOptions>
 export interface AudioOptions {
     type: 'opts'
     data: RecorderOptions
@@ -189,11 +159,7 @@ export interface AudioStrList {
     data: string[]
 }
 
-export interface LocationRecord {
-    type: RecordType.LOCATION
-    data: LocationRecordData
-    time: string
-}
+export type LocationRecord = BaseRecord<RecordType.LOCATION, LocationRecordData>
 
 export interface LocationRecordData {
     href: string
@@ -201,11 +167,7 @@ export interface LocationRecordData {
     hash: string
     contextNodeId: number
 }
-export interface CanvasRecord {
-    type: RecordType.CANVAS
-    data: CanvasRecordData
-    time: string
-}
+export type CanvasRecord = BaseRecord<RecordType.CANVAS, CanvasRecordData>
 
 export type CanvasRecordData = CanvasMutationRecordData | CanvasInitRecordData
 
@@ -278,6 +240,7 @@ export type WatcherOptions<T extends RecordData | HeadRecord> = {
     context: Window
     reverseStore: Set<Function>
     emit: RecordEvent<T>
+    relatedId: string
 }
 
 export interface Constructable<T> {
@@ -290,7 +253,8 @@ export interface ReplayOptions {
     receiver?: (sender: (data: RecordData) => void) => void
     proxy?: string
     autoplay?: boolean
-    replayPacks?: ReplayPack[]
+    packs?: ReplayPack[]
+    records?: RecordData[]
 }
 
 export interface ReplayPack {
@@ -308,7 +272,7 @@ export interface ReplayData {
 export interface ReplayHead {
     version: string
     href: string
-    sessionId: string
+    relatedId: string
     userAgent: string
     platform: string
     beginTime: string
@@ -318,8 +282,11 @@ export interface ReplayHead {
     }
 }
 
-export interface HeadRecord {
-    type: RecordType.HEAD
-    data: ReplayHead
+export type HeadRecord = BaseRecord<RecordType.HEAD, ReplayHead>
+
+export interface BaseRecord<T, D = any> {
+    type: T
+    data: D
     time: string
+    relatedId: string
 }

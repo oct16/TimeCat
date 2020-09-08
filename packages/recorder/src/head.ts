@@ -1,18 +1,14 @@
-import { ReplayHead, RecordType, HeadRecord } from '@timecat/share'
-import { getRadix64TimeStr, getRandomCode, getTime } from '@timecat/utils'
+import { ReplayHead } from '@timecat/share'
+import { getRandomCode, getTime } from '@timecat/utils'
 import pkg from 'pkg'
 
 export function getHeadData() {
     return {
-        type: RecordType.HEAD,
-        data: <ReplayHead>{
-            href: location.href,
-            sessionId: getRandomCode(),
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            beginTime: getTime().toString(),
-            version: pkg.version
-        },
-        time: getRadix64TimeStr()
-    } as HeadRecord
+        href: location.href,
+        relatedId: getRandomCode(),
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        beginTime: getTime().toString(),
+        version: pkg.version
+    } as ReplayHead
 }

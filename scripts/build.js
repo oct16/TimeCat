@@ -79,6 +79,9 @@ async function build(target) {
     if (buildTypes && pkg.types) {
         const { Extractor, ExtractorConfig } = require('@microsoft/api-extractor')
         const extractorConfigPath = path.resolve(pkgDir, `api-extractor.json`)
+        if (!fs.existsSync(extractorConfigPath)) {
+            return
+        }
         const extractorConfig = ExtractorConfig.loadFileAndPrepare(extractorConfigPath)
         const extractorResult = Extractor.invoke(extractorConfig, {
             localBuild: true,

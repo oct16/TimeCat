@@ -1,5 +1,7 @@
 # @TimeCat/recorder
 
+#### CDN [jsDelivr](https://www.jsdelivr.com/package/npm/@timecat/recorder)
+
 #### More details to see 🏘️ [TimeCat Homepage](https://github.com/oct16/timecat#readme)
 
 ## Which dist file to use?
@@ -18,7 +20,6 @@
 ### With a Bundler
 
 - **`recorder.esm.js`**:
-
   - For use with bundlers like `webpack`, `rollup` and `parcel`.
   - Leaves prod/dev branches with `process.env.NODE_ENV` guards (must be replaced by bundler)
   - Does not ship minified builds (to be done together with the rest of the code after bundling)

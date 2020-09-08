@@ -231,8 +231,8 @@ export class PlayerComponent {
             let nextTime = Number(this.frames[this.frameIndex])
 
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
-                // delay 200ms wait for all frame finished and switch next
-                await this.switchNextView(200)
+                // delay 300ms wait for all frame finished and switch next
+                await this.switchNextView(300)
             }
 
             while (nextTime && currTime >= nextTime) {
@@ -351,8 +351,8 @@ export class PlayerComponent {
         this.audioNode.currentTime = 0
     }
 
-    execFrame(this: PlayerComponent, record: RecordData) {
-        setTimeout(() => updateDom.call(this, record), 0)
+    async execFrame(this: PlayerComponent, record: RecordData) {
+        updateDom.call(this, record)
     }
 
     getPercentInterval() {
