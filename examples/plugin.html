@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>TimeCat Plugin Usage Example</title>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.4em;
+            background: #f5f5f5;
+            color: #4d4d4d;
+            min-width: 230px;
+            max-width: 550px;
+            margin: 0 auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 300;
+        }
+
+        button {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: none;
+            font-size: 100%;
+            vertical-align: baseline;
+            font-family: inherit;
+            font-weight: inherit;
+            color: inherit;
+            -webkit-appearance: none;
+            appearance: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #replay {
+            border: 1px solid grey;
+            padding: 2px 10px;
+            margin: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #replay.hide {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <!--hidden--><button id="replay">Replay</button>
+
+    <h2>TimeCat Plugin Usage Example</h2>
+
+    <input type="text" value="123">
+
+    <script id="timecat" src="./timecat.global.js"></script>
+    <script>
+
+        class RunPlugin {
+            apply(recorder) {
+                recorder.plugin('run', () => {
+                    console.log('record run')
+                })
+            }
+        }
+
+        class EmitPlugin {
+            apply(recorder) {
+                recorder.plugin('emit', (data) => {
+                    console.log(data)
+                    // you can modify data here
+                    // data.insertNumber = Date.now()
+                })
+            }
+        }
+
+        const { Recorder } = TimeCat
+        const recorder = new Recorder({
+            // register the plugins in here
+            plugins: [
+                new RunPlugin({ test: true }),
+                new EmitPlugin({})
+            ]
+        })
+
+        // or like this
+        recorder.use(new RunPlugin())
+
+        const replayButton = document.getElementById('replay')
+        if (replayButton) {
+            replayButton.addEventListener('click', () => {
+                if (replayButton.className) {
+                    return
+                }
+                recorder.unsubscribe()
+                window.open('replay.html')
+            })
+        }
+    </script>
+</body>
+
+</html>

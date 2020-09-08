@@ -6,6 +6,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import { string } from 'rollup-plugin-string'
 import scss from 'rollup-plugin-scss'
 import node from '@rollup/plugin-node-resolve'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 if (!process.env.TARGET) {
     throw new Error('TARGET package must be specified via --environment flag.')
@@ -120,6 +121,7 @@ function createConfig(format, output, plugins = []) {
             browser: true,
             mainFields: ['module', 'main']
         }),
+        nodePolyfills(),
         json(),
         string({
             include: ['**/*.html', '**/*.css'],

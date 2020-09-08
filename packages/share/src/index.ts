@@ -223,6 +223,7 @@ export interface RecordOptions {
     audio?: boolean
     write?: boolean
     uploadUrl?: string
+    plugins?: any[]
 }
 
 export interface RecorderOptions {

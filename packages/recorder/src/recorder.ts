@@ -1,16 +1,19 @@
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions, TerminateRecord } from '@timecat/share'
-import { getDBOperator, logError, Transmitter, getRadix64TimeStr } from '@timecat/utils'
+import { getDBOperator, logError, Transmitter, getRadix64TimeStr, IndexedDBOperator } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
+import { Pluginable } from './pluginable'
 
-export class Recorder {
+export class Recorder extends Pluginable {
     private static defaultRecordOpts = { mode: 'default', write: true, context: window } as RecordOptions
     private reverseStore: Set<Function> = new Set()
     private onDataCallback: Function
+    private db: IndexedDBOperator
 
     constructor(options?: RecordOptions) {
+        super(options)
         const opts = { ...Recorder.defaultRecordOpts, ...options } as RecordInternalOptions
 
         // TODO: Plugin module
@@ -18,8 +21,16 @@ export class Recorder {
             new Transmitter(opts.uploadUrl)
         }
 
-        this.record(opts)
-        this.listenVisibleChange(opts)
+        this.init(opts)
+    }
+
+    private async init(options: RecordInternalOptions) {
+        const db = await getDBOperator
+        this.db = db
+        this.hooks.beforeRun.call(this)
+        this.record(options)
+        this.hooks.run.call(this)
+        this.listenVisibleChange(options)
     }
 
     public onData(cb: (data: RecordData) => void) {
@@ -50,15 +61,13 @@ export class Recorder {
     }
 
     private async startRecord(options: RecordInternalOptions) {
-        const db = await getDBOperator
-
         const allRecorders = this.getRecorders(options)
         let iframeWatchers = allRecorders
 
         // is record iframe, switch context
         if (options.context === window) {
             if (!options.skip) {
-                db.clear()
+                this.db.clear()
             }
         } else {
             iframeWatchers = [
@@ -77,17 +86,20 @@ export class Recorder {
                     return
                 }
 
+                this.hooks.emit.call(data)
+
                 this.onDataCallback && this.onDataCallback(data)
 
                 if (write) {
-                    db.addRecord(data)
+                    this.db.addRecord(data)
                 }
             }
         }
 
         const emit = onEmit(options)
 
-        const headData = getHeadData()
+        const headData = await getHeadData()
+
         const relatedId = headData.relatedId
         if (options.context) {
             options.context.G_RECORD_RELATED_ID = relatedId
@@ -149,16 +161,16 @@ export class Recorder {
 
             async function handleVisibilityChange(this: Recorder) {
                 if (document[hidden]) {
-                    const db = await getDBOperator
                     const data = {
                         type: RecordType.TERMINATE,
                         data: null,
                         relatedId: options.context.G_RECORD_RELATED_ID,
                         time: getRadix64TimeStr()
                     }
-                    db.addRecord(data as TerminateRecord)
+                    this.db.addRecord(data as TerminateRecord)
                     this.onDataCallback && this.onDataCallback(data)
                     this.unsubscribe()
+                    this.hooks.end.call()
                 } else {
                     this.record({ ...options, skip: true } as RecordInternalOptions)
                 }

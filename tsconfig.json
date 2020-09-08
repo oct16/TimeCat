@@ -3,7 +3,7 @@
         "baseUrl": ".",
         "outDir": "dist",
         "module": "esnext",
-        "target": "ES2019",
+        "target": "esnext",
         "moduleResolution": "node",
         "allowJs": false,
         "noUnusedLocals": false,
