@@ -1,4 +1,4 @@
-import { watchers } from './watchers'
+import { watchers as RecorderWatchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions, TerminateRecord } from '@timecat/share'
 import { getDBOperator, logError, Transmitter, getRadix64TimeStr, IndexedDBOperator } from '@timecat/utils'
@@ -11,10 +11,12 @@ export class Recorder extends Pluginable {
     private reverseStore: Set<Function> = new Set()
     private onDataCallback: Function
     private db: IndexedDBOperator
+    private watchers: Array<ValueOf<typeof RecorderWatchers> | typeof RecordAudio | typeof Snapshot>
 
     constructor(options?: RecordOptions) {
         super(options)
         const opts = { ...Recorder.defaultRecordOpts, ...options } as RecordInternalOptions
+        this.watchers = this.getWatchers(opts)
 
         // TODO: Plugin module
         if (opts && opts.uploadUrl) {
@@ -41,15 +43,15 @@ export class Recorder extends Pluginable {
         this.reverseStore.forEach(un => un())
     }
 
-    private getRecorders(options: RecordOptions) {
-        const recorders: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot> = [
+    private getWatchers(options: RecordOptions) {
+        const watchers: Array<ValueOf<typeof RecorderWatchers> | typeof RecordAudio | typeof Snapshot> = [
             Snapshot,
-            ...Object.values(watchers)
+            ...Object.values(RecorderWatchers)
         ]
         if (options && options.audio) {
-            recorders.push(RecordAudio)
+            watchers.push(RecordAudio)
         }
-        return recorders
+        return watchers
     }
 
     public record(options: RecordOptions): void
@@ -61,8 +63,7 @@ export class Recorder extends Pluginable {
     }
 
     private async startRecord(options: RecordInternalOptions) {
-        const allRecorders = this.getRecorders(options)
-        let iframeWatchers = allRecorders
+        let activeWatchers = this.watchers
 
         // is record iframe, switch context
         if (options.context === window) {
@@ -70,12 +71,13 @@ export class Recorder extends Pluginable {
                 this.db.clear()
             }
         } else {
-            iframeWatchers = [
+            // for iframe watchers
+            activeWatchers = [
                 Snapshot,
-                watchers.MouseWatcher,
-                watchers.DOMWatcher,
-                watchers.FormElementWatcher,
-                watchers.ScrollWatcher
+                RecorderWatchers.MouseWatcher,
+                RecorderWatchers.DOMWatcher,
+                RecorderWatchers.FormElementWatcher,
+                RecorderWatchers.ScrollWatcher
             ]
         }
 
@@ -111,7 +113,7 @@ export class Recorder extends Pluginable {
             time: getRadix64TimeStr()
         })
 
-        iframeWatchers.forEach(watcher => {
+        activeWatchers.forEach(watcher => {
             new watcher({
                 context: options && options.context,
                 reverseStore: this.reverseStore,
@@ -125,7 +127,7 @@ export class Recorder extends Pluginable {
 
     private async waitingFramesLoaded() {
         const frames = window.frames
-        const tasks = Array.from(frames)
+        const validFrames = Array.from(frames)
             .filter(frame => {
                 try {
                     const frameElement = frame.frameElement
@@ -143,10 +145,10 @@ export class Recorder extends Pluginable {
                     })
                 })
             })
-        if (!tasks.length) {
+        if (!validFrames.length) {
             return Promise.resolve([])
         }
-        return Promise.all(tasks) as Promise<Window[]>
+        return Promise.all(validFrames) as Promise<Window[]>
     }
 
     private async recordFrames() {
