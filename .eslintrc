@@ -31,6 +31,7 @@
         {
             "excludedFiles": "*.spec.ts",
             "files": [
+                "*.js",
                 "*.ts"
             ],
             "extends": [
@@ -72,6 +73,9 @@
                     "off"
                 ],
                 "@typescript-eslint/no-var-requires": [
+                    "off"
+                ],
+                "node/no-unpublished-require": [
                     "off"
                 ]
             }
