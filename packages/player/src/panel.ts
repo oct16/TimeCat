@@ -4,6 +4,7 @@ import { PointerComponent } from './pointer'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { BroadcasterComponent } from './broadcaster'
+import { ReplayInternalOptions } from '@timecat/share/src'
 
 export class Panel {
     keyboard: KeyboardComponent
@@ -12,9 +13,11 @@ export class Panel {
     player: PlayerComponent
     broadcaster: BroadcasterComponent
     container: ContainerComponent
+    options: ReplayInternalOptions
 
-    constructor(container: ContainerComponent) {
+    constructor(container: ContainerComponent, options: ReplayInternalOptions) {
         this.container = container
+        this.options = options
         this.initComponent()
     }
 
@@ -23,6 +26,6 @@ export class Panel {
         this.progress = new ProgressComponent(this.container)
         this.pointer = new PointerComponent()
         this.broadcaster = new BroadcasterComponent()
-        this.player = new PlayerComponent(this.container, this.pointer, this.progress, this.broadcaster)
+        this.player = new PlayerComponent(this.options, this.container, this.pointer, this.progress, this.broadcaster)
     }
 }

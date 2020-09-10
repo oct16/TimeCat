@@ -16,6 +16,7 @@ export { ProgressTypes, ProgressState } from './reducers/progress'
 // TODO
 // the return type was added for fix warning: The expression contains an import() type, which is not yet supported by API Extractor
 export const reduxStore = createStore(reducer) as {
+    unsubscribe: () => void
     subscribe: {
         <T extends 'player' | 'progress', S extends ValueOfKey<StateMap, T>>(
             type: T,

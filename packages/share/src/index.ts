@@ -242,7 +242,7 @@ export enum TransactionMode {
 
 export type WatcherOptions<T extends RecordData | HeadRecord> = {
     context: Window
-    reverseStore: Set<Function>
+    listenStore: Set<Function>
     emit: RecordEvent<T>
     relatedId: string
 }
@@ -258,6 +258,11 @@ export interface ReplayOptions {
     autoplay?: boolean
     packs?: ReplayPack[]
     records?: RecordData[]
+    target?: string | HTMLElement | Window
+}
+
+export interface ReplayInternalOptions extends ReplayOptions {
+    destroyStore: Set<Function>
 }
 
 export interface ReplayPack {

@@ -1,17 +1,20 @@
 import { watchers as RecorderWatchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions, TerminateRecord } from '@timecat/share'
-import { getDBOperator, logError, Transmitter, getRadix64TimeStr, IndexedDBOperator } from '@timecat/utils'
+import { getDBOperator, logError, Transmitter, getRadix64TimeStr, IndexedDBOperator, nodeStore } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { Pluginable } from './pluginable'
 
 export class Recorder extends Pluginable {
     private static defaultRecordOpts = { mode: 'default', write: true, context: window } as RecordOptions
-    private reverseStore: Set<Function> = new Set()
+    private destroyStore: Set<Function> = new Set()
+    private listenStore: Set<Function> = new Set()
     private onDataCallback: Function
     private db: IndexedDBOperator
     private watchers: Array<ValueOf<typeof RecorderWatchers> | typeof RecordAudio | typeof Snapshot>
+    private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
+    private watcherResolve: Function
 
     constructor(options?: RecordOptions) {
         super(options)
@@ -39,8 +42,16 @@ export class Recorder extends Pluginable {
         this.onDataCallback = cb
     }
 
-    public unsubscribe() {
-        this.reverseStore.forEach(un => un())
+    public async destroy() {
+        await this.cancelListen()
+        this.destroyStore.forEach(un => un())
+    }
+
+    private async cancelListen() {
+        // wait for watchers loaded
+        await this.watchesReadyPromise
+        this.listenStore.forEach(un => un())
+        nodeStore.reset()
     }
 
     private getWatchers(options: RecordOptions) {
@@ -116,12 +127,13 @@ export class Recorder extends Pluginable {
         activeWatchers.forEach(watcher => {
             new watcher({
                 context: options && options.context,
-                reverseStore: this.reverseStore,
+                listenStore: this.listenStore,
                 relatedId: relatedId,
                 emit
             })
         })
 
+        this.watcherResolve()
         await this.recordFrames()
     }
 
@@ -171,18 +183,18 @@ export class Recorder extends Pluginable {
                     }
                     this.db.addRecord(data as TerminateRecord)
                     this.onDataCallback && this.onDataCallback(data)
-                    this.unsubscribe()
+                    this.cancelListen()
                     this.hooks.end.call()
                 } else {
                     this.record({ ...options, skip: true } as RecordInternalOptions)
                 }
             }
 
-            document.addEventListener(visibilityChange, handleVisibilityChange.bind(this), false)
+            const handle = handleVisibilityChange.bind(this)
 
-            this.reverseStore.add(() =>
-                document.removeEventListener(visibilityChange, handleVisibilityChange.bind(this), false)
-            )
+            document.addEventListener(visibilityChange, handle, false)
+
+            this.destroyStore.add(() => document.removeEventListener(visibilityChange, handle, false))
         }
     }
 }

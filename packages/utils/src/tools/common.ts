@@ -16,10 +16,6 @@ import {
 
 export const isDev = process.env.NODE_ENV === 'development'
 
-export function logger(data: any) {
-    // console.log('record', data)
-}
-
 function logErrorOverload(e: Error): string
 function logErrorOverload(msg: string): string
 function logErrorOverload(e: Error | string): string {
