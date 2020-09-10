@@ -61,38 +61,37 @@
 
     <script>
         const { Recorder } = TimeCat
-        const r = new Recorder()
-        handleReplay(r)
+        const recorder = new Recorder()
 
-        function handleReplay(r) {
-            function isPC() {
-                var userAgentInfo = navigator.userAgent;
-                var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
-                var flag = true;
-                for (var v = 0; v < Agents.length; v++) {
-                    if (userAgentInfo.indexOf(Agents[v]) > 0) { flag = false; break; }
-                }
-                return flag;
+
+
+        function isPC() {
+            var userAgentInfo = navigator.userAgent;
+            var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
+            var flag = true;
+            for (var v = 0; v < Agents.length; v++) {
+                if (userAgentInfo.indexOf(Agents[v]) > 0) { flag = false; break; }
             }
-            const replayButton = document.getElementById('replay')
-            setTimeout(() => {
-                replayButton.className = ''
-            }, 5000);
-            document.addEventListener(isPC() ? 'click' : 'touchstart', e => {
-                if (e.target === replayButton) {
-                    if (replayButton.className) {
-                        return
-                    }
-                    replayButton.className = 'hide'
-                    r.unsubscribe()
-                    if (isPC()) {
-                        window.open('replay.html')
-                    } else {
-                        location.href = './replay.html'
-                    }
-                }
-            })
+            return flag;
         }
+        const replayButton = document.getElementById('replay')
+        setTimeout(() => {
+            replayButton.className = ''
+        }, 5000);
+        document.addEventListener(isPC() ? 'click' : 'touchstart', e => {
+            if (e.target === replayButton) {
+                if (replayButton.className) {
+                    return
+                }
+                replayButton.className = 'hide'
+                recorder.destroy()
+                if (isPC()) {
+                    window.open('replay.html')
+                } else {
+                    location.href = './replay.html'
+                }
+            }
+        })
     </script>
 
     <script>
