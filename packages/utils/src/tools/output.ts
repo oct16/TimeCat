@@ -2,16 +2,7 @@ import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from '../store/idb'
 import { isDev, classifyRecords, download, getRandomCode, isVNode, getRadix64TimeStr } from './common'
 import pako from 'pako'
-import {
-    VNode,
-    VSNode,
-    AudioData,
-    RecorderOptions,
-    TerminateRecord,
-    RecordType,
-    ReplayData,
-    ReplayPack
-} from '@timecat/share'
+import { VNode, VSNode, AudioData, RecorderOptions, RecordType, ReplayData, ReplayPack } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './dom'
 import { recoverNative } from '../polyfill/recover-native'
@@ -109,7 +100,7 @@ async function initOptions(html: Document, exportOptions: ExportOptions) {
     await injectScripts(html, scriptList)
 }
 
-async function injectScripts(html: Document, scripts?: ScriptItem[]) {
+async function injectScripts(html: Document, scripts: ScriptItem[]) {
     if (scripts) {
         for (const scriptItem of scripts) {
             const { src, name } = scriptItem

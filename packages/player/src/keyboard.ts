@@ -131,13 +131,16 @@ export class KeyboardComponent {
             )
         }
 
-        const SDKSource = (await getScriptSource(SDKScript)) || detectSDKSrc() || detectSDKContent()
+        const defaultSDK = `https://cdn.jsdelivr.net/npm/timecatjs/dist/timecat.global.prod.js`
+        const SDKSource = (await getScriptSource(SDKScript)) || detectSDKSrc() || detectSDKContent() || defaultSDK
+
         scriptList.push({
             name: 'timecat',
             src: SDKSource
         })
 
-        const source = (await getScriptSource(initScript)) || detectInitScriptContent()
+        const defaultInitScript = `new window.TimeCat.Player({autoplay: true})`
+        const source = (await getScriptSource(initScript)) || detectInitScriptContent() || defaultInitScript
         scriptList.push({
             name: 'timecat-init',
             src: source
