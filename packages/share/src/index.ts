@@ -222,7 +222,6 @@ export interface RecordOptions {
     mode?: 'live' | 'default'
     audio?: boolean
     write?: boolean
-    uploadUrl?: string
     plugins?: any[]
 }
 

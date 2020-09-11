@@ -1,7 +1,7 @@
 import { watchers as RecorderWatchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions, TerminateRecord } from '@timecat/share'
-import { getDBOperator, logError, Transmitter, getRadix64TimeStr, IndexedDBOperator, nodeStore } from '@timecat/utils'
+import { getDBOperator, logError, getRadix64TimeStr, IndexedDBOperator, nodeStore } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { Pluginable } from './pluginable'
@@ -20,12 +20,6 @@ export class Recorder extends Pluginable {
         super(options)
         const opts = { ...Recorder.defaultRecordOpts, ...options } as RecordInternalOptions
         this.watchers = this.getWatchers(opts)
-
-        // TODO: Plugin module
-        if (opts && opts.uploadUrl) {
-            new Transmitter(opts.uploadUrl)
-        }
-
         this.init(opts)
     }
 
