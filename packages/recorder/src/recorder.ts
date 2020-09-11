@@ -1,10 +1,22 @@
 import { watchers as RecorderWatchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions, TerminateRecord } from '@timecat/share'
+import { RecordData, ValueOf, RecordType, TerminateRecord } from '@timecat/share'
 import { getDBOperator, logError, getRadix64TimeStr, IndexedDBOperator, nodeStore } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
-import { Pluginable } from './pluginable'
+import { Pluginable, RecorderPlugin } from './pluginable'
+
+export interface RecordInternalOptions extends RecordOptions {
+    context: Window
+    skip?: boolean
+}
+
+export interface RecordOptions {
+    mode?: 'live' | 'default'
+    audio?: boolean
+    write?: boolean
+    plugins?: RecorderPlugin[]
+}
 
 export class Recorder extends Pluginable {
     private static defaultRecordOpts = { mode: 'default', write: true, context: window } as RecordOptions

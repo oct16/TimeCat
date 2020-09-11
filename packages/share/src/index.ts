@@ -213,18 +213,6 @@ interface SubtitlesData {
     text: string
 }
 
-export interface RecordInternalOptions extends RecordOptions {
-    context: Window
-    skip?: boolean
-}
-
-export interface RecordOptions {
-    mode?: 'live' | 'default'
-    audio?: boolean
-    write?: boolean
-    plugins?: any[]
-}
-
 export interface RecorderOptions {
     sampleBits: 8 | 16
     sampleRate: 8000 | 16000 | 22050 | 24000 | 44100 | 48000
