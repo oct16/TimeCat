@@ -1,8 +1,8 @@
-### Quick Start
+## Quick Start
 
 > TimeCat is going rapid iteration, The API may change frequently, Please pay attention to documentation updates, If you have any questions, please contact the author
 
-###### Import SDK
+#### Import TimeCat
 ```ts
 // from module
 import { Recorder, Player } from 'timecatjs';
@@ -14,68 +14,75 @@ import Player from '@timecat/player'
 const { Recorder, Player } = window.TimeCat
 ```
 
-###### Record Data
+#### Record
+
+```ts
+const recorder = new Recorder()
+```
+#### Play
+
+```ts
+const player = new Player()
+```
+
+## Advanced
+
+#### Record Options
 ```ts
 // record page
 interface RecordOptions {
     mode?: 'live' | 'default' // mode
     write?: boolean // write data to indexedDB, default is true
     audio?: boolean // if your want record audio
+    plugins?: RecorderPlugin[] // extend plugins here
 }
 
 // default use IndexedDB to save records
 const recorder = new Recorder(RecordOptions)
 
-// if you wanna send the records to server
-const recorder = new recorder()
-
 // receive data here
 recorder.onData((data: RecordData) => void)
 
-// The onData API called very frequently
-// You can push the data to a Array
-// Collect the amount of data and upload it
-
-// simple upload like this
-const records = []
-recorder.onData((data) => {
-    records.push(data)
-})
-
-// upload after collected
-fetch(<Server URL>, {
-        body: JSON.stringify(records),
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-
 // if you want stop record
-recorder.unsubscribe()
-```
-- [Record Example](https://github.com/oct16/TimeCat/blob/073c467afc644ce37e4f51937c28eb5000b2a92c/examples/todo.html#L258) 
+recorder.destroy()
 
-###### Replay
+// write a plugin 
+class EmitPlugin {
+    apply(recorder) {
+        recorder.plugin('emit', (data) => {
+            // get dataRecord
+            console.log(data)
+            
+            // you can modify data here
+            data.insertNumber = Date.now()
+            
+            // operating database
+            recorder.db.doSomething(...)
+        })
+    }
+}
+```
+- [Record Example](https://github.com/oct16/TimeCat/blob/master/examples/todo.html#L257-L275) 
+
+#### Replay
 
 ```ts
 // replay record
 interface ReplayOptions {
     mode?: 'live' | 'default' // mode
-    records: ReplayData[]
-    packs?: ReplayPack[] // data from options
-    // receive data in live mode
+    records: RecordData[] // play with records data
+    packs?: ReplayPack[] // play with packs data
+    // receive data in live mode, see examples/mirror
     receiver?: ((data: RecordData) => void) => void
-    proxy?: string // if cross domain
     autoplay?: boolean // autoplay when data loaded
 }
 
 new Player(ReplayOptions)
 ```
-- [Replay example](https://github.com/oct16/TimeCat/blob/4c91fe2e9dc3786921cd23288e26b421f6ea0848/examples/player.html#L14)
+- [Replay example](https://github.com/oct16/TimeCat/blob/master/examples/replay.html#L1-L29)
 
 
-###### Export
+#### Export
 ```ts
 
 import { exportReplay } from 'timecatjs'
@@ -90,5 +97,11 @@ interface ExportOptions {
 
 exportReplay(ExportOptions)
 ```
+- [Export Example](https://github.com/oct16/TimeCat/blob/5172352a6494c1182e83452605677796e0fe0f46/packages/player/src/keyboard.ts#L96-L154)
 
+
+## Articles
+ - [TimeCat 入门：我们的第一个应用](articles/record-and-replay.md)
+
+---
 ##### [🏠Homepage](../README.md) 
