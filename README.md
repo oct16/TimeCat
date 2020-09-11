@@ -65,7 +65,7 @@ Add script tags in your browser and use the global variable ``TimeCat``
 ## Usage
  - [Quick Start](articles/quick-start.md)
 
-## Technology
+## Articles
  - [How are TimeCat works](articles/technology.md)
 
 ## Contributing

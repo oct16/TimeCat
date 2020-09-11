@@ -38,7 +38,7 @@ TimeCat 是一个网页录屏工具，利用独特的录制方式与算法，提
 
 提供了Chrome插件并支持一键录制导出
 
-| <img src="./assets/logo.png" width="30">| [TimeCat-Chrome](https://chrome.google.com/webstore/detail/timecat-chrome/jgnkkambbdmhfdbdbkljlenddlbplhal?hl=en&authuser=0) |
+| <img src="articles/images/logo.png" width="30">| [TimeCat-Chrome](https://chrome.google.com/webstore/detail/timecat-chrome/jgnkkambbdmhfdbdbkljlenddlbplhal?hl=en&authuser=0) |
 |--|--|
 
 ## Installation
@@ -64,14 +64,15 @@ Add script tags in your browser and use the global variable ``TimeCat``
 ## Usage
  - [快速开始](articles/quick-start.md)
 
-## Technology
+## Articles
  - [录屏原理简介](articles/technology.cn.md)
+ - [TimeCat 入门：我们的第一个应用](articles/record-and-replay.md)
 
 ## 交流与建议
 
 开发中若遇到任何问题或有任何建议   
 欢迎联系 [@oct16](https://github.com/oct16) 交流与讨论   
-<img src="assets/contactQR.jpg" width="150"/>
+<img src="articles/images/contactQR.jpg" width="150"/>
 
 </a>
 
@@ -87,7 +88,7 @@ Add script tags in your browser and use the global variable ``TimeCat``
 ## 捐助项目
 
 ##### WeChat Pay and Alipay
-<img src="assets/donate.png" width="180" />
+<img src="articles/images/donate.png" width="180" />
 
 <br>
 <br>

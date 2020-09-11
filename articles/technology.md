@@ -50,7 +50,7 @@ I have though about the following aspects
 ---
 ### Technical details of the [TimeCat](https://github.com/oct16/timecat)
 
-![Architecture](./assets/architecture.png)
+![Architecture](./images/architecture.png)
 
 #### Take a snapshot of the DOM
 
@@ -177,7 +177,7 @@ Before starting to play, we need to restore the previous data to the real DOM. T
 When the user moves the mouse on the page, many `mouseMove` events will be generated. The coordinates and timestamp of the track are obtained through` const { x, y } = event.target`
 
 If I use a mouse to trace a track on the page, I may get the coordinate points like the picture below
-<img src="./assets/heart1.png" width="300">
+<img src="./images/heart1.png" width="300">
 
 However, on most occasions we do not require 100% restoration of accurate mouse path for the scenario of recording, and we only care about two situations:
 
@@ -186,7 +186,7 @@ However, on most occasions we do not require 100% restoration of accurate mouse 
 
 After simplifying the mouse path through these two strategies, it takes only about 6 points to draw a 💖, to simulate the virtual path of the mouse through the spline curve
 
-<img src="./assets/heart2.png" width="300">
+<img src="./images/heart2.png" width="300">
 
 After filtering out the key points through the rules, the B-spline curve calculation function is used, When redrawing the mouse position during rendering, you can get a mouse with an approximate curve Track
 
@@ -214,7 +214,7 @@ Recorded a coordinate info through a mouse event, the heat map can be easily gen
 
 When the page switches, we need to reset the heat map. If it is a single-page application, we can monitor changes on the page via  `popstate` and  `hashchange` in the `History`
 
-![heatmap](./assets/heatmap.png)
+![heatmap](./images/heatmap.png)
 
 #### Desensitization to user privacy
 

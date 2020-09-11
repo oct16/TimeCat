@@ -50,7 +50,7 @@ new Recorder()
 2. 一个表单页面，可以输入内容，对该页面进行录制
 3. 一个回放页面，播放刚才录制的两个页面的录像
 
-开始把！
+开始吧！
 
 首先我们为网站添加一个路由
 
@@ -249,6 +249,8 @@ export default class Record extends Component {
 }
 ```
 
+### 使用 TimeCat Player 对录制的数据进行播放
+
 在组件内引入 ``timecatjs`` 的 ``Player`` 模块，其中的参数 ``target`` 表示选取该元素作为容器，播放器会注入到容器中，容器元素需要指定宽度与高度，播放器会根据容器的大小进行自适应，若 ``target`` 为空表示播放器会注入到 ``document.body`` 中
 
 ```ts
@@ -282,4 +284,13 @@ export default class Replay extends Component {
 
 ```
 
-这时候已经可以看到录制效果了，以上代码见： https://github.com/oct16/timecat-demo/tree/master
+这时候已经可以看到录制效果了
+
+<img width="500" src="images/record-4.png">
+
+---
+
+以上代码详见: https://github.com/oct16/timecat-demo/tree/master
+
+
+##### [🏠Homepage](../README.md) 
