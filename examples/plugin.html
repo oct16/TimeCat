@@ -102,7 +102,7 @@
                 if (replayButton.className) {
                     return
                 }
-                recorder.unsubscribe()
+                recorder.destroy()
                 window.open('replay.html')
             })
         }
