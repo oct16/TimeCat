@@ -101,7 +101,7 @@ exportReplay(ExportOptions)
 
 
 ## Articles
- - [TimeCat 入门：我们的第一个应用](articles/record-and-replay.md)
+ - [TimeCat 入门：我们的第一个应用](record-and-replay.md)
 
 ---
 ##### [🏠Homepage](../README.md) 

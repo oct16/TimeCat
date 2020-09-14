@@ -290,7 +290,7 @@ export default class Replay extends Component {
 
 ---
 
-以上代码详见: https://github.com/oct16/timecat-demo/tree/master
+以上代码详见: https://github.com/oct16/timecat-demo/tree/record-and-replay
 
 
 ##### [🏠Homepage](../README.md) 
