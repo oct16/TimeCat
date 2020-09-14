@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy-Report-Only" />
+    <title>TimeCat Async</title>
+</head>
+
+<body>
+    <script id="timecat" src="./timecat.global.js"></script>
+    <script>
+        async function run() {
+            new TimeCat.Player({ packs: await fetch('https://xxxxoo.com/timeCatReplay/data.json').then(res => res.json()) })
+        }
+        run()
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151180797-1"></script>
+    <script>
+        if (!~['localhost', '127.0.0.1'].indexOf(document.location.hostname)) {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'UA-151180797-1');
+        }
+    </script>
+</body>
+
+</html>

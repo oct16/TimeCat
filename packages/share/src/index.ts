@@ -67,7 +67,7 @@ export enum MouseEventType {
     'CLICK'
 }
 
-export type TerminateRecord = BaseRecord<TerminateRecord, null>
+export type TerminateRecord = BaseRecord<RecordType.TERMINATE, null>
 
 export type WindowRecord = BaseRecord<RecordType.WINDOW, WindowRecordData>
 
@@ -213,15 +213,6 @@ interface SubtitlesData {
     text: string
 }
 
-export interface RecordOptions {
-    mode?: 'live' | 'default'
-    context?: Window
-    audio?: boolean
-    skip?: boolean
-    uploadUrl?: string
-    onData?: (data: RecordData, db: any) => RecordData | void
-}
-
 export interface RecorderOptions {
     sampleBits: 8 | 16
     sampleRate: 8000 | 16000 | 22050 | 24000 | 44100 | 48000
@@ -238,7 +229,7 @@ export enum TransactionMode {
 
 export type WatcherOptions<T extends RecordData | HeadRecord> = {
     context: Window
-    reverseStore: Set<Function>
+    listenStore: Set<Function>
     emit: RecordEvent<T>
     relatedId: string
 }
@@ -249,12 +240,16 @@ export interface Constructable<T> {
 
 export interface ReplayOptions {
     mode?: 'live' | 'default'
-    fetch?: { url: string; options?: RequestInit }
     receiver?: (sender: (data: RecordData) => void) => void
     proxy?: string
     autoplay?: boolean
     packs?: ReplayPack[]
     records?: RecordData[]
+    target?: string | HTMLElement | Window
+}
+
+export interface ReplayInternalOptions extends ReplayOptions {
+    destroyStore: Set<Function>
 }
 
 export interface ReplayPack {

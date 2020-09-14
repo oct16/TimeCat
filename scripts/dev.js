@@ -13,7 +13,7 @@ run()
 async function run() {
     execa(
         'rollup',
-        ['-wc', '--environment', [`NODE_ENV:${env}`, `TARGET:${target}`, `FORMATS:${formats || 'global'}`]],
+        ['-wc', '--environment', [`NODE_ENV:${env}`, `TARGET:${target}`, `FORMATS:${formats || 'global|esm|cjs'}`]],
         {
             stdio: 'inherit'
         }

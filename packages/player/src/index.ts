@@ -7,7 +7,8 @@ import {
     isSnapshot,
     classifyRecords,
     radix64,
-    logError
+    logError,
+    nodeStore
 } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
@@ -20,34 +21,39 @@ import {
     ReplayData,
     ReplayPack,
     RecordType,
-    ReplayHead
+    ReplayHead,
+    ReplayInternalOptions
 } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
 
-const defaultReplayOptions = { autoplay: true, mode: 'default' } as ReplayOptions
+const defaultReplayOptions = { autoplay: true, mode: 'default', target: window } as ReplayOptions
 
 export class Player {
     fmp: FMP
+    destroyStore = new Set<Function>()
     constructor(options?: ReplayOptions) {
+        nodeStore.reset()
         this.init(options)
     }
 
     async init(options?: ReplayOptions) {
-        const opts = { ...defaultReplayOptions, ...options }
+        const opts = { destroyStore: this.destroyStore, ...defaultReplayOptions, ...options } as ReplayInternalOptions
 
         window.G_REPLAY_OPTIONS = opts
 
+        this.destroyStore.add(() => reduxStore.unsubscribe())
+
         const replayPacks = await this.getReplayData(opts)
 
-        if (!replayPacks) {
+        if (!replayPacks || !replayPacks.length) {
             return
         }
 
         const { records, audio } = (window.G_REPLAY_DATA = this.getFirstReplayData(replayPacks))
         const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
-        const c = new ContainerComponent()
-        new Panel(c)
+        const c = new ContainerComponent(opts)
+        new Panel(c, opts)
 
         showStartMask()
 
@@ -130,12 +136,8 @@ export class Player {
     }
 
     dispatchEvent(type: string, data: RecordData) {
-        event = new CustomEvent(type, { detail: data })
+        const event = new CustomEvent(type, { detail: data })
         window.dispatchEvent(event)
-    }
-
-    async fetchData(input: RequestInfo, init?: RequestInit): Promise<ReplayPack[]> {
-        return fetch(input, init).then(res => res.json())
     }
 
     async dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<ReplayPack[]> {
@@ -193,13 +195,12 @@ export class Player {
         return null
     }
 
-    async getReplayData(options: ReplayOptions) {
-        const { receiver, packs, records, fetch } = options
+    async getReplayData(options: ReplayInternalOptions) {
+        const { receiver, packs, records } = options
 
         const rawReplayPacks =
             (records && classifyRecords(records)) ||
             packs ||
-            (fetch && (await this.fetchData(fetch.url, fetch.options))) ||
             (receiver && (await this.dataReceiver(receiver))) ||
             this.getGZipData() ||
             (await this.getDataFromDB()) ||
@@ -231,5 +232,9 @@ export class Player {
             })
         })
         return packs
+    }
+
+    destroy() {
+        this.destroyStore.forEach(un => un())
     }
 }

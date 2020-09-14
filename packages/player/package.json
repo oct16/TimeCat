@@ -1,6 +1,6 @@
 {
     "name": "@timecat/player",
-    "version": "1.2.0-alpha.8",
+    "version": "1.2.0-alpha.10",
     "description": "@timecat/player",
     "main": "index.js",
     "module": "dist/player.esm.js",
@@ -25,10 +25,10 @@
             "cjs"
         ]
     },
-    "devDependencies": {
-        "@timecat/share": "1.2.0-alpha.8",
-        "@timecat/utils": "1.2.0-alpha.8",
-        "@timecat/virtual-dom": "1.2.0-alpha.8"
+    "dependencies": {
+        "@timecat/share": "1.2.0-alpha.10",
+        "@timecat/utils": "1.2.0-alpha.10",
+        "@timecat/virtual-dom": "1.2.0-alpha.10"
     },
     "author": "",
     "license": "ISC"

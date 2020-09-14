@@ -52,7 +52,7 @@ interface Window {
         record: (
             options: RecordOptions
         ) => {
-            unsubscribe: () => void
+            destroy: () => void
         }
         replay(options: { socketUrl: string } = {} as any): Promise<void>
         exportReplay(exportOptions: ExportOptions): Promise<void>

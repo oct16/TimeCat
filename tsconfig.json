@@ -3,7 +3,7 @@
         "baseUrl": ".",
         "outDir": "dist",
         "module": "esnext",
-        "target": "ES2019",
+        "target": "ES2015",
         "moduleResolution": "node",
         "allowJs": false,
         "noUnusedLocals": false,
@@ -18,7 +18,7 @@
         "jsx": "preserve",
         "skipLibCheck": true,
         "lib": [
-            "ES2019",
+            "esnext",
             "dom",
             "dom.iterable"
         ],

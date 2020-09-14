@@ -100,7 +100,7 @@
         }
 
         const { Recorder } = TimeCat
-        const r = new Recorder()
+        const recorder = new Recorder()
         const replayButton = document.getElementById('replay')
         if (replayButton) {
             setTimeout(() => {
@@ -111,7 +111,7 @@
                     return
                 }
                 replayButton.className = 'hide'
-                r.unsubscribe()
+                recorder.destroy()
                 window.open('replay.html')
             })
         }

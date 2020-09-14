@@ -9,6 +9,7 @@ const initState = {
 export type ProgressState = typeof initState
 
 export enum ProgressTypes {
+    RESET = 'RESET',
     FORWARD = 'FORWARD',
     BACKWARD = 'BACKWARD',
     INFO = 'INFO'
@@ -26,6 +27,8 @@ export default function progressReducer(state: ProgressState, action?: { type: s
     const { type, data } = action
 
     switch (type) {
+        case ProgressTypes.RESET:
+            return initState
         case ProgressTypes.FORWARD:
             return {
                 ...state,

@@ -19,6 +19,10 @@ export class FMP {
         }
     }
 
+    destroy() {
+        this.listener.length = 0
+    }
+
     observe() {
         this.timer = window.setTimeout(() => {
             const entries = performance
