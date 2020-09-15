@@ -213,19 +213,6 @@ interface SubtitlesData {
     text: string
 }
 
-export interface RecordInternalOptions extends RecordOptions {
-    context: Window
-    skip?: boolean
-}
-
-export interface RecordOptions {
-    mode?: 'live' | 'default'
-    audio?: boolean
-    write?: boolean
-    uploadUrl?: string
-    plugins?: any[]
-}
-
 export interface RecorderOptions {
     sampleBits: 8 | 16
     sampleRate: 8000 | 16000 | 22050 | 24000 | 44100 | 48000
@@ -242,7 +229,7 @@ export enum TransactionMode {
 
 export type WatcherOptions<T extends RecordData | HeadRecord> = {
     context: Window
-    reverseStore: Set<Function>
+    listenStore: Set<Function>
     emit: RecordEvent<T>
     relatedId: string
 }
@@ -258,6 +245,11 @@ export interface ReplayOptions {
     autoplay?: boolean
     packs?: ReplayPack[]
     records?: RecordData[]
+    target?: string | HTMLElement | Window
+}
+
+export interface ReplayInternalOptions extends ReplayOptions {
+    destroyStore: Set<Function>
 }
 
 export interface ReplayPack {

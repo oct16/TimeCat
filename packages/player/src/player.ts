@@ -13,11 +13,12 @@ import {
 } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData } from '@timecat/share'
+import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData, ReplayInternalOptions } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animation-frame'
 
 export class PlayerComponent {
+    options: ReplayInternalOptions
     c: ContainerComponent
     pointer: PointerComponent
     progress: ProgressComponent
@@ -48,11 +49,13 @@ export class PlayerComponent {
     RAF: AnimationFrame
 
     constructor(
+        options: ReplayInternalOptions,
         c: ContainerComponent,
         pointer: PointerComponent,
         progress: ProgressComponent,
         broadcaster: BroadcasterComponent
     ) {
+        this.options = options
         this.c = c
         this.pointer = pointer
         this.progress = progress
@@ -64,6 +67,7 @@ export class PlayerComponent {
         if (!this.records.length) {
             // is live mode
             window.addEventListener('record-data', this.streamHandle.bind(this))
+            this.options.destroyStore.add(() => window.removeEventListener('record-data', this.streamHandle.bind(this)))
         } else {
             reduxStore.subscribe('player', state => {
                 if (state) {
@@ -212,6 +216,7 @@ export class PlayerComponent {
 
         const maxFps = 30
         this.RAF = new AnimationFrame(loop.bind(this), maxFps)
+        this.options.destroyStore.add(() => this.RAF.stop())
         this.RAF.start()
 
         const initTime = getTime()

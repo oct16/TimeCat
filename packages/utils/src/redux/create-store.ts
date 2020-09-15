@@ -7,9 +7,14 @@ import { ValueOfKey } from '@timecat/share'
 export function createStore(reducer: Reducer, initState: States = {}) {
     let state = initState
 
-    const topics = {
+    let topics = {
         all: []
     } as { [key: string]: Function[] }
+
+    function unsubscribe() {
+        state = reducer(state, { type: 'RESET', data: {} as any })
+        topics = { all: [] } as { [key: string]: Function[] }
+    }
 
     function subscribe<T extends keyof StateMap, S extends ValueOfKey<StateMap, T>>(
         type: T,
@@ -80,6 +85,7 @@ export function createStore(reducer: Reducer, initState: States = {}) {
     }
 
     return {
+        unsubscribe,
         subscribe,
         dispatch,
         getState

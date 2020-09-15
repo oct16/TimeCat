@@ -55,7 +55,7 @@ Web录屏器其实也借鉴这样的一种思路，工程上一般称之为Opera
 ---
 ### [TimeCat](https://github.com/oct16/timecat) 的技术细节
 
-![Architecture](./assets/architecture.png)
+![Architecture](./images/architecture.png)
 
 #### 对DOM进行快照
 
@@ -184,7 +184,7 @@ const elementList: [HTMLElement, string][] = [
 
 假如在页面上用鼠标划过一个💖的轨迹，可能会得到下图这样的坐标点
 
-<img src="./assets/heart1.png" width="300">
+<img src="./images/heart1.png" width="300">
 
 但是对于录屏这个业务场景来说，大部分场合并不要求100%还原精确的鼠标轨迹，通常只会关心两种情况：
 
@@ -193,7 +193,7 @@ const elementList: [HTMLElement, string][] = [
 
 那么通过这个两个策略对鼠标轨迹进行精简后，画一个💖大约只需要6个点，通过样条曲线来模拟鼠标的虚拟轨迹，当 t = 0.2 的时候，就可以得到一个下图这样带着弧度的轨迹了
 
-<img src="./assets/heart2.png" width="300">
+<img src="./images/heart2.png" width="300">
 
 通过规则筛选出关键点后，利用B样条曲线计算函数，按照最小间隔进行取样并插入鼠标路径队执行列里，当渲染时重绘鼠标位置的时候，就可以得到一个近似曲线的鼠标轨迹了
 
@@ -221,7 +221,7 @@ const patches = [
 
 这里需要注意的地方是当页面切换的时候需要重置热力图，如果是单页应用，通过 `History` 的 `popstate` 与 `hashchange` 可以监听页面的变化
 
-![heatmap](./assets/heatmap.png)
+![heatmap](./images/heatmap.png)
 
 #### 对于用户隐私的脱敏
 

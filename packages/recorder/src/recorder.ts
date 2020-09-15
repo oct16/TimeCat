@@ -1,26 +1,37 @@
-import { watchers } from './watchers'
+import { watchers as RecorderWatchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, RecordOptions, ValueOf, RecordType, RecordInternalOptions, TerminateRecord } from '@timecat/share'
-import { getDBOperator, logError, Transmitter, getRadix64TimeStr, IndexedDBOperator } from '@timecat/utils'
+import { RecordData, ValueOf, RecordType, TerminateRecord } from '@timecat/share'
+import { getDBOperator, logError, getRadix64TimeStr, IndexedDBOperator, nodeStore } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
-import { Pluginable } from './pluginable'
+import { Pluginable, RecorderPlugin } from './pluginable'
+
+export interface RecordInternalOptions extends RecordOptions {
+    context: Window
+    skip?: boolean
+}
+
+export interface RecordOptions {
+    mode?: 'live' | 'default'
+    audio?: boolean
+    write?: boolean
+    plugins?: RecorderPlugin[]
+}
 
 export class Recorder extends Pluginable {
     private static defaultRecordOpts = { mode: 'default', write: true, context: window } as RecordOptions
-    private reverseStore: Set<Function> = new Set()
+    private destroyStore: Set<Function> = new Set()
+    private listenStore: Set<Function> = new Set()
     private onDataCallback: Function
     private db: IndexedDBOperator
+    private watchers: Array<ValueOf<typeof RecorderWatchers> | typeof RecordAudio | typeof Snapshot>
+    private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
+    private watcherResolve: Function
 
     constructor(options?: RecordOptions) {
         super(options)
         const opts = { ...Recorder.defaultRecordOpts, ...options } as RecordInternalOptions
-
-        // TODO: Plugin module
-        if (opts && opts.uploadUrl) {
-            new Transmitter(opts.uploadUrl)
-        }
-
+        this.watchers = this.getWatchers(opts)
         this.init(opts)
     }
 
@@ -37,19 +48,27 @@ export class Recorder extends Pluginable {
         this.onDataCallback = cb
     }
 
-    public unsubscribe() {
-        this.reverseStore.forEach(un => un())
+    public async destroy() {
+        await this.cancelListen()
+        this.destroyStore.forEach(un => un())
     }
 
-    private getRecorders(options: RecordOptions) {
-        const recorders: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot> = [
+    private async cancelListen() {
+        // wait for watchers loaded
+        await this.watchesReadyPromise
+        this.listenStore.forEach(un => un())
+        nodeStore.reset()
+    }
+
+    private getWatchers(options: RecordOptions) {
+        const watchers: Array<ValueOf<typeof RecorderWatchers> | typeof RecordAudio | typeof Snapshot> = [
             Snapshot,
-            ...Object.values(watchers)
+            ...Object.values(RecorderWatchers)
         ]
         if (options && options.audio) {
-            recorders.push(RecordAudio)
+            watchers.push(RecordAudio)
         }
-        return recorders
+        return watchers
     }
 
     public record(options: RecordOptions): void
@@ -61,8 +80,7 @@ export class Recorder extends Pluginable {
     }
 
     private async startRecord(options: RecordInternalOptions) {
-        const allRecorders = this.getRecorders(options)
-        let iframeWatchers = allRecorders
+        let activeWatchers = this.watchers
 
         // is record iframe, switch context
         if (options.context === window) {
@@ -70,12 +88,13 @@ export class Recorder extends Pluginable {
                 this.db.clear()
             }
         } else {
-            iframeWatchers = [
+            // for iframe watchers
+            activeWatchers = [
                 Snapshot,
-                watchers.MouseWatcher,
-                watchers.DOMWatcher,
-                watchers.FormElementWatcher,
-                watchers.ScrollWatcher
+                RecorderWatchers.MouseWatcher,
+                RecorderWatchers.DOMWatcher,
+                RecorderWatchers.FormElementWatcher,
+                RecorderWatchers.ScrollWatcher
             ]
         }
 
@@ -111,21 +130,22 @@ export class Recorder extends Pluginable {
             time: getRadix64TimeStr()
         })
 
-        iframeWatchers.forEach(watcher => {
+        activeWatchers.forEach(watcher => {
             new watcher({
                 context: options && options.context,
-                reverseStore: this.reverseStore,
+                listenStore: this.listenStore,
                 relatedId: relatedId,
                 emit
             })
         })
 
+        this.watcherResolve()
         await this.recordFrames()
     }
 
     private async waitingFramesLoaded() {
         const frames = window.frames
-        const tasks = Array.from(frames)
+        const validFrames = Array.from(frames)
             .filter(frame => {
                 try {
                     const frameElement = frame.frameElement
@@ -143,10 +163,10 @@ export class Recorder extends Pluginable {
                     })
                 })
             })
-        if (!tasks.length) {
+        if (!validFrames.length) {
             return Promise.resolve([])
         }
-        return Promise.all(tasks) as Promise<Window[]>
+        return Promise.all(validFrames) as Promise<Window[]>
     }
 
     private async recordFrames() {
@@ -169,18 +189,18 @@ export class Recorder extends Pluginable {
                     }
                     this.db.addRecord(data as TerminateRecord)
                     this.onDataCallback && this.onDataCallback(data)
-                    this.unsubscribe()
+                    this.cancelListen()
                     this.hooks.end.call()
                 } else {
                     this.record({ ...options, skip: true } as RecordInternalOptions)
                 }
             }
 
-            document.addEventListener(visibilityChange, handleVisibilityChange.bind(this), false)
+            const handle = handleVisibilityChange.bind(this)
 
-            this.reverseStore.add(() =>
-                document.removeEventListener(visibilityChange, handleVisibilityChange.bind(this), false)
-            )
+            document.addEventListener(visibilityChange, handle, false)
+
+            this.destroyStore.add(() => document.removeEventListener(visibilityChange, handle, false))
         }
     }
 }

@@ -111,7 +111,7 @@
                     return
                 }
                 replayButton.className = 'hide'
-                recorder.unsubscribe()
+                recorder.destroy()
                 window.open('replay.html')
             })
         }

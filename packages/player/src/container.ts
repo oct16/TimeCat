@@ -3,25 +3,28 @@ import HTML from './ui.html'
 import CSS from './ui.scss'
 import { createIframeDOM, injectIframeContent } from './dom'
 import smoothScroll from 'smoothscroll-polyfill'
+import { ReplayInternalOptions } from '@timecat/share'
 
 export class ContainerComponent {
     container: HTMLElement
     sandBox: HTMLIFrameElement
     sandBoxDoc: Document
     resize: (w?: number, h?: number) => void
+    options: ReplayInternalOptions
+    target: Element | Window
 
-    constructor() {
+    constructor(options: ReplayInternalOptions) {
+        this.options = options
         this.init()
     }
 
-    getSnapshotRecord() {
-        return window.G_REPLAY_DATA.snapshot.data
-    }
-
     init() {
+        const target = this.options.target
+        const targetElement = typeof target === 'string' ? document.querySelector(target) : target
+        this.target = targetElement as HTMLElement
         this.initTemplate()
         this.initSandbox()
-        const { resize } = this.makeItResponsive(this.container)
+        const { resize } = this.makeItResponsive()
         this.resize = resize
     }
 
@@ -32,6 +35,10 @@ export class ContainerComponent {
         createIframeDOM(this.sandBoxDoc, this.getSnapshotRecord())
         disableScrolling(this.sandBox.contentWindow!.document)
         this.setViewState()
+    }
+
+    getSnapshotRecord() {
+        return window.G_REPLAY_DATA.snapshot.data
     }
 
     // use scroll polyfill if browser (e.g. ios safari) not support
@@ -47,8 +54,10 @@ export class ContainerComponent {
     }
 
     initTemplate() {
-        document.head.append(this.createStyle('cat-css', CSS))
-        document.body.append(this.createContainer('cat-main', HTML))
+        const targetElement: HTMLElement =
+            this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
+        targetElement.append(this.createStyle('cat-css', CSS))
+        targetElement.append(this.createContainer('cat-main', HTML))
     }
 
     createContainer(id: string, html: string) {
@@ -61,9 +70,13 @@ export class ContainerComponent {
         return (this.container = el)
     }
 
-    makeItResponsive(target: HTMLElement) {
+    makeItResponsive() {
+        const self = this
         const debounceResizeFn = debounce(resizeHandle, 500)
-        window.addEventListener('resize', debounceResizeFn.bind(this))
+        window.addEventListener('resize', debounceResizeFn.call(this, { target: self.target }), true)
+        this.options.destroyStore.add(() => {
+            window.removeEventListener('resize', debounceResizeFn.bind(this), true)
+        })
 
         triggerResize()
 
@@ -71,13 +84,20 @@ export class ContainerComponent {
         this.container.style.display = 'block'
 
         function triggerResize(setWidth?: number, setHeight?: number) {
-            resizeHandle(({ target: window } as unknown) as Event, setWidth, setHeight)
+            resizeHandle(({ target: self.target } as unknown) as Event, setWidth, setHeight)
         }
 
         function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
-            if (e && e.target instanceof Window) {
+            if (!e) {
+                return
+            }
+
+            if (e.target instanceof Window) {
                 const { innerWidth: w, innerHeight: h } = e.target
-                scalePages(target, w, h, setWidth, setHeight)
+                scalePages(self.container, w, h, setWidth, setHeight)
+            } else {
+                const { offsetWidth: w, offsetHeight: h } = e.target as HTMLElement
+                scalePages(self.container, w, h, setWidth, setHeight)
             }
         }
 

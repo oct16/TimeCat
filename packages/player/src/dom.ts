@@ -99,6 +99,10 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             const { top, left, id } = data as ScrollRecordData
             const target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
 
+            if (!target) {
+                return
+            }
+
             const curTop = target.scrollTop
 
             // prevent jump too long distance
@@ -132,7 +136,11 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
 
             if (id) {
                 const node = nodeStore.getNode(id) as HTMLElement
-                const { left: nodeLeft, top: nodeTop } = node?.getBoundingClientRect() || {}
+                let rect = {}
+                if (node && node.getBoundingClientRect) {
+                    rect = node.getBoundingClientRect()
+                }
+                const { left: nodeLeft, top: nodeTop } = rect as any
                 left = nodeLeft
                 top = nodeTop
             }
@@ -250,9 +258,9 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                     if (mode === 'live') {
                         return
                     }
-                    node.focus()
+                    node.focus && node.focus()
                 } else if (formType === FormElementEvent.BLUR) {
-                    node.blur()
+                    node.blur && node.blur()
                 } else if (formType === FormElementEvent.PROP) {
                     if (key) {
                         ;(node as any)[key] = value
@@ -340,7 +348,7 @@ function showStartBtn() {
 
 export function removeStartPage() {
     const startPage = document.querySelector('#cat-start-page') as HTMLElement
-    startPage.parentElement!.removeChild(startPage)
+    startPage?.parentElement?.removeChild(startPage)
 }
 
 export async function waitStart(): Promise<void> {
