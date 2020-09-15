@@ -1,15 +1,4 @@
-import {
-    getDBOperator,
-    ProgressTypes,
-    PlayerTypes,
-    reduxStore,
-    FMP,
-    isSnapshot,
-    classifyRecords,
-    radix64,
-    logError,
-    nodeStore
-} from '@timecat/utils'
+import { getDBOperator, isSnapshot, classifyRecords, radix64, logError, nodeStore } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
@@ -27,6 +16,8 @@ import {
 import { waitStart, removeStartPage, showStartMask } from './dom'
 import { observer } from './utils/observer'
 import { PlayerEventTypes } from './types'
+import { FMP } from './utils/fmp'
+import { PlayerTypes, ProgressTypes, reduxStore } from './utils'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default', target: window } as ReplayOptions
 

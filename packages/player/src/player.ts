@@ -1,16 +1,6 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from './dom'
-import {
-    reduxStore,
-    PlayerTypes,
-    ProgressState,
-    getTime,
-    isSnapshot,
-    delay,
-    toTimeStamp,
-    base64ToFloat32Array,
-    encodeWAV
-} from '@timecat/utils'
+import { getTime, isSnapshot, delay, toTimeStamp, base64ToFloat32Array, encodeWAV } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData, ReplayInternalOptions } from '@timecat/share'
@@ -18,6 +8,7 @@ import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animation-frame'
 import { observer } from './utils/observer'
 import { PlayerEventTypes } from './types'
+import { PlayerTypes, ProgressState, reduxStore } from './utils'
 
 export class PlayerComponent {
     options: ReplayInternalOptions
