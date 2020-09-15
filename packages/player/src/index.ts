@@ -25,6 +25,8 @@ import {
     ReplayInternalOptions
 } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
+import { observer } from './utils/observer'
+import { PlayerEventTypes } from './types'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default', target: window } as ReplayOptions
 
@@ -83,13 +85,11 @@ export class Player {
                     }, 0) + +startTime
 
                 reduxStore.dispatch({
-                    type: ProgressTypes.INFO,
+                    type: ProgressTypes.PROGRESS,
                     data: {
-                        frame: 0,
-                        curTime: Number(startTime),
+                        frames: records.length,
                         startTime: Number(startTime),
-                        endTime,
-                        length: records.length
+                        endTime
                     }
                 })
 
@@ -136,7 +136,7 @@ export class Player {
     }
 
     dispatchEvent(type: string, data: RecordData) {
-        event = new CustomEvent(type, { detail: data })
+        const event = new CustomEvent(type, { detail: data })
         window.dispatchEvent(event)
     }
 
@@ -236,5 +236,10 @@ export class Player {
 
     destroy() {
         this.destroyStore.forEach(un => un())
+        observer.destroy()
+    }
+
+    on(key: PlayerEventTypes, fn: Function) {
+        observer.on(key, fn)
     }
 }
