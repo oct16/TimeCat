@@ -1,15 +1,4 @@
-import {
-    getDBOperator,
-    ProgressTypes,
-    PlayerTypes,
-    reduxStore,
-    FMP,
-    isSnapshot,
-    classifyRecords,
-    radix64,
-    logError,
-    nodeStore
-} from '@timecat/utils'
+import { getDBOperator, isSnapshot, classifyRecords, radix64, logError, nodeStore } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
@@ -25,6 +14,10 @@ import {
     ReplayInternalOptions
 } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
+import { observer } from './utils/observer'
+import { PlayerEventTypes } from './types'
+import { FMP } from './utils/fmp'
+import { PlayerTypes, ProgressTypes, reduxStore } from './utils'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default', target: window } as ReplayOptions
 
@@ -83,13 +76,11 @@ export class Player {
                     }, 0) + +startTime
 
                 reduxStore.dispatch({
-                    type: ProgressTypes.INFO,
+                    type: ProgressTypes.PROGRESS,
                     data: {
-                        frame: 0,
-                        curTime: Number(startTime),
+                        frames: records.length,
                         startTime: Number(startTime),
-                        endTime,
-                        length: records.length
+                        endTime
                     }
                 })
 
@@ -236,5 +227,10 @@ export class Player {
 
     destroy() {
         this.destroyStore.forEach(un => un())
+        observer.destroy()
+    }
+
+    on(key: PlayerEventTypes, fn: Function) {
+        observer.on(key, fn)
     }
 }

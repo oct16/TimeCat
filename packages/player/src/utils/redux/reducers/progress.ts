@@ -1,7 +1,5 @@
 const initState = {
-    frame: 0,
-    length: 0,
-    curTime: 0,
+    frames: 0,
     startTime: 0,
     endTime: 0
 }
@@ -10,9 +8,7 @@ export type ProgressState = typeof initState
 
 export enum ProgressTypes {
     RESET = 'RESET',
-    FORWARD = 'FORWARD',
-    BACKWARD = 'BACKWARD',
-    INFO = 'INFO'
+    PROGRESS = 'PROGRESS'
 }
 
 export default function progressReducer(state: ProgressState, action?: { type: string; data: Partial<ProgressState> }) {
@@ -29,18 +25,7 @@ export default function progressReducer(state: ProgressState, action?: { type: s
     switch (type) {
         case ProgressTypes.RESET:
             return initState
-        case ProgressTypes.FORWARD:
-            return {
-                ...state,
-                frame: data.frame,
-                curTime: data.curTime
-            }
-        case ProgressTypes.BACKWARD:
-            return {
-                ...state,
-                frame: data.frame
-            }
-        case ProgressTypes.INFO:
+        case ProgressTypes.PROGRESS:
             return {
                 ...state,
                 ...data

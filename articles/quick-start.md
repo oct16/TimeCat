@@ -77,7 +77,15 @@ interface ReplayOptions {
     autoplay?: boolean // autoplay when data loaded
 }
 
-new Player(ReplayOptions)
+const player = new Player(ReplayOptions)
+
+type EventTypes = 'play' | 'stop' | 'pause' | 'speed'
+player.on(eventType: EventTypes, (...args) => {
+    // ... receive event here
+})
+
+player.destroy() // destroy player
+
 ```
 - [Replay example](https://github.com/oct16/TimeCat/blob/master/examples/replay.html#L1-L29)
 

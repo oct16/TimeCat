@@ -1,8 +1,8 @@
 import { PlayerTypes } from './reducers/player'
 import { ProgressTypes } from './reducers/progress'
-import { objectEquals } from '../tools/tool'
 import { States, Reducer, Action, TopicName, StateMap } from './types'
 import { ValueOfKey } from '@timecat/share'
+import { objectEquals } from '../tools'
 
 export function createStore(reducer: Reducer, initState: States = {}) {
     let state = initState

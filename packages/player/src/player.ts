@@ -1,21 +1,14 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from './dom'
-import {
-    reduxStore,
-    PlayerTypes,
-    ProgressState,
-    getTime,
-    isSnapshot,
-    delay,
-    toTimeStamp,
-    base64ToFloat32Array,
-    encodeWAV
-} from '@timecat/utils'
+import { getTime, isSnapshot, delay, toTimeStamp, base64ToFloat32Array, encodeWAV } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData, ReplayInternalOptions } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animation-frame'
+import { observer } from './utils/observer'
+import { PlayerEventTypes } from './types'
+import { PlayerTypes, ProgressState, reduxStore } from './utils'
 
 export class PlayerComponent {
     options: ReplayInternalOptions
@@ -73,11 +66,18 @@ export class PlayerComponent {
                 if (state) {
                     this.progressState = reduxStore.getState('progress')
                     const speed = state.speed
+                    const curSpeed = this.speed
                     this.speed = speed
+
                     this.frames = this.getAccuratelyFrame()
+
+                    observer.emit(PlayerEventTypes.SPEED, speed)
 
                     if (speed > 0) {
                         this.play()
+                        if (curSpeed === 0) {
+                            observer.emit(PlayerEventTypes.PLAY)
+                        }
                     } else {
                         this.pause()
                     }
@@ -343,6 +343,7 @@ export class PlayerComponent {
             }
         })
         this.pauseAudio()
+        observer.emit(PlayerEventTypes.PAUSE)
     }
 
     stop() {
@@ -352,8 +353,8 @@ export class PlayerComponent {
         this.lastPercentage = 0
         this.elapsedTime = 0 // unit: sec
         this.pause()
-
         this.audioNode.currentTime = 0
+        observer.emit(PlayerEventTypes.STOP)
     }
 
     async execFrame(this: PlayerComponent, record: RecordData) {

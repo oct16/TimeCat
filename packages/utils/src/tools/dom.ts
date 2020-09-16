@@ -1,17 +1,8 @@
-import { isDev } from './common'
 import { VNode } from '@timecat/share'
 
 const snapshot = () => window.G_REPLAY_DATA && window.G_REPLAY_DATA.snapshot.data
 
 const href = () => snapshot().href
-
-export function filteringTemplate(tpl: string) {
-    const reg = /<!--env-->[\s\S]*<!--env-->/g
-    if (isDev) {
-        tpl = tpl.replace(reg, '')
-    }
-    return tpl
-}
 
 export function isCommentNode(node: Node) {
     return node.nodeType === Node.COMMENT_NODE
@@ -28,23 +19,6 @@ export function isTextNode(node: Node) {
 export function filteringScriptTag(str: string) {
     const reg = /<\/script>/g
     return str.replace(reg, '<\\/script>')
-}
-
-export function proxyResource(url: string) {
-    const { proxy } = window.G_REPLAY_OPTIONS
-
-    if (proxy) {
-        const proxyUrl = stitchingLink(proxy, url)
-        return proxyUrl
-    }
-    return url
-}
-
-function stitchingLink(pre: string, next: string) {
-    if (pre.endsWith('/') || next.startsWith('/')) {
-        return pre + next
-    }
-    return pre + '/' + next
 }
 
 export function completeCssHref(str: string, parentVNode?: VNode) {
