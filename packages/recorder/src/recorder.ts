@@ -23,10 +23,11 @@ export class Recorder extends Pluginable {
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
     private onDataCallback: Function
-    private db: IndexedDBOperator
     private watchers: Array<ValueOf<typeof RecorderWatchers> | typeof RecordAudio | typeof Snapshot>
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
     private watcherResolve: Function
+
+    public db: IndexedDBOperator
 
     constructor(options?: RecordOptions) {
         super(options)
@@ -38,6 +39,7 @@ export class Recorder extends Pluginable {
     private async init(options: RecordInternalOptions) {
         const db = await getDBOperator
         this.db = db
+        this.pluginsOnload()
         this.hooks.beforeRun.call(this)
         this.record(options)
         this.hooks.run.call(this)
