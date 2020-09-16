@@ -1,4 +1,4 @@
-import { filteringTemplate, disableScrolling, nodeStore, debounce } from '@timecat/utils'
+import { disableScrolling, nodeStore, debounce } from '@timecat/utils'
 import HTML from './ui.html'
 import CSS from './ui.scss'
 import { createIframeDOM, injectIframeContent } from './dom'
@@ -62,7 +62,7 @@ export class ContainerComponent {
 
     createContainer(id: string, html: string) {
         const parser = new DOMParser()
-        const el = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
+        const el = parser.parseFromString(html, 'text/html').body.firstChild as HTMLElement
         el.id = id
         el.style.width = this.getSnapshotRecord().width + 'px'
         el.style.height = this.getSnapshotRecord().height + 'px'

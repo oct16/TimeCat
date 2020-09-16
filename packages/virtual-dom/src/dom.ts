@@ -1,4 +1,4 @@
-import { completeAttrHref, completeCssHref, proxyResource } from '@timecat/utils'
+import { completeAttrHref, completeCssHref } from '@timecat/utils'
 
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null): void {
     if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -46,14 +46,14 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         if (value.startsWith('data:')) {
             // skip
         } else {
-            value = proxyResource(completeAttrHref(String(value), node))
+            value = completeAttrHref(String(value), node)
         }
     }
 
     // The srcset attribute specifies the URL of the image to use in different situations
     if (name === 'srcset') {
         const srcArray = value.split(',')
-        value = srcArray.map(src => proxyResource(completeAttrHref(src.trim(), node))).toString()
+        value = srcArray.map(src => completeAttrHref(src.trim(), node)).toString()
     }
 
     if (value.startsWith('/')) {
