@@ -20,17 +20,18 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "node scripts/dev.js",
-        "build": "node scripts/build.js",
-        "release": "node scripts/release.js",
-        "live": "node scripts/live.js",
-        "test": "jest",
-        "embed": "cp packages/timecat/dist/timecat.global.prod.js ../TimeCatChrome/src/assets/",
-        "gh": "node scripts/gh.js",
-        "count": "git ls-files --exclude-standard -- ':!:**/*.[pjs][npv]g' ':!:.eslintrc' ':!: examples/*' ':!:.gitignore' ':!:README.*' ':!:LICENSE' ':!:yarn.lock' | xargs wc -l",
+        "dev": "$npm_execpath --silent run checkyarn && node scripts/dev.js",
+        "build": "$npm_execpath --silent run checkyarn && node scripts/build.js",
+        "release": "$npm_execpath --silent run checkyarn && node scripts/release.js",
+        "preinstall": "$npm_execpath --silent run checkyarn",
+        "checkyarn": "node ./scripts/checkYarn.js",
         "ls-lint": "ls-lint",
         "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix",
-        "preinstall": "node ./scripts/checkYarn.js"
+        "test": "jest",
+        "live": "node scripts/live.js",
+        "embed": "cp packages/timecat/dist/timecat.global.prod.js ../TimeCatChrome/src/assets/",
+        "gh": "node scripts/gh.js",
+        "count": "git ls-files --exclude-standard -- ':!:**/*.[pjs][npv]g' ':!:.eslintrc' ':!: examples/*' ':!:.gitignore' ':!:README.*' ':!:LICENSE' ':!:yarn.lock' | xargs wc -l"
     },
     "husky": {
         "hooks": {
