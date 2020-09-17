@@ -47,20 +47,41 @@ recorder.onData((data: RecordData) => void)
 recorder.destroy()
 
 // write a plugin 
-class EmitPlugin {
+class ExamplePlugin {
+
+    constructor(options) {
+        // init plugin options
+    }
+
     apply(recorder) {
-        recorder.plugin('emit', (data) => {
-            // get dataRecord
+
+        const { plugin, db } = recorder
+
+        type HooksType = 'beforeRun' | 'run' | 'emit' | 'end'
+        plugin(HooksType, () => void)
+
+        plugin('emit', record => {
+
+            // get record
             console.log(data)
             
-            // you can modify data here
-            data.insertNumber = Date.now()
-            
-            // operating database
-            recorder.db.doSomething(...)
+            // you can modify record here
+            record['some property'] = doSomething
         })
+        
+        // read or write to indexedDB
+       
+        const records = await db.readRecords()
+        
+        db.deleteRecords(range: { lowerBound: <recordID>, upperBound: <recordID> })
+       
+        db.clear()
+        db.doSomething...
     }
 }
+
+new Recorder({ plugins: [new ExamplePlugin(options...)] })
+
 ```
 - [Record Example](https://github.com/oct16/TimeCat/blob/master/examples/todo.html#L257-L275) 
 
