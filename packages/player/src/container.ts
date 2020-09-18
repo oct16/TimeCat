@@ -73,10 +73,11 @@ export class ContainerComponent {
     makeItResponsive() {
         const self = this
         const debounceResizeFn = debounce(resizeHandle, 500)
-        window.addEventListener('resize', debounceResizeFn.call(this, { target: self.target }), true)
-        this.options.destroyStore.add(() => {
-            window.removeEventListener('resize', debounceResizeFn.bind(this), true)
-        })
+
+        const callbackFn = () => debounceResizeFn({ target: self.target as EventTarget } as Event)
+        window.addEventListener('resize', callbackFn, true)
+
+        this.options.destroyStore.add(() => window.removeEventListener('resize', callbackFn, true))
 
         triggerResize()
 
