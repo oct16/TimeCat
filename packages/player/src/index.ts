@@ -45,6 +45,31 @@ export class Player {
         const { records, audio } = (window.G_REPLAY_DATA = this.getFirstReplayData(replayPacks))
         const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
+        if (records.length) {
+            const firstRecord = records[0]
+            const startTime = firstRecord.time
+            const endTime =
+                replayPacks.reduce((packAcc, pack) => {
+                    return (
+                        packAcc +
+                        pack.body
+                            .map((replayData: ReplayData) => replayData.records)
+                            .reduce((acc: number, records: RecordData[]) => {
+                                return acc + (+records.slice(-1)[0].time - +records[0].time)
+                            }, 0)
+                    )
+                }, 0) + +startTime
+
+            reduxStore.dispatch({
+                type: ProgressTypes.PROGRESS,
+                data: {
+                    frames: records.length,
+                    startTime: Number(startTime),
+                    endTime
+                }
+            })
+        }
+
         const c = new ContainerComponent(opts)
         new Panel(c, opts)
 
@@ -56,34 +81,10 @@ export class Player {
             if (hasAudio) {
                 await waitStart()
             }
+
             removeStartPage()
 
             if (records.length) {
-                const firstRecord = records[0]
-
-                const replayPacks = window.G_REPLAY_PACKS as ReplayPack[]
-                const startTime = firstRecord.time
-                const endTime =
-                    replayPacks.reduce((packAcc, pack) => {
-                        return (
-                            packAcc +
-                            pack.body
-                                .map((replayData: ReplayData) => replayData.records)
-                                .reduce((acc: number, records: RecordData[]) => {
-                                    return acc + (+records.slice(-1)[0].time - +records[0].time)
-                                }, 0)
-                        )
-                    }, 0) + +startTime
-
-                reduxStore.dispatch({
-                    type: ProgressTypes.PROGRESS,
-                    data: {
-                        frames: records.length,
-                        startTime: Number(startTime),
-                        endTime
-                    }
-                })
-
                 if (opts.autoplay || hasAudio) {
                     reduxStore.dispatch({
                         type: PlayerTypes.SPEED,

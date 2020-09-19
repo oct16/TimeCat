@@ -193,34 +193,41 @@ body {
     position: relative;
     padding: 0 5px;
     width: calc(100% - 20px);
-    height: 5px;
+    height: 7px;
     margin: 7.5px 8px;
     background: white;
     border-radius: 2.5px;
 }
 
+.cat-heat-bar {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
 .cat-thumb {
     width: 12px;
-    height: 12px;
+    height: 12.5px;
     box-sizing: border-box;
     border: 1px solid white;
     background: black;
-    border-radius: 100%;
+    border-radius: 6px;
     cursor: pointer;
     position: absolute;
-    font-smoothing: antialiased;
     right: 0px;
-    transform: translate3d(5px, -4px, 0);
+    transform: translate3d(5px, -3px, 0);
     z-index: 10;
 }
 
 .cat-current-progress {
-    background: #aaa;
+    background: rgba(50, 50, 50, .75);
     border-radius: 2.5px;
     position: absolute;
     left: 0;
     width: 0;
-    height: 5px;
+    height: 7px;
     transition-property: width;
     transition-timing-function: linear;
     transition-duration: 0s;

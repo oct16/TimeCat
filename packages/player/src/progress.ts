@@ -1,5 +1,6 @@
 import { secondToDate, delay } from '@timecat/utils'
 import { ContainerComponent } from './container'
+import { Heat } from './utils/heat'
 
 export class ProgressComponent {
     progress: HTMLElement
@@ -7,6 +8,7 @@ export class ProgressComponent {
     thumb: HTMLElement
     timer: HTMLElement
     slider: HTMLElement
+    heatBar: HTMLCanvasElement
 
     constructor(c: ContainerComponent) {
         this.progress = c.container.querySelector('.cat-progress')! as HTMLElement
@@ -14,6 +16,7 @@ export class ProgressComponent {
         this.thumb = this.progress.querySelector('.cat-thumb') as HTMLElement
         this.currentProgress = this.progress.querySelector('.cat-current-progress') as HTMLElement
         this.slider = this.progress.querySelector('.cat-slider-bar') as HTMLElement
+        this.heatBar = this.progress.querySelector('.cat-heat-bar') as HTMLCanvasElement
     }
 
     async setProgressAnimation(index: number, total: number, interval: number, speed: number) {
@@ -58,5 +61,9 @@ export class ProgressComponent {
         this.currentProgress.parentNode!.replaceChild(currentProgress, this.currentProgress)
         currentProgress.style.width = '0'
         this.currentProgress = currentProgress as HTMLElement
+    }
+
+    drawHeatPoints(points: number[]) {
+        new Heat(this.heatBar, points)
     }
 }
