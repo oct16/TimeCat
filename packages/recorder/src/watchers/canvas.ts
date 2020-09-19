@@ -49,7 +49,10 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                 },
                 set: function (value: any) {
                     const id = self.getNodeId(this.canvas)!
-                    self.aggregateDataEmitter(id, name, value)
+
+                    if (typeof value !== 'function') {
+                        self.aggregateDataEmitter(id, name, value)
+                    }
 
                     return original.set?.apply(this, arguments)
                 }
