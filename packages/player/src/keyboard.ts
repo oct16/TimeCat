@@ -132,7 +132,7 @@ export class KeyboardComponent {
             )
         }
 
-        const defaultSDK = `https://cdn.jsdelivr.net/npm/timecatjs/dist/timecat.global.prod.js`
+        const defaultSDK = `//cdn.jsdelivr.net/npm/timecatjs/dist/timecat.global.prod.js`
         const SDKSource = (await getScriptSource(SDKScript)) || detectSDKSrc() || detectSDKContent() || defaultSDK
 
         scriptList.push({

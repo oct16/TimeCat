@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <script id="timecat" src="./timecat.global.js"></script>
+    <script id="timecat" src="//cdn.jsdelivr.net/npm/timecatjs"></script>
     <script>
         async function run() {
             new TimeCat.Player({ packs: await fetch('https://xxxxoo.com/timeCatReplay/data.json').then(res => res.json()) })
