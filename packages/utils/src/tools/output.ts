@@ -244,7 +244,7 @@ async function makeCssInline(packs: ReplayPack[]) {
 
         try {
             // try to extract css
-            const cssURL = new URL(href, location.origin).href
+            const cssURL = new URL(href, location.href).href
             const cssValue = await fetch(cssURL).then(res => res.text())
             const textNode = {
                 id: nodeStore.createNodeId(),
