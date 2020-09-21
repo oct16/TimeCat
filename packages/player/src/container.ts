@@ -1,9 +1,11 @@
-import { disableScrolling, nodeStore, debounce } from '@timecat/utils'
+import { disableScrolling, nodeStore, debounce, delay } from '@timecat/utils'
 import HTML from './ui.html'
 import CSS from './ui.scss'
 import { createIframeDOM, injectIframeContent } from './dom'
 import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions } from '@timecat/share'
+import { observer } from './utils'
+import { PlayerEventTypes } from './types'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -88,7 +90,7 @@ export class ContainerComponent {
             resizeHandle(({ target: self.target } as unknown) as Event, setWidth, setHeight)
         }
 
-        function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
+        async function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
             if (!e) {
                 return
             }
@@ -100,6 +102,8 @@ export class ContainerComponent {
                 const { offsetWidth: w, offsetHeight: h } = e.target as HTMLElement
                 scalePages(self.container, w, h, setWidth, setHeight)
             }
+
+            observer.emit(PlayerEventTypes.RESIZE)
         }
 
         function scalePages(

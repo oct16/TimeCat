@@ -199,6 +199,13 @@ body {
     border-radius: 2.5px;
 }
 
+.cat-heat-bar-container {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    overflow: hidden;
+}
+
 .cat-heat-bar {
     height: 100%;
     width: 100%;

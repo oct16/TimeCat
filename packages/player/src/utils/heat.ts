@@ -12,21 +12,26 @@ export class Heat {
     points: number[]
 
     constructor(target: HTMLCanvasElement, points: number[]) {
-        const { offsetWidth: width, offsetHeight: height } = target
-        target.width = width
-        target.height = height
-        target.style.width = width + 'px'
-        target.style.height = height + 'px'
-
         this.target = target
         this.points = points
-
-        this.yAxis = Math.floor(height / 2)
 
         this.draw(target.getContext('2d')!, points)
     }
 
+    initTarget() {
+        const target = this.target
+        const { offsetWidth: width, offsetHeight: height } = target.parentElement!
+
+        target.width = width
+        target.height = height
+        target.style.width = width + 'px'
+        target.style.height = height + 'px'
+        this.yAxis = Math.floor(height / 2)
+    }
+
     draw(context: CanvasRenderingContext2D, points: number[]) {
+        this.initTarget()
+
         const size = this.options.size
         const circle = this.createCircle(size)
         const circleHalfWidth = circle.width / 2
