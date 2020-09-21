@@ -6,6 +6,7 @@ import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions } from '@timecat/share'
 import { observer } from './utils'
 import { PlayerEventTypes } from './types'
+import { Panel } from './panel'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -28,6 +29,11 @@ export class ContainerComponent {
         this.initSandbox()
         const { resize } = this.makeItResponsive()
         this.resize = resize
+        this.initPanel()
+    }
+
+    initPanel() {
+        new Panel(this)
     }
 
     initSandbox() {
@@ -58,8 +64,9 @@ export class ContainerComponent {
     initTemplate() {
         const targetElement: HTMLElement =
             this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
-        targetElement.append(this.createStyle('cat-css', CSS))
-        targetElement.append(this.createContainer('cat-main', HTML))
+        const shadow = targetElement.attachShadow({ mode: 'open' })
+        shadow.appendChild(this.createStyle('cat-css', CSS))
+        shadow.appendChild(this.createContainer('cat-main', HTML))
     }
 
     createContainer(id: string, html: string) {

@@ -71,9 +71,8 @@ export class Player {
         }
 
         const c = new ContainerComponent(opts)
-        new Panel(c, opts)
 
-        showStartMask()
+        showStartMask(c)
 
         this.fmp = new FMP()
 
@@ -82,7 +81,7 @@ export class Player {
                 await waitStart()
             }
 
-            removeStartPage()
+            removeStartPage(c)
 
             if (records.length) {
                 if (opts.autoplay || hasAudio) {

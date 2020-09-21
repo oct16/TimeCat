@@ -12,20 +12,20 @@ export class Panel {
     pointer: PointerComponent
     player: PlayerComponent
     broadcaster: BroadcasterComponent
-    container: ContainerComponent
+    c: ContainerComponent
     options: ReplayInternalOptions
 
-    constructor(container: ContainerComponent, options: ReplayInternalOptions) {
-        this.container = container
-        this.options = options
+    constructor(c: ContainerComponent) {
+        this.c = c
+        this.options = c.options
         this.initComponent()
     }
 
     initComponent() {
-        this.keyboard = new KeyboardComponent(this.container)
-        this.progress = new ProgressComponent(this.container)
-        this.pointer = new PointerComponent()
-        this.broadcaster = new BroadcasterComponent()
-        this.player = new PlayerComponent(this.options, this.container, this.pointer, this.progress, this.broadcaster)
+        this.keyboard = new KeyboardComponent(this.c)
+        this.progress = new ProgressComponent(this.c)
+        this.pointer = new PointerComponent(this.c)
+        this.broadcaster = new BroadcasterComponent(this.c)
+        this.player = new PlayerComponent(this.options, this.c, this.pointer, this.progress, this.broadcaster)
     }
 }

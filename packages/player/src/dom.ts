@@ -23,6 +23,7 @@ import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
 import { setAttribute, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
+import { ContainerComponent } from './container'
 
 /**
  * if return true then revert
@@ -334,8 +335,8 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
     }
 }
 
-export function showStartMask() {
-    const startPage = document.querySelector('#cat-start-page')! as HTMLElement
+export function showStartMask(c: ContainerComponent) {
+    const startPage = c.container.querySelector('#cat-start-page')! as HTMLElement
     startPage.setAttribute('style', '')
 }
 
@@ -346,8 +347,8 @@ function showStartBtn() {
     return btn
 }
 
-export function removeStartPage() {
-    const startPage = document.querySelector('#cat-start-page') as HTMLElement
+export function removeStartPage(c: ContainerComponent) {
+    const startPage = c.container.querySelector('#cat-start-page') as HTMLElement
     startPage?.parentElement?.removeChild(startPage)
 }
 
