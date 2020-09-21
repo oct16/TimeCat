@@ -191,7 +191,6 @@ body {
 
 .cat-slider-bar {
     position: relative;
-    padding: 0 5px;
     width: calc(100% - 20px);
     height: 7px;
     margin: 7.5px 8px;
@@ -215,16 +214,16 @@ body {
 }
 
 .cat-thumb {
-    width: 12px;
-    height: 12.5px;
+    width: 14px;
+    height: 14px;
     box-sizing: border-box;
-    border: 1px solid white;
+    border: 2px solid white;
     background: black;
-    border-radius: 6px;
+    border-radius: 100%;
     cursor: pointer;
     position: absolute;
-    right: 0px;
-    transform: translate3d(5px, -3px, 0);
+    right: -5px;
+    top: -4px;
     z-index: 10;
 }
 
@@ -233,8 +232,9 @@ body {
     border-radius: 2.5px;
     position: absolute;
     left: 0;
+    top: 0;
     width: 0;
-    height: 7px;
+    height: 100%;
     transition-property: width;
     transition-timing-function: linear;
     transition-duration: 0s;
