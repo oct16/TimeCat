@@ -52,6 +52,10 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
             if (!nextNode) {
                 return true
             }
+
+            if (!parentNode.contains(nextNode)) {
+                return true
+            }
         }
         const n = node as VNode | VSNode
 
