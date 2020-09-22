@@ -7,8 +7,8 @@
 // from module
 import { Recorder, Player } from 'timecatjs';
  // or
-import Recorder from '@timecat/recorder'
-import Player from '@timecat/player'
+import { Recorder } from '@timecat/recorder'
+import { Player } from '@timecat/player'
 
 // from cdn
 const { Recorder, Player } = window.TimeCat
