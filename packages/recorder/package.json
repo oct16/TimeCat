@@ -1,6 +1,6 @@
 {
     "name": "@timecat/recorder",
-    "version": "1.2.0-alpha.11",
+    "version": "1.2.0-alpha.12",
     "description": "@timecat/recorder",
     "main": "index.js",
     "module": "dist/recorder.esm.js",
@@ -26,9 +26,9 @@
         ]
     },
     "dependencies": {
-        "@timecat/utils": "1.2.0-alpha.11",
-        "@timecat/virtual-dom": "1.2.0-alpha.11",
-        "@timecat/share": "1.2.0-alpha.11"
+        "@timecat/utils": "1.2.0-alpha.12",
+        "@timecat/virtual-dom": "1.2.0-alpha.12",
+        "@timecat/share": "1.2.0-alpha.12"
     },
     "author": "",
     "license": "ISC"
