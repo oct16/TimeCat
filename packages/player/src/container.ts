@@ -1,9 +1,12 @@
-import { filteringTemplate, disableScrolling, nodeStore, debounce } from '@timecat/utils'
+import { disableScrolling, nodeStore, debounce, delay } from '@timecat/utils'
 import HTML from './ui.html'
 import CSS from './ui.scss'
 import { createIframeDOM, injectIframeContent } from './dom'
 import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions } from '@timecat/share'
+import { observer } from './utils'
+import { PlayerEventTypes } from './types'
+import { Panel } from './panel'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -26,6 +29,11 @@ export class ContainerComponent {
         this.initSandbox()
         const { resize } = this.makeItResponsive()
         this.resize = resize
+        this.initPanel()
+    }
+
+    initPanel() {
+        new Panel(this)
     }
 
     initSandbox() {
@@ -56,13 +64,14 @@ export class ContainerComponent {
     initTemplate() {
         const targetElement: HTMLElement =
             this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
-        targetElement.append(this.createStyle('cat-css', CSS))
-        targetElement.append(this.createContainer('cat-main', HTML))
+        const shadow = targetElement.attachShadow({ mode: 'open' })
+        shadow.appendChild(this.createStyle('cat-css', CSS))
+        shadow.appendChild(this.createContainer('cat-main', HTML))
     }
 
     createContainer(id: string, html: string) {
         const parser = new DOMParser()
-        const el = parser.parseFromString(filteringTemplate(html), 'text/html').body.firstChild as HTMLElement
+        const el = parser.parseFromString(html, 'text/html').body.firstChild as HTMLElement
         el.id = id
         el.style.width = this.getSnapshotRecord().width + 'px'
         el.style.height = this.getSnapshotRecord().height + 'px'
@@ -73,10 +82,11 @@ export class ContainerComponent {
     makeItResponsive() {
         const self = this
         const debounceResizeFn = debounce(resizeHandle, 500)
-        window.addEventListener('resize', debounceResizeFn.call(this, { target: self.target }), true)
-        this.options.destroyStore.add(() => {
-            window.removeEventListener('resize', debounceResizeFn.bind(this), true)
-        })
+
+        const callbackFn = () => debounceResizeFn({ target: self.target as EventTarget } as Event)
+        window.addEventListener('resize', callbackFn, true)
+
+        this.options.destroyStore.add(() => window.removeEventListener('resize', callbackFn, true))
 
         triggerResize()
 
@@ -87,7 +97,7 @@ export class ContainerComponent {
             resizeHandle(({ target: self.target } as unknown) as Event, setWidth, setHeight)
         }
 
-        function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
+        async function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
             if (!e) {
                 return
             }
@@ -99,6 +109,8 @@ export class ContainerComponent {
                 const { offsetWidth: w, offsetHeight: h } = e.target as HTMLElement
                 scalePages(self.container, w, h, setWidth, setHeight)
             }
+
+            observer.emit(PlayerEventTypes.RESIZE)
         }
 
         function scalePages(

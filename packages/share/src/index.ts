@@ -241,7 +241,6 @@ export interface Constructable<T> {
 export interface ReplayOptions {
     mode?: 'live' | 'default'
     receiver?: (sender: (data: RecordData) => void) => void
-    proxy?: string
     autoplay?: boolean
     packs?: ReplayPack[]
     records?: RecordData[]

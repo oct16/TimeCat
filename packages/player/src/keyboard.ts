@@ -1,5 +1,6 @@
-import { PlayerTypes, reduxStore, exportReplay, getRawScriptContent } from '@timecat/utils'
+import { exportReplay, getRawScriptContent } from '@timecat/utils'
 import { ContainerComponent } from './container'
+import { PlayerTypes, reduxStore } from './utils'
 
 export class KeyboardComponent {
     c: ContainerComponent
@@ -131,7 +132,7 @@ export class KeyboardComponent {
             )
         }
 
-        const defaultSDK = `https://cdn.jsdelivr.net/npm/timecatjs/dist/timecat.global.prod.js`
+        const defaultSDK = `//cdn.jsdelivr.net/npm/timecatjs/dist/timecat.global.prod.js`
         const SDKSource = (await getScriptSource(SDKScript)) || detectSDKSrc() || detectSDKContent() || defaultSDK
 
         scriptList.push({

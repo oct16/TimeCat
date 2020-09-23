@@ -1,17 +1,20 @@
 import { setAttribute } from '@timecat/virtual-dom'
 import { delay } from '@timecat/utils'
+import { ContainerComponent } from './container'
 
 export class PointerComponent {
     x = 0
     y = 0
 
     pointer: HTMLElement
-    constructor() {
+    c: ContainerComponent
+    constructor(c: ContainerComponent) {
+        this.c = c
         this.initPointer()
     }
 
     initPointer() {
-        this.pointer = document.getElementById('cat-pointer') as HTMLElement
+        this.pointer = this.c.container.querySelector('#cat-pointer') as HTMLElement
         this.move(0, 0)
     }
 

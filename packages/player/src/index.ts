@@ -1,15 +1,4 @@
-import {
-    getDBOperator,
-    ProgressTypes,
-    PlayerTypes,
-    reduxStore,
-    FMP,
-    isSnapshot,
-    classifyRecords,
-    radix64,
-    logError,
-    nodeStore
-} from '@timecat/utils'
+import { getDBOperator, isSnapshot, classifyRecords, radix64, logError, nodeStore } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Panel } from './panel'
 import pako from 'pako'
@@ -25,6 +14,10 @@ import {
     ReplayInternalOptions
 } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
+import { observer } from './utils/observer'
+import { PlayerEventTypes } from './types'
+import { FMP } from './utils/fmp'
+import { PlayerTypes, ProgressTypes, reduxStore } from './utils'
 
 const defaultReplayOptions = { autoplay: true, mode: 'default', target: window } as ReplayOptions
 
@@ -52,10 +45,34 @@ export class Player {
         const { records, audio } = (window.G_REPLAY_DATA = this.getFirstReplayData(replayPacks))
         const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
-        const c = new ContainerComponent(opts)
-        new Panel(c, opts)
+        if (records.length) {
+            const firstRecord = records[0]
+            const startTime = firstRecord.time
+            const endTime =
+                replayPacks.reduce((packAcc, pack) => {
+                    return (
+                        packAcc +
+                        pack.body
+                            .map((replayData: ReplayData) => replayData.records)
+                            .reduce((acc: number, records: RecordData[]) => {
+                                return acc + (+records.slice(-1)[0].time - +records[0].time)
+                            }, 0)
+                    )
+                }, 0) + +startTime
 
-        showStartMask()
+            reduxStore.dispatch({
+                type: ProgressTypes.PROGRESS,
+                data: {
+                    frames: records.length,
+                    startTime: Number(startTime),
+                    endTime
+                }
+            })
+        }
+
+        const c = new ContainerComponent(opts)
+
+        showStartMask(c)
 
         this.fmp = new FMP()
 
@@ -63,36 +80,10 @@ export class Player {
             if (hasAudio) {
                 await waitStart()
             }
-            removeStartPage()
+
+            removeStartPage(c)
 
             if (records.length) {
-                const firstRecord = records[0]
-
-                const replayPacks = window.G_REPLAY_PACKS as ReplayPack[]
-                const startTime = firstRecord.time
-                const endTime =
-                    replayPacks.reduce((packAcc, pack) => {
-                        return (
-                            packAcc +
-                            pack.body
-                                .map((replayData: ReplayData) => replayData.records)
-                                .reduce((acc: number, records: RecordData[]) => {
-                                    return acc + (+records.slice(-1)[0].time - +records[0].time)
-                                }, 0)
-                        )
-                    }, 0) + +startTime
-
-                reduxStore.dispatch({
-                    type: ProgressTypes.INFO,
-                    data: {
-                        frame: 0,
-                        curTime: Number(startTime),
-                        startTime: Number(startTime),
-                        endTime,
-                        length: records.length
-                    }
-                })
-
                 if (opts.autoplay || hasAudio) {
                     reduxStore.dispatch({
                         type: PlayerTypes.SPEED,
@@ -136,7 +127,7 @@ export class Player {
     }
 
     dispatchEvent(type: string, data: RecordData) {
-        event = new CustomEvent(type, { detail: data })
+        const event = new CustomEvent(type, { detail: data })
         window.dispatchEvent(event)
     }
 
@@ -236,5 +227,10 @@ export class Player {
 
     destroy() {
         this.destroyStore.forEach(un => un())
+        observer.destroy()
+    }
+
+    on(key: PlayerEventTypes, fn: Function) {
+        observer.on(key, fn)
     }
 }

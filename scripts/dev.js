@@ -27,6 +27,12 @@ async function run() {
         port: 4321,
         notify: false,
         open: false,
-        cors: true
+        cors: true,
+        rewriteRules: [
+            {
+                match: '//cdn.jsdelivr.net/npm/timecatjs',
+                replace: './timecat.global.js'
+            }
+        ]
     })
 }

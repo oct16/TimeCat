@@ -1,13 +1,17 @@
+import { ContainerComponent } from './container'
+
 export class BroadcasterComponent {
     broadcaster: HTMLElement
     floatLayer: HTMLElement
     subtitle: HTMLElement
-    constructor() {
+    c: ContainerComponent
+    constructor(container: ContainerComponent) {
+        this.c = container
         this.init()
     }
 
     init() {
-        this.broadcaster = document.querySelector('.cat-broadcaster') as HTMLElement
+        this.broadcaster = this.c.container.querySelector('.cat-broadcaster') as HTMLElement
         this.floatLayer = this.broadcaster.firstElementChild as HTMLElement
         this.subtitle = this.floatLayer.firstElementChild as HTMLElement
     }

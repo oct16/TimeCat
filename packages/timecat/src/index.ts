@@ -3,6 +3,8 @@ import { Player } from '@timecat/player'
 
 export {
     RecordData,
+    DBRecordData,
+    BaseRecord,
     RecordType,
     RecorderOptions,
     ReplayOptions,
@@ -15,4 +17,4 @@ const version = '__VERSION__'
 export { version }
 
 export { Player, Recorder }
-export { exportReplay, radix64, classifyRecords } from '@timecat/utils'
+export { exportReplay, radix64, classifyRecords, delay, debounce, throttle } from '@timecat/utils'
