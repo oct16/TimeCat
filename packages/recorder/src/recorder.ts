@@ -158,8 +158,7 @@ export class Recorder extends Pluginable {
             })
             .map(frame => {
                 return new Promise(resolve => {
-                    const { head, body } = frame.document
-                    if (head.children.length || body.children.length) {
+                    if (frame.document.readyState === 'complete') {
                         resolve(frame)
                     } else {
                         frame.addEventListener('load', () => {
