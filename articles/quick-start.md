@@ -90,6 +90,7 @@ new Recorder({ plugins: [new ExamplePlugin(options...)] })
 ```ts
 // replay record
 interface ReplayOptions {
+    target: string | HTMLElement // which element has contained the Player, default is Body
     mode?: 'live' | 'default' // mode
     records: RecordData[] // play with records data
     packs?: ReplayPack[] // play with packs data
@@ -100,7 +101,7 @@ interface ReplayOptions {
 
 const player = new Player(ReplayOptions)
 
-type EventTypes = 'play' | 'stop' | 'pause' | 'speed'
+type EventTypes = 'play' | 'stop' | 'pause' | 'speed' | 'resize'
 player.on(eventType: EventTypes, (...args) => {
     // ... receive event here
 })
