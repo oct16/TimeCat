@@ -1,4 +1,4 @@
-import { disableScrolling, nodeStore, debounce, delay } from '@timecat/utils'
+import { disableScrolling, nodeStore, debounce } from '@timecat/utils'
 import HTML from './ui.html'
 import CSS from './ui.scss'
 import { createIframeDOM, injectIframeContent } from './dom'
