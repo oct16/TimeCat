@@ -169,7 +169,7 @@ export interface LocationRecordData {
 }
 export type CanvasRecord = BaseRecord<RecordType.CANVAS, CanvasRecordData>
 
-export type CanvasRecordData = CanvasMutationRecordData | CanvasInitRecordData
+export type CanvasRecordData = CanvasMutationRecordData | CanvasInitSnapshotData | CanvasInitStatusData
 
 export interface CanvasMutationRecordData {
     id: number
@@ -178,9 +178,15 @@ export interface CanvasMutationRecordData {
         args: any[]
     }[]
 }
-export interface CanvasInitRecordData {
+
+export interface CanvasInitSnapshotData {
     id: number
     src: string
+}
+
+export interface CanvasInitStatusData {
+    id: number
+    status: { [key: string]: string | number }
 }
 
 export type RecordEvent<T extends RecordData> = (e: T) => void

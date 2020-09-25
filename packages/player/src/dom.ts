@@ -287,7 +287,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.CANVAS: {
             await actionDelay()
-            const { src, id, strokes } = data as UnionToIntersection<CanvasRecordData>
+            const { src, status, id, strokes } = data as UnionToIntersection<CanvasRecordData>
             const target = nodeStore.getNode(id) as HTMLCanvasElement
             if (!target) {
                 return
@@ -300,6 +300,10 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                 image.onload = function (this: HTMLImageElement) {
                     ctx.drawImage(this, 0, 0)
                 }
+            } else if (status) {
+                Object.keys(status).forEach(key => {
+                    ;(ctx as any)[key] = status[key]
+                })
             } else {
                 async function createChain() {
                     type Strokes = UnionToIntersection<CanvasRecordData>['strokes']
