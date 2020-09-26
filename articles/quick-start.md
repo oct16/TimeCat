@@ -31,14 +31,14 @@ const player = new Player()
 ```ts
 // record page
 interface RecordOptions {
-    mode?: 'live' | 'default' // mode
-    write?: boolean // write data to indexedDB, default is true
-    audio?: boolean // if your want record audio
-    plugins?: RecorderPlugin[] // extend plugins here
+    mode: 'default' | 'live' // mode
+    write: boolean // write data to indexedDB, default is true
+    audio: boolean // if your want record audio
+    plugins: RecorderPlugin[] // extend plugins here
 }
 
 // default use IndexedDB to save records
-const recorder = new Recorder(RecordOptions)
+const recorder = new Recorder(Partial<RecordOptions>)
 
 // receive data here
 recorder.onData((data: RecordData) => void)
@@ -91,17 +91,18 @@ new Recorder({ plugins: [new ExamplePlugin(options...)] })
 // replay record
 interface ReplayOptions {
     target: string | HTMLElement // which element has contained the Player, default is Body
-    mode?: 'live' | 'default' // mode
+    mode: 'live' | 'default' // mode
     records: RecordData[] // play with records data
-    packs?: ReplayPack[] // play with packs data
+    packs: ReplayPack[] // play with packs data
     // receive data in live mode, see examples/mirror
-    receiver?: ((data: RecordData) => void) => void
-    autoplay?: boolean // autoplay when data loaded
+    receiver: ((data: RecordData) => void) => void
+    autoplay: boolean // autoplay when data loaded
 }
 
-const player = new Player(ReplayOptions)
+const player = new Player(Partial<ReplayOptions>)
 
 type EventTypes = 'play' | 'stop' | 'pause' | 'speed' | 'resize'
+
 player.on(eventType: EventTypes, (...args) => {
     // ... receive event here
 })
@@ -119,19 +120,21 @@ import { exportReplay } from 'timecatjs'
 
 // export html file
 interface ExportOptions {
-    scripts?: ScriptItem[] // inject script in html
-    autoplay?: boolean // autoplay when data loaded
-    audioExternal?: boolean // export audio as a file, default is inline
-    dataExternal?: boolean // export data json as a file, default is inline
+    scripts: ScriptItem[] // inject script in html
+    autoplay: boolean // autoplay when data loaded
+    audioExternal: boolean // export audio as a file, default is inline
+    dataExternal: boolean // export data json as a file, default is inline
 }
 
-exportReplay(ExportOptions)
+exportReplay(Partial<ExportOptions>)
 ```
 - [Export Example](https://github.com/oct16/TimeCat/blob/5172352a6494c1182e83452605677796e0fe0f46/packages/player/src/keyboard.ts#L96-L154)
 
 
 ## Articles
  - [TimeCat 入门：我们的第一个应用](record-and-replay.md)
+ - [TimeCat 进阶：把数据上传到服务器](upload-to-server.md)
+ - TimeCat 高级 // TODO
 
 ---
 ##### [🏠Homepage](../README.md) 

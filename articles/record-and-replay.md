@@ -292,5 +292,8 @@ export default class Replay extends Component {
 
 以上代码详见: https://github.com/oct16/timecat-demo/tree/record-and-replay
 
+下一篇
+#### [TimeCat 进阶：把数据上传到服务器](./upload-to-server.md)
+---
 
-##### [🏠Homepage](../README.md) 
+#### [🏠Homepage](../README.md) 

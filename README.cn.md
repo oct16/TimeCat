@@ -67,7 +67,7 @@ Add script tags in your browser and use the global variable ``TimeCat``
 ## Articles
  - [录屏原理简介](articles/technology.cn.md)
  - [TimeCat 入门：我们的第一个应用](articles/record-and-replay.md)
-
+ - [TimeCat 进阶：把数据上传到服务器](articles/upload-to-server.md)
 ## 交流与建议
 
 开发中若遇到任何问题或有任何建议   
