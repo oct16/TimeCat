@@ -287,54 +287,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.CANVAS: {
             await actionDelay()
-            const { src, status, id, strokes } = data as UnionToIntersection<CanvasRecordData>
-            const target = nodeStore.getNode(id) as HTMLCanvasElement
-            if (!target) {
-                return
-            }
-            const ctx = target.getContext('2d')!
-
-            if (src) {
-                const image = new Image()
-                image.src = src
-                image.onload = function (this: HTMLImageElement) {
-                    ctx.drawImage(this, 0, 0)
-                }
-            } else if (status) {
-                Object.keys(status).forEach(key => {
-                    ;(ctx as any)[key] = status[key]
-                })
-            } else {
-                async function createChain() {
-                    type Strokes = UnionToIntersection<CanvasRecordData>['strokes']
-                    function splitStrokes(strokesArray: Strokes[]) {
-                        const result: Strokes[] = []
-                        strokesArray.forEach(strokes => {
-                            const len = strokes.length
-                            const pivot = Math.floor(len / 2)
-                            result.push(...[strokes.splice(0, pivot), strokes])
-                        })
-                        return result
-                    }
-
-                    // TODO expect stroke smooth (elapsed time)
-                    for (const strokesArray of splitStrokes(splitStrokes([strokes]))) {
-                        // await delay(0) // have problem here
-                        for (const stroke of strokesArray) {
-                            const { name, args } = stroke
-                            if (Array.isArray(args)) {
-                                if (name === 'drawImage') {
-                                    args[0] = nodeStore.getNode(args[0])
-                                }
-                                ;(ctx[name] as Function).apply(ctx, args)
-                            } else {
-                                ;(ctx[name] as Object) = args
-                            }
-                        }
-                    }
-                }
-                createChain()
-            }
+            renderCanvas(data as CanvasRecordData)
         }
 
         default: {
@@ -399,4 +352,39 @@ export function injectIframeContent(contentDocument: Document, snapshotData: Sna
 // waiting for mouse or scroll transform animation finish
 async function actionDelay() {
     return delay(200)
+}
+
+function renderCanvas(canvasRecordData: CanvasRecordData) {
+    const data = canvasRecordData as UnionToIntersection<CanvasRecordData>
+    const { src, status, id, strokes } = data
+    const canvas = nodeStore.getNode(id) as HTMLCanvasElement
+    if (!canvas) {
+        return
+    }
+    const ctx = canvas.getContext('2d')!
+    if (src) {
+        const image = new Image()
+        image.src = src
+        image.onload = function (this: HTMLImageElement) {
+            ctx.drawImage(this, 0, 0)
+        }
+    } else if (status) {
+        Object.keys(status).forEach(key => {
+            ;(ctx as any)[key] = status[key]
+        })
+    } else {
+        // TODO expect stroke smooth (elapsed time)
+        for (const stroke of strokes) {
+            // await delay(0) // have problem here
+            const { name, args } = stroke
+            if (Array.isArray(args)) {
+                if (name === 'drawImage') {
+                    args[0] = nodeStore.getNode(args[0])
+                }
+                ;(ctx[name] as Function).apply(ctx, args)
+            } else {
+                ;(ctx[name] as Object) = args
+            }
+        }
+    }
 }
