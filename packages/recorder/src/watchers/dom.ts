@@ -129,6 +129,10 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
             const vn = addedSiblingMap.get(node)!
 
+            if ((vn as VNode).tag === 'option' && (node as HTMLOptionElement).selected) {
+                ;(vn as VNode).attrs.selected = 'true'
+            }
+
             if (isParentSVG && isVNode(vn)) {
                 ;(vn as VNode).extra.isSVG = true
             }
