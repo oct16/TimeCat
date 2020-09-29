@@ -55,6 +55,13 @@ function getExtra(node: Element, isSVG?: boolean) {
         }
     }
 
+    if (tagName === 'OPTION') {
+        const { selected } = node as HTMLOptionElement
+        if (selected === true) {
+            props.selected = true
+        }
+    }
+    
     // find the scrolled elements
     const scrollLeft = node.scrollLeft
     const scrollTop = node.scrollTop
