@@ -61,7 +61,7 @@ function getExtra(node: Element, isSVG?: boolean) {
             props.selected = true
         }
     }
-    
+
     // find the scrolled elements
     const scrollLeft = node.scrollLeft
     const scrollTop = node.scrollTop
