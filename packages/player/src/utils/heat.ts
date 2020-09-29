@@ -1,3 +1,8 @@
+/**
+ * canvas heatMap
+ * Reference https://codepen.io/linghuam/pen/pQEXva
+ */
+
 type pointItem = { x: number; val: number }
 
 export class Heat {

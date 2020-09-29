@@ -77,7 +77,7 @@ export class ProgressComponent {
     async resizeHeatBar() {
         // wait for scaling page finish to get target offsetWidth
         await delay(500)
-        if (this.heatPoints) {
+        if (this.heatPoints && this.heatPoints.length) {
             this.drawHeatPoints(this.heatPoints)
         }
     }

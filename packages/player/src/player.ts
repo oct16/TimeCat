@@ -206,7 +206,9 @@ export class PlayerComponent {
                 this.initViewState()
                 this.c.setViewState()
             } else {
-                this.progress.drawHeatPoints(this.heatPoints)
+                if (this.heatPoints && this.heatPoints.length) {
+                    this.progress.drawHeatPoints(this.heatPoints)
+                }
             }
             this.isFirstTimePlay = false
         }
@@ -389,6 +391,9 @@ export class PlayerComponent {
 
     calcHeatPointsData() {
         const frames = this.frames
+        if (!this.options.heatPoints) {
+            return []
+        }
         const { G_REPLAY_PACKS: packs } = window
         const allRecords = (packs as ReplayPack[])
             .map(pack => pack.body.map(data => data.records))

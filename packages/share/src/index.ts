@@ -251,6 +251,7 @@ export interface ReplayOptions {
     packs?: ReplayPack[]
     records?: RecordData[]
     target?: string | HTMLElement | Window
+    heatPoints?: boolean
 }
 
 export interface ReplayInternalOptions extends ReplayOptions {

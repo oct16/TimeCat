@@ -97,6 +97,7 @@ interface ReplayOptions {
     // receive data in live mode, see examples/mirror
     receiver: ((data: RecordData) => void) => void
     autoplay: boolean // autoplay when data loaded
+    heatPoints: boolean // show heatPoints in progress bar, default is false
 }
 
 const player = new Player(Partial<ReplayOptions>)
