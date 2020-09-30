@@ -1,5 +1,5 @@
 import { createFlatVNode } from '@timecat/virtual-dom'
-import { isVNode, isExistingNode } from '@timecat/utils'
+import { isVNode, isExistingNode, nodeStore } from '@timecat/utils'
 import {
     WatcherOptions,
     RecordType,
@@ -14,6 +14,7 @@ import {
     CharacterDataUpdateData
 } from '@timecat/share'
 import { Watcher } from '../watcher'
+import { CanvasWatcher } from './canvas'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
     constructor(options: WatcherOptions<DOMRecord>) {
@@ -23,7 +24,6 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
     init() {
         const Watcher = new MutationObserver(callback => this.mutationCallback(callback))
-
         Watcher.observe(this.context.document.documentElement, {
             attributeOldValue: true,
             attributes: true,
@@ -211,8 +211,29 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             }
         })
 
+        if (data.addedNodes) {
+            const nodes = this.siftElements('canvas', addedNodes)
+            if (nodes.length) {
+                const elements = nodes
+                    .map(node => {
+                        return nodeStore.getNode(node.node.id) as HTMLCanvasElement
+                    })
+                    .filter(Boolean)
+
+                const watcher = this.options.watchers.get('CanvasWatcher') as CanvasWatcher
+                watcher.watchCanvas(elements)
+            }
+        }
+
         if (Object.values(data).some(item => item.length)) {
             this.emitData(RecordType.DOM, data)
         }
+    }
+
+    siftElements(name: string, updateNodeData: UpdateNodeData[]) {
+        const elements = updateNodeData.filter(data => {
+            return (data.node as VNode).tag === name
+        })
+        return elements as UpdateNodeData<VNode>[]
     }
 }

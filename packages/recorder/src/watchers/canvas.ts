@@ -40,13 +40,17 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
     }
 
     init() {
-        const self = this
         const canvasElements = document.getElementsByTagName('canvas')
+        this.watchCanvas(Array.from(canvasElements))
+    }
+
+    watchCanvas(canvasList: Array<HTMLCanvasElement>) {
+        const self = this
 
         const ctxProto = CanvasRenderingContext2D.prototype
         const names = Object.getOwnPropertyNames(ctxProto)
 
-        Array.from(canvasElements)
+        canvasList
             .map(canvas => {
                 const dataURL = canvas.toDataURL()
                 this.emitData(RecordType.CANVAS, {
@@ -84,7 +88,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                             return typeof method === 'function'
                                 ? function () {
                                       const args = [...arguments]
-                                      if (name === 'drawImage') {
+                                      if (name === 'drawImage' || name === 'createPattern') {
                                           args[0] = id
                                       }
 
@@ -124,7 +128,7 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
         const tasks = Object.create(null) as { [key: number]: { name: Prop; args: any[] }[] }
         const timeouts = Object.create(null) as { [key: number]: number }
 
-        const blockInstances = [CanvasGradient]
+        const blockInstances = [CanvasGradient, CanvasPattern]
 
         return function (this: any, id: number, prop: Prop, args: any) {
             const context = this

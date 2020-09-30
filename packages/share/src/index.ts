@@ -52,7 +52,8 @@ export enum RecordType {
     'LOCATION',
     'AUDIO',
     'CANVAS',
-    'TERMINATE'
+    'TERMINATE',
+    'FONT'
 }
 
 export enum FormElementEvent {
@@ -107,10 +108,10 @@ export interface CharacterDataUpdateData {
     id: number
 }
 
-export interface UpdateNodeData {
+export interface UpdateNodeData<T = VSNode | VNode | number> {
     parentId: number
     nextId: number | null
-    node: VSNode | VNode | number
+    node: T
 }
 
 export interface movedNodesData {
@@ -205,6 +206,7 @@ export type RecordData =
     | LocationRecord
     | CanvasRecord
     | TerminateRecord
+    | FontRecord
 
 export interface AudioData {
     src: string
@@ -233,11 +235,12 @@ export enum TransactionMode {
     'VERSIONCHANGE' = 'versionchange'
 }
 
-export type WatcherOptions<T extends RecordData | HeadRecord> = {
+export type WatcherOptions<T extends RecordData | HeadRecord, WatchersInstance = any> = {
     context: Window
     listenStore: Set<Function>
     emit: RecordEvent<T>
     relatedId: string
+    watchers: WatchersInstance
 }
 
 export interface Constructable<T> {
@@ -291,3 +294,10 @@ export interface BaseRecord<T, D = any> {
     time: string
     relatedId: string
 }
+
+export interface FontRecordData {
+    family: string
+    source: string
+}
+
+export type FontRecord = BaseRecord<RecordType.FONT, FontRecordData>

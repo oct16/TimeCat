@@ -17,7 +17,8 @@ import {
     LocationRecordData,
     CanvasRecordData,
     UnionToIntersection,
-    SnapshotRecord
+    SnapshotRecord,
+    FontRecordData
 } from '@timecat/share'
 import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
@@ -288,8 +289,20 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         case RecordType.CANVAS: {
             await actionDelay()
             renderCanvas(data as CanvasRecordData)
+            break
         }
-
+        case RecordType.FONT: {
+            const { family, source } = data as FontRecordData
+            const buffer = new Uint8Array(source.length)
+            for (let i = 0; i < source.length; i++) {
+                const code = source.charCodeAt(i)
+                buffer[i] = code
+            }
+            const font = new window.FontFace(family, buffer)
+            this.c.sandBoxDoc.fonts.add(font)
+            document.fonts.add(font)
+            break
+        }
         default: {
             break
         }
@@ -378,7 +391,7 @@ function renderCanvas(canvasRecordData: CanvasRecordData) {
             // await delay(0) // have problem here
             const { name, args } = stroke
             if (Array.isArray(args)) {
-                if (name === 'drawImage') {
+                if (name === 'drawImage' || name === 'createPattern') {
                     args[0] = nodeStore.getNode(args[0])
                 }
                 ;(ctx[name] as Function).apply(ctx, args)

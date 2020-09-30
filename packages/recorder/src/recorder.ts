@@ -24,6 +24,10 @@ export class Recorder extends Pluginable {
     private listenStore: Set<Function> = new Set()
     private onDataCallback: Function
     private watchers: Array<ValueOf<typeof RecorderWatchers> | typeof RecordAudio | typeof Snapshot>
+    private watchersInstance = new Map<
+        string,
+        InstanceType<ValueOf<typeof RecorderWatchers>> | RecordAudio | Snapshot
+    >()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
     private watcherResolve: Function
 
@@ -132,13 +136,15 @@ export class Recorder extends Pluginable {
             time: getRadix64TimeStr()
         })
 
-        activeWatchers.forEach(watcher => {
-            new watcher({
+        activeWatchers.forEach(Watcher => {
+            const watcher = new Watcher({
                 context: options && options.context,
                 listenStore: this.listenStore,
                 relatedId: relatedId,
-                emit
+                emit,
+                watchers: this.watchersInstance
             })
+            this.watchersInstance.set(Watcher.name, watcher)
         })
 
         this.watcherResolve()
