@@ -20,9 +20,9 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "$npm_execpath --silent run checkyarn && node scripts/dev.js",
-        "build": "$npm_execpath --silent run checkyarn && node scripts/build.js",
-        "release": "$npm_execpath --silent run checkyarn && node scripts/release.js",
+        "dev": "node scripts/dev.js",
+        "build": "node scripts/build.js",
+        "release": "node scripts/release.js",
         "preinstall": "$npm_execpath --silent run checkyarn",
         "checkyarn": "node ./scripts/checkYarn.js",
         "ls-lint": "ls-lint",
