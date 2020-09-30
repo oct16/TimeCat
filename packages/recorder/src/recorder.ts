@@ -16,10 +16,15 @@ export interface RecordOptions {
     audio?: boolean
     write?: boolean
     plugins?: RecorderPlugin[]
+    font?: boolean
 }
 
 export class Recorder extends Pluginable {
-    private static defaultRecordOpts = { mode: 'default', write: true, context: window } as RecordOptions
+    private static defaultRecordOpts = {
+        mode: 'default',
+        write: true,
+        context: window
+    } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
     private onDataCallback: Function

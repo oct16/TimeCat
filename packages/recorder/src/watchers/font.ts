@@ -15,7 +15,9 @@ export class FontWatcher extends Watcher<FontRecord> {
     }
 
     init() {
-        this.interceptAddFont()
+        if (this.recordOptions.font) {
+            this.interceptAddFont()
+        }
     }
 
     interceptAddFont() {
