@@ -80,6 +80,10 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
                     const val = ctx[name as keyof CanvasRenderingContext2D]
                     ctxTemp[name] = val
 
+                    if (!original.configurable) {
+                        return
+                    }
+
                     Object.defineProperty(ctx, name, {
                         get() {
                             const context = this

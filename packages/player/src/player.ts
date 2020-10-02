@@ -3,7 +3,15 @@ import { updateDom } from './dom'
 import { getTime, isSnapshot, delay, toTimeStamp, base64ToFloat32Array, encodeWAV } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData, ReplayInternalOptions } from '@timecat/share'
+import {
+    RecordData,
+    AudioData,
+    SnapshotRecord,
+    ReplayPack,
+    ReplayData,
+    ReplayInternalOptions,
+    RecordType
+} from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animation-frame'
 import { observer } from './utils/observer'
@@ -126,8 +134,7 @@ export class PlayerComponent {
         const { G_REPLAY_PACKS: packs } = window
         const firstPack = packs[0] as ReplayPack
         const firstData = firstPack.body[0]
-        this.records = firstData.records
-
+        this.records = this.orderRecords(firstData.records)
         this.audioData = firstData.audio
         this.initAudio()
 
@@ -184,7 +191,7 @@ export class PlayerComponent {
         this.curViewDiffTime += nextStartTime - curEndTime
 
         window.G_REPLAY_DATA = nextData
-        this.records = nextData.records
+        this.records = this.orderRecords(nextData.records)
         this.audioData = nextData.audio
         this.initAudio()
         this.curViewEndTime = +this.records.slice(-1)[0].time
@@ -411,5 +418,24 @@ export class PlayerComponent {
         })
 
         return heatPoints
+    }
+
+    orderRecords(records: RecordData[]) {
+        if (!records.length) {
+            return []
+        }
+        // Lift font records for canvas render
+        let insertIndex = 1
+        const startTime = +records[0].time
+        for (let i = 0; i < records.length; i++) {
+            const record = records[i]
+            if (record.type === RecordType.FONT) {
+                const fontRecord = records.splice(i, 1)[0]
+                fontRecord.time = startTime + insertIndex + ''
+                records.splice(insertIndex++, 0, fontRecord)
+            }
+        }
+
+        return records
     }
 }
