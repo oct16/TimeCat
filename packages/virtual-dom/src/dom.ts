@@ -1,6 +1,6 @@
 import { completeAttrHref, completeCssHref } from '@timecat/utils'
 
-export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null): void {
+export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null | object): void {
     if (node.nodeType !== Node.ELEMENT_NODE) {
         return
     }
