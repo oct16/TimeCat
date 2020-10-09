@@ -50,16 +50,10 @@ $ npm i timecatjs -D
 
 #### Import in Browser
 
-Add script tags in your browser and use the global variable ``TimeCat``
+Add script tags in your browser and use the global variable ``TimeCat``, you can choose the follow CDN:
 
-- **jsDelivr**
-  - https://cdn.jsdelivr.net/npm/timecatjs
-  - https://cdn.jsdelivr.net/npm/@timecat/recorder
-  - https://cdn.jsdelivr.net/npm/@timecat/player
-- **UNPKG**
-  - https://unpkg.com/timecatjs
-  - https://unpkg.com/@timecat/recorder
-  - https://unpkg.com/@timecat/player
+- <a href="https://www.jsdelivr.com/package/npm/timecatjs"><img align="top" width="100" src="./articles/images/jsdelivr.png"></a>
+- <a href="https://unpkg.com/timecatjs"><img align="top" width="100" src="./articles/images/unpkg.png"></a>
 
 ## Usage
  - [快速开始](articles/quick-start.md)

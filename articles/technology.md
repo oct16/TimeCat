@@ -1,4 +1,4 @@
-### TimeCat -- A Magical Web Recorder
+### How it works
 
 If you like playing games,  Warcraft 3 must be on that list. You may be curious about the video files exported by the game-why the video is only a few hundred KB even after you have played the game for an hour?  Soon you will realize what have a happened-the map inside the game has to be reloaded almost every time when you import the replay video. If you skip the step, the video won’t be played
 
