@@ -16,7 +16,7 @@ import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animation-frame'
 import { observer } from './utils/observer'
 import { PlayerEventTypes } from './types'
-import { PlayerTypes, reduxStore } from './utils'
+import { PlayerTypes, reduxStore, ProgressState } from './utils'
 
 export class PlayerComponent {
     options: ReplayInternalOptions
@@ -34,7 +34,6 @@ export class PlayerComponent {
     isFirstTimePlay = true
     frameInterval = 250
     frames: number[]
-    heatPoints: number[]
 
     startTime: number
     elapsedTime = 0
@@ -61,9 +60,12 @@ export class PlayerComponent {
         this.pointer = pointer
         this.progress = progress
         this.broadcaster = broadcaster
+        this.init()
+    }
+
+    async init() {
         this.audioNode = new Audio()
         this.frames = this.calcFrames()
-        this.heatPoints = this.calcHeatPointsData()
 
         this.initViewState()
 
@@ -72,6 +74,7 @@ export class PlayerComponent {
             window.addEventListener('record-data', this.streamHandle.bind(this))
             this.options.destroyStore.add(() => window.removeEventListener('record-data', this.streamHandle.bind(this)))
         } else {
+            reduxStore.subscribe('progress', this.recalculateProgress.bind(this))
             reduxStore.subscribe('player', state => {
                 if (state) {
                     const speed = state.speed
@@ -213,9 +216,7 @@ export class PlayerComponent {
                 this.initViewState()
                 this.c.setViewState()
             } else {
-                if (this.heatPoints && this.heatPoints.length) {
-                    this.progress.drawHeatPoints(this.heatPoints)
-                }
+                this.progress.drawHeatPoints(this.calcHeatPointsData())
             }
             this.isFirstTimePlay = false
         }
@@ -315,7 +316,6 @@ export class PlayerComponent {
 
     renderEachFrame() {
         this.progress.updateTimer(((this.frameIndex + 1) * this.frameInterval) / 1000)
-
         let data: RecordData
         while (
             this.recordIndex < this.records.length &&
@@ -402,15 +402,26 @@ export class PlayerComponent {
             return []
         }
         const { G_REPLAY_PACKS: packs } = window
-        const allRecords = (packs as ReplayPack[])
+
+        let diffTime = 0
+        const recordTimes = (packs as ReplayPack[])
             .map(pack => pack.body.map(data => data.records))
-            .reduce((a, b) => (a.concat(...b) as unknown) as RecordData[], [] as RecordData[])
+            .flat(1)
+            .reduce((a, b, i, arr) => {
+                const preLastTime = i === 0 ? 0 : Number(arr[i - 1].slice(-1)[0].time)
+                const curFirstTime = b[0].time
+                if (preLastTime) {
+                    diffTime += +curFirstTime - preLastTime
+                }
+
+                return a.concat(b.map(n => +n.time - diffTime))
+            }, [] as number[])
 
         let index = 0
         const heatPoints = frames.map(t => {
-            let curRecord
+            let recordTime: number
             let count = 0
-            while ((curRecord = allRecords[index]) && +curRecord.time < t) {
+            while ((recordTime = recordTimes[index]) && +recordTime < t) {
                 index++
                 count++
             }
@@ -437,5 +448,11 @@ export class PlayerComponent {
         }
 
         return records
+    }
+
+    recalculateProgress() {
+        this.frames = this.calcFrames()
+        this.progress.drawHeatPoints(this.calcHeatPointsData())
+        this.setProgress()
     }
 }

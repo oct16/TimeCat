@@ -1,4 +1,4 @@
-import { getDBOperator, isSnapshot, classifyRecords, radix64, logError, nodeStore } from '@timecat/utils'
+import { getDBOperator, isSnapshot, classifyRecords, radix64, logError, nodeStore, isNumeric } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import pako from 'pako'
 import {
@@ -23,9 +23,11 @@ const defaultReplayOptions = { autoplay: true, mode: 'default', target: window }
 interface IPlayerPublic {
     on: (key: PlayerEventTypes, fn: Function) => void
     destroy: () => void
+    append: (records: RecordData[]) => void
 }
 export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
     class Player {
+        c: ContainerComponent
         fmp: FMP
         destroyStore = new Set<Function>()
         constructor(options?: ReplayOptions) {
@@ -33,7 +35,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             this.init(options)
         }
 
-        async init(options?: ReplayOptions) {
+        private async init(options?: ReplayOptions) {
             const opts = {
                 destroyStore: this.destroyStore,
                 ...defaultReplayOptions,
@@ -54,31 +56,10 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
             if (records.length) {
-                const firstRecord = records[0]
-                const startTime = firstRecord.time
-                const endTime =
-                    replayPacks.reduce((packAcc, pack) => {
-                        return (
-                            packAcc +
-                            pack.body
-                                .map((replayData: ReplayData) => replayData.records)
-                                .reduce((acc: number, records: RecordData[]) => {
-                                    return acc + (+records.slice(-1)[0].time - +records[0].time)
-                                }, 0)
-                        )
-                    }, 0) + +startTime
-
-                reduxStore.dispatch({
-                    type: ProgressTypes.PROGRESS,
-                    data: {
-                        frames: records.length,
-                        startTime: Number(startTime),
-                        endTime
-                    }
-                })
+                this.initProgress(replayPacks)
             }
 
-            const c = new ContainerComponent(opts)
+            const c = (this.c = new ContainerComponent(opts))
 
             showStartMask(c)
 
@@ -109,11 +90,46 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             }
         }
 
-        getFirstReplayData(replayPacks: ReplayPack[]) {
+        private initProgress(replayPacks: ReplayPack[]) {
+            const firstPack = replayPacks[0]
+            const { beginTime } = firstPack.head
+
+            const startTime = isNumeric(beginTime) ? +beginTime : radix64.atob(beginTime)
+            const { endTime, frames } = replayPacks.reduce(
+                (packsAcc, pack) => {
+                    const { frames, endTime } = pack.body
+                        .map((replayData: ReplayData) => replayData.records)
+                        .reduce(
+                            (acc, records: RecordData[]) => {
+                                acc.endTime += +records.slice(-1)[0].time - +records[0].time
+                                acc.frames += records.length
+                                return acc
+                            },
+                            { endTime: 0, frames: 0 }
+                        )
+
+                    packsAcc.frames += frames
+                    packsAcc.endTime += endTime
+                    return packsAcc
+                },
+                { endTime: startTime, frames: 0 }
+            )
+
+            reduxStore.dispatch({
+                type: ProgressTypes.PROGRESS,
+                data: {
+                    frames,
+                    startTime,
+                    endTime
+                }
+            })
+        }
+
+        private getFirstReplayData(replayPacks: ReplayPack[]) {
             return replayPacks[0].body[0]
         }
 
-        getGZipData() {
+        private getGZipData() {
             const data = window.G_REPLAY_STR_PACKS
             if (!data) {
                 return null
@@ -134,12 +150,12 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             return packs
         }
 
-        dispatchEvent(type: string, data: RecordData) {
+        private dispatchEvent(type: string, data: RecordData) {
             const event = new CustomEvent(type, { detail: data })
             window.dispatchEvent(event)
         }
 
-        async dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<ReplayPack[]> {
+        private async dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<ReplayPack[]> {
             let replayPack: ReplayPack
             let head: ReplayHead
             const body: ReplayData[] = []
@@ -183,7 +199,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             })
         }
 
-        async getDataFromDB() {
+        private async getDataFromDB() {
             const DBOperator = await getDBOperator
             const data = await DBOperator.readAllRecords()
 
@@ -194,7 +210,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             return null
         }
 
-        async getReplayData(options: ReplayInternalOptions) {
+        private async getReplayData(options: ReplayInternalOptions) {
             const { receiver, packs, records } = options
 
             const rawReplayPacks =
@@ -219,7 +235,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             return null
         }
 
-        decodePacks(packs: ReplayPack[]): ReplayPack[] {
+        private decodePacks(packs: ReplayPack[]): ReplayPack[] {
             const { atob } = radix64
             packs.forEach(pack => {
                 pack.body.forEach(data => {
@@ -241,6 +257,13 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
         on(key: PlayerEventTypes, fn: Function) {
             observer.on(key, fn)
         }
+
+        append(records: RecordData[]) {
+            const { G_REPLAY_PACKS } = window
+            const packs = classifyRecords(records)
+            G_REPLAY_PACKS.push(...packs)
+            this.initProgress(G_REPLAY_PACKS)
+        }
     }
 
     if (this.constructor.name !== 'Player') {
@@ -248,7 +271,8 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
     }
 
     const player = new Player(options)
-    const { on, destroy } = player
+    const { on, destroy, append } = player
     this.on = on.bind(player)
+    this.append = append.bind(player)
     this.destroy = destroy.bind(player)
 }

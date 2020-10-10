@@ -40,6 +40,8 @@ interface Window {
 
     G_REPLAY_DATA: any
 
+    G_REPLAY_RECORDS?: any
+
     G_RECORD_OPTIONS: any
     G_REPLAY_OPTIONS: any
 

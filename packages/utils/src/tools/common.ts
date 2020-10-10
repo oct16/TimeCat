@@ -64,6 +64,7 @@ export function isSnapshot(frame: RecordData) {
 }
 
 export function classifyRecords(records: RecordData[]) {
+    window.G_REPLAY_RECORDS = records
     const packs: ReplayPack[] = []
 
     function isAudioBufferStr(frame: AudioRecord) {
@@ -207,4 +208,8 @@ function getPatches(changes: diff.Change[]) {
         value?: string
         len?: number
     }>
+}
+
+export function isNumeric(n: string) {
+    return !isNaN(parseFloat(n)) && isFinite(parseFloat(n))
 }

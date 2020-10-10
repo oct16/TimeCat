@@ -44,6 +44,13 @@ export class ProgressComponent {
             return
         }
 
+        // recalculate progress thumb position
+        const percent = index / total
+        this.currentProgress.style.width = percent * this.slider.offsetWidth + 'px'
+
+        // fix change class not trigger animate
+        await delay(20)
+
         // remind animation seconds
         const duration = ((total - index) * interval) / speed / 1000
         this.currentProgress.style.transitionDuration = duration + 's'
@@ -67,18 +74,14 @@ export class ProgressComponent {
         this.currentProgress = currentProgress as HTMLElement
     }
 
-    drawHeatPoints(points: number[]) {
-        if (this.heatPoints !== points) {
-            this.heatPoints = points
-        }
-        new Heat(this.heatBar, points)
+    drawHeatPoints(points?: number[]) {
+        this.heatPoints = points || this.heatPoints
+        new Heat(this.heatBar, this.heatPoints)
     }
 
     async resizeHeatBar() {
         // wait for scaling page finish to get target offsetWidth
         await delay(500)
-        if (this.heatPoints && this.heatPoints.length) {
-            this.drawHeatPoints(this.heatPoints)
-        }
+        this.drawHeatPoints()
     }
 }
