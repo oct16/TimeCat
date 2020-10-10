@@ -39,5 +39,9 @@ export class FontWatcher extends Watcher<FontRecord> {
         }
 
         window.FontFace = (FontFace as unknown) as FontFace
+
+        this.uninstall(() => {
+            window.FontFace = original
+        })
     }
 }
