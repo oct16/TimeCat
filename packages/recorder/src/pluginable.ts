@@ -24,22 +24,22 @@ export class Pluginable {
         this.plugins.push(...defaultPlugins, ...(plugins || []))
     }
 
-    pluginsOnload() {
+    protected pluginsOnload() {
         this.plugins.forEach(plugin => {
             plugin.apply.call(plugin, this)
         })
     }
 
     private plugins: RecorderPlugin[] = []
-    public hooks = HOOKS
+    protected hooks = HOOKS
 
-    plugin = (type: keyof typeof HOOKS, cb: (data: any) => void) => {
+    protected plugin = (type: keyof typeof HOOKS, cb: (data: any) => void) => {
         const name = this.hooks[type].constructor.name
         const method = /Async/.test(name) ? 'tapAsync' : 'tap'
         this.hooks[type][method](type, cb)
     }
 
-    use(plugin: RecorderPlugin): void {
+    public use(plugin: RecorderPlugin): void {
         this.plugins.push(plugin)
         plugin.apply(this)
     }
