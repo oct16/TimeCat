@@ -3,7 +3,7 @@ import { RecorderOptions } from '@timecat/share'
 function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
     const { sampleBits } = opts
     const isLittleEndian = true
-    const length = bufferData.length * (opts.sampleBits / 8)
+    const length = bufferData.length * (sampleBits / 8)
     const data = new DataView(new ArrayBuffer(length))
     let offset = 0
 
