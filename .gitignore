@@ -109,3 +109,4 @@ docs
 stats.html
 */test*
 .yarn
+.idea
