@@ -16,7 +16,7 @@ import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animation-frame'
 import { observer } from './utils/observer'
 import { PlayerEventTypes } from './types'
-import { PlayerTypes, reduxStore, ProgressState } from './utils'
+import { PlayerTypes, reduxStore } from './utils'
 
 export class PlayerComponent {
     options: ReplayInternalOptions
@@ -47,6 +47,8 @@ export class PlayerComponent {
     audioBlobUrl: string
 
     RAF: AnimationFrame
+
+    maxIntensityStep = 8
 
     constructor(
         options: ReplayInternalOptions,
@@ -420,12 +422,14 @@ export class PlayerComponent {
         let index = 0
         const heatPoints = frames.map(t => {
             let recordTime: number
-            let count = 0
+            let step = 0
             while ((recordTime = recordTimes[index]) && +recordTime < t) {
                 index++
-                count++
+                if (step < this.maxIntensityStep) {
+                    step++
+                }
             }
-            return count
+            return step
         })
 
         return heatPoints
