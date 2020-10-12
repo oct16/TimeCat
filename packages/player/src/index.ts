@@ -258,11 +258,23 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             observer.on(key, fn)
         }
 
-        append(records: RecordData[]) {
-            const { G_REPLAY_PACKS } = window
-            const packs = classifyRecords(records)
-            G_REPLAY_PACKS.push(...packs)
-            this.initProgress(G_REPLAY_PACKS)
+        append(data: RecordData[] | ReplayPack | ReplayPack[]) {
+            function isPack(data: any) {
+                return !!data.head
+            }
+            let packs: ReplayPack[]
+            if (Array.isArray(data)) {
+                if (!isPack(data[0])) {
+                    packs = classifyRecords(data as RecordData[])
+                } else {
+                    packs = data as ReplayPack[]
+                }
+            } else {
+                packs = [data]
+            }
+            const { G_REPLAY_PACKS: GPacks } = window
+            GPacks.push(...packs)
+            this.initProgress(GPacks)
         }
     }
 

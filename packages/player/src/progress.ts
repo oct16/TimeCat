@@ -76,7 +76,9 @@ export class ProgressComponent {
 
     drawHeatPoints(points?: number[]) {
         this.heatPoints = points || this.heatPoints
-        new Heat(this.heatBar, this.heatPoints)
+        if (this.heatPoints && this.heatPoints.length) {
+            new Heat(this.heatBar, this.heatPoints)
+        }
     }
 
     async resizeHeatBar() {

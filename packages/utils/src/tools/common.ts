@@ -1,4 +1,4 @@
-import * as diff from 'diff'
+import diff from 'diff'
 import { radix64 } from '../performance/radix64'
 import {
     VNode,
