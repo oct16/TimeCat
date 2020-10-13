@@ -1,7 +1,8 @@
 import { Watcher } from './watcher'
-import { SnapshotRecord, WatcherOptions, RecordType, InfoData, VNode } from '@timecat/share'
+import { SnapshotRecord, WatcherOptions, RecordType, InfoData, VNode, VSNode } from '@timecat/share'
 import { createElement } from '@timecat/virtual-dom'
-import { nodeStore } from '@timecat/utils'
+import { nodeStore, isVNode } from '@timecat/utils'
+import { rewriteNodes } from './common'
 
 export class Snapshot extends Watcher<SnapshotRecord> {
     constructor(options: WatcherOptions<SnapshotRecord>) {
@@ -11,6 +12,7 @@ export class Snapshot extends Watcher<SnapshotRecord> {
 
     init() {
         const snapshotData = this.DOMSnapshotData(this.options.context || window)
+        this.checkNodesData(snapshotData)
         this.emitData(RecordType.SNAPSHOT, snapshotData)
     }
 
@@ -43,5 +45,25 @@ export class Snapshot extends Watcher<SnapshotRecord> {
             height: height(),
             frameId
         }
+    }
+
+    checkNodesData({ vNode }: { vNode: VNode }) {
+        const { G_RECORD_OPTIONS: options } = window
+        if (!options.rewriteResource) {
+            return
+        }
+
+        const deepLoopChildNodes = (children: (VNode | VSNode)[]) => {
+            const vNodes: VNode[] = []
+            children.forEach(child => {
+                const c = child as VNode
+                if (isVNode(c)) {
+                    vNodes.push(c, ...deepLoopChildNodes(c.children))
+                }
+            })
+            return vNodes
+        }
+
+        rewriteNodes(deepLoopChildNodes(vNode.children))
     }
 }

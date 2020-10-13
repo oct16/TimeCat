@@ -16,8 +16,15 @@ export interface RecordOptions {
     audio?: boolean
     write?: boolean
     keep?: boolean
-    plugins?: RecorderPlugin[]
     font?: boolean
+    plugins?: RecorderPlugin[]
+    rewriteResource?: RewriteResource
+}
+
+export interface RewriteResource {
+    matches: string[]
+    replaceOrigin: string
+    fn?: (oldUrl: string, nextUrl: string) => void
 }
 
 interface IRecorderPublic {
@@ -229,8 +236,8 @@ export const Recorder = function (this: IRecorderPublic, options?: RecordOptions
         }
     }
 
-    if (this.constructor.name !== 'Recorder') {
-        return logError("should be using 'new' operate")
+    if (!new.target) {
+        return logError('should be using new operate')
     }
 
     const recorder = new Recorder(options)

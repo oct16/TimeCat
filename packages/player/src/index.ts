@@ -292,8 +292,8 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
         }
     }
 
-    if (this.constructor.name !== 'Player') {
-        return logError("should be using 'new' operate")
+    if (!new.target) {
+        return logError('should be using new operate')
     }
 
     const player = new Player(options)

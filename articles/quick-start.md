@@ -37,6 +37,14 @@ interface RecordOptions {
     audio: boolean // if your want record audio, default is false
     font: boolean // record font, default is false
     plugins: RecorderPlugin[] // extend plugins here
+    rewriteResource: RewriteResource
+}
+
+// make 'http://a.com/path' => 'http://b.com/path' for keep resource
+interface RewriteResource {
+    matches: string[] // example: ['css', 'woff']
+    replaceOrigin: string  // example: 'https://xxx.com'
+    fn?: (oldUrl: string, nextUrl: string) => void
 }
 
 // default use IndexedDB to save records

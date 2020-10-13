@@ -15,6 +15,7 @@ import {
 } from '@timecat/share'
 import { Watcher } from '../watcher'
 import { CanvasWatcher } from './canvas'
+import { rewriteNodes } from '../common'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
     constructor(options: WatcherOptions<DOMRecord>) {
@@ -223,6 +224,9 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 const watcher = this.options.watchers.get('CanvasWatcher') as CanvasWatcher
                 watcher.watchCanvas(elements)
             }
+
+            const vNodes = addedNodes.map(item => item.node).filter(node => isVNode(node as VNode) && node) as VNode[]
+            rewriteNodes(vNodes)
         }
 
         if (Object.values(data).some(item => item.length)) {
