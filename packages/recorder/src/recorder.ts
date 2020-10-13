@@ -15,6 +15,7 @@ export interface RecordOptions {
     mode?: 'live' | 'default'
     audio?: boolean
     write?: boolean
+    keep?: boolean
     plugins?: RecorderPlugin[]
     font?: boolean
 }
@@ -30,6 +31,7 @@ export const Recorder = function (this: IRecorderPublic, options?: RecordOptions
         private static defaultRecordOpts = {
             mode: 'default',
             write: true,
+            keep: false,
             context: window
         } as RecordOptions
         private destroyStore: Set<Function> = new Set()
@@ -102,7 +104,7 @@ export const Recorder = function (this: IRecorderPublic, options?: RecordOptions
 
             // is record iframe, switch context
             if (options.context === window) {
-                if (!options.skip) {
+                if (!options.skip && !options.keep) {
                     this.db.clear()
                 }
             } else {

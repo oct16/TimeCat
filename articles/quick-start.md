@@ -33,9 +33,10 @@ const player = new Player()
 interface RecordOptions {
     mode: 'default' | 'live' // mode
     write: boolean // write data to indexedDB, default is true
-    audio: boolean // if your want record audio
-    plugins: RecorderPlugin[] // extend plugins here
+    keep: boolean // keep data in DB otherwise auto-clear, default is true
+    audio: boolean // if your want record audio, default is false
     font: boolean // record font, default is false
+    plugins: RecorderPlugin[] // extend plugins here
 }
 
 // default use IndexedDB to save records
