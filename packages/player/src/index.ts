@@ -1,4 +1,13 @@
-import { getDBOperator, isSnapshot, classifyRecords, radix64, logError, nodeStore, isNumeric } from '@timecat/utils'
+import {
+    getDBOperator,
+    isSnapshot,
+    classifyRecords,
+    radix64,
+    logError,
+    nodeStore,
+    isNumeric,
+    debounce
+} from '@timecat/utils'
 import { ContainerComponent } from './container'
 import pako from 'pako'
 import {
@@ -56,7 +65,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
             if (records.length) {
-                this.initProgress(replayPacks)
+                this.calcProgress(replayPacks)
             }
 
             const c = (this.c = new ContainerComponent(opts))
@@ -90,7 +99,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             }
         }
 
-        private initProgress(replayPacks: ReplayPack[]) {
+        private calcProgress(replayPacks: ReplayPack[]) {
             const firstPack = replayPacks[0]
             const { beginTime } = firstPack.head
 
@@ -249,6 +258,8 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             return packs
         }
 
+        private triggerCalcProgress = debounce(() => this.calcProgress(window.G_REPLAY_PACKS), 500)
+
         destroy() {
             this.destroyStore.forEach(un => un())
             observer.destroy()
@@ -262,6 +273,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             function isPack(data: any) {
                 return !!data.head
             }
+
             let packs: ReplayPack[]
             if (Array.isArray(data)) {
                 if (!isPack(data[0])) {
@@ -272,9 +284,11 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             } else {
                 packs = [data]
             }
+
             const { G_REPLAY_PACKS: GPacks } = window
             GPacks.push(...packs)
-            this.initProgress(GPacks)
+
+            this.triggerCalcProgress()
         }
     }
 
