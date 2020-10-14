@@ -151,7 +151,7 @@ export class PlayerComponent {
         this.subtitlesIndex = 0
         this.broadcaster.cleanText()
 
-        this.curViewEndTime = +this.records.slice(-1)[0].time
+        this.curViewEndTime = this.records.slice(-1)[0].time
         this.curViewDiffTime = 0
         window.G_REPLAY_DATA = firstData
     }
@@ -191,15 +191,15 @@ export class PlayerComponent {
             return null
         }
 
-        const curEndTime = +this.records.slice(-1)[0].time
-        const nextStartTime = +nextData.records[0].time
+        const curEndTime = this.records.slice(-1)[0].time
+        const nextStartTime = nextData.records[0].time
         this.curViewDiffTime += nextStartTime - curEndTime
 
         window.G_REPLAY_DATA = nextData
         this.records = this.orderRecords(nextData.records)
         this.audioData = nextData.audio
         this.initAudio()
-        this.curViewEndTime = +this.records.slice(-1)[0].time
+        this.curViewEndTime = this.records.slice(-1)[0].time
         this.recordIndex = 0
 
         if (delayTime) {
@@ -386,15 +386,12 @@ export class PlayerComponent {
         const progressState = reduxStore.getState('progress')
         const { startTime, endTime } = progressState
 
-        const s = +startTime
-        const e = +endTime
-
         const result: number[] = []
 
-        for (let i = s; i < e; i += interval) {
+        for (let i = startTime; i < endTime; i += interval) {
             result.push(i)
         }
-        result.push(e)
+        result.push(endTime)
         return result
     }
 
@@ -413,17 +410,17 @@ export class PlayerComponent {
                 const preLastTime = i === 0 ? 0 : Number(arr[i - 1].slice(-1)[0].time)
                 const curFirstTime = b[0].time
                 if (preLastTime) {
-                    diffTime += +curFirstTime - preLastTime
+                    diffTime += curFirstTime - preLastTime
                 }
 
-                return a.concat(b.map(n => +n.time - diffTime))
+                return a.concat(b.map(n => n.time - diffTime))
             }, [] as number[])
 
         let index = 0
         const heatPoints = frames.map(t => {
             let recordTime: number
             let step = 0
-            while ((recordTime = recordTimes[index]) && +recordTime < t) {
+            while ((recordTime = recordTimes[index]) && recordTime < t) {
                 index++
                 if (step < this.maxIntensityStep) {
                     step++
@@ -441,12 +438,12 @@ export class PlayerComponent {
         }
         // Lift font records for canvas render
         let insertIndex = 1
-        const startTime = +records[0].time
+        const startTime = records[0].time
         for (let i = 0; i < records.length; i++) {
             const record = records[i]
             if (record.type === RecordType.FONT) {
                 const fontRecord = records.splice(i, 1)[0]
-                fontRecord.time = startTime + insertIndex + ''
+                fontRecord.time = startTime + insertIndex
                 records.splice(insertIndex++, 0, fontRecord)
             }
         }

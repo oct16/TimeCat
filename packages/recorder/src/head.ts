@@ -17,7 +17,7 @@ export async function getHeadData() {
         relatedId: getRandomCode(),
         userAgent: navigator.userAgent,
         platform: navigator.platform,
-        beginTime: getTime().toString(),
+        beginTime: getTime(),
         version: pkg.version,
         fp
     } as ReplayHead

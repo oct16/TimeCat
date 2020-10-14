@@ -279,8 +279,8 @@ export interface ReplayHead {
     relatedId: string
     userAgent: string
     platform: string
-    beginTime: string
-    endTime?: string
+    beginTime: number
+    endTime?: number
     extra?: {
         [key: string]: string
     }

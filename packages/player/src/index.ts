@@ -94,14 +94,14 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             const firstPack = replayPacks[0]
             const { beginTime } = firstPack.head
 
-            const startTime = +beginTime
+            const startTime = beginTime
             const { endTime, frames } = replayPacks.reduce(
                 (packsAcc, pack) => {
                     const { frames, endTime } = pack.body
                         .map((replayData: ReplayData) => replayData.records)
                         .reduce(
                             (acc, records: RecordData[]) => {
-                                acc.endTime += +records.slice(-1)[0].time - +records[0].time
+                                acc.endTime += records.slice(-1)[0].time - records[0].time
                                 acc.frames += records.length
                                 return acc
                             },
