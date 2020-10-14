@@ -44,7 +44,7 @@ interface RecordOptions {
 interface RewriteResource {
     matches: string[] // example: ['css', 'woff']
     replaceOrigin: string  // example: 'https://xxx.com'
-    fn?: (oldUrl: string, nextUrl: string) => void
+    fn?: (pre: string, next: string) => void
 }
 
 // default use IndexedDB to save records
@@ -58,35 +58,25 @@ recorder.destroy()
 
 // write a plugin 
 class ExamplePlugin {
-
-    constructor(options) {
-        // init plugin options
-    }
+    constructor(options) { /** init plugin options */ }
 
     apply(recorder) {
-
         const { plugin, db } = recorder
 
         type HooksType = 'beforeRun' | 'run' | 'emit' | 'end'
         plugin(HooksType, () => void)
-
         plugin('emit', record => {
-
             // get record
-            console.log(data)
-            
+            console.log(record)
             // you can modify record here
             record['some property'] = doSomething
         })
-        
+
         // read or write to indexedDB
-       
         const records = await db.readRecords()
-        
         db.deleteRecords(range: { lowerBound: <recordID>, upperBound: <recordID> })
-       
         db.clear()
-        db.doSomething...
+        db.doSomething()...
     }
 }
 
@@ -115,7 +105,7 @@ const player = new Player(Partial<ReplayOptions>)
 type EventTypes = 'play' | 'stop' | 'pause' | 'speed' | 'resize'
 
 player.on(eventType: EventTypes, (...args) => {
-    // ... receive event here
+    // receive event here
 })
 
 player.destroy() // destroy player
