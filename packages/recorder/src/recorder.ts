@@ -1,7 +1,7 @@
 import { watchers as RecorderWatchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, ValueOf, RecordType, TerminateRecord } from '@timecat/share'
-import { getDBOperator, logError, getRadix64TimeStr, IndexedDBOperator, nodeStore } from '@timecat/utils'
+import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { Pluginable, RecorderPlugin } from './pluginable'
@@ -154,7 +154,7 @@ export const Recorder = function (this: IRecorderPublic, options?: RecordOptions
                 type: RecordType.HEAD,
                 data: headData,
                 relatedId: relatedId,
-                time: getRadix64TimeStr()
+                time: getTime()
             })
 
             activeWatchers.forEach(Watcher => {
@@ -216,7 +216,7 @@ export const Recorder = function (this: IRecorderPublic, options?: RecordOptions
                             type: RecordType.TERMINATE,
                             data: null,
                             relatedId: options.context.G_RECORD_RELATED_ID,
-                            time: getRadix64TimeStr()
+                            time: getTime()
                         }
                         this.db.addRecord(data as TerminateRecord)
                         this.onDataCallback && this.onDataCallback(data)

@@ -291,7 +291,7 @@ export type HeadRecord = BaseRecord<RecordType.HEAD, ReplayHead>
 export interface BaseRecord<T, D = any> {
     type: T
     data: D
-    time: string
+    time: number
     relatedId: string
 }
 

@@ -1,13 +1,12 @@
 import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from '../store/idb'
-import { isDev, classifyRecords, download, getRandomCode, isVNode, getRadix64TimeStr } from './common'
+import { isDev, classifyRecords, download, getRandomCode, isVNode } from './common'
 import pako from 'pako'
 import { VNode, VSNode, AudioData, RecorderOptions, RecordType, ReplayData, ReplayPack } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './dom'
 import { recoverNative } from '../polyfill/recover-native'
 import { nodeStore } from '../store/node'
-import { radix64 } from '../performance/radix64'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
@@ -49,12 +48,12 @@ async function addNoneFrame() {
     const last = await DBOperator.last()
 
     if (count && last.type !== RecordType.TERMINATE) {
-        const lastTime = radix64.atob(last.time)
+        const lastTime = last.time
         DBOperator.add({
             type: RecordType.TERMINATE,
             data: null,
             relatedId: window.G_RECORD_RELATED_ID,
-            time: radix64.btoa(lastTime + 1)
+            time: lastTime + 1
         })
     }
 }

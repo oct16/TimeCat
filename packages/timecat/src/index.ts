@@ -17,4 +17,4 @@ const version = '__VERSION__'
 export { version }
 
 export { Player, Recorder }
-export { exportReplay, radix64, classifyRecords, delay, debounce, throttle } from '@timecat/utils'
+export { exportReplay, classifyRecords, delay, debounce, throttle } from '@timecat/utils'

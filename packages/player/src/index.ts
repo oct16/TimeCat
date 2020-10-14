@@ -1,13 +1,4 @@
-import {
-    getDBOperator,
-    isSnapshot,
-    classifyRecords,
-    radix64,
-    logError,
-    nodeStore,
-    isNumeric,
-    debounce
-} from '@timecat/utils'
+import { getDBOperator, isSnapshot, classifyRecords, logError, nodeStore, isNumeric, debounce } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import pako from 'pako'
 import {
@@ -103,7 +94,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             const firstPack = replayPacks[0]
             const { beginTime } = firstPack.head
 
-            const startTime = isNumeric(beginTime) ? +beginTime : radix64.atob(beginTime)
+            const startTime = +beginTime
             const { endTime, frames } = replayPacks.reduce(
                 (packsAcc, pack) => {
                     const { frames, endTime } = pack.body
@@ -234,7 +225,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
                 throw logError('Replay data not found')
             }
 
-            const replayPacks = this.decodePacks(rawReplayPacks)
+            const replayPacks = rawReplayPacks
 
             if (replayPacks) {
                 window.G_REPLAY_PACKS = replayPacks
@@ -242,20 +233,6 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             }
 
             return null
-        }
-
-        private decodePacks(packs: ReplayPack[]): ReplayPack[] {
-            const { atob } = radix64
-            packs.forEach(pack => {
-                pack.body.forEach(data => {
-                    const { records, snapshot } = data
-                    snapshot.time = snapshot.time.length < 8 ? atob.call(radix64, snapshot.time) + '' : snapshot.time
-                    records.forEach(record => {
-                        record.time = record.time.length < 8 ? atob.call(radix64, record.time) + '' : record.time
-                    })
-                })
-            })
-            return packs
         }
 
         private triggerCalcProgress = debounce(() => this.calcProgress(window.G_REPLAY_PACKS), 500)

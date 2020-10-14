@@ -1,5 +1,5 @@
 import { WatcherOptions, RecordEvent, RecordData, RecordType, ValueOf } from '@timecat/share'
-import { debounce, throttle, getRadix64TimeStr, nodeStore } from '@timecat/utils'
+import { debounce, throttle, nodeStore, getTime } from '@timecat/utils'
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
 import { Snapshot } from './snapshot'
@@ -34,7 +34,7 @@ export abstract class Watcher<T extends RecordData> {
             type,
             data: record,
             relatedId: this.relatedId,
-            time: getRadix64TimeStr()
+            time: getTime()
         } as RecordData
 
         if (callback) {
