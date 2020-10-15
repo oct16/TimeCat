@@ -60,17 +60,17 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             }
 
             const c = (this.c = new ContainerComponent(opts))
-
+            const container = c.container
             showStartMask(c)
 
             this.fmp = new FMP()
 
             this.fmp.ready(async () => {
                 if (hasAudio) {
-                    await waitStart()
+                    await waitStart(container)
                 }
 
-                removeStartPage(c)
+                removeStartPage(container)
 
                 if (records.length) {
                     if (opts.autoplay || hasAudio) {

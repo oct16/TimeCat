@@ -314,20 +314,20 @@ export function showStartMask(c: ContainerComponent) {
     startPage.setAttribute('style', '')
 }
 
-function showStartBtn() {
-    const startPage = document.querySelector('#cat-start-page')! as HTMLElement
+function showStartBtn(el: HTMLElement) {
+    const startPage = el.querySelector('#cat-start-page')! as HTMLElement
     const btn = startPage.querySelector('.play-btn') as HTMLElement
     btn.classList.add('show')
     return btn
 }
 
-export function removeStartPage(c: ContainerComponent) {
-    const startPage = c.container.querySelector('#cat-start-page') as HTMLElement
+export function removeStartPage(el: HTMLElement) {
+    const startPage = el.querySelector('#cat-start-page') as HTMLElement
     startPage?.parentElement?.removeChild(startPage)
 }
 
-export async function waitStart(): Promise<void> {
-    const btn = showStartBtn()
+export async function waitStart(el: HTMLElement): Promise<void> {
+    const btn = showStartBtn(el)
     return new Promise(r => {
         btn.addEventListener('click', async () => {
             btn.classList.remove('show')
