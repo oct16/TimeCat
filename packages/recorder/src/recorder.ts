@@ -31,6 +31,7 @@ interface IRecorderPublic {
     onData: (cb: (data: RecordData) => void) => void
     destroy: () => void
     use: (plugin: RecorderPlugin) => void
+    clearDB: () => Promise<void>
 }
 
 export const Recorder = function (this: IRecorderPublic, options?: RecordOptions) {
@@ -78,6 +79,10 @@ export const Recorder = function (this: IRecorderPublic, options?: RecordOptions
         public async destroy() {
             await this.cancelListen()
             this.destroyStore.forEach(un => un())
+        }
+
+        public async clearDB() {
+            await this.db.clear()
         }
 
         private async cancelListen() {
@@ -241,8 +246,9 @@ export const Recorder = function (this: IRecorderPublic, options?: RecordOptions
     }
 
     const recorder = new Recorder(options)
-    const { onData, destroy, use } = recorder
+    const { onData, destroy, use, clearDB } = recorder
     this.onData = onData.bind(recorder)
     this.destroy = destroy.bind(recorder)
     this.use = use.bind(recorder)
+    this.clearDB = clearDB.bind(recorder)
 }

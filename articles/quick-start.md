@@ -53,8 +53,11 @@ const recorder = new Recorder(Partial<RecordOptions>)
 // receive data here
 recorder.onData((data: RecordData) => void)
 
-// if you want stop record
+// stop record
 recorder.destroy()
+
+// clear all records in db
+recorder.clearDB()
 
 // write a plugin 
 class ExamplePlugin {
