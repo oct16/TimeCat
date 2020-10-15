@@ -156,7 +156,7 @@ export class PlayerComponent {
         window.G_REPLAY_DATA = firstData
     }
 
-    async switchNextView(delayTime?: number) {
+    async switchNextView() {
         const { G_REPLAY_DATA: rData, G_REPLAY_PACKS: packs } = window as {
             G_REPLAY_DATA: ReplayData
             G_REPLAY_PACKS: ReplayPack[]
@@ -181,7 +181,7 @@ export class PlayerComponent {
                         const next = body[j + 1]
                         if (next) {
                             return next
-                        } else if (nextPackBody.length) {
+                        } else if (nextPackBody && nextPackBody.length) {
                             return nextPackBody[0]
                         }
                         return null
@@ -202,9 +202,8 @@ export class PlayerComponent {
         this.curViewEndTime = this.records.slice(-1)[0].time
         this.recordIndex = 0
 
-        if (delayTime) {
-            await delay(delayTime)
-        }
+        // delay 300ms wait for all frame finished and switch next
+        await delay(300)
 
         this.c.setViewState()
     }
@@ -242,21 +241,20 @@ export class PlayerComponent {
                 return
             }
             if (!this.startTime) {
-                this.startTime = Number(this.frames[this.frameIndex])
+                this.startTime = this.frames[this.frameIndex]
             }
 
             const currTime = this.startTime + timeStamp * this.speed
-            let nextTime = Number(this.frames[this.frameIndex])
+            let nextTime = this.frames[this.frameIndex]
 
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
-                // delay 300ms wait for all frame finished and switch next
-                await this.switchNextView(300)
+                await this.switchNextView()
             }
 
             while (nextTime && currTime >= nextTime) {
                 this.renderEachFrame()
                 this.frameIndex++
-                nextTime = Number(this.frames[this.frameIndex])
+                nextTime = this.frames[this.frameIndex]
             }
 
             this.elapsedTime = (currTime - this.frames[0]) / 1000
@@ -321,7 +319,7 @@ export class PlayerComponent {
         let data: RecordData
         while (
             this.recordIndex < this.records.length &&
-            +(data = this.records[this.recordIndex]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
+            (data = this.records[this.recordIndex]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
         ) {
             this.execFrame.call(this, data)
             this.recordIndex++
@@ -388,7 +386,7 @@ export class PlayerComponent {
 
         const result: number[] = []
 
-        for (let i = startTime; i < endTime; i += interval) {
+        for (let i = startTime; i < endTime + interval; i += interval) {
             result.push(i)
         }
         result.push(endTime)
@@ -407,7 +405,7 @@ export class PlayerComponent {
             .map(pack => pack.body.map(data => data.records))
             .flat(1)
             .reduce((a, b, i, arr) => {
-                const preLastTime = i === 0 ? 0 : Number(arr[i - 1].slice(-1)[0].time)
+                const preLastTime = i === 0 ? 0 : arr[i - 1].slice(-1)[0].time
                 const curFirstTime = b[0].time
                 if (preLastTime) {
                     diffTime += curFirstTime - preLastTime
