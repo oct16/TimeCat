@@ -63,7 +63,7 @@ export function isSnapshot(frame: RecordData) {
     return (frame as SnapshotRecord).type === RecordType.SNAPSHOT && !(frame as SnapshotRecord).data.frameId
 }
 
-export function classifyRecords(records: RecordData[]) {
+export function transRecordsToPacks(records: RecordData[]) {
     window.G_REPLAY_RECORDS = records
     const packs: ReplayPack[] = []
 
@@ -127,7 +127,9 @@ export function classifyRecords(records: RecordData[]) {
                 break
 
             default:
-                replayData.records.push(record as RecordData)
+                if (replayData) {
+                    replayData.records.push(record as RecordData)
+                }
                 break
         }
     })

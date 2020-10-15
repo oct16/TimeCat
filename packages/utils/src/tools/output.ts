@@ -1,8 +1,17 @@
 import { TPL, pacmanCss } from './tpl'
 import { getDBOperator } from '../store/idb'
-import { isDev, classifyRecords, download, getRandomCode, isVNode } from './common'
+import { isDev, transRecordsToPacks, download, getRandomCode, isVNode } from './common'
 import pako from 'pako'
-import { VNode, VSNode, AudioData, RecorderOptions, RecordType, ReplayData, ReplayPack } from '@timecat/share'
+import {
+    VNode,
+    VSNode,
+    AudioData,
+    RecorderOptions,
+    RecordType,
+    ReplayPack,
+    RecordData,
+    DOMRecord
+} from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './dom'
 import { recoverNative } from '../polyfill/recover-native'
@@ -126,17 +135,16 @@ async function injectScripts(html: Document, scripts: ScriptItem[]) {
     }
 }
 
-async function getDataFromDB(exportOptions?: ExportOptions) {
+export async function getRecordsFromDB() {
     const DBOperator = await getDBOperator
-    const data = await DBOperator.readAllRecords()
-    if (data) {
-        const classified = classifyRecords(data)
-        return extract(classified, exportOptions)
+    const records = await DBOperator.readAllRecords()
+    if (records && records.length) {
+        return records
     }
     return null
 }
 
-function extract(replayPacks: ReplayPack[], exportOptions?: ExportOptions) {
+export function extract(replayPacks: ReplayPack[], exportOptions?: ExportOptions) {
     return replayPacks.map(replayPack => {
         replayPack.body.forEach(replayData => {
             if (exportOptions && exportOptions.audioExternal) {
@@ -175,14 +183,16 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const data = (window.G_REPLAY_PACKS as ReplayPack[]) || (await getDataFromDB(exportOptions))
+    const records = await getRecordsFromDB()
 
-    if (!data) {
+    if (!records) {
         return
     }
 
-    const extractedData = await makeCssInline(data) // some link cross origin
-    const jsonStrData = JSON.stringify(extractedData)
+    extract(transRecordsToPacks(records), exportOptions)
+    await makeCssInline(records) // some link cross origin
+
+    const jsonStrData = JSON.stringify(records)
 
     const zipArray = pako.gzip(jsonStrData)
     let outputStr = ''
@@ -197,48 +207,38 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
         outputStr += String.fromCharCode(num)
     }
 
-    const replayData = `var G_REPLAY_STR_PACKS =  '${outputStr}'`
+    const replayData = `var G_REPLAY_STR_RECORDS =  '${outputStr}'`
 
     injectScripts(html, [{ src: replayData }])
 }
 
-async function makeCssInline(packs: ReplayPack[]) {
-    const dataList: ReplayData[] = []
-
-    packs.forEach(pack => {
-        pack.body.forEach(data => {
-            dataList.push(data)
-        })
-    })
-
+async function makeCssInline(records: RecordData[]) {
+    const tasks: VNode[] = []
     const extractLinkList: VNode[] = []
-    for (let k = 0; k < dataList.length; k++) {
-        const data = dataList[k]
-        const { snapshot, records } = data
-        const tasks = [snapshot.data.vNode]
-        let node
-        while ((node = tasks.shift())) {
-            if (isVNode(node)) {
-                extractLink(node, extractLinkList)
-                tasks.push(...(node.children as VNode[]))
-            }
-        }
 
-        for (let i = 0; i < records.length; i++) {
-            const record = records[i]
-            if (record.type === RecordType.DOM) {
-                const { addedNodes } = record.data
-                if (addedNodes) {
-                    for (let j = 0; j < addedNodes.length; j++) {
-                        const node = addedNodes[j].node
-                        if (isVNode(node as VNode)) {
-                            extractLink(node as VNode, extractLinkList)
-                        }
+    records.forEach(record => {
+        const { type, data } = record
+        if (type === RecordType.SNAPSHOT) {
+            tasks.push((data as { vNode: VNode }).vNode)
+            let node: VNode
+            while ((node = tasks.shift()!)) {
+                if (isVNode(node)) {
+                    extractLink(node, extractLinkList)
+                    tasks.push(...(node.children as VNode[]))
+                }
+            }
+        } else if (type === RecordType.DOM) {
+            const { addedNodes } = (record as DOMRecord).data
+            if (addedNodes) {
+                for (let j = 0; j < addedNodes.length; j++) {
+                    const node = addedNodes[j].node
+                    if (isVNode(node as VNode)) {
+                        extractLink(node as VNode, extractLinkList)
                     }
                 }
             }
         }
-    }
+    })
 
     for (const node of extractLinkList) {
         const { attrs } = node
@@ -267,7 +267,6 @@ async function makeCssInline(packs: ReplayPack[]) {
             // maybe cross
         }
     }
-    return packs
 }
 
 function extractLink(node: VNode, extractLinkList: VNode[]) {

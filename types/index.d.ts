@@ -34,20 +34,16 @@ interface Window {
     HTMLTextAreaElement: typeof HTMLTextAreaElement
     Object: typeof Object
 
-    G_REPLAY_STR_PACKS: string
-
-    G_REPLAY_PACKS: any
-
-    G_REPLAY_DATA: any
-
-    G_REPLAY_RECORDS?: any
-
     G_RECORD_OPTIONS: any
-    G_REPLAY_OPTIONS: any
+    G_RECORD_RELATED_ID: string
 
+    G_REPLAY_STR_RECORDS: string
+    G_REPLAY_PACKS: any
+    G_REPLAY_DATA: any
+    G_REPLAY_RECORDS?: any
+    G_REPLAY_OPTIONS: any
     G_REPLAY_LOCATION: any
 
-    G_RECORD_RELATED_ID: string
     webkitAudioContext?: typeof AudioContext
 
     TimeCat: {

@@ -1,4 +1,4 @@
-import { getDBOperator, isSnapshot, classifyRecords, logError, nodeStore, isNumeric, debounce } from '@timecat/utils'
+import { isSnapshot, transRecordsToPacks, logError, nodeStore, debounce, getRecordsFromDB } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import pako from 'pako'
 import {
@@ -46,7 +46,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
 
             this.destroyStore.add(() => reduxStore.unsubscribe())
 
-            const replayPacks = await this.getReplayData(opts)
+            const replayPacks = await this.getReplayPacks(opts)
 
             if (!replayPacks || !replayPacks.length) {
                 return
@@ -130,7 +130,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
         }
 
         private getGZipData() {
-            const data = window.G_REPLAY_STR_PACKS
+            const data = window.G_REPLAY_STR_RECORDS
             if (!data) {
                 return null
             }
@@ -145,9 +145,9 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             const str = pako.ungzip(codeArray, {
                 to: 'string'
             })
-            const packs = JSON.parse(str) as ReplayData[]
+            const records = JSON.parse(str) as RecordData[]
 
-            return packs
+            return transRecordsToPacks(records)
         }
 
         private dispatchEvent(type: string, data: RecordData) {
@@ -199,33 +199,28 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             })
         }
 
-        private async getDataFromDB() {
-            const DBOperator = await getDBOperator
-            const data = await DBOperator.readAllRecords()
+        private async getPacksFromDB() {
+            const records = await getRecordsFromDB()
 
-            if (data) {
-                return classifyRecords(data)
+            if (records && records.length) {
+                return transRecordsToPacks(records)
             }
-
-            return null
         }
 
-        private async getReplayData(options: ReplayInternalOptions) {
+        private async getReplayPacks(options: ReplayInternalOptions) {
             const { receiver, packs, records } = options
 
-            const rawReplayPacks =
-                (records && classifyRecords(records)) ||
+            const replayPacks =
+                (records && transRecordsToPacks(records)) ||
                 packs ||
                 (receiver && (await this.dataReceiver(receiver))) ||
                 this.getGZipData() ||
-                (await this.getDataFromDB()) ||
-                window.G_REPLAY_PACKS
+                (await this.getPacksFromDB()) ||
+                (window.G_REPLAY_PACKS as ReplayPack[])
 
-            if (!rawReplayPacks) {
+            if (!replayPacks) {
                 throw logError('Replay data not found')
             }
-
-            const replayPacks = rawReplayPacks
 
             if (replayPacks) {
                 window.G_REPLAY_PACKS = replayPacks
@@ -254,7 +249,7 @@ export const Player = function (this: IPlayerPublic, options?: ReplayOptions) {
             let packs: ReplayPack[]
             if (Array.isArray(data)) {
                 if (!isPack(data[0])) {
-                    packs = classifyRecords(data as RecordData[])
+                    packs = transRecordsToPacks(data as RecordData[])
                 } else {
                     packs = data as ReplayPack[]
                 }
