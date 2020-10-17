@@ -145,8 +145,9 @@ export class MouseWatcher extends Watcher<MouseRecord> {
 
             const frameElement = doc?.defaultView?.frameElement as HTMLElement
             if (frameElement && mode === 'default') {
-                position.y += frameElement.offsetTop
-                position.x += frameElement.offsetLeft
+                const rect = frameElement.getBoundingClientRect()
+                position.y += rect.top
+                position.x += rect.left
             }
 
             return position
