@@ -4,7 +4,7 @@ import {
     isSnapshot,
     secondToDate,
     toTimeStamp,
-    classifyRecords,
+    transRecordsToPacks,
     isVNode,
     getStrDiffPatches,
     revertStrByPatches,
@@ -65,13 +65,12 @@ describe('Test of common', () => {
                     tag: 'html',
                     type: 1
                 },
-                doctype: null,
                 width: 2500,
                 height: 1329,
                 scrollLeft: 0,
                 scrollTop: 0
             },
-            time: 'XTIsGKK',
+            time: 1,
             relatedId: 'OAW2B2TQ'
         }
 
@@ -83,11 +82,11 @@ describe('Test of common', () => {
         expect(isVNode({ tag: 'div' } as VNode)).toBeTruthy()
     })
 
-    describe('classifyRecords', () => {
+    describe('transRecordsToPacks', () => {
         const commonRecords = [
             {
                 type: 0,
-                time: 'XTIsGKI',
+                time: 1,
                 relatedId: 'OAW2B2TQ',
                 id: 804,
                 data: {
@@ -113,7 +112,7 @@ describe('Test of common', () => {
                     scrollLeft: 0,
                     scrollTop: 0
                 },
-                time: 'XTIsGKK',
+                time: 2,
                 relatedId: 'OAW2B2TQ'
             },
             {
@@ -128,19 +127,19 @@ describe('Test of common', () => {
                     scrollLeft: 0,
                     scrollTop: 0
                 },
-                time: 'XTIsGTq',
+                time: 3,
                 relatedId: 'OAW2B2TQ'
             },
             {
                 type: 8,
-                time: 'XTIsGKN',
+                time: 4,
                 relatedId: 'OAW2B2TQ',
                 id: 808,
                 data: { type: 'opts', data: { sampleBits: 8, sampleRate: 8000, channelCount: 1 } }
             },
             {
                 type: 8,
-                time: 'XTIsGKN',
+                time: 4,
                 relatedId: 'OAW2B2TQ',
                 id: 809,
                 data: { type: 'base64', data: ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'] }
@@ -148,7 +147,7 @@ describe('Test of common', () => {
             {
                 id: 826,
                 relatedId: 'OAW2B2TQ',
-                time: 'XTIsHFm',
+                time: 5,
                 type: 2,
                 data: {
                     height: 1329,
@@ -183,7 +182,7 @@ describe('Test of common', () => {
                                 scrollLeft: 0,
                                 scrollTop: 0
                             },
-                            time: 'XTIsGKK',
+                            time: 2,
                             relatedId: 'OAW2B2TQ'
                         },
                         records: [
@@ -199,13 +198,13 @@ describe('Test of common', () => {
                                     scrollLeft: 0,
                                     scrollTop: 0
                                 },
-                                time: 'XTIsGTq',
+                                time: 3,
                                 relatedId: 'OAW2B2TQ'
                             },
                             {
                                 id: 826,
                                 relatedId: 'OAW2B2TQ',
-                                time: 'XTIsHFm',
+                                time: 5,
                                 type: 2,
                                 data: {
                                     height: 1329,
@@ -225,14 +224,14 @@ describe('Test of common', () => {
             }
         ]
         it('records include [head, snapshot, audio]', () => {
-            const actual = classifyRecords(commonRecords as RecordData[])
+            const actual = transRecordsToPacks(commonRecords as RecordData[])
             expect(actual).toStrictEqual(expected)
         })
         it('same head', () => {
             const twoSameHeadRecords = commonRecords.concat([
                 {
                     type: 0,
-                    time: 'XTIsGKI',
+                    time: 1,
                     relatedId: 'OAW2B2TQ',
                     id: 809,
                     data: {
@@ -247,7 +246,7 @@ describe('Test of common', () => {
                     }
                 }
             ])
-            const twoSameHeadActual = classifyRecords(twoSameHeadRecords as RecordData[])
+            const twoSameHeadActual = transRecordsToPacks(twoSameHeadRecords as RecordData[])
 
             expect(twoSameHeadActual).toStrictEqual(expected)
         })
