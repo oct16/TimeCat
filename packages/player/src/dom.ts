@@ -225,6 +225,11 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                     const node = nodeStore.getNode(id) as HTMLElement
 
                     if (node) {
+                        if (node.tagName === 'IFRAME' && key === 'src') {
+                            setAttribute(node as HTMLElement, 'disabled-src', value)
+                            setAttribute(node as HTMLElement, 'src', null)
+                            return
+                        }
                         setAttribute(node as HTMLElement, key, value)
                     }
                 })

@@ -8,14 +8,18 @@ import { CanvasWatcher } from './canvas'
 import { TerminateWatcher } from './terminate'
 import { FontWatcher } from './font'
 
-export const watchers = {
-    FontWatcher,
+export const baseWatchers = {
     DOMWatcher,
     FormElementWatcher,
-    LocationWatcher,
     MouseWatcher,
-    ScrollWatcher,
+    ScrollWatcher
+}
+
+export const watchers = {
+    ...baseWatchers,
     WindowWatcher,
+    LocationWatcher,
     CanvasWatcher,
+    FontWatcher,
     TerminateWatcher
 }

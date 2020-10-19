@@ -177,6 +177,11 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                         return null
                     }
                     const id = this.getNodeId(node)
+
+                    if ((node as Element).tagName === 'IFRAME' && key === 'src') {
+                        this.waitAndRecordIFrame(node as HTMLIFrameElement)
+                    }
+
                     return {
                         id,
                         key,
@@ -213,20 +218,9 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         })
 
         if (data.addedNodes) {
-            const nodes = this.siftElements('canvas', addedNodes)
-            if (nodes.length) {
-                const elements = nodes
-                    .map(node => {
-                        return nodeStore.getNode(node.node.id) as HTMLCanvasElement
-                    })
-                    .filter(Boolean)
-
-                const watcher = this.options.watchers.get('CanvasWatcher') as CanvasWatcher
-                watcher.watchCanvas(elements)
-            }
-
-            const vNodes = addedNodes.map(item => item.node).filter(node => isVNode(node as VNode) && node) as VNode[]
-            rewriteNodes(vNodes)
+            this.watchCanvas(addedNodes)
+            this.watchIFrames(addedNodes)
+            this.rewriteAddedSource(addedNodes)
         }
 
         if (Object.values(data).some(item => item.length)) {
@@ -234,10 +228,48 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         }
     }
 
-    siftElements(name: string, updateNodeData: UpdateNodeData[]) {
+    waitAndRecordIFrame(iframe: HTMLIFrameElement) {
+        const contentWindow = iframe.contentWindow
+        ;(iframe as any)?.frameRecorder.destroy()
+        const onLoadHandle = () => {
+            this.recorder.recordIFrame(contentWindow!)
+            iframe.removeEventListener('load', onLoadHandle)
+        }
+        iframe.addEventListener('load', onLoadHandle)
+    }
+
+    findElementsByTag(name: string, updateNodeData: UpdateNodeData[]) {
         const elements = updateNodeData.filter(data => {
             return (data.node as VNode).tag === name
         })
         return elements as UpdateNodeData<VNode>[]
+    }
+
+    watchCanvas(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+        const canvasNodes = this.findElementsByTag('canvas', addedNodes)
+        if (canvasNodes.length) {
+            const elements = canvasNodes
+                .map(node => nodeStore.getNode(node.node.id) as HTMLCanvasElement)
+                .filter(Boolean)
+
+            const watcher = this.options.watchers.get('CanvasWatcher') as CanvasWatcher
+            watcher.watchCanvas(elements)
+        }
+    }
+
+    watchIFrames(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+        const iframeNodes = this.findElementsByTag('iframe', addedNodes)
+        if (iframeNodes.length) {
+            iframeNodes
+                .map(node => nodeStore.getNode(node.node.id) as HTMLFrameElement)
+                .filter(Boolean)
+                .map(iframeElement => iframeElement.contentWindow)
+                .forEach((context: Window) => this.recorder.recordIFrame(context))
+        }
+    }
+
+    rewriteAddedSource(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+        const vNodes = addedNodes.map(item => item.node).filter(node => isVNode(node as VNode) && node) as VNode[]
+        rewriteNodes(vNodes)
     }
 }

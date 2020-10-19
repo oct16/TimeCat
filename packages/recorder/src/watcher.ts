@@ -3,18 +3,24 @@ import { debounce, throttle, nodeStore, getTime } from '@timecat/utils'
 import { watchers } from './watchers'
 import { RecordAudio } from './audio'
 import { Snapshot } from './snapshot'
-import { RecordOptions } from './recorder'
+import { RecordOptions, RecorderModule } from './recorder'
 
 export abstract class Watcher<T extends RecordData> {
+    recorder: RecorderModule
     relatedId: string
     context: Window
     private emit: RecordEvent<RecordData>
-    options: WatcherOptions<T, Map<string, InstanceType<ValueOf<typeof watchers>> | RecordAudio | Snapshot>>
+    options: WatcherOptions<
+        T,
+        Map<string, InstanceType<ValueOf<typeof watchers>> | RecordAudio | Snapshot>,
+        RecorderModule
+    >
     recordOptions: RecordOptions = window.G_RECORD_OPTIONS
 
     constructor(options: WatcherOptions<T>) {
-        const { emit, context, relatedId } = options
+        const { emit, context, relatedId, recorder } = options
         this.options = options
+        this.recorder = recorder
         this.relatedId = relatedId
         this.context = context
         this.emit = emit

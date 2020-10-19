@@ -235,7 +235,8 @@ export enum TransactionMode {
     'VERSIONCHANGE' = 'versionchange'
 }
 
-export type WatcherOptions<T extends RecordData | HeadRecord, WatchersInstance = any> = {
+export type WatcherOptions<T extends RecordData | HeadRecord, WatchersInstance = any, Recorder = any> = {
+    recorder: Recorder
     context: Window
     listenStore: Set<Function>
     emit: RecordEvent<T>
