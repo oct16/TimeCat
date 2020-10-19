@@ -54,6 +54,7 @@ export class RecorderModule extends Pluginable {
         keep: false,
         context: window
     } as RecordOptions
+    private options: RecordInternalOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
     private onDataCallback: Function
@@ -67,11 +68,13 @@ export class RecorderModule extends Pluginable {
     constructor(options?: RecordOptions) {
         super(options)
         const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
-        this.watchers = this.getWatchers(opts)
-        this.init(opts)
+        this.options = opts
+        this.watchers = this.getWatchers()
+        this.init()
     }
 
-    private async init(options: RecordInternalOptions) {
+    private async init() {
+        const options = this.options
         const db = await getDBOperator
         this.db = db
         this.pluginsOnload()
@@ -101,7 +104,8 @@ export class RecorderModule extends Pluginable {
         nodeStore.reset()
     }
 
-    private getWatchers(options: RecordOptions) {
+    private getWatchers() {
+        const options = this.options
         const watchersList: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot> = [
             Snapshot,
             ...Object.values(watchers)

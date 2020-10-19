@@ -1,4 +1,5 @@
 import { VNode } from '@timecat/share/src'
+import { logError } from '@timecat/utils/src'
 
 const baseHref = window.location.href
 
@@ -10,7 +11,9 @@ export function rewriteNodes(vNodes: VNode[]) {
         return
     }
     const { replaceOrigin, fn, matches } = rewriteResource
-
+    if (!replaceOrigin || !matches) {
+        return logError('The params replaceOrigin and matches is required for using rewriteResource')
+    }
     const rewriteNodeSrc = (node: VNode) => {
         const { href, src } = node.attrs
         Object.entries({ href, src })
