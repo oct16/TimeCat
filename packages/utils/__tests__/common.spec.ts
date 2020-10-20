@@ -20,23 +20,25 @@ describe('Test of common', () => {
     })
 
     it('getRandomCode', () => {
-        Object.defineProperty(Math, 'random', {
-            value: () => 0.25566305092035857
-        })
-        expect(getRandomCode(6)).toEqual('42SB0O')
+        expect(getRandomCode(6)).toHaveLength(6)
+        expect(getRandomCode(6)).not.toEqual(getRandomCode(6))
+        expect(getRandomCode(7)).toHaveLength(7)
+        expect(getRandomCode()).toHaveLength(8)
     })
 
-    it('getTime and getRadix64TimeStr', () => {
+    it('getTime', done => {
         Object.defineProperty(performance, 'timing', {
             value: {
                 navigationStart: 111.2
             }
         })
-        performance.now = () => 111
-        const time = Math.floor(performance.timing.navigationStart + performance.now())
-        expect(getTime()).toEqual(time)
+        const time = getTime()
+        expect(getTime()).toBeGreaterThanOrEqual(time)
 
-        expect(getRadix64TimeStr()).toEqual(radix64.btoa(time))
+        setTimeout(() => {
+            expect(getTime()).toBeGreaterThan(time)
+            done()
+        }, 2)
     })
 
     it('secondToDate and toTimeStamp', () => {

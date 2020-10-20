@@ -1,68 +1,32 @@
 import { base64ToFloat32Array, encodeWAV, float32ArrayToBase64 } from '@timecat/utils'
 
 describe('Test of transform', () => {
-    const str = 'test'
-    const asc = btoa(str)
-    it('base64ToFloat32Array and base64ToFloat32Array', () => {
-        const blob = atob(asc)
-        const bLength = blob.length
-        const arrayBuffer = new ArrayBuffer(bLength)
-        const dataView = new DataView(arrayBuffer)
-        for (let i = 0; i < bLength; i++) {
-            dataView.setUint8(i, blob.charCodeAt(i))
-        }
+    const base64Str = btoa('test')
+    describe('float32ArrayToBase64 and base64ToFloat32Array', () => {
+        it('should return Base64', () => {
+            const float32Array = new Float32Array(4)
+            const result = float32ArrayToBase64(float32Array)
+            expect(btoa(atob(result))).toEqual(result)
+        })
 
-        const expectedFloat32Array = new Float32Array(arrayBuffer)
-        const actualFloat32Array = base64ToFloat32Array(asc)
+        it('should return Float32Array', () => {
+            const result = base64ToFloat32Array(base64Str)
+            expect(result instanceof Float32Array).toBeTruthy()
+        })
 
-        expect(actualFloat32Array).toStrictEqual(expectedFloat32Array)
-
-        const uint8Array = new Uint8Array(actualFloat32Array.buffer)
-        const baseStr = btoa(String.fromCharCode.apply(null, uint8Array))
-        const actualBaseStr = float32ArrayToBase64(actualFloat32Array)
-        expect(baseStr).toStrictEqual(actualBaseStr)
-
-        expect(atob(baseStr)).toEqual(str)
+        it('base64ToFloat32Array then float32ArrayToBase64', () => {
+            const float32Array = base64ToFloat32Array(base64Str)
+            const convertedBase64 = float32ArrayToBase64(float32Array)
+            expect(convertedBase64).toEqual(base64Str)
+        })
     })
 
     it('encodeWAV', () => {
-        const writeUTFBytes = (view: DataView, offset: number, string: string) => {
-            const len = string.length
-            for (let i = 0; i < len; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i))
-            }
-        }
-        const flat32ArrayList = [base64ToFloat32Array(asc)]
-        const length = flat32ArrayList.length * flat32ArrayList[0].length
-        const mergedArray = new Float32Array(length)
-        let offset = 0
-        for (let i = 0; i < flat32ArrayList.length; i++) {
-            mergedArray.set(flat32ArrayList[i], offset)
-            offset += flat32ArrayList[i].length
-        }
-
-        const newDataView = new DataView(new ArrayBuffer(mergedArray.length))
-        newDataView.setInt8(0, 255)
-        const buffer = new ArrayBuffer(45)
-        const view = new DataView(buffer)
-        writeUTFBytes(view, 0, 'RIFF')
-        view.setUint32(4, 38, true)
-        writeUTFBytes(view, 8, 'WAVE')
-        writeUTFBytes(view, 12, 'fmt ')
-        view.setUint32(16, 16, true)
-        view.setUint16(20, 1, true)
-        view.setUint16(22, 1, true)
-        view.setUint32(24, 8000, true)
-        view.setUint32(28, 8000, true)
-        view.setUint16(32, 1, true)
-        view.setUint16(34, 8, true)
-        writeUTFBytes(view, 36, 'data')
-        view.setUint32(40, 1, true)
-        view.setUint8(offset, newDataView.getUint8(0)) // * (0x7fff * volume)
-        const blob = new Blob([view], {
-            type: 'audio/wav'
+        const result = encodeWAV([base64ToFloat32Array(base64Str)], {
+            sampleBits: 8,
+            sampleRate: 8000,
+            channelCount: 1
         })
-        const actual = encodeWAV(flat32ArrayList, { sampleBits: 8, sampleRate: 8000, channelCount: 1 })
-        expect(actual).toStrictEqual(blob)
+        expect(result.type).toEqual('audio/wav')
     })
 })
