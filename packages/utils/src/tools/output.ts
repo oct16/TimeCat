@@ -10,7 +10,8 @@ import {
     RecordType,
     ReplayPack,
     RecordData,
-    DOMRecord
+    DOMRecord,
+    DBRecordData
 } from '@timecat/share'
 import { base64ToFloat32Array, encodeWAV } from './transform'
 import { getScript } from './dom'
@@ -137,7 +138,7 @@ async function injectScripts(html: Document, scripts: ScriptItem[]) {
 
 export async function getRecordsFromDB() {
     const DBOperator = await getDBOperator
-    const records = await DBOperator.readAllRecords()
+    const records: DBRecordData[] | null = await DBOperator.readAllRecords()
     if (records && records.length) {
         return records
     }
