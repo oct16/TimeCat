@@ -1,1 +1,1 @@
-export { Recorder } from './recorder'
+export { Recorder, RecorderModule } from './recorder'

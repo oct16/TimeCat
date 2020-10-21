@@ -27,24 +27,19 @@ export interface RewriteResource {
     fn?: (oldUrl: string, nextUrl: string) => void
 }
 
-interface IRecorderPublic {
+export class Recorder {
     onData: (cb: (data: RecordData) => void) => void
     destroy: () => void
     use: (plugin: RecorderPlugin) => void
     clearDB: () => Promise<void>
-}
-
-export const Recorder = function (this: IRecorderPublic, options?: RecordOptions) {
-    if (!new.target) {
-        return logError('should be using new operate')
+    constructor(options: RecordOptions) {
+        const recorder = new RecorderModule(options)
+        const { onData, destroy, use, clearDB } = recorder
+        this.onData = onData.bind(recorder)
+        this.destroy = destroy.bind(recorder)
+        this.use = use.bind(recorder)
+        this.clearDB = clearDB.bind(recorder)
     }
-
-    const recorder = new RecorderModule(options)
-    const { onData, destroy, use, clearDB } = recorder
-    this.onData = onData.bind(recorder)
-    this.destroy = destroy.bind(recorder)
-    this.use = use.bind(recorder)
-    this.clearDB = clearDB.bind(recorder)
 }
 
 export class RecorderModule extends Pluginable {
@@ -54,7 +49,6 @@ export class RecorderModule extends Pluginable {
         keep: false,
         context: window
     } as RecordOptions
-    private options: RecordInternalOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
     private onDataCallback: Function
@@ -64,6 +58,7 @@ export class RecorderModule extends Pluginable {
     private watcherResolve: Function
 
     public db: IndexedDBOperator
+    public options: RecordInternalOptions
 
     constructor(options?: RecordOptions) {
         super(options)

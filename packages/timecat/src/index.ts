@@ -1,4 +1,4 @@
-import { Recorder } from '@timecat/recorder'
+import { Recorder, RecorderModule } from '@timecat/recorder'
 import { Player } from '@timecat/player'
 
 export {
@@ -16,5 +16,5 @@ export {
 const version = '__VERSION__'
 export { version }
 
-export { Player, Recorder }
+export { Player, Recorder, RecorderModule }
 export { exportReplay, transRecordsToPacks, delay, debounce, throttle } from '@timecat/utils'
