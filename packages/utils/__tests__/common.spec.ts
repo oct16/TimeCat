@@ -1,17 +1,13 @@
 import {
-    getRadix64TimeStr,
     getTime,
     isSnapshot,
     secondToDate,
     toTimeStamp,
     transRecordsToPacks,
     isVNode,
-    getStrDiffPatches,
-    revertStrByPatches,
     logError,
     getRandomCode
 } from '../src/tools/common'
-import { radix64 } from '@timecat/utils'
 import { RecordData, RecorderOptions, VNode } from '@timecat/share'
 
 describe('Test of common', () => {
@@ -254,14 +250,14 @@ describe('Test of common', () => {
         })
     })
 
-    it('getStrDiffPatches and revertStrByPatches', () => {
-        const newStr = 'newStr'
-        const oldStr = 'oldStr'
-        const expected = [
-            { index: 0, type: 'rm', len: 3 },
-            { index: 0, type: 'add', value: 'new' }
-        ]
-        expect(getStrDiffPatches(oldStr, newStr)).toStrictEqual(expected)
-        expect(revertStrByPatches(oldStr, expected as ReturnType<typeof getStrDiffPatches>)).toEqual(newStr)
-    })
+    // it('getStrDiffPatches and revertStrByPatches', () => {
+    //     const newStr = 'newStr'
+    //     const oldStr = 'oldStr'
+    //     const expected = [
+    //         { index: 0, type: 'rm', len: 3 },
+    //         { index: 0, type: 'add', value: 'new' }
+    //     ]
+    //     expect(getStrDiffPatches(oldStr, newStr)).toStrictEqual(expected)
+    //     expect(revertStrByPatches(oldStr, expected as ReturnType<typeof getStrDiffPatches>)).toEqual(newStr)
+    // })
 })
