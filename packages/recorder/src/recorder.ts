@@ -32,7 +32,7 @@ export class Recorder {
     destroy: () => void
     use: (plugin: RecorderPlugin) => void
     clearDB: () => Promise<void>
-    constructor(options: RecordOptions) {
+    constructor(options?: RecordOptions) {
         const recorder = new RecorderModule(options)
         const { onData, destroy, use, clearDB } = recorder
         this.onData = onData.bind(recorder)
@@ -154,15 +154,17 @@ export class RecorderModule extends Pluginable {
         const headData = await getHeadData()
 
         const relatedId = headData.relatedId
-        if (options.context) {
-            options.context.G_RECORD_RELATED_ID = relatedId
+
+        options.context.G_RECORD_RELATED_ID = relatedId
+
+        if (options.context === window) {
+            emit({
+                type: RecordType.HEAD,
+                data: headData,
+                relatedId: relatedId,
+                time: getTime()
+            })
         }
-        emit({
-            type: RecordType.HEAD,
-            data: headData,
-            relatedId: relatedId,
-            time: getTime()
-        })
 
         activeWatchers.forEach(Watcher => {
             const watcher = new Watcher({
@@ -229,17 +231,21 @@ export class RecorderModule extends Pluginable {
     public async recordSubIFrames(context: Window) {
         const frames = await this.waitingSubIFramesLoaded(context)
         frames.forEach(frameWindow => {
-            const frameRecorder = new RecorderModule({ context: frameWindow, keep: true })
-            ;(frameWindow.frameElement as any).frameRecorder = frameRecorder
+            this.createIFrameRecorder(frameWindow)
         })
     }
 
     public async recordIFrame(context: Window) {
         const frameWindow = await this.waitingIFrameLoaded(context)
         if (frameWindow) {
-            const frameRecorder = new RecorderModule({ context: frameWindow, keep: true })
-            ;(frameWindow.frameElement as any).frameRecorder = frameRecorder
+            this.createIFrameRecorder(frameWindow)
         }
+    }
+
+    private createIFrameRecorder(frameWindow: Window) {
+        const frameRecorder = new RecorderModule({ context: frameWindow, keep: true })
+        const frameElement = frameWindow.frameElement as any
+        frameElement.frameRecorder = frameRecorder
     }
 
     private listenVisibleChange(this: RecorderModule, options: RecordInternalOptions) {
