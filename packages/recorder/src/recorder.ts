@@ -173,7 +173,7 @@ export class RecorderModule extends Pluginable {
                 emit,
                 watchers: this.watchersInstance
             })
-            this.watchersInstance.set(name, watcher)
+            this.watchersInstance.set(Watcher.name, watcher)
         })
 
         this.watcherResolve()
