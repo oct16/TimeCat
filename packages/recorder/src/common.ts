@@ -1,8 +1,6 @@
 import { VNode } from '@timecat/share/src'
 import { logError } from '@timecat/utils/src'
 
-const baseHref = window.location.href
-
 export function rewriteNodes(vNodes: VNode[]) {
     const { G_RECORD_OPTIONS: options } = window
     const { rewriteResource } = options
@@ -14,6 +12,10 @@ export function rewriteNodes(vNodes: VNode[]) {
     if (!replaceOrigin || !matches) {
         return logError('The params replaceOrigin and matches is required for using rewriteResource')
     }
+
+    const [base] = document.getElementsByTagName('base')
+    const href = window.location.href
+
     const rewriteNodeSrc = (node: VNode) => {
         const { href, src } = node.attrs
         Object.entries({ href, src })
@@ -22,7 +24,7 @@ export function rewriteNodes(vNodes: VNode[]) {
     }
 
     const rewrite = (target: { [key: string]: string }, [key, source]: [string, string]) => {
-        const url = new URL(source, baseHref)
+        const url = new URL(source, base?.href || href)
         const oldUrl = url.href
 
         target[key] = new URL(url.pathname, replaceOrigin).href

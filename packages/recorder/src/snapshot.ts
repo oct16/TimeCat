@@ -31,14 +31,16 @@ export class Snapshot extends Watcher<SnapshotRecord> {
         const height = () => context.innerHeight
         const scrollTop = () => context.pageYOffset
         const scrollLeft = () => context.pageXOffset
+        const [base] = document.getElementsByTagName('base')
 
         const getFrameElement = () => context.frameElement
         const frameElement = getFrameElement()
         const frameId = nodeStore.getNodeId(frameElement) || null
+        const baseHref = base?.href
 
         return {
             doctype: doctype(),
-            href: href(),
+            href: baseHref || href(),
             scrollTop: scrollTop(),
             scrollLeft: scrollLeft(),
             width: width(),

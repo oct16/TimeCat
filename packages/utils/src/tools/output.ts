@@ -216,6 +216,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
 async function makeCssInline(records: RecordData[]) {
     const tasks: VNode[] = []
     const extractLinkList: VNode[] = []
+    const [base] = document.getElementsByTagName('base')
 
     records.forEach(record => {
         const { type, data } = record
@@ -247,7 +248,7 @@ async function makeCssInline(records: RecordData[]) {
 
         try {
             // try to extract css
-            const cssURL = new URL(href, location.href).href
+            const cssURL = new URL(href, base?.href || location.href).href
             const cssValue = await fetch(cssURL).then(res => res.text())
             const textNode = {
                 id: nodeStore.createNodeId(),

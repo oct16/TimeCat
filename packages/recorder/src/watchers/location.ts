@@ -40,10 +40,11 @@ export class LocationWatcher extends Watcher<LocationRecord> {
     locationHandle = (e: Event) => {
         const contextNodeId = this.getContextNodeId(e)
         const [, , path] = e.arguments || [, , this.context?.location?.pathname]
+        const [base] = this.context.document.body.getElementsByTagName('base')
         const { href, hash } = this.context.location
         this.emitData(RecordType.LOCATION, {
             contextNodeId,
-            href,
+            href: base?.href || href,
             hash,
             path
         })
