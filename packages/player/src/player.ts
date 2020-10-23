@@ -315,7 +315,8 @@ export class PlayerComponent {
     }
 
     renderEachFrame() {
-        this.progress.updateTimer(((this.frameIndex + 1) * this.frameInterval) / 1000)
+        this.progress.updateTimer(this.frameIndex, this.frameInterval, this.curViewDiffTime)
+
         let data: RecordData
         while (
             this.recordIndex < this.records.length &&

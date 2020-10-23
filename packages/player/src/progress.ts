@@ -1,10 +1,11 @@
-import { secondToDate, delay } from '@timecat/utils'
+import { secondToTime, delay, getDateTime } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Heat } from './utils/heat'
-import { observer } from './utils'
+import { observer, reduxStore } from './utils'
 import { PlayerEventTypes } from './types'
 
 export class ProgressComponent {
+    c: ContainerComponent
     progress: HTMLElement
     currentProgress: HTMLElement
     thumb: HTMLElement
@@ -14,6 +15,7 @@ export class ProgressComponent {
     heatPoints: number[]
 
     constructor(c: ContainerComponent) {
+        this.c = c
         this.progress = c.container.querySelector('.cat-progress')! as HTMLElement
         this.timer = c.container.querySelector('.cat-timer time') as HTMLElement
         this.thumb = this.progress.querySelector('.cat-thumb') as HTMLElement
@@ -59,10 +61,21 @@ export class ProgressComponent {
         this.currentProgress.classList.add('active')
     }
 
-    updateTimer(second: number) {
-        const t = secondToDate(second)
-        if (t) {
-            this.timer.innerHTML = t
+    updateTimer(frameIndex: number, frameInterval: number, curViewDiffTime: number) {
+        const c = this.c.options
+        const { timeMode } = c
+        const seconds = (frameIndex + 1) * frameInterval
+
+        let time
+        if (timeMode === 'durationTime') {
+            time = secondToTime(seconds / 1000)
+        } else {
+            const { startTime } = reduxStore.getState('progress')
+            const timestamp = startTime + seconds + curViewDiffTime
+            time = getDateTime(timestamp)
+        }
+        if (time) {
+            this.timer.innerHTML = time
         }
     }
 

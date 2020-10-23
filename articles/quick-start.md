@@ -101,6 +101,7 @@ interface ReplayOptions {
     receiver: ((data: RecordData) => void) => void
     autoplay: boolean // autoplay when data loaded
     heatPoints: boolean // show heatPoints in progress bar, default is false
+    timeMod: 'recordingTime' | 'durationTime' // default is durationTime
 }
 
 const player = new Player(Partial<ReplayOptions>)

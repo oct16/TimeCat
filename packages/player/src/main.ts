@@ -18,7 +18,12 @@ import { PlayerEventTypes } from './types'
 import { FMP } from './utils/fmp'
 import { PlayerTypes, ProgressTypes, reduxStore } from './utils'
 
-const defaultReplayOptions = { autoplay: true, mode: 'default', target: window } as ReplayOptions
+const defaultReplayOptions = {
+    autoplay: true,
+    mode: 'default',
+    target: window,
+    timeMode: 'durationTime'
+} as ReplayOptions
 
 export class Player {
     on: (key: PlayerEventTypes, fn: Function) => void

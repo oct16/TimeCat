@@ -256,6 +256,7 @@ export interface ReplayOptions {
     records?: RecordData[]
     target?: string | HTMLElement | Window
     heatPoints?: boolean
+    timeMode?: 'recordingTime' | 'durationTime'
 }
 
 export interface ReplayInternalOptions extends ReplayOptions {
