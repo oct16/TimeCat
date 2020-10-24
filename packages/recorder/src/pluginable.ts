@@ -1,14 +1,29 @@
 import { SyncHook } from 'tapable'
 import { RecordOptions } from './recorder'
+import { logError } from '@timecat/utils/src'
 
 const defaultPlugins: RecorderPlugin[] = [] // todo
 
-const HOOKS = {
+const checkHookAvailable = () => {
+    try {
+        new SyncHook().call()
+        return true
+    } catch (error) {
+        logError(`Plugin hooks is not available in the current env, because ${error}`)
+    }
+}
+
+const DEFAULT_HOOKS = {
     beforeRun: new SyncHook(),
     run: new SyncHook(),
     emit: new SyncHook(['data']),
     end: new SyncHook()
 }
+const HOOKS = checkHookAvailable()
+    ? DEFAULT_HOOKS
+    : Object.keys(DEFAULT_HOOKS).reduce((obj, key) => {
+          return { ...obj, [key]: () => {} }
+      }, {} as { [key in keyof typeof DEFAULT_HOOKS]: any })
 
 export interface RecorderPlugin {
     apply(recorder: Pluginable): void
