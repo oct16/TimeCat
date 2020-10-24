@@ -3,5 +3,6 @@ export enum PlayerEventTypes {
     PAUSE = 'pause',
     STOP = 'stop',
     SPEED = 'speed',
-    RESIZE = 'resize'
+    RESIZE = 'resize',
+    PROGRESS = 'progress'
 }

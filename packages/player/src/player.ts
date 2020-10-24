@@ -252,6 +252,7 @@ export class PlayerComponent {
             }
 
             while (nextTime && currTime >= nextTime) {
+                observer.emit(PlayerEventTypes.PROGRESS, this.frameIndex, this.frames.length - 1)
                 this.renderEachFrame()
                 this.frameIndex++
                 nextTime = this.frames[this.frameIndex]
