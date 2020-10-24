@@ -1,7 +1,7 @@
 import {
     getTime,
     isSnapshot,
-    secondToDate,
+    secondToTime,
     toTimeStamp,
     transRecordsToPacks,
     isVNode,
@@ -37,12 +37,12 @@ describe('Test of common', () => {
         }, 2)
     })
 
-    it('secondToDate and toTimeStamp', () => {
+    it('secondToTime and toTimeStamp', () => {
         const second = 1601134
         const date = '444:45:34'
-        const actualDate = secondToDate(second)
+        const actualDate = secondToTime(second)
 
-        expect(secondToDate(-1)).toEqual('00:00')
+        expect(secondToTime(-1)).toEqual('00:00')
         expect(actualDate).toEqual(date)
 
         expect(toTimeStamp(date)).toEqual(second * 1000)
