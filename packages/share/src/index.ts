@@ -257,10 +257,16 @@ export interface ReplayOptions {
     target?: string | HTMLElement | Window
     heatPoints?: boolean
     timeMode?: 'recordingTime' | 'durationTime'
+    fastForward?: number[]
 }
 
 export interface ReplayInternalOptions extends ReplayOptions {
     destroyStore: Set<Function>
+    fastForward: number[]
+    autoplay: boolean
+    mode: 'live' | 'default'
+    target: string | HTMLElement | Window
+    timeMode: 'recordingTime' | 'durationTime'
 }
 
 export interface ReplayPack {

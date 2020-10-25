@@ -22,8 +22,9 @@ const defaultReplayOptions = {
     autoplay: true,
     mode: 'default',
     target: window,
-    timeMode: 'durationTime'
-} as ReplayOptions
+    timeMode: 'durationTime',
+    fastForward: [4, 16]
+}
 
 export class Player {
     on: (key: PlayerEventTypes, fn: Function) => void

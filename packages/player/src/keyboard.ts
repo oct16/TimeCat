@@ -1,15 +1,18 @@
 import { exportReplay, getRawScriptContent } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { PlayerTypes, reduxStore } from './utils'
+import { ReplayInternalOptions } from '@timecat/share'
 
 export class KeyboardComponent {
     c: ContainerComponent
+    options: ReplayInternalOptions
     controller: HTMLElement
 
     playOrPauseBtn: HTMLButtonElement
     exportBtn: HTMLElement
 
-    constructor(container: ContainerComponent) {
+    constructor(options: ReplayInternalOptions, container: ContainerComponent) {
+        this.options = options
         this.c = container
         this.init()
     }
@@ -19,6 +22,7 @@ export class KeyboardComponent {
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
         this.exportBtn = this.c.container.querySelector('.cat-export') as HTMLButtonElement
         this.exportBtn.addEventListener('click', this.export)
+        this.createFastForwardBtns(this.options.fastForward)
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
                 const speed = Number((e.target as HTMLElement).getAttribute('speed'))
@@ -34,6 +38,19 @@ export class KeyboardComponent {
         })
 
         this.detectWindowIsActive()
+    }
+
+    createFastForwardBtns(speeds: number[]) {
+        speeds = Array.from(new Set(speeds.concat(1))).sort()
+        if (speeds) {
+            let html = ''
+            speeds.forEach(speed => {
+                html += `<button type="button" class="speed" speed="${speed}">${speed}x</button>`
+            })
+            const htmlTemp = document.createElement('div')
+            htmlTemp.innerHTML = html
+            this.controller.append(...htmlTemp.children)
+        }
     }
 
     dispatchPlay(speed = 0) {
@@ -78,16 +95,7 @@ export class KeyboardComponent {
         const index = getBtnIndex(speed)
 
         function getBtnIndex(speed: number) {
-            switch (speed) {
-                case 100:
-                    return 2
-                case 10:
-                    return 1
-                case 1:
-                    return 0
-                default:
-                    return 0
-            }
+            return [...speedNodes].findIndex(node => node.getAttribute('speed') === speed.toString())
         }
         if (index > -1) {
             speedNodes[index].setAttribute('disabled', '')

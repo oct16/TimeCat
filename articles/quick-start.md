@@ -102,6 +102,7 @@ interface ReplayOptions {
     autoplay: boolean // autoplay when data loaded
     heatPoints: boolean // show heatPoints in progress bar, default is false
     timeMod: 'recordingTime' | 'durationTime' // default is durationTime
+    fastForward: number[] // present the fast-forward speeds in progress bar, default is [4,16]
 }
 
 const player = new Player(Partial<ReplayOptions>)
