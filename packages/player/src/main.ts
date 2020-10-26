@@ -258,7 +258,7 @@ export class PlayerModule {
 
     append(data: RecordData[] | ReplayPack | ReplayPack[]) {
         function isPack(data: any) {
-            return !!data.head
+            return data.head && data.body
         }
 
         let packs: ReplayPack[]
