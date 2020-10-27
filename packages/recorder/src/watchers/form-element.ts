@@ -97,7 +97,8 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
             [context.HTMLInputElement.prototype, 'value'],
             [context.HTMLInputElement.prototype, 'checked'],
             [context.HTMLSelectElement.prototype, 'value'],
-            [context.HTMLTextAreaElement.prototype, 'value']
+            [context.HTMLTextAreaElement.prototype, 'value'],
+            [context.HTMLOptionElement.prototype, 'selected']
         ]
 
         const handles = elementList.map(item => {
