@@ -1,5 +1,5 @@
-import { VNode } from '@timecat/share/src'
-import { logError } from '@timecat/utils/src'
+import { VNode } from '@timecat/share'
+import { logError } from '@timecat/utils'
 
 export function rewriteNodes(vNodes: VNode[]) {
     const { G_RECORD_OPTIONS: options } = window

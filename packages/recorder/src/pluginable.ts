@@ -1,6 +1,6 @@
 import { SyncHook } from 'tapable'
 import { RecordOptions } from './recorder'
-import { logError } from '@timecat/utils/src'
+import { logError } from '@timecat/utils'
 
 const defaultPlugins: RecorderPlugin[] = [] // todo
 
