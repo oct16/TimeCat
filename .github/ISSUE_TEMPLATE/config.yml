@@ -1,0 +1,7 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Create new issue
+    url: https://timecatjs.com/issue-helper
+    about: The issue which is not created via https://timecatjs.com/issue-helper will be closed immediately.
+
+# https://docs.github.com/en/free-pro-team@latest/github/building-a-strong-community/configuring-issue-templates-for-your-repository#configuring-the-template-chooser    
