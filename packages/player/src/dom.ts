@@ -17,7 +17,8 @@ import {
     LocationRecordData,
     CanvasRecordData,
     UnionToIntersection,
-    SnapshotRecord
+    SnapshotRecord,
+    FontRecordData
 } from '@timecat/share'
 import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './player'
@@ -224,6 +225,11 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                     const node = nodeStore.getNode(id) as HTMLElement
 
                     if (node) {
+                        if (node.tagName === 'IFRAME' && key === 'src') {
+                            setAttribute(node as HTMLElement, 'disabled-src', value)
+                            setAttribute(node as HTMLElement, 'src', null)
+                            return
+                        }
                         setAttribute(node as HTMLElement, key, value)
                     }
                 })
@@ -287,52 +293,21 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
         }
         case RecordType.CANVAS: {
             await actionDelay()
-            const { src, id, strokes } = data as UnionToIntersection<CanvasRecordData>
-            const target = nodeStore.getNode(id) as HTMLCanvasElement
-            if (!target) {
-                return
-            }
-            const ctx = target.getContext('2d')!
-
-            if (src) {
-                const image = new Image()
-                image.src = src
-                image.onload = function (this: HTMLImageElement) {
-                    ctx.drawImage(this, 0, 0)
-                }
-            } else {
-                async function createChain() {
-                    type Strokes = UnionToIntersection<CanvasRecordData>['strokes']
-                    function splitStrokes(strokesArray: Strokes[]) {
-                        const result: Strokes[] = []
-                        strokesArray.forEach(strokes => {
-                            const len = strokes.length
-                            const pivot = Math.floor(len / 2)
-                            result.push(...[strokes.splice(0, pivot), strokes])
-                        })
-                        return result
-                    }
-
-                    // TODO expect stroke smooth (elapsed time)
-                    for (const strokesArray of splitStrokes(splitStrokes([strokes]))) {
-                        // await delay(0) // have problem here
-                        for (const stroke of strokesArray) {
-                            const { name, args } = stroke
-                            if (Array.isArray(args)) {
-                                if (name === 'drawImage') {
-                                    args[0] = nodeStore.getNode(args[0])
-                                }
-                                ;(ctx[name] as Function).apply(ctx, args)
-                            } else {
-                                ;(ctx[name] as Object) = args
-                            }
-                        }
-                    }
-                }
-                createChain()
-            }
+            renderCanvas(data as CanvasRecordData)
+            break
         }
-
+        case RecordType.FONT: {
+            const { family, source } = data as FontRecordData
+            const buffer = new Uint8Array(source.length)
+            for (let i = 0; i < source.length; i++) {
+                const code = source.charCodeAt(i)
+                buffer[i] = code
+            }
+            const font = new window.FontFace(family, buffer)
+            this.c.sandBoxDoc.fonts.add(font)
+            document.fonts.add(font)
+            break
+        }
         default: {
             break
         }
@@ -344,20 +319,20 @@ export function showStartMask(c: ContainerComponent) {
     startPage.setAttribute('style', '')
 }
 
-function showStartBtn() {
-    const startPage = document.querySelector('#cat-start-page')! as HTMLElement
+function showStartBtn(el: HTMLElement) {
+    const startPage = el.querySelector('#cat-start-page')! as HTMLElement
     const btn = startPage.querySelector('.play-btn') as HTMLElement
     btn.classList.add('show')
     return btn
 }
 
-export function removeStartPage(c: ContainerComponent) {
-    const startPage = c.container.querySelector('#cat-start-page') as HTMLElement
+export function removeStartPage(el: HTMLElement) {
+    const startPage = el.querySelector('#cat-start-page') as HTMLElement
     startPage?.parentElement?.removeChild(startPage)
 }
 
-export async function waitStart(): Promise<void> {
-    const btn = showStartBtn()
+export async function waitStart(el: HTMLElement): Promise<void> {
+    const btn = showStartBtn(el)
     return new Promise(r => {
         btn.addEventListener('click', async () => {
             btn.classList.remove('show')
@@ -395,4 +370,39 @@ export function injectIframeContent(contentDocument: Document, snapshotData: Sna
 // waiting for mouse or scroll transform animation finish
 async function actionDelay() {
     return delay(200)
+}
+
+function renderCanvas(canvasRecordData: CanvasRecordData) {
+    const data = canvasRecordData as UnionToIntersection<CanvasRecordData>
+    const { src, status, id, strokes } = data
+    const canvas = nodeStore.getNode(id) as HTMLCanvasElement
+    if (!canvas) {
+        return
+    }
+    const ctx = canvas.getContext('2d')!
+    if (src) {
+        const image = new Image()
+        image.src = src
+        image.onload = function (this: HTMLImageElement) {
+            ctx.drawImage(this, 0, 0)
+        }
+    } else if (status) {
+        Object.keys(status).forEach(key => {
+            ;(ctx as any)[key] = status[key]
+        })
+    } else {
+        // TODO expect stroke smooth (elapsed time)
+        for (const stroke of strokes) {
+            // await delay(0) // have problem here
+            const { name, args } = stroke
+            if (Array.isArray(args)) {
+                if (name === 'drawImage' || name === 'createPattern') {
+                    args[0] = nodeStore.getNode(args[0])
+                }
+                ;(ctx[name] as Function).apply(ctx, args)
+            } else {
+                ;(ctx[name] as Object) = args
+            }
+        }
+    }
 }

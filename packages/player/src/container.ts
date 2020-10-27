@@ -1,4 +1,4 @@
-import { disableScrolling, nodeStore, debounce, delay } from '@timecat/utils'
+import { disableScrolling, nodeStore, debounce } from '@timecat/utils'
 import HTML from './ui.html'
 import CSS from './ui.scss'
 import { createIframeDOM, injectIframeContent } from './dom'
@@ -62,8 +62,16 @@ export class ContainerComponent {
     }
 
     initTemplate() {
-        const targetElement: HTMLElement =
+        let targetElement: HTMLElement =
             this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
+
+        if (targetElement.tagName === 'BODY') {
+            const shadowHost = document.createElement('div')
+            shadowHost.className = 'cat-shadowhost'
+            targetElement.appendChild(shadowHost)
+            targetElement = shadowHost
+        }
+
         const shadow = targetElement.attachShadow({ mode: 'open' })
         shadow.appendChild(this.createStyle('cat-css', CSS))
         shadow.appendChild(this.createContainer('cat-main', HTML))

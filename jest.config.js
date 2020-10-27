@@ -15,5 +15,7 @@ module.exports = {
     },
     testMatch: ['<rootDir>/packages/**/__tests__/**/*spec.[jt]s?(x)'],
     testPathIgnorePatterns: process.env.SKIP_E2E ? ['/node_modules/', '/examples/__tests__'] : ['/node_modules/'],
-    verbose: true
+    verbose: true,
+    testEnvironment: 'jsdom',
+    setupFiles: ['<rootDir>/jest-setup.js']
 }

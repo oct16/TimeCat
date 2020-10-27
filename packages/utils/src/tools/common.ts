@@ -39,13 +39,22 @@ export function getRandomCode(len: 6 | 7 | 8 = 8) {
     return code.toUpperCase()
 }
 
-export function secondToDate(ms: number) {
-    if (ms <= 0) {
-        ms = 0
+export function secondToTime(second: number) {
+    if (second <= 0) {
+        second = 0
     }
-    const [h, m, s] = [Math.floor(ms / 3600), Math.floor((ms / 60) % 60), Math.floor(ms % 60)]
+    const [h, m, s] = [Math.floor(second / 3600), Math.floor((second / 60) % 60), Math.floor(second % 60)]
     const timeStr = [h, m, s].map(i => (i <= 9 ? '0' + i : i)).join(':')
     return timeStr.replace(/^00\:/, '')
+}
+
+export function getDateTime(timestamp: number) {
+    const date = new Date(timestamp)
+    const hours = date.getHours()
+    const minutes = '0' + date.getMinutes()
+    const seconds = '0' + date.getSeconds()
+    const formattedTime = (hours < 10 ? '0' + hours : hours) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2)
+    return formattedTime
 }
 
 export function toTimeStamp(timeStr: string) {
@@ -63,7 +72,8 @@ export function isSnapshot(frame: RecordData) {
     return (frame as SnapshotRecord).type === RecordType.SNAPSHOT && !(frame as SnapshotRecord).data.frameId
 }
 
-export function classifyRecords(records: RecordData[]) {
+export function transRecordsToPacks(records: RecordData[]) {
+    window.G_REPLAY_RECORDS = records
     const packs: ReplayPack[] = []
 
     function isAudioBufferStr(frame: AudioRecord) {
@@ -126,7 +136,9 @@ export function classifyRecords(records: RecordData[]) {
                 break
 
             default:
-                replayData.records.push(record as RecordData)
+                if (replayData) {
+                    replayData.records.push(record as RecordData)
+                }
                 break
         }
     })
@@ -207,4 +219,8 @@ function getPatches(changes: diff.Change[]) {
         value?: string
         len?: number
     }>
+}
+
+export function isNumeric(n: string) {
+    return !isNaN(parseFloat(n)) && isFinite(parseFloat(n))
 }

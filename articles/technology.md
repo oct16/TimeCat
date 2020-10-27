@@ -1,4 +1,4 @@
-### TimeCat -- A Magical Web Recorder
+### How it works
 
 If you like playing games,  Warcraft 3 must be on that list. You may be curious about the video files exported by the game-why the video is only a few hundred KB even after you have played the game for an hour?  Soon you will realize what have a happened-the map inside the game has to be reloaded almost every time when you import the replay video. If you skip the step, the video won’t be played
 
@@ -23,29 +23,13 @@ In fact, the Web recorder also draws on such an idea, which is generally called 
 
 From a practical perspective, even if you compare the compressed video with an H.265 compression ratio of several hundred times, you can save at least 200 times in volume
 
-Compared with traditional video streaming, its advantages obviously stand out:
-
-1. Greatly reduce the size of video files
-2. Very low consumption of CPU and memory
-3. Lossless display, infinite zoom, window adaptation, etc.
-4. Very flexible time jump, almost imperceptible buffer time
-5. All information is live (text and pictures can be copied, links can be clicked, and the mouse can scroll)
-6. You can easily record the sound, and synchronize the sound with the picture, and also translate the sound into subtitles similar to YouTube
-7. It is convenient to modify the details of the video, such as desensitizing the displayed content, generating a heat map, etc.
-8. The recorded serialized data is very useful for  the data analysis
-   ...
-
 So the question is coming: Why do we have to record web pages? What are the scenarios?
 
 I have though about the following aspects
 
 1. The anomaly monitoring system, such as [LogRocket](https://logrocket.com/), it can be understood that he is a tool that integrates Sentry and Web Recorder, which can playback the graphical interface and data logs of webpage errors to help Debug
 2. Recording the user's behavior for analysis, such as [MouseFlow](https://mouseflow.com/). [LiveSession](https://livesession.io/), "connect" to the user's to see what people do through live streaming
-3. Monitoring for customer service personnel, for example, Alibaba has 100,000 customer service personnel scattered throughout the country, and they need to record 7x24 hours of their service process. The performance requirements for monitoring on this order of magnitude are very High, Ali's internal tool is called `XReplay`
-4. Collaborative tools, web live broadcast, etc., will also involve similar technologies
-5. RPA
-
-...
+3. Collaborative tools, RPA, Webpage Operation Tracking, etc. will also involve similar technologies
 
 ---
 ### Technical details of the [TimeCat](https://github.com/oct16/timecat)
@@ -208,14 +192,6 @@ const patches = [
 ]
 ```
 
-#### Generate heat map from mouse data
-
-Recorded a coordinate info through a mouse event, the heat map can be easily generated for analyzing the user's behavior data by [heatmap.js](https://www.patrick-wied.at/static/heatmapjs/).
-
-When the page switches, we need to reset the heat map. If it is a single-page application, we can monitor changes on the page via  `popstate` and  `hashchange` in the `History`
-
-![heatmap](./images/heatmap.png)
-
 #### Desensitization to user privacy
 
 We can obtain and process some personal privacy data through the annotation of the DOM during development `Node.COMMENT_NODE` like： `<!-- ... -->`）annotation. Based on  agreed statements, we only have to process the requirements of the DOM tag that needs to be desensitized. For example, if want hide tag`<button>`, we need change it into`<!--hidden--><button><button>`
@@ -243,16 +219,6 @@ pause timer through `cancelAnimationFrame`
 ##### Fast forward
 double the speed of the acquisition rate
 
-##### Jump
-Jumping is a complicated problem. If you want to achieve a Bi-Directional jump that can be forward and backward like a video, due to the constraints of the rendering engine, I did not implement a reverse rendering method but solved it by a special method
-
-To achieve a Bi-Directional jump, the idea here is to calculate the corresponding `S(Snapshot)` and `A (Action)` at a certain distance in memory
-
-| _S_ | `A` | `A` | `A` | _S_ | `A` | `A` | _S_ | `A` | `A` | `A` | ...... |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ------ |
-
-So `[SAAA]` formed a block, when the jump behavior occurs, it will be located in the corresponding block for calculation and rendering
-
 #### Record audio and generate subtitles
 
 Audio recording can be provided by the HTML5 WebRTC. Since it mainly records human voice, it doesn’t not need high standard in recording quality. I thus chose the 8000 sample rate, 8-bit rate and mono PCM recording format, later can be converted into lossy compressed `mp3` format to save space. Subtitles will be automatically generated after analyzing the recording files by some third-party services
@@ -279,7 +245,7 @@ The RollUp packer can generate multiple formats, such as `UMD` and `ESM`, etc. L
 
 #### Thanks
 
-Thanks to Ali's XREPLAY for inspiration   
+Thanks for sharing from the technical community   
 Thanks to RRWEB for technical sharing
 
 ##### [🏠Homepage](../README.md) 

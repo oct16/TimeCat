@@ -22,7 +22,7 @@ export function filteringScriptTag(str: string) {
 }
 
 export function completeCssHref(str: string, parentVNode?: VNode) {
-    return str.replace(/(url\(['"]?((\/{1,2}|\.\.?\/)[^'"]*?)['"]?(?=\)))/g, (string, b, url) => {
+    return str.replace(/(url\(['"]?((\/{1,2}|\.\.?\/)?[^'"]*?)['"]?(?=\)))/g, (string, b, url) => {
         if (!url.startsWith('data')) {
             const baseUrl = parentVNode?.attrs['css-url'] || href()
             const newUrl = new URL(url, baseUrl)

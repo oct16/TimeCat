@@ -3,7 +3,15 @@ import { updateDom } from './dom'
 import { getTime, isSnapshot, delay, toTimeStamp, base64ToFloat32Array, encodeWAV } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData, SnapshotRecord, ReplayPack, ReplayData, ReplayInternalOptions } from '@timecat/share'
+import {
+    RecordData,
+    AudioData,
+    SnapshotRecord,
+    ReplayPack,
+    ReplayData,
+    ReplayInternalOptions,
+    RecordType
+} from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from './animation-frame'
 import { observer } from './utils/observer'
@@ -26,7 +34,6 @@ export class PlayerComponent {
     isFirstTimePlay = true
     frameInterval = 250
     frames: number[]
-    heatPoints: number[]
 
     startTime: number
     elapsedTime = 0
@@ -41,6 +48,8 @@ export class PlayerComponent {
 
     RAF: AnimationFrame
 
+    maxIntensityStep = 8
+
     constructor(
         options: ReplayInternalOptions,
         c: ContainerComponent,
@@ -53,9 +62,12 @@ export class PlayerComponent {
         this.pointer = pointer
         this.progress = progress
         this.broadcaster = broadcaster
+        this.init()
+    }
+
+    async init() {
         this.audioNode = new Audio()
         this.frames = this.calcFrames()
-        this.heatPoints = this.calcHeatPointsData()
 
         this.initViewState()
 
@@ -64,6 +76,7 @@ export class PlayerComponent {
             window.addEventListener('record-data', this.streamHandle.bind(this))
             this.options.destroyStore.add(() => window.removeEventListener('record-data', this.streamHandle.bind(this)))
         } else {
+            reduxStore.subscribe('progress', this.recalculateProgress.bind(this))
             reduxStore.subscribe('player', state => {
                 if (state) {
                     const speed = state.speed
@@ -126,8 +139,7 @@ export class PlayerComponent {
         const { G_REPLAY_PACKS: packs } = window
         const firstPack = packs[0] as ReplayPack
         const firstData = firstPack.body[0]
-        this.records = firstData.records
-
+        this.records = this.orderRecords(firstData.records)
         this.audioData = firstData.audio
         this.initAudio()
 
@@ -139,12 +151,12 @@ export class PlayerComponent {
         this.subtitlesIndex = 0
         this.broadcaster.cleanText()
 
-        this.curViewEndTime = +this.records.slice(-1)[0].time
+        this.curViewEndTime = this.records.slice(-1)[0].time
         this.curViewDiffTime = 0
         window.G_REPLAY_DATA = firstData
     }
 
-    async switchNextView(delayTime?: number) {
+    async switchNextView() {
         const { G_REPLAY_DATA: rData, G_REPLAY_PACKS: packs } = window as {
             G_REPLAY_DATA: ReplayData
             G_REPLAY_PACKS: ReplayPack[]
@@ -169,7 +181,7 @@ export class PlayerComponent {
                         const next = body[j + 1]
                         if (next) {
                             return next
-                        } else if (nextPackBody.length) {
+                        } else if (nextPackBody && nextPackBody.length) {
                             return nextPackBody[0]
                         }
                         return null
@@ -179,20 +191,19 @@ export class PlayerComponent {
             return null
         }
 
-        const curEndTime = +this.records.slice(-1)[0].time
-        const nextStartTime = +nextData.records[0].time
+        const curEndTime = this.records.slice(-1)[0].time
+        const nextStartTime = nextData.records[0].time
         this.curViewDiffTime += nextStartTime - curEndTime
 
         window.G_REPLAY_DATA = nextData
-        this.records = nextData.records
+        this.records = this.orderRecords(nextData.records)
         this.audioData = nextData.audio
         this.initAudio()
-        this.curViewEndTime = +this.records.slice(-1)[0].time
+        this.curViewEndTime = this.records.slice(-1)[0].time
         this.recordIndex = 0
 
-        if (delayTime) {
-            await delay(delayTime)
-        }
+        // delay 300ms wait for all frame finished and switch next
+        await delay(300)
 
         this.c.setViewState()
     }
@@ -206,7 +217,7 @@ export class PlayerComponent {
                 this.initViewState()
                 this.c.setViewState()
             } else {
-                this.progress.drawHeatPoints(this.heatPoints)
+                this.progress.drawHeatPoints(this.calcHeatPointsData())
             }
             this.isFirstTimePlay = false
         }
@@ -230,21 +241,21 @@ export class PlayerComponent {
                 return
             }
             if (!this.startTime) {
-                this.startTime = Number(this.frames[this.frameIndex])
+                this.startTime = this.frames[this.frameIndex]
             }
 
             const currTime = this.startTime + timeStamp * this.speed
-            let nextTime = Number(this.frames[this.frameIndex])
+            let nextTime = this.frames[this.frameIndex]
 
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
-                // delay 300ms wait for all frame finished and switch next
-                await this.switchNextView(300)
+                await this.switchNextView()
             }
 
             while (nextTime && currTime >= nextTime) {
+                observer.emit(PlayerEventTypes.PROGRESS, this.frameIndex, this.frames.length - 1)
                 this.renderEachFrame()
                 this.frameIndex++
-                nextTime = Number(this.frames[this.frameIndex])
+                nextTime = this.frames[this.frameIndex]
             }
 
             this.elapsedTime = (currTime - this.frames[0]) / 1000
@@ -305,12 +316,12 @@ export class PlayerComponent {
     }
 
     renderEachFrame() {
-        this.progress.updateTimer(((this.frameIndex + 1) * this.frameInterval) / 1000)
+        this.progress.updateTimer(this.frameIndex, this.frameInterval, this.curViewDiffTime)
 
         let data: RecordData
         while (
             this.recordIndex < this.records.length &&
-            +(data = this.records[this.recordIndex]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
+            (data = this.records[this.recordIndex]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
         ) {
             this.execFrame.call(this, data)
             this.recordIndex++
@@ -369,39 +380,80 @@ export class PlayerComponent {
     }
 
     calcFrames(interval = this.frameInterval) {
+        if (this.options.mode === 'live') {
+            return []
+        }
         const progressState = reduxStore.getState('progress')
         const { startTime, endTime } = progressState
 
-        const s = +startTime
-        const e = +endTime
-
         const result: number[] = []
 
-        for (let i = s; i < e; i += interval) {
+        for (let i = startTime; i < endTime + interval; i += interval) {
             result.push(i)
         }
-        result.push(e)
+        result.push(endTime)
         return result
     }
 
     calcHeatPointsData() {
         const frames = this.frames
+        if (!this.options.heatPoints) {
+            return []
+        }
         const { G_REPLAY_PACKS: packs } = window
-        const allRecords = (packs as ReplayPack[])
+
+        let diffTime = 0
+        const recordTimes = (packs as ReplayPack[])
             .map(pack => pack.body.map(data => data.records))
-            .reduce((a, b) => (a.concat(...b) as unknown) as RecordData[], [] as RecordData[])
+            .flat(1)
+            .reduce((a, b, i, arr) => {
+                const preLastTime = i === 0 ? 0 : arr[i - 1].slice(-1)[0].time
+                const curFirstTime = b[0].time
+                if (preLastTime) {
+                    diffTime += curFirstTime - preLastTime
+                }
+
+                return a.concat(b.map(n => n.time - diffTime))
+            }, [] as number[])
 
         let index = 0
         const heatPoints = frames.map(t => {
-            let curRecord
-            let count = 0
-            while ((curRecord = allRecords[index]) && +curRecord.time < t) {
+            let recordTime: number
+            let step = 0
+            while ((recordTime = recordTimes[index]) && recordTime < t) {
                 index++
-                count++
+                if (step < this.maxIntensityStep) {
+                    step++
+                }
             }
-            return count
+            return step
         })
 
         return heatPoints
+    }
+
+    orderRecords(records: RecordData[]) {
+        if (!records.length) {
+            return []
+        }
+        // Lift font records for canvas render
+        let insertIndex = 1
+        const startTime = records[0].time
+        for (let i = 0; i < records.length; i++) {
+            const record = records[i]
+            if (record.type === RecordType.FONT) {
+                const fontRecord = records.splice(i, 1)[0]
+                fontRecord.time = startTime + insertIndex
+                records.splice(insertIndex++, 0, fontRecord)
+            }
+        }
+
+        return records
+    }
+
+    recalculateProgress() {
+        this.frames = this.calcFrames()
+        this.progress.drawHeatPoints(this.calcHeatPointsData())
+        this.setProgress()
     }
 }

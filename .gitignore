@@ -108,4 +108,6 @@ docs
 .DS_Store
 stats.html
 */test*
+*/data*
 .yarn
+.idea

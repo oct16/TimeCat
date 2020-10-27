@@ -115,6 +115,24 @@ export class IndexedDBOperator {
         })
     }
 
+    async last(): Promise<RecordData> {
+        const store = await this.getStore()
+
+        return new Promise((resolve, reject) => {
+            const openCursorRequest = store.openKeyCursor(null, 'prev')
+            openCursorRequest.onsuccess = () => {
+                const cursor = openCursorRequest.result
+                if (!cursor) {
+                    return reject()
+                }
+                const request = store.get(cursor.key)
+                request.onsuccess = () => {
+                    resolve(request.result)
+                }
+            }
+        })
+    }
+
     triggerEvent(name: string) {
         this.listeners.filter(item => item.name === name).forEach(item => item.fn())
     }

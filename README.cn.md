@@ -14,7 +14,7 @@ A Magical Web Recorder 🖥 网页录屏器
 
 TimeCat 是一个网页录屏工具，利用独特的录制方式与算法，提供超高性能与高压缩比的网页无损视频录制与回放
 
-[🖥 DEMO](https://timecat.xxxxoo.com/) Chrome浏览器
+[🖥 DEMO](https://www.timecatjs.com/) Chrome浏览器
 
 ## Milestone
     08.20 Prerelease V1.2.0-alpha
@@ -50,16 +50,10 @@ $ npm i timecatjs -D
 
 #### Import in Browser
 
-Add script tags in your browser and use the global variable ``TimeCat``
+Add script tags in your browser and use the global variable ``TimeCat``, you can choose the follow CDN:
 
-- **jsDelivr**
-  - //cdn.jsdelivr.net/npm/timecatjs
-  - https://cdn.jsdelivr.net/npm/@timecat/recorder
-  - https://cdn.jsdelivr.net/npm/@timecat/player
-- **UNPKG**
-  - https://unpkg.com/timecatjs
-  - https://unpkg.com/@timecat/recorder
-  - https://unpkg.com/@timecat/player
+- <a href="https://www.jsdelivr.com/package/npm/timecatjs"><img align="top" width="100" src="./articles/images/jsdelivr.png"></a>
+- <a href="https://unpkg.com/timecatjs"><img align="top" width="100" src="./articles/images/unpkg.png"></a>
 
 ## Usage
  - [快速开始](articles/quick-start.md)
@@ -67,7 +61,7 @@ Add script tags in your browser and use the global variable ``TimeCat``
 ## Articles
  - [录屏原理简介](articles/technology.cn.md)
  - [TimeCat 入门：我们的第一个应用](articles/record-and-replay.md)
-
+ - [TimeCat 进阶：把数据上传到服务器](articles/upload-to-server.md)
 ## 交流与建议
 
 开发中若遇到任何问题或有任何建议   

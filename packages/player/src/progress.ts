@@ -1,10 +1,11 @@
-import { secondToDate, delay } from '@timecat/utils'
+import { secondToTime, delay, getDateTime } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Heat } from './utils/heat'
-import { observer } from './utils'
+import { observer, reduxStore } from './utils'
 import { PlayerEventTypes } from './types'
 
 export class ProgressComponent {
+    c: ContainerComponent
     progress: HTMLElement
     currentProgress: HTMLElement
     thumb: HTMLElement
@@ -14,6 +15,7 @@ export class ProgressComponent {
     heatPoints: number[]
 
     constructor(c: ContainerComponent) {
+        this.c = c
         this.progress = c.container.querySelector('.cat-progress')! as HTMLElement
         this.timer = c.container.querySelector('.cat-timer time') as HTMLElement
         this.thumb = this.progress.querySelector('.cat-thumb') as HTMLElement
@@ -44,6 +46,13 @@ export class ProgressComponent {
             return
         }
 
+        // recalculate progress thumb position
+        const percent = index / total
+        this.currentProgress.style.width = percent * this.slider.offsetWidth + 'px'
+
+        // fix change class not trigger animate
+        await delay(20)
+
         // remind animation seconds
         const duration = ((total - index) * interval) / speed / 1000
         this.currentProgress.style.transitionDuration = duration + 's'
@@ -52,10 +61,21 @@ export class ProgressComponent {
         this.currentProgress.classList.add('active')
     }
 
-    updateTimer(second: number) {
-        const t = secondToDate(second)
-        if (t) {
-            this.timer.innerHTML = t
+    updateTimer(frameIndex: number, frameInterval: number, curViewDiffTime: number) {
+        const c = this.c.options
+        const { timeMode } = c
+        const seconds = (frameIndex + 1) * frameInterval
+
+        let time
+        if (timeMode === 'durationTime') {
+            time = secondToTime(seconds / 1000)
+        } else {
+            const { startTime } = reduxStore.getState('progress')
+            const timestamp = startTime + seconds + curViewDiffTime
+            time = getDateTime(timestamp)
+        }
+        if (time) {
+            this.timer.innerHTML = time
         }
     }
 
@@ -67,18 +87,16 @@ export class ProgressComponent {
         this.currentProgress = currentProgress as HTMLElement
     }
 
-    drawHeatPoints(points: number[]) {
-        if (this.heatPoints !== points) {
-            this.heatPoints = points
+    drawHeatPoints(points?: number[]) {
+        this.heatPoints = points || this.heatPoints
+        if (this.heatPoints && this.heatPoints.length) {
+            new Heat(this.heatBar, this.heatPoints)
         }
-        new Heat(this.heatBar, points)
     }
 
     async resizeHeatBar() {
         // wait for scaling page finish to get target offsetWidth
         await delay(500)
-        if (this.heatPoints) {
-            this.drawHeatPoints(this.heatPoints)
-        }
+        this.drawHeatPoints()
     }
 }

@@ -1,5 +1,5 @@
-import { Recorder } from '@timecat/recorder'
-import { Player } from '@timecat/player'
+import { Recorder, RecorderModule } from '@timecat/recorder'
+import { Player, PlayerModule } from '@timecat/player'
 
 export {
     RecordData,
@@ -16,5 +16,5 @@ export {
 const version = '__VERSION__'
 export { version }
 
-export { Player, Recorder }
-export { exportReplay, radix64, classifyRecords, delay, debounce, throttle } from '@timecat/utils'
+export { Player, PlayerModule, Recorder, RecorderModule }
+export { exportReplay, transRecordsToPacks, delay, debounce, throttle } from '@timecat/utils'

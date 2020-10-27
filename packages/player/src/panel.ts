@@ -22,7 +22,7 @@ export class Panel {
     }
 
     initComponent() {
-        this.keyboard = new KeyboardComponent(this.c)
+        this.keyboard = new KeyboardComponent(this.options, this.c)
         this.progress = new ProgressComponent(this.c)
         this.pointer = new PointerComponent(this.c)
         this.broadcaster = new BroadcasterComponent(this.c)

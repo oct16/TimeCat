@@ -2,7 +2,7 @@
     "private": true,
     "name": "timecat",
     "author": "oct16",
-    "version": "1.2.0-alpha.12",
+    "version": "1.2.0-alpha.15",
     "description": "TimeCat Web Recorder",
     "keywords": [
         "recorder",
@@ -20,9 +20,9 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "$npm_execpath --silent run checkyarn && node scripts/dev.js",
-        "build": "$npm_execpath --silent run checkyarn && node scripts/build.js",
-        "release": "$npm_execpath --silent run checkyarn && node scripts/release.js",
+        "dev": "node scripts/dev.js",
+        "build": "node scripts/build.js",
+        "release": "node scripts/release.js",
         "preinstall": "$npm_execpath --silent run checkyarn",
         "checkyarn": "node ./scripts/checkYarn.js",
         "ls-lint": "ls-lint",
@@ -99,7 +99,8 @@
         "smoothscroll-polyfill": "^0.4.4",
         "tapable": "^1.1.3",
         "ts-jest": "^26.1.0",
-        "typescript": "^3.9.7"
+        "typescript": "^3.9.7",
+        "fake-indexeddb": "3.1.2"
     },
     "repository": {
         "type": "git",
