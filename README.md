@@ -14,7 +14,7 @@ A Magical Web Recorder 🖥 网页录屏器
 
 English | [中文](./README.cn.md)
 
-TimeCat is a website record tool, passing a unique recording method to provide ultra-high performance and high compression ratio lossless video recording and replay
+TimeCat is a website record tool, passing a unique recording method to provide ultra-high performance and ultra-high compression ratio lossless video record and replay
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
