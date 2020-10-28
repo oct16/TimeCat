@@ -72,7 +72,7 @@ Add script tags in your browser and use the global variable ``TimeCat``, you can
 
 ## 贡献项目
 非常欢迎您的加入    
-[提一个 Issue](https://github.com/oct16/TimeCat/issues/new) 或者提交一个 Pull Request
+[提一个 Issue](https://github.com/oct16/TimeCat/issues/new/choose) 或者提交一个 Pull Request   
 标准 Readme 遵循 [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct/)  行为规范
 
 ## Contributors

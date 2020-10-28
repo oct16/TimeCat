@@ -64,7 +64,7 @@ Add script tags in your browser and use the global variable ``TimeCat``, you can
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/oct16/TimeCat/issues/new) or submit PRs.
+Feel free to dive in! [Open an issue](https://github.com/oct16/TimeCat/issues/new/choose) or submit PRs.
 
 Standard Readme follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct/) Code of Conduct.
 
