@@ -6,13 +6,15 @@ A Magical Web Recorder 🖥 网页录屏器
 <h6 align="center">
 
 [![GitHub issues](https://img.shields.io/github/issues-raw/oct16/TimeCat)](https://github.com/oct16/TimeCat/issues) ![GitHub last commit](https://img.shields.io/github/last-commit/oct16/timecat) [![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)](https://www.npmjs.com/package/timecatjs)
-<h6>
+
+<img src="./timecat.gif">
+</h6>
 
 ## 项目简介
 
 中文 | [English](./README.md)
 
-TimeCat 是一个网页录屏工具，利用独特的录制方式与算法，提供超高性能与高压缩比的网页无损视频录制与回放
+TimeCat 是一个网页录屏工具，利用独特的录制方式，提供超高性能与高压缩比的网页无损视频录制与回放
 
 [🖥 DEMO](https://www.timecatjs.com/) Chrome浏览器
 
