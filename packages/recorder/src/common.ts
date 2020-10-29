@@ -8,7 +8,8 @@ export function rewriteNodes(vNodes: VNode[]) {
     if (!rewriteResource) {
         return
     }
-    const { replaceOrigin, fn, matches } = rewriteResource
+    const { replaceOrigin, folderPath, fn, matches } = rewriteResource
+
     if (!replaceOrigin || !matches) {
         return logError('The params replaceOrigin and matches is required for using rewriteResource')
     }
@@ -28,10 +29,38 @@ export function rewriteNodes(vNodes: VNode[]) {
         const oldUrl = url.href
 
         target[key] = new URL(url.pathname, replaceOrigin).href
+        target[key] = pathJoin(replaceOrigin, folderPath || '', url.pathname)
         const nextUrl = target[key]
 
         fn && fn(oldUrl, nextUrl)
     }
 
     vNodes.forEach(rewriteNodeSrc)
+}
+
+function pathJoin(...urls: string[]) {
+    if (!urls.length) {
+        return ''
+    }
+
+    if (urls.length === 1) {
+        return urls[0]
+    }
+
+    function pureEnd(path: string) {
+        return path.endsWith('/') ? path.substring(0, path.length - 1) : path
+    }
+    function pureStart(path: string) {
+        return path.startsWith('/') ? path.substring(1) : path
+    }
+
+    return urls.reduce((url, path) => {
+        if (!url) {
+            if (!path.startsWith('http')) {
+                throw new Error('path error')
+            }
+            return pureEnd(path)
+        }
+        return url + (path ? '/' + pureStart(pureEnd(path)) : '')
+    }, '')
 }

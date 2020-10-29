@@ -44,6 +44,7 @@ interface RecordOptions {
 interface RewriteResource {
     matches: string[] // example: ['css', 'woff']
     replaceOrigin: string  // example: 'https://xxx.com'
+    folderPath?: string // /path/xxx
     fn?: (pre: string, next: string) => void
 }
 

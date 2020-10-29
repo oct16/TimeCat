@@ -24,6 +24,7 @@ export interface RecordOptions {
 export interface RewriteResource {
     matches: string[]
     replaceOrigin: string
+    folderPath?: string
     fn?: (oldUrl: string, nextUrl: string) => void
 }
 
