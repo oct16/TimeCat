@@ -44,7 +44,6 @@ export class Pluginable {
 
     public use(plugin: RecorderPlugin): void {
         this.plugins.push(plugin)
-        plugin.apply(this)
     }
 
     private initPlugin(options?: RecordOptions) {
