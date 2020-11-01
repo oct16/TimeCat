@@ -10,6 +10,7 @@ export class KeyboardComponent {
 
     playOrPauseBtn: HTMLButtonElement
     exportBtn: HTMLElement
+    fullscreenBtn: HTMLElement
 
     constructor(options: ReplayInternalOptions, container: ContainerComponent) {
         this.options = options
@@ -21,7 +22,9 @@ export class KeyboardComponent {
         this.controller = this.c.container.querySelector('.cat-keyboard') as HTMLElement
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
         this.exportBtn = this.c.container.querySelector('.cat-export') as HTMLButtonElement
+        this.fullscreenBtn = this.c.container.querySelector('.cat-fullscreen') as HTMLButtonElement
         this.exportBtn.addEventListener('click', this.export)
+        this.fullscreenBtn.addEventListener('click', this.setFullScreen)
         this.createFastForwardBtns(this.options.fastForward)
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
@@ -160,5 +163,9 @@ export class KeyboardComponent {
             ...replayOptions,
             scripts: scriptList
         })
+    }
+
+    setFullScreen(this: HTMLButtonElement) {
+        this.ownerDocument.body.requestFullscreen()
     }
 }

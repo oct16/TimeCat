@@ -156,6 +156,7 @@ body {
     }
 }
 
+.cat-fullscreen,
 .cat-export,
 .cat-progress,
 .cat-keyboard,
@@ -182,6 +183,11 @@ body {
         padding: 0;
         padding-left: 2px;
     }
+}
+
+.cat-fullscreen {
+    margin-left: 8px;
+    cursor: pointer;
 }
 
 .cat-progress {
