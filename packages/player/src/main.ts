@@ -116,7 +116,7 @@ export class PlayerModule {
                     .map((replayData: ReplayData) => replayData.records)
                     .reduce(
                         (acc, records: RecordData[]) => {
-                            acc.endTime += records.slice(-1)[0].time - records[0].time
+                            acc.endTime += records.length ? records.slice(-1)[0].time - records[0].time : 0
                             acc.frames += records.length
                             return acc
                         },
@@ -258,7 +258,7 @@ export class PlayerModule {
 
     append(data: RecordData[] | ReplayPack | ReplayPack[]) {
         function isPack(data: any) {
-            return !!data.head
+            return data.head && data.body
         }
 
         let packs: ReplayPack[]

@@ -7,13 +7,14 @@ A Magical Web Recorder 🖥 网页录屏器
 
 [![GitHub issues](https://img.shields.io/github/issues-raw/oct16/TimeCat)](https://github.com/oct16/TimeCat/issues) ![GitHub last commit](https://img.shields.io/github/last-commit/oct16/timecat) [![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)](https://www.npmjs.com/package/timecatjs)
 
-<h6>
+<img src="./timecat.gif">
+</h6>
 
 ## Description
 
 English | [中文](./README.cn.md)
 
-TimeCat is a Web Record tool, passing a unique way and algorithm to provide ultra-high performance and ultra-high compression webpage lossless video record and replay
+TimeCat is a website record tool, passing a unique recording method to provide ultra-high performance and ultra-high compression ratio lossless video record and replay
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
@@ -64,7 +65,7 @@ Add script tags in your browser and use the global variable ``TimeCat``, you can
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/oct16/TimeCat/issues/new) or submit PRs.
+Feel free to dive in! [Open an issue](https://github.com/oct16/TimeCat/issues/new/choose) or submit PRs.
 
 Standard Readme follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct/) Code of Conduct.
 

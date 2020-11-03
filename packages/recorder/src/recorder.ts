@@ -161,7 +161,7 @@ export class RecorderModule extends Pluginable {
             emit({
                 type: RecordType.HEAD,
                 data: headData,
-                relatedId: relatedId,
+                relatedId,
                 time: getTime()
             })
         }
@@ -171,7 +171,7 @@ export class RecorderModule extends Pluginable {
                 recorder: this,
                 context: options && options.context,
                 listenStore: this.listenStore,
-                relatedId: relatedId,
+                relatedId,
                 emit,
                 watchers: this.watchersInstance
             })
@@ -258,11 +258,13 @@ export class RecorderModule extends Pluginable {
                     const data = {
                         type: RecordType.TERMINATE,
                         data: null,
-                        relatedId: options.context.G_RECORD_RELATED_ID,
+                        relatedId: window.G_RECORD_RELATED_ID,
                         time: getTime()
                     }
-                    this.db.addRecord(data as TerminateRecord)
-                    this.onDataCallback && this.onDataCallback(data)
+                    if (data.relatedId) {
+                        this.db.addRecord(data as TerminateRecord)
+                        this.onDataCallback && this.onDataCallback(data)
+                    }
                     this.cancelListen()
                     this.hooks.end.call()
                 } else {

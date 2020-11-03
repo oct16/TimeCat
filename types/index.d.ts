@@ -32,6 +32,7 @@ interface Window {
     HTMLInputElement: typeof HTMLInputElement
     HTMLSelectElement: typeof HTMLSelectElement
     HTMLTextAreaElement: typeof HTMLTextAreaElement
+    HTMLOptionElement: typeof HTMLOptionElement
     Object: typeof Object
 
     G_RECORD_OPTIONS: any

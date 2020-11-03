@@ -30,7 +30,6 @@ export class PlayerComponent {
     speed = 0
     recordIndex = 0
     frameIndex = 0
-    lastPercentage = 0
     isFirstTimePlay = true
     frameInterval = 250
     frames: number[]
@@ -93,9 +92,8 @@ export class PlayerComponent {
                     } else {
                         this.pause()
                     }
-
-                    this.setProgress()
                 }
+                this.setProgress()
             })
         }
     }
@@ -236,7 +234,7 @@ export class PlayerComponent {
 
         async function loop(this: PlayerComponent, t: number, loopIndex: number) {
             const timeStamp = getTime() - initTime
-            if (this.frameIndex > 0 && !this.frames[this.frameIndex]) {
+            if (this.frameIndex > 0 && this.frameIndex >= this.frames.length) {
                 this.stop()
                 return
             }
@@ -362,7 +360,6 @@ export class PlayerComponent {
         this.speed = 0
         this.recordIndex = 0
         this.frameIndex = 0
-        this.lastPercentage = 0
         this.elapsedTime = 0 // unit: sec
         this.pause()
         this.audioNode.currentTime = 0
