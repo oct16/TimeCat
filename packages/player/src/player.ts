@@ -384,8 +384,16 @@ export class PlayerComponent {
         const { startTime, endTime } = progressState
 
         const result: number[] = []
-
+        const { G_REPLAY_PACKS: packs } = window
+        let framesIndex = 0
         for (let i = startTime; i < endTime + interval; i += interval) {
+            if (
+                packs[framesIndex]?.body[0]?.records?.slice(-1)[0].time &&
+                i > packs[framesIndex].body[0].records.slice(-1)[0].time
+            ) {
+                result.push(packs[framesIndex].body[0].records.slice(-1)[0].time)
+                framesIndex++
+            }
             result.push(i)
         }
         result.push(endTime)
