@@ -154,7 +154,7 @@ export class PlayerComponent {
         window.G_REPLAY_DATA = firstData
     }
 
-    async switchNextView() {
+    getNextReplayData() {
         const { G_REPLAY_DATA: rData, G_REPLAY_PACKS: packs } = window as {
             G_REPLAY_DATA: ReplayData
             G_REPLAY_PACKS: ReplayPack[]
@@ -164,11 +164,7 @@ export class PlayerComponent {
             return
         }
 
-        const nextData = getNextData(rData)
-
-        if (!nextData) {
-            return
-        }
+        return getNextData(rData)
 
         function getNextData(curData: ReplayData) {
             for (let i = 0; i < packs.length; i++) {
@@ -182,13 +178,15 @@ export class PlayerComponent {
                         } else if (nextPackBody && nextPackBody.length) {
                             return nextPackBody[0]
                         }
-                        return null
+                        return
                     }
                 }
             }
-            return null
+            return
         }
+    }
 
+    async switchNextView(nextData: ReplayData) {
         const curEndTime = this.records.slice(-1)[0].time
         const nextStartTime = nextData.records[0].time
         this.curViewDiffTime += nextStartTime - curEndTime
@@ -245,15 +243,16 @@ export class PlayerComponent {
             const currTime = this.startTime + timeStamp * this.speed
             let nextTime = this.frames[this.frameIndex]
 
-            if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
-                await this.switchNextView()
-            }
-
             while (nextTime && currTime >= nextTime) {
                 observer.emit(PlayerEventTypes.PROGRESS, this.frameIndex, this.frames.length - 1)
-                this.renderEachFrame()
                 this.frameIndex++
+                this.renderEachFrame()
                 nextTime = this.frames[this.frameIndex]
+            }
+
+            if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
+                const nextReplayData = this.getNextReplayData()
+                nextReplayData && (await this.switchNextView(nextReplayData))
             }
 
             this.elapsedTime = (currTime - this.frames[0]) / 1000
