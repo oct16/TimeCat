@@ -5,7 +5,7 @@ import {
     SnapshotRecord,
     ReplayOptions,
     RecordData,
-    RecorderOptions,
+    AudioOptionsData,
     ReplayData,
     ReplayPack,
     RecordType,
@@ -191,7 +191,7 @@ export class PlayerModule {
                             body.push({
                                 snapshot: data as SnapshotRecord,
                                 records: [],
-                                audio: { src: '', bufferStrList: [], subtitles: [], opts: {} as RecorderOptions }
+                                audio: { src: '', bufferStrList: [], subtitles: [], opts: {} as AudioOptionsData }
                             })
 
                             replayPack = {

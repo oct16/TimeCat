@@ -1,6 +1,6 @@
 import { watchers, baseWatchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, ValueOf, RecordType, TerminateRecord } from '@timecat/share'
+import { RecordData, ValueOf, RecordType, TerminateRecord, RecordOptionsBase } from '@timecat/share'
 import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
@@ -10,13 +10,7 @@ export interface RecordInternalOptions extends RecordOptions {
     context: Window
 }
 
-export interface RecordOptions {
-    context?: Window
-    mode?: 'live' | 'default'
-    audio?: boolean
-    write?: boolean
-    keep?: boolean
-    font?: boolean
+export interface RecordOptions extends RecordOptionsBase {
     plugins?: RecorderPlugin[]
     rewriteResource?: RewriteResource
 }

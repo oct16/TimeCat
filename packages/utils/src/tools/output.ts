@@ -6,7 +6,7 @@ import {
     VNode,
     VSNode,
     AudioData,
-    RecorderOptions,
+    AudioOptionsData,
     RecordType,
     ReplayPack,
     RecordData,
@@ -27,7 +27,7 @@ const downloadAudioConfig = {
         source: string[]
         fileName: string
     }[],
-    opts: {} as RecorderOptions
+    opts: {} as AudioOptionsData
 }
 
 export async function exportReplay(exportOptions: ExportOptions) {

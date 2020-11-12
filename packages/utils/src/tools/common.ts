@@ -7,7 +7,7 @@ import {
     RecordData,
     AudioRecord,
     AudioStrList,
-    RecorderOptions,
+    AudioOptionsData,
     RecordType,
     ReplayData,
     ReplayPack,
@@ -116,7 +116,7 @@ export function transRecordsToPacks(records: RecordData[]) {
                             src: '',
                             bufferStrList: [],
                             subtitles: [],
-                            opts: {} as RecorderOptions
+                            opts: {} as AudioOptionsData
                         }
                     }
                     if (replayData && replayPack) {
@@ -131,7 +131,7 @@ export function transRecordsToPacks(records: RecordData[]) {
                     const audioData = record as AudioRecord
                     replayData.audio.bufferStrList.push(...(audioData.data as AudioStrList).data)
                 } else {
-                    replayData.audio.opts = (record as AudioRecord).data.data as RecorderOptions
+                    replayData.audio.opts = (record as AudioRecord).data.data as AudioOptionsData
                 }
                 break
 

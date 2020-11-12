@@ -1,6 +1,6 @@
-import { RecorderOptions } from '@timecat/share'
+import { AudioOptionsData } from '@timecat/share'
 
-function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
+function encodePCM(bufferData: Float32Array, opts: AudioOptionsData) {
     const { sampleBits } = opts
     const isLittleEndian = true
     const length = bufferData.length * (sampleBits / 8)
@@ -24,7 +24,7 @@ function encodePCM(bufferData: Float32Array, opts: RecorderOptions) {
     return data
 }
 
-export function encodeWAV(data: Float32Array[], opts: RecorderOptions) {
+export function encodeWAV(data: Float32Array[], opts: AudioOptionsData) {
     const PMC = encodePCM(mergeArray(data), opts)
     const arrayBuffer = createWavFile(PMC, opts)
 
@@ -46,7 +46,7 @@ function mergeArray(list: Float32Array[]) {
     return data
 }
 
-function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRate }: RecorderOptions) {
+function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRate }: AudioOptionsData) {
     const WAV_HEAD_SIZE = 44
     const buffer = new ArrayBuffer(WAV_HEAD_SIZE + audioData.byteLength)
     const isLittleEndian = true

@@ -1,4 +1,4 @@
-import { RecorderOptions, IRecorderStatus } from '@timecat/share'
+import { AudioOptionsData, IRecorderStatus } from '@timecat/share'
 import { float32ArrayToBase64 } from '@timecat/utils'
 
 export class AudioRecorder {
@@ -6,10 +6,10 @@ export class AudioRecorder {
         sampleBits: 8,
         sampleRate: 8000,
         channelCount: 1
-    } as RecorderOptions
+    } as AudioOptionsData
 
     private status: IRecorderStatus
-    private opts: RecorderOptions
+    private opts: AudioOptionsData
 
     private audioContext: AudioContext
     private mediaStream: MediaStream
@@ -20,15 +20,15 @@ export class AudioRecorder {
 
     onProgress: ((audioBase64Data: string[]) => void) | null
 
-    constructor(opts: Partial<RecorderOptions> = AudioRecorder.defaultRecordOptions) {
+    constructor(opts: Partial<AudioOptionsData> = AudioRecorder.defaultRecordOptions) {
         this.setOptions(opts)
     }
 
-    getOptions(): RecorderOptions {
+    getOptions(): AudioOptionsData {
         return this.opts
     }
 
-    setOptions(opts: Partial<RecorderOptions> = AudioRecorder.defaultRecordOptions) {
+    setOptions(opts: Partial<AudioOptionsData> = AudioRecorder.defaultRecordOptions) {
         this.opts = { ...this.opts, ...opts }
     }
 
@@ -77,7 +77,7 @@ export class AudioRecorder {
         })
     }
 
-    public async start(opts: Partial<RecorderOptions> = AudioRecorder.defaultRecordOptions) {
+    public async start(opts: Partial<AudioOptionsData> = AudioRecorder.defaultRecordOptions) {
         this.setOptions(opts)
         this.mediaStream = await this.initRecorder()
         this.mediaStream && this.beginRecord()

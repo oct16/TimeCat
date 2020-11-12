@@ -6,7 +6,7 @@ export {
     DBRecordData,
     BaseRecord,
     RecordType,
-    RecorderOptions,
+    AudioOptionsData,
     ReplayOptions,
     ReplayData,
     ReplayHead,

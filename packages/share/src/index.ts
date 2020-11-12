@@ -153,7 +153,7 @@ interface FormElementStrPatches {
 export type AudioRecord = BaseRecord<RecordType.AUDIO, AudioStrList | AudioOptions>
 export interface AudioOptions {
     type: 'opts'
-    data: RecorderOptions
+    data: AudioOptionsData
 }
 export interface AudioStrList {
     type: 'base64'
@@ -210,7 +210,7 @@ export type RecordData =
 
 export interface AudioData {
     src: string
-    opts: RecorderOptions
+    opts: AudioOptionsData
     bufferStrList: string[]
     subtitles: SubtitlesData[]
 }
@@ -221,7 +221,7 @@ interface SubtitlesData {
     text: string
 }
 
-export interface RecorderOptions {
+export interface AudioOptionsData {
     sampleBits: 8 | 16
     sampleRate: 8000 | 16000 | 22050 | 24000 | 44100 | 48000
     channelCount: 1 | 2
@@ -309,3 +309,14 @@ export interface FontRecordData {
 }
 
 export type FontRecord = BaseRecord<RecordType.FONT, FontRecordData>
+
+export interface RecordOptionsBase {
+    context?: Window
+    mode?: 'live' | 'default'
+    audio?: boolean
+    write?: boolean
+    keep?: boolean
+    font?: boolean
+    plugins?: any[]
+    rewriteResource?: any
+}
