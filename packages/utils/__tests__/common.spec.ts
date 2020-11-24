@@ -8,7 +8,7 @@ import {
     logError,
     getRandomCode
 } from '../src/tools/common'
-import { RecordData, RecorderOptions, VNode } from '@timecat/share'
+import { RecordData, AudioOptionsData, VNode } from '@timecat/share'
 
 describe('Test of common', () => {
     it('logError', () => {
@@ -215,7 +215,7 @@ describe('Test of common', () => {
                             src: '',
                             bufferStrList: ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
                             subtitles: [],
-                            opts: { sampleBits: 8, sampleRate: 8000, channelCount: 1 } as RecorderOptions
+                            opts: { sampleBits: 8, sampleRate: 8000, channelCount: 1 } as AudioOptionsData
                         }
                     }
                 ]
