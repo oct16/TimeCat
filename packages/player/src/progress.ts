@@ -46,19 +46,16 @@ export class ProgressComponent {
             return
         }
 
-        // recalculate progress thumb position
-        const percent = index / total
-        this.currentProgress.style.width = percent * this.slider.offsetWidth + 'px'
-
-        // fix change class not trigger animate
-        await delay(20)
-
         // remind animation seconds
         const duration = ((total - index) * interval) / speed / 1000
         this.currentProgress.style.transitionDuration = duration + 's'
 
         // animate
         this.currentProgress.classList.add('active')
+
+        // recalculate progress thumb position
+        const percent = index / total
+        this.currentProgress.style.width = percent * this.slider.offsetWidth + 'px'
     }
 
     updateTimer(frameIndex: number, frameInterval: number, curViewDiffTime: number) {
