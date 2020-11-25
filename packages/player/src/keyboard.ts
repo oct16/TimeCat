@@ -44,7 +44,7 @@ export class KeyboardComponent {
     }
 
     createFastForwardBtns(speeds: number[]) {
-        speeds = Array.from(new Set(speeds.concat(1))).sort()
+        speeds = Array.from(new Set([1].concat(speeds)))
         if (speeds) {
             let html = ''
             speeds.forEach(speed => {
