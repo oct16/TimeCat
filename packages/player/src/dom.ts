@@ -130,7 +130,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
                 ;(target as HTMLElement).style.height = height + 'px'
             } else {
                 target = this.c.sandBoxDoc.body
-                this.c.resize(width, height)
+                this.c.resize({ setWidth: width, setHeight: height })
             }
             break
         }

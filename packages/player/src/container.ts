@@ -12,7 +12,7 @@ export class ContainerComponent {
     container: HTMLElement
     sandBox: HTMLIFrameElement
     sandBoxDoc: Document
-    resize: (w?: number, h?: number) => void
+    resize: (options?: Partial<{ setWidth: number; setHeight: number; maxScale: number }>) => void
     options: ReplayInternalOptions
     target: Element | Window
 
@@ -96,18 +96,25 @@ export class ContainerComponent {
 
         this.options.destroyStore.add(() => window.removeEventListener('resize', callbackFn, true))
 
-        triggerResize()
-
         setTimeout(() => (this.container.style.opacity = '1'))
         this.container.style.display = 'block'
 
-        function triggerResize(setWidth?: number, setHeight?: number) {
-            resizeHandle(({ target: self.target } as unknown) as Event, setWidth, setHeight)
+        let setMaxScale: number
+
+        triggerResize()
+
+        function triggerResize(options?: Partial<{ setWidth: number; setHeight: number; maxScale: number }>) {
+            const { setHeight, setWidth, maxScale } = options || {}
+            resizeHandle(({ target: self.target } as unknown) as Event, setWidth, setHeight, maxScale)
         }
 
-        async function resizeHandle(e?: Event, setWidth?: number, setHeight?: number) {
+        async function resizeHandle(e?: Event, setWidth?: number, setHeight?: number, maxScale?: number) {
             if (!e) {
                 return
+            }
+
+            if (maxScale) {
+                setMaxScale = maxScale
             }
 
             if (e.target instanceof Window) {
@@ -137,8 +144,8 @@ export class ContainerComponent {
             const scaleX = maxWidth / (setWidth || targetWidth)
             const scaleY = maxHeight / ((setHeight || targetHeight) + panelHeight)
 
-            // max zoom 1
-            const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, 1)
+            // limit scale
+            const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, setMaxScale || 1)
 
             const left =
                 ((setWidth || targetWidth) * scale - (setWidth || targetWidth)) / 2 +

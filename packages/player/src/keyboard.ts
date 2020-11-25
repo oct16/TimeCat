@@ -11,6 +11,7 @@ export class KeyboardComponent {
     playOrPauseBtn: HTMLButtonElement
     exportBtn: HTMLElement
     fullscreenBtn: HTMLElement
+    fullscreenTarget: HTMLElement
 
     constructor(options: ReplayInternalOptions, container: ContainerComponent) {
         this.options = options
@@ -23,8 +24,11 @@ export class KeyboardComponent {
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
         this.exportBtn = this.c.container.querySelector('.cat-export') as HTMLButtonElement
         this.fullscreenBtn = this.c.container.querySelector('.cat-fullscreen') as HTMLButtonElement
+        this.fullscreenTarget = document.querySelector('.cat-shadowhost') as HTMLButtonElement
+
+        this.fullscreenTarget.addEventListener('fullscreenchange', () => this.cancelFullScreen())
+        this.fullscreenBtn.addEventListener('click', () => this.setFullScreen())
         this.exportBtn.addEventListener('click', this.export)
-        this.fullscreenBtn.addEventListener('click', this.setFullScreen)
         this.createFastForwardBtns(this.options.fastForward)
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
@@ -165,7 +169,15 @@ export class KeyboardComponent {
         })
     }
 
-    setFullScreen(this: HTMLButtonElement) {
-        this.ownerDocument.body.requestFullscreen()
+    setFullScreen(this: KeyboardComponent) {
+        this.c.resize({ maxScale: 100 })
+        this.fullscreenTarget.requestFullscreen()
+    }
+
+    cancelFullScreen() {
+        if (document.fullscreen) {
+            return
+        }
+        this.c.resize({ maxScale: 1 })
     }
 }
