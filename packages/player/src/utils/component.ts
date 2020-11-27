@@ -1,17 +1,26 @@
-export function Component(name: string, html: string, opts?: Partial<{ isShadow: boolean }>) {
+export function Component(name: string, html: string, opts?: Partial<{ replaceSlot: boolean; isShadow: boolean }>) {
     return function (constructor: Function) {
         customElements.define(
             name,
             class extends HTMLElement {
                 constructor() {
                     super()
-                    constructor.prototype.target = this
                     const temp = document.createElement('div')
                     temp.innerHTML = html
+                    const child = temp.firstElementChild!
+                    constructor.prototype.target = child
+
+                    if (opts?.replaceSlot && this.children?.length > 0) {
+                        const slot = child.getElementsByTagName('slot')[0]
+                        const parent = slot.parentElement
+                        ;[...this.children].forEach(el => parent?.insertBefore(el, null))
+                        parent?.removeChild(slot)
+                    }
+
                     if (opts?.isShadow) {
-                        this.attachShadow({ mode: 'open' }).append(...temp.childNodes)
+                        this.attachShadow({ mode: 'open' }).append(child)
                     } else {
-                        this.append(...temp.childNodes)
+                        this.parentElement?.replaceChild(child, this)
                     }
                 }
             }
