@@ -1,5 +1,14 @@
 import { ContainerComponent } from './container'
+import { Component } from '../utils/component'
 
+@Component(
+    'player-broadcaster',
+    `<div class="player-broadcaster">
+        <div class="float-layer" hidden>
+            <span class="subtitle"></span>
+        </div>
+    </div>`
+)
 export class BroadcasterComponent {
     broadcaster: HTMLElement
     floatLayer: HTMLElement
@@ -11,7 +20,7 @@ export class BroadcasterComponent {
     }
 
     init() {
-        this.broadcaster = this.c.container.querySelector('.cat-broadcaster') as HTMLElement
+        this.broadcaster = this.c.container.querySelector('.player-broadcaster') as HTMLElement
         this.floatLayer = this.broadcaster.firstElementChild as HTMLElement
         this.subtitle = this.floatLayer.firstElementChild as HTMLElement
     }

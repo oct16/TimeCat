@@ -21,10 +21,10 @@ import {
     FontRecordData
 } from '@timecat/share'
 import FIXED_CSS from './fixed.scss'
-import { PlayerComponent } from './player'
+import { PlayerComponent } from './components/player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
 import { setAttribute, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
-import { ContainerComponent } from './container'
+import { ContainerComponent } from './components/container'
 
 /**
  * if return true then revert
@@ -315,19 +315,19 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
 }
 
 export function showStartMask(c: ContainerComponent) {
-    const startPage = c.container.querySelector('#cat-start-page')! as HTMLElement
+    const startPage = c.container.querySelector('.player-start-page')! as HTMLElement
     startPage.setAttribute('style', '')
 }
 
 function showStartBtn(el: HTMLElement) {
-    const startPage = el.querySelector('#cat-start-page')! as HTMLElement
+    const startPage = el.querySelector('.player-start-page')! as HTMLElement
     const btn = startPage.querySelector('.play-btn') as HTMLElement
     btn.classList.add('show')
     return btn
 }
 
 export function removeStartPage(el: HTMLElement) {
-    const startPage = el.querySelector('#cat-start-page') as HTMLElement
+    const startPage = el.querySelector('.player-start-page') as HTMLElement
     startPage?.parentElement?.removeChild(startPage)
 }
 

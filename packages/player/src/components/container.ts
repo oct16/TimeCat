@@ -1,12 +1,13 @@
 import { disableScrolling, nodeStore, debounce } from '@timecat/utils'
-import HTML from './ui.html'
-import CSS from './ui.scss'
-import { createIframeDOM, injectIframeContent } from './dom'
+import HTML from '../ui.html'
+import CSS from '../ui.scss'
+import { createIframeDOM, injectIframeContent } from '../dom'
 import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions } from '@timecat/share'
-import { observer } from './utils'
-import { PlayerEventTypes } from './types'
+import { observer } from '../utils'
+import { PlayerEventTypes } from '../types'
 import { Panel } from './panel'
+import { PageStartComponent } from './page-start'
 
 export class ContainerComponent {
     container: HTMLElement
@@ -34,10 +35,11 @@ export class ContainerComponent {
 
     initPanel() {
         new Panel(this)
+        new PageStartComponent()
     }
 
     initSandbox() {
-        this.sandBox = this.container.querySelector('#cat-sandbox') as HTMLIFrameElement
+        this.sandBox = this.container.querySelector('.player-sandbox') as HTMLIFrameElement
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.setSmoothScroll(this.sandBox.contentWindow!)
         createIframeDOM(this.sandBoxDoc, this.getSnapshotRecord())
@@ -67,20 +69,20 @@ export class ContainerComponent {
 
         if (targetElement.tagName === 'BODY') {
             const shadowHost = document.createElement('div')
-            shadowHost.className = 'cat-shadowhost'
+            shadowHost.className = 'player-shadowhost'
             targetElement.appendChild(shadowHost)
             targetElement = shadowHost
         }
 
         const shadow = targetElement.attachShadow({ mode: 'open' })
-        shadow.appendChild(this.createStyle('cat-css', CSS))
-        shadow.appendChild(this.createContainer('cat-main', HTML))
+        shadow.appendChild(this.createStyle('player-css', CSS))
+        shadow.appendChild(this.createContainer('player-main', HTML))
     }
 
-    createContainer(id: string, html: string) {
+    createContainer(className: string, html: string) {
         const parser = new DOMParser()
         const el = parser.parseFromString(html, 'text/html').body.firstChild as HTMLElement
-        el.id = id
+        el.className = className
         el.style.width = this.getSnapshotRecord().width + 'px'
         el.style.height = this.getSnapshotRecord().height + 'px'
         el.style.display = 'none'

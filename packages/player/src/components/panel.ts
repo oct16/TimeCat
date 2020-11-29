@@ -5,7 +5,16 @@ import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { BroadcasterComponent } from './broadcaster'
 import { ReplayInternalOptions } from '@timecat/share/src'
+import { Component } from '../utils/component'
+import { ToolboxComponent } from './toolbox'
 
+@Component(
+    'player-panel',
+    `<div class="player-panel">
+        <slot></slot>
+    </div>`,
+    { replaceSlot: true }
+)
 export class Panel {
     keyboard: KeyboardComponent
     progress: ProgressComponent
@@ -22,6 +31,7 @@ export class Panel {
     }
 
     initComponent() {
+        new ToolboxComponent(this.c)
         this.keyboard = new KeyboardComponent(this.options, this.c)
         this.progress = new ProgressComponent(this.c)
         this.pointer = new PointerComponent(this.c)

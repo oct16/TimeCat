@@ -1,5 +1,5 @@
 import { isSnapshot, transRecordsToPacks, logError, nodeStore, debounce, getRecordsFromDB } from '@timecat/utils'
-import { ContainerComponent } from './container'
+import { ContainerComponent } from './components/container'
 import pako from 'pako'
 import {
     SnapshotRecord,
@@ -98,7 +98,7 @@ export class PlayerModule {
         })
 
         if (!records.length) {
-            const panel = c.container.querySelector('#cat-panel')
+            const panel = c.container.querySelector('.player-panel')
             if (panel) {
                 panel.setAttribute('style', 'display: none')
             }

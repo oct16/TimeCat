@@ -1,9 +1,28 @@
 import { secondToTime, delay, getDateTime } from '@timecat/utils'
 import { ContainerComponent } from './container'
-import { Heat } from './utils/heat'
-import { observer, reduxStore } from './utils'
-import { PlayerEventTypes } from './types'
+import { Heat } from '../utils/heat'
+import { observer, reduxStore } from '../utils'
+import { PlayerEventTypes } from '../types'
+import { Component } from '../utils/component'
 
+@Component(
+    'player-progress',
+    `<div class="player-progress">
+        <div class="player-timer">
+            <time>
+                00:00
+            </time>
+        </div>
+        <div class="player-slider-bar">
+            <div class="player-heat-bar-container">
+                <canvas class="player-heat-bar"></canvas>
+            </div>
+            <div class="player-current-progress">
+                <div class="player-thumb"></div>
+            </div>s
+        </div>
+    </div>`
+)
 export class ProgressComponent {
     c: ContainerComponent
     progress: HTMLElement
@@ -16,12 +35,12 @@ export class ProgressComponent {
 
     constructor(c: ContainerComponent) {
         this.c = c
-        this.progress = c.container.querySelector('.cat-progress')! as HTMLElement
-        this.timer = c.container.querySelector('.cat-timer time') as HTMLElement
-        this.thumb = this.progress.querySelector('.cat-thumb') as HTMLElement
-        this.currentProgress = this.progress.querySelector('.cat-current-progress') as HTMLElement
-        this.slider = this.progress.querySelector('.cat-slider-bar') as HTMLElement
-        this.heatBar = this.progress.querySelector('.cat-heat-bar') as HTMLCanvasElement
+        this.progress = c.container.querySelector('.player-progress')! as HTMLElement
+        this.timer = c.container.querySelector('.player-timer time') as HTMLElement
+        this.thumb = this.progress.querySelector('.player-thumb') as HTMLElement
+        this.currentProgress = this.progress.querySelector('.player-current-progress') as HTMLElement
+        this.slider = this.progress.querySelector('.player-slider-bar') as HTMLElement
+        this.heatBar = this.progress.querySelector('.player-heat-bar') as HTMLCanvasElement
         observer.on(PlayerEventTypes.RESIZE, this.resizeHeatBar.bind(this))
     }
 

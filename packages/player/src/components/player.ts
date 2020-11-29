@@ -1,5 +1,5 @@
 import { PointerComponent } from './pointer'
-import { updateDom } from './dom'
+import { updateDom } from '../dom'
 import { getTime, isSnapshot, delay, toTimeStamp, base64ToFloat32Array, encodeWAV } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
@@ -13,11 +13,18 @@ import {
     RecordType
 } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
-import { AnimationFrame } from './animation-frame'
-import { observer } from './utils/observer'
-import { PlayerEventTypes } from './types'
-import { PlayerTypes, reduxStore } from './utils'
+import { AnimationFrame } from '../animation-frame'
+import { observer } from '../utils/observer'
+import { PlayerEventTypes } from '../types'
+import { PlayerTypes, reduxStore } from '../utils'
+import { Component } from '../utils/component'
 
+@Component(
+    'timecat-player',
+    `<div class="timecat-player">
+        <iframe class="player-sandbox" sandbox="allow-same-origin allow-scripts allow-popups"></iframe>
+    </div>`
+)
 export class PlayerComponent {
     options: ReplayInternalOptions
     c: ContainerComponent
