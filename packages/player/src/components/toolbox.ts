@@ -52,8 +52,9 @@ export class ToolboxComponent {
         this.c = c
         this.exportBtn = this.target.querySelector('.player-export') as HTMLButtonElement
         this.exportBtn.addEventListener('click', this.export)
-        this.fullscreenBtn = this.c.container.querySelector('.player-fullscreen') as HTMLButtonElement
-        this.fullscreenTarget = document.querySelector('.player-shadowhost') as HTMLButtonElement
+
+        this.fullscreenBtn = this.target.querySelector('.player-fullscreen') as HTMLButtonElement
+        this.fullscreenTarget = (this.c.container.parentNode as ShadowRoot).host as HTMLElement
 
         this.fullscreenTarget.addEventListener('fullscreenchange', () => this.cancelFullScreen())
         this.fullscreenBtn.addEventListener('click', () => this.setFullScreen())
