@@ -3,7 +3,7 @@ import HTML from '../ui.html'
 import CSS from '../ui.scss'
 import { createIframeDOM, injectIframeContent } from '../dom'
 import smoothScroll from 'smoothscroll-polyfill'
-import { ReplayInternalOptions } from '@timecat/share'
+import { ReplayInternalOptions, VNode, InfoData } from '@timecat/share'
 import { observer } from '../utils'
 import { PlayerEventTypes } from '../types'
 import { Panel } from './panel'
@@ -48,7 +48,9 @@ export class ContainerComponent {
     }
 
     getSnapshotRecord() {
-        return window.G_REPLAY_DATA.snapshot.data
+        return window.G_REPLAY_DATA.snapshot.data as {
+            vNode: VNode
+        } & InfoData
     }
 
     // use scroll polyfill if browser (e.g. ios safari) not support
