@@ -376,10 +376,15 @@ function renderCanvas(canvasRecordData: CanvasRecordData) {
     const data = canvasRecordData as UnionToIntersection<CanvasRecordData>
     const { src, status, id, strokes } = data
     const canvas = nodeStore.getNode(id) as HTMLCanvasElement
-    if (!canvas) {
+    if (!canvas || canvas.constructor.name !== 'HTMLCanvasElement') {
         return
     }
-    const ctx = canvas.getContext('2d')!
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+        return
+    }
+
     if (src) {
         const image = new Image()
         image.src = src
@@ -398,6 +403,9 @@ function renderCanvas(canvasRecordData: CanvasRecordData) {
             if (Array.isArray(args)) {
                 if (name === 'drawImage' || name === 'createPattern') {
                     args[0] = nodeStore.getNode(args[0])
+                } else if (name === 'putImageData') {
+                    const data = args[0].data
+                    args[0] = new ImageData(new Uint8ClampedArray(data), args[1], args[2])
                 }
                 ;(ctx[name] as Function).apply(ctx, args)
             } else {
