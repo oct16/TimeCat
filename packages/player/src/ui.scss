@@ -230,6 +230,12 @@ body {
     right: -5px;
     top: -4px;
     z-index: 10;
+    opacity: 0;
+    transition: opacity .5s;
+
+    &[active] {
+        opacity: 1;
+    }
 }
 
 .player-current-progress {

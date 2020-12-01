@@ -5,7 +5,7 @@ import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { BroadcasterComponent } from './broadcaster'
 import { ReplayInternalOptions } from '@timecat/share/src'
-import { Component } from '../utils/component'
+import { Component, IComponent } from '../utils/component'
 import { ToolboxComponent } from './toolbox'
 
 @Component(
@@ -15,7 +15,9 @@ import { ToolboxComponent } from './toolbox'
     </div>`,
     { replaceSlot: true }
 )
-export class Panel {
+export class PanelComponent implements IComponent {
+    target: HTMLElement
+    parent: HTMLElement
     keyboard: KeyboardComponent
     progress: ProgressComponent
     pointer: PointerComponent

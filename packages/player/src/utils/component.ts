@@ -1,3 +1,8 @@
+export interface IComponent {
+    parent: HTMLElement
+    target: HTMLElement
+}
+
 export function Component(name: string, html: string, opts?: Partial<{ replaceSlot: boolean; isShadow: boolean }>) {
     return function (constructor: Function) {
         customElements.define(
@@ -22,6 +27,8 @@ export function Component(name: string, html: string, opts?: Partial<{ replaceSl
                     } else {
                         this.parentElement?.replaceChild(child, this)
                     }
+
+                    constructor.prototype.parent = child.parentElement
                 }
             }
         )

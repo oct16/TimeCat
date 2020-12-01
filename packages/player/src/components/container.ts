@@ -6,10 +6,11 @@ import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions, VNode, InfoData } from '@timecat/share'
 import { observer } from '../utils'
 import { PlayerEventTypes } from '../types'
-import { Panel } from './panel'
+import { PanelComponent } from './panel'
 import { PageStartComponent } from './page-start'
 
 export class ContainerComponent {
+    panel: PanelComponent
     container: HTMLElement
     sandBox: HTMLIFrameElement
     sandBoxDoc: Document
@@ -34,7 +35,7 @@ export class ContainerComponent {
     }
 
     initPanel() {
-        new Panel(this)
+        this.panel = new PanelComponent(this)
         new PageStartComponent()
     }
 

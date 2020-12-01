@@ -3,7 +3,7 @@ import { ContainerComponent } from './container'
 import { Heat } from '../utils/heat'
 import { observer, reduxStore } from '../utils'
 import { PlayerEventTypes } from '../types'
-import { Component } from '../utils/component'
+import { Component, IComponent } from '../utils/component'
 
 @Component(
     'player-progress',
@@ -19,15 +19,16 @@ import { Component } from '../utils/component'
             </div>
             <div class="player-current-progress">
                 <div class="player-thumb"></div>
-            </div>s
+            </div>
         </div>
     </div>`
 )
-export class ProgressComponent {
+export class ProgressComponent implements IComponent {
+    target: HTMLElement
+    parent: HTMLElement
     c: ContainerComponent
     progress: HTMLElement
     currentProgress: HTMLElement
-    thumb: HTMLElement
     timer: HTMLElement
     slider: HTMLElement
     heatBar: HTMLCanvasElement
@@ -37,11 +38,53 @@ export class ProgressComponent {
         this.c = c
         this.progress = c.container.querySelector('.player-progress')! as HTMLElement
         this.timer = c.container.querySelector('.player-timer time') as HTMLElement
-        this.thumb = this.progress.querySelector('.player-thumb') as HTMLElement
         this.currentProgress = this.progress.querySelector('.player-current-progress') as HTMLElement
         this.slider = this.progress.querySelector('.player-slider-bar') as HTMLElement
         this.heatBar = this.progress.querySelector('.player-heat-bar') as HTMLCanvasElement
         observer.on(PlayerEventTypes.RESIZE, this.resizeHeatBar.bind(this))
+
+        this.listenElementOnHover(this.parent)(isHover => {
+            if (isHover) {
+                this.getThumb().setAttribute('active', '')
+                return
+            }
+            this.getThumb().removeAttribute('active')
+        })
+    }
+
+    listenElementOnHover = (el: HTMLElement) => {
+        let hoverState = false
+        const delayTime = 1200
+        let timer = 0
+        return (cb: (isHover: boolean) => void) => {
+            el.addEventListener('mouseover', () => {
+                delayExec(true)
+            })
+
+            el.addEventListener('mouseout', () => {
+                delayExec(false)
+            })
+
+            function delayExec(isHover: boolean) {
+                const preState = hoverState
+                hoverState = isHover
+                if (timer || preState === isHover) {
+                    return
+                }
+                timer = window.setTimeout(
+                    () => {
+                        cb(hoverState)
+                        clearTimeout(timer)
+                        timer = 0
+                    },
+                    hoverState ? delayTime / 5 : delayTime
+                )
+            }
+        }
+    }
+
+    getThumb() {
+        return this.progress.querySelector('.player-thumb') as HTMLElement
     }
 
     async setProgressAnimation(index: number, total: number, interval: number, speed: number) {
