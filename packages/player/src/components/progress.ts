@@ -3,11 +3,11 @@ import { ContainerComponent } from './container'
 import { Heat } from '../utils/heat'
 import { observer, reduxStore } from '../utils'
 import { PlayerEventTypes } from '../types'
-import { Component, IComponent } from '../utils/component'
+import { Component, IComponent, html } from '../utils/component'
 
 @Component(
     'player-progress',
-    `<div class="player-progress">
+    html`<div class="player-progress">
         <div class="player-timer">
             <time>
                 00:00

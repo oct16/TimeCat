@@ -1,9 +1,9 @@
 import { ContainerComponent } from './container'
-import { Component } from '../utils/component'
+import { Component, html } from '../utils/component'
 
 @Component(
     'player-broadcaster',
-    `<div class="player-broadcaster">
+    html`<div class="player-broadcaster">
         <div class="float-layer" hidden>
             <span class="subtitle"></span>
         </div>

@@ -1,11 +1,11 @@
 import { ContainerComponent } from './container'
 import { PlayerTypes, reduxStore } from '../utils'
 import { ReplayInternalOptions } from '@timecat/share'
-import { Component } from '../utils/component'
+import { Component, html } from '../utils/component'
 
 @Component(
     'player-keyboard',
-    `<div class="player-keyboard">
+    html`<div class="player-keyboard">
         <button class="play-or-pause" type="button" speed="1">▲</button>
     </div>`
 )

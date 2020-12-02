@@ -34,3 +34,12 @@ export function Component(name: string, html: string, opts?: Partial<{ replaceSl
         )
     }
 }
+
+/**
+ * for vscode lit-html
+ * highlight tagged string template
+ * @param str
+ */
+export const html = function (str: TemplateStringsArray) {
+    return str.raw[0]
+}
