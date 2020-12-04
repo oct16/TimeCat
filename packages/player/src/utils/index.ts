@@ -1,6 +1,6 @@
 export * from './fmp'
 export * from './observer'
-export * from './tools'
+export * from './common'
 export * from './pure-redux'
 export * from './heat'
 export * from './redux'

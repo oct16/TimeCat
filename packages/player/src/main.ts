@@ -1,6 +1,5 @@
 import { logError, nodeStore, debounce } from '@timecat/utils'
 import { ContainerComponent } from './components/container'
-import pako from 'pako'
 import {
     SnapshotRecord,
     ReplayOptions,
@@ -19,7 +18,9 @@ import {
     getRecordsFromDB,
     ProgressTypes,
     ReplayDataReducerTypes,
-    transToReplayData
+    transToReplayData,
+    getGZipData,
+    getPacks
 } from './utils'
 
 const defaultReplayOptions = {
@@ -66,7 +67,7 @@ export class PlayerModule {
         this.destroyStore.add(() => Store.unsubscribe())
 
         const records = await this.getRecords(opts)
-        const packs = this.getPacks(records)
+        const packs = getPacks(records)
         const firstData = transToReplayData(packs[0])
         const { audio } = firstData
         Store.dispatch({
@@ -110,32 +111,13 @@ export class PlayerModule {
         }
     }
 
-    getPacks(records: RecordData[]) {
-        const packs: RecordData[][] = []
-        const pack: RecordData[] = []
-
-        records.forEach((record, i) => {
-            if (i && record.type === RecordType.HEAD) {
-                packs.push(pack.slice())
-                pack.length = 0
-            }
-            pack.push(record)
-
-            if (records.length - 1 === i) {
-                packs.push(pack)
-            }
-        })
-
-        return packs
-    }
-
     private async getRecords(options: ReplayInternalOptions) {
         const { receiver, records: recordsData } = options
 
         const records =
             recordsData ||
             (receiver && (await this.dataReceiver(receiver))) ||
-            this.getGZipData() ||
+            getGZipData() ||
             (await getRecordsFromDB())
 
         if (!records) {
@@ -177,26 +159,6 @@ export class PlayerModule {
                 endTime
             }
         })
-    }
-
-    private getGZipData() {
-        const data = window.G_REPLAY_STR_RECORDS
-        if (!data) {
-            return null
-        }
-
-        const codeArray: number[] = []
-        const strArray = data.split('')
-        for (let i = 0; i < strArray.length; i++) {
-            const num = strArray[i].charCodeAt(0)
-            codeArray.push(num >= 300 ? num - 300 : num)
-        }
-
-        const str = pako.ungzip(codeArray, {
-            to: 'string'
-        })
-        const records = JSON.parse(str) as RecordData[]
-        return records
     }
 
     private dispatchEvent(type: string, data: RecordData) {

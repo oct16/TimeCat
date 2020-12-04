@@ -252,7 +252,6 @@ export interface ReplayOptions {
     mode?: 'live' | 'default'
     receiver?: (sender: (data: RecordData) => void) => void
     autoplay?: boolean
-    packs?: ReplayPack[]
     records?: RecordData[]
     target?: string | HTMLElement | Window
     heatPoints?: boolean
@@ -269,13 +268,9 @@ export interface ReplayInternalOptions extends ReplayOptions {
     timeMode: 'recordingTime' | 'durationTime'
 }
 
-export interface ReplayPack {
-    head: ReplayHead
-    body: ReplayData[]
-}
-
 export interface ReplayData {
     index?: number
+    head?: HeadRecord
     snapshot: SnapshotRecord
     records: RecordData[]
     audio: AudioData

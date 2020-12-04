@@ -1,4 +1,4 @@
-import { TPL, pacmanCss } from './tpl'
+import { emptyTemplate, loadingScriptContent } from './tpl'
 import {
     base64ToFloat32Array,
     encodeWAV,
@@ -7,20 +7,12 @@ import {
     getRandomCode,
     isVNode,
     getScript,
-    nodeStore
+    nodeStore,
+    logError
 } from '@timecat/utils'
 import pako from 'pako'
-import {
-    VNode,
-    VSNode,
-    AudioData,
-    AudioOptionsData,
-    RecordType,
-    RecordData,
-    DOMRecord,
-    DBRecordData
-} from '@timecat/share'
-import { download, transToReplayData } from './tools'
+import { VNode, VSNode, AudioData, AudioOptionsData, RecordType, RecordData, DOMRecord } from '@timecat/share'
+import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks } from './common'
 import { recoverNative } from './polyfill/recover-native'
 import { Store } from './redux'
 
@@ -40,7 +32,7 @@ export async function exportReplay(exportOptions: ExportOptions) {
     recoveryMethods()
     await addNoneFrame()
     const parser = new DOMParser()
-    const html = parser.parseFromString(TPL, 'text/html')
+    const html = parser.parseFromString(emptyTemplate, 'text/html')
     await injectLoading(html)
     await injectData(html, exportOptions)
     await initOptions(html, exportOptions)
@@ -142,15 +134,6 @@ async function injectScripts(html: Document, scripts: ScriptItem[]) {
     }
 }
 
-export async function getRecordsFromDB() {
-    const DBOperator = await getDBOperator
-    const records: DBRecordData[] | null = await DBOperator.readAllRecords()
-    if (records && records.length) {
-        return records
-    }
-    return null
-}
-
 export function extract(packs: RecordData[][], exportOptions?: ExportOptions) {
     const replayDataList = packs.map(transToReplayData)
     return replayDataList.forEach(replayData => {
@@ -179,21 +162,15 @@ function extractAudio(audio: AudioData) {
 }
 
 async function injectLoading(html: Document) {
-    const loadingScriptContent = `const loadingNode = document.createElement('div')
-    loadingNode.className = 'pacman-box';
-    loadingNode.innerHTML = '<style>${pacmanCss}<\/style><div class="pacman"><div><\/div><div><\/div><div><\/div><div><\/div><div><\/div><\/div>'
-    loadingNode.setAttribute('style', 'text-align: center;vertical-align: middle;line-height: 100vh;')
-    document.body.insertBefore(loadingNode, document.body.firstChild);window.addEventListener('DOMContentLoaded', () => loadingNode.parentNode.removeChild(loadingNode))`
     injectScripts(html, [{ src: loadingScriptContent }])
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const { records, packs } = Store.getState().replayData
-
+    const records = getGZipData() || (await getRecordsFromDB()) || Store.getState().replayData.records
     if (!records) {
-        return
+        return logError('Records not found')
     }
-
+    const packs = getPacks(records)
     extract(packs, exportOptions)
     await makeCssInline(records) // some link cross origin
 

@@ -9,12 +9,11 @@ export {
     AudioOptionsData,
     ReplayOptions,
     ReplayData,
-    ReplayHead,
-    ReplayPack
+    ReplayHead
 } from '@timecat/share'
 
 const version = '__VERSION__'
 export { version }
 
 export { Player, PlayerModule, Recorder, RecorderModule, exportReplay }
-export { transRecordsToPacks, delay, debounce, throttle } from '@timecat/utils'
+export { delay, debounce, throttle } from '@timecat/utils'

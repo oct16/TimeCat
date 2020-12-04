@@ -10,8 +10,8 @@ import {
     AudioOptionsData,
     RecordType,
     ReplayData,
-    ReplayPack,
-    ReplayHead
+    ReplayHead,
+    HeadRecord
 } from '@timecat/share'
 
 export const isDev = process.env.NODE_ENV === 'development'
@@ -70,80 +70,6 @@ export function toTimeStamp(timeStr: string) {
 
 export function isSnapshot(frame: RecordData) {
     return (frame as SnapshotRecord).type === RecordType.SNAPSHOT && !(frame as SnapshotRecord).data.frameId
-}
-
-export function transRecordsToPacks(records: RecordData[]) {
-    window.G_REPLAY_RECORDS = records
-    const packs: ReplayPack[] = []
-
-    function isAudioBufferStr(frame: AudioRecord) {
-        return frame.data.type === 'base64'
-    }
-
-    function isSameHEAD(head: ReplayHead, compare: ReplayHead) {
-        return head.href === compare.href // && head.relatedId === compare.relatedId
-    }
-
-    let replayPack: ReplayPack
-    let replayData: ReplayData
-    records.forEach((record, index) => {
-        const next = records[index + 1]
-        switch (record.type) {
-            case RecordType.HEAD:
-                const headData = record.data
-                const lastHEAD = replayPack && replayPack.head
-
-                if (lastHEAD && isSameHEAD(headData, lastHEAD)) {
-                    break
-                }
-
-                replayPack = {
-                    head: headData,
-                    body: []
-                }
-                if (next && !(next.data as SnapshotRecord['data']).frameId) {
-                    if (replayPack) {
-                        packs.push(replayPack)
-                    }
-                }
-                break
-            case RecordType.SNAPSHOT:
-                if (!record.data.frameId) {
-                    replayData = {
-                        snapshot: record as SnapshotRecord,
-                        records: [],
-                        audio: {
-                            src: '',
-                            bufferStrList: [],
-                            subtitles: [],
-                            opts: {} as AudioOptionsData
-                        }
-                    }
-                    if (replayData && replayPack) {
-                        replayPack.body.push(replayData)
-                    }
-                } else {
-                    replayData.records.push(record)
-                }
-                break
-            case RecordType.AUDIO:
-                if (isAudioBufferStr(record as AudioRecord)) {
-                    const audioData = record as AudioRecord
-                    replayData.audio.bufferStrList.push(...(audioData.data as AudioStrList).data)
-                } else {
-                    replayData.audio.opts = (record as AudioRecord).data.data as AudioOptionsData
-                }
-                break
-
-            default:
-                if (replayData) {
-                    replayData.records.push(record as RecordData)
-                }
-                break
-        }
-    })
-
-    return packs
 }
 
 export async function delay(t = 200): Promise<void> {
