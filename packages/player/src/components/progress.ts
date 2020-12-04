@@ -1,10 +1,7 @@
 import { secondToTime, delay, getDateTime } from '@timecat/utils'
 import { ContainerComponent } from './container'
-import { Heat } from '../utils/heat'
-import { observer } from '../utils'
 import { PlayerEventTypes } from '../types'
-import { Component, IComponent, html } from '../utils/component'
-import { Store } from '../utils/redux'
+import { observer, Heat, Store, Component, IComponent, html } from '../utils'
 
 @Component(
     'player-progress',

@@ -1,25 +1,26 @@
-import { isSnapshot, transRecordsToPacks, logError, nodeStore, debounce, getRecordsFromDB } from '@timecat/utils'
+import { logError, nodeStore, debounce } from '@timecat/utils'
 import { ContainerComponent } from './components/container'
 import pako from 'pako'
 import {
     SnapshotRecord,
     ReplayOptions,
     RecordData,
-    AudioOptionsData,
-    ReplayData,
-    ReplayPack,
     RecordType,
-    ReplayHead,
-    ReplayInternalOptions
+    ReplayInternalOptions,
+    HeadRecord
 } from '@timecat/share'
 import { waitStart, removeStartPage, showStartMask } from './dom'
-import { observer } from './utils/observer'
 import { PlayerEventTypes } from './types'
-import { FMP } from './utils/fmp'
-
-import { Store } from './utils/redux'
-import { PlayerTypes } from './utils/redux/reducers/player'
-import { ProgressTypes } from './utils/redux/reducers/progress'
+import {
+    FMP,
+    observer,
+    Store,
+    PlayerTypes,
+    getRecordsFromDB,
+    ProgressTypes,
+    ReplayDataReducerTypes,
+    transToReplayData
+} from './utils'
 
 const defaultReplayOptions = {
     autoplay: true,
@@ -64,26 +65,25 @@ export class PlayerModule {
 
         this.destroyStore.add(() => Store.unsubscribe())
 
-        const replayPacks = await this.getReplayPacks(opts)
+        const records = await this.getRecords(opts)
+        const packs = this.getPacks(records)
+        const firstData = transToReplayData(packs[0])
+        const { audio } = firstData
+        Store.dispatch({
+            type: ReplayDataReducerTypes.UPDATE_DATA,
+            data: { records, packs, currentData: firstData }
+        })
 
-        if (!replayPacks || !replayPacks.length) {
-            return
-        }
-
-        const { records, audio } = (window.G_REPLAY_DATA = this.getFirstReplayData(replayPacks))
         const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
-        if (records.length) {
-            this.calcProgress(replayPacks)
+        if (packs.length) {
+            this.calcProgress()
         }
 
-        const c = (this.c = new ContainerComponent(opts))
-        const container = c.container
-        showStartMask(c)
-
-        this.fmp = new FMP()
-
-        this.fmp.ready(async () => {
+        this.c = new ContainerComponent(opts)
+        const container = this.c.container
+        showStartMask(this.c)
+        ;(this.fmp = new FMP()).ready(async () => {
             if (hasAudio) {
                 await waitStart(container)
             }
@@ -92,59 +92,91 @@ export class PlayerModule {
 
             if (records.length) {
                 if (opts.autoplay || hasAudio) {
-                    Store.dispatch({
-                        type: PlayerTypes.SPEED,
-                        data: { speed: 1 }
-                    })
+                    if (opts.autoplay) {
+                        Store.dispatch({
+                            type: PlayerTypes.SPEED,
+                            data: { speed: 1 }
+                        })
+                    }
                 }
             }
         })
 
-        if (!records.length) {
-            const panel = c.container.querySelector('.player-panel')
+        if (records.length <= 2) {
+            const panel = this.c.container.querySelector('.player-panel')
             if (panel) {
                 panel.setAttribute('style', 'display: none')
             }
         }
     }
 
-    private calcProgress(replayPacks: ReplayPack[]) {
-        const firstPack = replayPacks[0]
-        const { beginTime } = firstPack.head
+    getPacks(records: RecordData[]) {
+        const packs: RecordData[][] = []
+        const pack: RecordData[] = []
 
-        const startTime = beginTime
-        const { endTime, frames } = replayPacks.reduce(
-            (packsAcc, pack) => {
-                const { frames, endTime } = pack.body
-                    .map((replayData: ReplayData) => replayData.records)
-                    .reduce(
-                        (acc, records: RecordData[]) => {
-                            acc.endTime += records.length ? records.slice(-1)[0].time - records[0].time : 0
-                            acc.frames += records.length
-                            return acc
-                        },
-                        { endTime: 0, frames: 0 }
-                    )
+        records.forEach((record, i) => {
+            if (i && record.type === RecordType.HEAD) {
+                packs.push(pack.slice())
+                pack.length = 0
+            }
+            pack.push(record)
 
-                packsAcc.frames += frames
-                packsAcc.endTime += endTime
-                return packsAcc
-            },
-            { endTime: startTime, frames: 0 }
-        )
+            if (records.length - 1 === i) {
+                packs.push(pack)
+            }
+        })
+
+        return packs
+    }
+
+    private async getRecords(options: ReplayInternalOptions) {
+        const { receiver, records: recordsData } = options
+
+        const records =
+            recordsData ||
+            (receiver && (await this.dataReceiver(receiver))) ||
+            this.getGZipData() ||
+            (await getRecordsFromDB())
+
+        if (!records) {
+            throw logError('Replay data not found')
+        }
+
+        return records
+    }
+
+    private calcProgress() {
+        const { packs } = Store.getState().replayData
+        const startTime = packs[0][0].time
+
+        let duration = 0
+        const packsInfo: {
+            startTime: number
+            endTime: number
+            duration: number
+        }[] = []
+        packs.forEach(pack => {
+            const startTime = pack[0].time
+            const endTime = pack.slice(-1)[0].time
+            const info = {
+                startTime,
+                endTime,
+                duration: endTime - startTime
+            }
+            packsInfo.push(info)
+            duration += info.duration
+        })
+        const endTime = startTime + duration
 
         Store.dispatch({
             type: ProgressTypes.PROGRESS,
             data: {
-                frames,
+                duration,
+                packsInfo,
                 startTime,
                 endTime
             }
         })
-    }
-
-    private getFirstReplayData(replayPacks: ReplayPack[]) {
-        return replayPacks[0].body[0]
     }
 
     private getGZipData() {
@@ -164,8 +196,7 @@ export class PlayerModule {
             to: 'string'
         })
         const records = JSON.parse(str) as RecordData[]
-
-        return transRecordsToPacks(records)
+        return records
     }
 
     private dispatchEvent(type: string, data: RecordData) {
@@ -173,82 +204,31 @@ export class PlayerModule {
         window.dispatchEvent(event)
     }
 
-    private async dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<ReplayPack[]> {
-        let replayPack: ReplayPack
-        let head: ReplayHead
-        const body: ReplayData[] = []
-        const self = this
+    private async dataReceiver(receiver: (sender: (data: RecordData) => void) => void): Promise<RecordData[]> {
+        let isResolved: boolean
+        let head: HeadRecord
+        let snapshot: SnapshotRecord
         return await new Promise(resolve => {
             receiver(data => {
-                if (replayPack) {
+                if (isResolved) {
                     this.dispatchEvent('record-data', data as RecordData)
                 } else {
-                    if (!data) {
-                        return
-                    }
-
-                    if (data.type === RecordType.HEAD) {
-                        head = data.data
-                    } else if (data && isSnapshot(data)) {
-                        if (head && body) {
-                            body.push({
-                                snapshot: data as SnapshotRecord,
-                                records: [],
-                                audio: { src: '', bufferStrList: [], subtitles: [], opts: {} as AudioOptionsData }
-                            })
-
-                            replayPack = {
-                                head,
-                                body
-                            }
-
-                            resolve([replayPack])
-
-                            if (self.fmp) {
-                                self.fmp.observe()
-                            }
-                        }
+                    if (head && snapshot) {
+                        isResolved = true
+                        resolve([head, snapshot])
                     } else {
-                        return
-                        // logError('ReplayHead not found')
+                        if (data.type === RecordType.HEAD) {
+                            head = data
+                        } else if (data.type === RecordType.SNAPSHOT) {
+                            snapshot = data
+                        }
                     }
                 }
             })
         })
     }
 
-    private async getPacksFromDB() {
-        const records = await getRecordsFromDB()
-
-        if (records && records.length) {
-            return transRecordsToPacks(records)
-        }
-    }
-
-    private async getReplayPacks(options: ReplayInternalOptions) {
-        const { receiver, packs, records } = options
-
-        const replayPacks =
-            (records && transRecordsToPacks(records)) ||
-            packs ||
-            (receiver && (await this.dataReceiver(receiver))) ||
-            this.getGZipData() ||
-            (await this.getPacksFromDB()) ||
-            (window.G_REPLAY_PACKS as ReplayPack[])
-
-        if (!replayPacks) {
-            throw logError('Replay data not found')
-        }
-
-        if (replayPacks) {
-            window.G_REPLAY_PACKS = replayPacks
-            return replayPacks
-        }
-
-        return null
-    }
-
-    private triggerCalcProgress = debounce(() => this.calcProgress(window.G_REPLAY_PACKS), 500)
+    private triggerCalcProgress = debounce(() => this.calcProgress(), 500)
 
     destroy() {
         this.destroyStore.forEach(un => un())
@@ -259,24 +239,11 @@ export class PlayerModule {
         observer.on(key, fn)
     }
 
-    append(data: RecordData[] | ReplayPack | ReplayPack[]) {
-        function isPack(data: any) {
-            return data.head && data.body
-        }
-
-        let packs: ReplayPack[]
-        if (Array.isArray(data)) {
-            if (!isPack(data[0])) {
-                packs = transRecordsToPacks(data as RecordData[])
-            } else {
-                packs = data as ReplayPack[]
-            }
-        } else {
-            packs = [data]
-        }
-
-        const { G_REPLAY_PACKS: GPacks } = window
-        GPacks.push(...packs)
+    append(records: RecordData[]) {
+        Store.dispatch({
+            type: ReplayDataReducerTypes.APPEND_RECORDS,
+            data: { records }
+        })
 
         this.triggerCalcProgress()
     }

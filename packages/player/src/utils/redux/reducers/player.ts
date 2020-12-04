@@ -8,16 +8,15 @@ export enum PlayerTypes {
     SPEED = 'SPEED'
 }
 
-export default function PlayerReducer(
-    state: typeof initState,
-    action: { type: string; data: Partial<typeof initState> }
-) {
+export function PlayerReducer(state: typeof initState, action: { type: PlayerTypes; data: Partial<typeof initState> }) {
     if (!state) {
         state = initState
     }
+
     if (!action) {
         return state
     }
+
     const { type, data } = action
 
     switch (type) {

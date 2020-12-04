@@ -1,5 +1,5 @@
 import { ContainerComponent } from './container'
-import { Component, html } from '../utils/component'
+import { Component, html } from '../utils'
 
 @Component(
     'player-broadcaster',

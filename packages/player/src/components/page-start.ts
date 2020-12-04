@@ -1,4 +1,4 @@
-import { html, Component } from '../utils/component'
+import { html, Component } from '../utils'
 
 @Component(
     'player-start-page',

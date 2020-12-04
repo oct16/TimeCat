@@ -5,12 +5,12 @@ import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { BroadcasterComponent } from './broadcaster'
 import { ReplayInternalOptions } from '@timecat/share/src'
-import { Component, IComponent } from '../utils/component'
+import { Component, IComponent, html } from '../utils'
 import { ToolboxComponent } from './toolbox'
 
 @Component(
     'player-panel',
-    `<div class="player-panel">
+    html`<div class="player-panel">
         <slot></slot>
     </div>`,
     { replaceSlot: true }

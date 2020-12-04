@@ -1,6 +1,14 @@
 import { TPL, pacmanCss } from './tpl'
-import { getDBOperator } from '../store/idb'
-import { isDev, transRecordsToPacks, download, getRandomCode, isVNode } from './common'
+import {
+    base64ToFloat32Array,
+    encodeWAV,
+    isDev,
+    getDBOperator,
+    getRandomCode,
+    isVNode,
+    getScript,
+    nodeStore
+} from '@timecat/utils'
 import pako from 'pako'
 import {
     VNode,
@@ -8,15 +16,13 @@ import {
     AudioData,
     AudioOptionsData,
     RecordType,
-    ReplayPack,
     RecordData,
     DOMRecord,
     DBRecordData
 } from '@timecat/share'
-import { base64ToFloat32Array, encodeWAV } from './transform'
-import { getScript } from './dom'
-import { recoverNative } from '../polyfill/recover-native'
-import { nodeStore } from '../store/node'
+import { download, transToReplayData } from './tools'
+import { recoverNative } from './polyfill/recover-native'
+import { Store } from './redux'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
@@ -145,15 +151,13 @@ export async function getRecordsFromDB() {
     return null
 }
 
-export function extract(replayPacks: ReplayPack[], exportOptions?: ExportOptions) {
-    return replayPacks.map(replayPack => {
-        replayPack.body.forEach(replayData => {
-            if (exportOptions && exportOptions.audioExternal) {
-                replayData.audio = extractAudio(replayData.audio)
-            }
-            return replayData
-        })
-        return replayPack
+export function extract(packs: RecordData[][], exportOptions?: ExportOptions) {
+    const replayDataList = packs.map(transToReplayData)
+    return replayDataList.forEach(replayData => {
+        if (exportOptions && exportOptions.audioExternal) {
+            replayData.audio = extractAudio(replayData.audio)
+        }
+        return replayData
     })
 }
 
@@ -184,13 +188,13 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const records = await getRecordsFromDB()
+    const { records, packs } = Store.getState().replayData
 
     if (!records) {
         return
     }
 
-    extract(transRecordsToPacks(records), exportOptions)
+    extract(packs, exportOptions)
     await makeCssInline(records) // some link cross origin
 
     const jsonStrData = JSON.stringify(records)

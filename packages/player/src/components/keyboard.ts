@@ -1,9 +1,6 @@
 import { ContainerComponent } from './container'
-import { ConnectProps } from '../utils'
 import { ReplayInternalOptions } from '@timecat/share'
-import { Component, html } from '../utils/component'
-import { Store } from '../utils/redux'
-import { PlayerTypes } from '../utils/redux/reducers/player'
+import { ConnectProps, Component, html, Store, PlayerTypes } from '../utils'
 
 @Component(
     'player-keyboard',

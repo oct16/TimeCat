@@ -3,23 +3,20 @@ import { updateDom } from '../dom'
 import { getTime, isSnapshot, delay, toTimeStamp, base64ToFloat32Array, encodeWAV } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import {
-    RecordData,
-    AudioData,
-    SnapshotRecord,
-    ReplayPack,
-    ReplayData,
-    ReplayInternalOptions,
-    RecordType
-} from '@timecat/share'
+import { RecordData, AudioData, SnapshotRecord, ReplayData, ReplayInternalOptions, RecordType } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from '../animation-frame'
-import { observer } from '../utils/observer'
 import { PlayerEventTypes } from '../types'
-import { ConnectProps } from '../utils'
-import { Component, html } from '../utils/component'
-import { Store } from '../utils/redux'
-import { PlayerTypes } from '../utils/redux/reducers/player'
+import {
+    Component,
+    html,
+    Store,
+    PlayerTypes,
+    ReplayDataReducerTypes,
+    ConnectProps,
+    observer,
+    transToReplayData
+} from '../utils'
 
 @Component(
     'timecat-player',
@@ -49,6 +46,7 @@ export class PlayerComponent {
 
     curViewEndTime: number
     curViewDiffTime = 0
+    viewIndex = 0
 
     subtitlesIndex = 0
     audioData: AudioData
@@ -97,7 +95,7 @@ export class PlayerComponent {
     }
 
     @ConnectProps(state => ({
-        frames: state.progress.frames
+        endTime: state.progress.endTime
     }))
     watchProgress() {
         this.recalculateProgress()
@@ -109,7 +107,7 @@ export class PlayerComponent {
 
         this.initViewState()
 
-        if (!this.records.length) {
+        if (this.records.length <= 2) {
             // is live mode
             window.addEventListener('record-data', this.streamHandle.bind(this))
             this.options.destroyStore.add(() => window.removeEventListener('record-data', this.streamHandle.bind(this)))
@@ -147,7 +145,7 @@ export class PlayerComponent {
     streamHandle(this: PlayerComponent, e: CustomEvent) {
         const frame = e.detail as RecordData
         if (isSnapshot(frame)) {
-            window.G_REPLAY_DATA.snapshot = frame as SnapshotRecord
+            Store.getState().replayData.currentData.snapshot = frame as SnapshotRecord
             this.c.setViewState()
             return
         }
@@ -155,9 +153,8 @@ export class PlayerComponent {
     }
 
     initViewState() {
-        const { G_REPLAY_PACKS: packs } = window
-        const firstPack = packs[0] as ReplayPack
-        const firstData = firstPack.body[0]
+        const { currentData } = Store.getState().replayData
+        const firstData = currentData
         this.records = this.orderRecords(firstData.records)
         this.audioData = firstData.audio
         this.initAudio()
@@ -172,39 +169,20 @@ export class PlayerComponent {
 
         this.curViewEndTime = this.records.slice(-1)[0].time
         this.curViewDiffTime = 0
-        window.G_REPLAY_DATA = firstData
+        this.viewIndex = 0
     }
 
-    getNextReplayData() {
-        const { G_REPLAY_DATA: rData, G_REPLAY_PACKS: packs } = window as {
-            G_REPLAY_DATA: ReplayData
-            G_REPLAY_PACKS: ReplayPack[]
-        }
+    getNextReplayData(index: number) {
+        const { packs } = Store.getState().replayData
 
-        if (!this.records) {
-            return
-        }
+        const nextPack = packs[index]
 
-        return getNextData(rData)
-
-        function getNextData(curData: ReplayData) {
-            for (let i = 0; i < packs.length; i++) {
-                const body = packs[i].body
-                const nextPackBody = packs[i + 1]?.body
-                for (let j = 0; j < body.length; j++) {
-                    if (curData === body[j]) {
-                        const next = body[j + 1]
-                        if (next) {
-                            return next
-                        } else if (nextPackBody && nextPackBody.length) {
-                            return nextPackBody[0]
-                        }
-                        return
-                    }
-                }
-            }
-            return
+        if (nextPack) {
+            const nextData = transToReplayData(nextPack)
+            Store.dispatch({ type: ReplayDataReducerTypes.UPDATE_DATA, data: { currentData: nextData } })
+            return nextData
         }
+        return null
     }
 
     async switchNextView(nextData: ReplayData) {
@@ -212,7 +190,6 @@ export class PlayerComponent {
         const nextStartTime = nextData.records[0].time
         this.curViewDiffTime += nextStartTime - curEndTime
 
-        window.G_REPLAY_DATA = nextData
         this.records = this.orderRecords(nextData.records)
         this.audioData = nextData.audio
         this.initAudio()
@@ -231,6 +208,7 @@ export class PlayerComponent {
             this.progress.resetThumb()
             if (!this.isFirstTimePlay) {
                 // Indicates the second times play
+                this.getNextReplayData(0)
                 this.initViewState()
                 this.c.setViewState()
             } else {
@@ -272,7 +250,7 @@ export class PlayerComponent {
             }
 
             if (nextTime > this.curViewEndTime - this.curViewDiffTime) {
-                const nextReplayData = this.getNextReplayData()
+                const nextReplayData = this.getNextReplayData(++this.viewIndex)
                 nextReplayData && (await this.switchNextView(nextReplayData))
             }
 
@@ -400,11 +378,10 @@ export class PlayerComponent {
         if (this.options.mode === 'live') {
             return []
         }
+
         const progressState = Store.getState().progress
         const { startTime, endTime } = progressState
-
         const result: number[] = []
-
         for (let i = startTime; i < endTime + interval; i += interval) {
             result.push(i)
         }
@@ -414,37 +391,36 @@ export class PlayerComponent {
 
     calcHeatPointsData() {
         const frames = this.frames
-        if (!this.options.heatPoints) {
+        if (!frames.length || !this.options.heatPoints) {
             return []
         }
-        const { G_REPLAY_PACKS: packs } = window
+        const state = Store.getState()
+        const { packs } = state.replayData
+        const { duration } = state.progress
+        const colum = 200
+        const gap = duration / colum
 
-        let diffTime = 0
-        const recordTimes = (packs as ReplayPack[])
-            .map(pack => pack.body.map(data => data.records))
-            .flat(1)
-            .reduce((a, b, i, arr) => {
-                const preLastTime = i === 0 ? 0 : arr[i - 1].slice(-1)[0].time
-                const curFirstTime = b[0].time
-                if (preLastTime) {
-                    diffTime += curFirstTime - preLastTime
-                }
-
-                return a.concat(b.map(n => n.time - diffTime))
-            }, [] as number[])
-
-        let index = 0
-        const heatPoints = frames.map(t => {
-            let recordTime: number
+        const heatPoints = packs.reduce((acc, records) => {
+            const counts: number[] = []
+            let index = 0
             let step = 0
-            while ((recordTime = recordTimes[index]) && recordTime < t) {
-                index++
-                if (step < this.maxIntensityStep) {
+            const endTime = records.slice(-1)[0].time
+            let currentTime = records[0].time
+
+            while (currentTime < endTime && index < records.length) {
+                const nextTime = currentTime + gap
+                if (records[index].time < nextTime) {
+                    index++
                     step++
+                    continue
                 }
+                counts.push(step)
+                step = 0
+                currentTime += gap
             }
-            return step
-        })
+            acc.push(...counts)
+            return acc
+        }, [] as number[])
 
         return heatPoints
     }

@@ -1,10 +1,10 @@
-import { disableScrolling, nodeStore, debounce } from '@timecat/utils'
+import { nodeStore, debounce } from '@timecat/utils'
 import HTML from '../ui.html'
 import CSS from '../ui.scss'
 import { createIframeDOM, injectIframeContent } from '../dom'
 import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions, VNode, InfoData } from '@timecat/share'
-import { observer } from '../utils'
+import { observer, Store, disableScrolling } from '../utils'
 import { PlayerEventTypes } from '../types'
 import { PanelComponent } from './panel'
 import { PageStartComponent } from './page-start'
@@ -49,7 +49,7 @@ export class ContainerComponent {
     }
 
     getSnapshotRecord() {
-        return window.G_REPLAY_DATA.snapshot.data as {
+        return Store.getState().replayData.currentData.snapshot.data as {
             vNode: VNode
         } & InfoData
     }

@@ -1,3 +1,5 @@
+import { RecordData, ReplayData, RecordType, SnapshotRecord, AudioOptionsData } from '@timecat/share'
+
 export function objectEquals(x: any, y: any): boolean {
     if (x === null || x === undefined || y === null || y === undefined) {
         return x === y
@@ -43,5 +45,36 @@ export function objectEquals(x: any, y: any): boolean {
         p.every(function (i) {
             return objectEquals(x[i], y[i])
         })
+    )
+}
+
+export function download(src: Blob | string, name: string) {
+    const tag = document.createElement('a')
+    tag.download = name
+    if (typeof src === 'string') {
+        tag.href = src
+        tag.click()
+    } else {
+        tag.href = URL.createObjectURL(src)
+        tag.click()
+        URL.revokeObjectURL(tag.href)
+    }
+}
+
+export function transToReplayData(records: RecordData[]): ReplayData {
+    return records.reduce(
+        (acc, record) => {
+            if (record.type === RecordType.SNAPSHOT) {
+                acc.snapshot = record
+            } else {
+                acc.records.push(record)
+            }
+            return acc
+        },
+        {
+            snapshot: {} as SnapshotRecord,
+            records: [] as RecordData[],
+            audio: { src: '', bufferStrList: [], subtitles: [], opts: {} as AudioOptionsData }
+        }
     )
 }

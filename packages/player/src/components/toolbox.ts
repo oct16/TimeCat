@@ -1,6 +1,6 @@
-import { Component, html } from '../utils/component'
+import { Component, html, exportReplay } from '../utils'
 import { ContainerComponent } from './container'
-import { exportReplay, getRawScriptContent } from '@timecat/utils'
+import { getRawScriptContent } from '@timecat/utils'
 
 @Component(
     'player-toolbox',
