@@ -1,16 +1,16 @@
-import { Reducer, Action, States, TopicName } from './types'
-
-export function combineReducers(reducers: { [key: string]: Reducer }) {
+import { Action, SubReducer } from './types'
+import { State } from './types'
+export function combineReducers(reducers: { [key: string]: SubReducer }) {
     const reducerKeys = Object.keys(reducers)
-    return function combination(state: States, action?: Action) {
-        const nextState = {} as States
+    return function combination(state: State, action: Action) {
+        const nextState = {} as State
 
         for (let i = 0; i < reducerKeys.length; i++) {
-            const key = reducerKeys[i] as TopicName // reducer name
+            const key = reducerKeys[i] as keyof State
 
             const reducer = reducers[key]
 
-            const previousStateForKey = state[key] as States
+            const previousStateForKey = state[key]
 
             const nextStateForKey = reducer(previousStateForKey, action)
 

@@ -1,7 +1,9 @@
 import { ContainerComponent } from './container'
-import { PlayerTypes, reduxStore } from '../utils'
+import { ConnectProps } from '../utils'
 import { ReplayInternalOptions } from '@timecat/share'
 import { Component, html } from '../utils/component'
+import { Store } from '../utils/redux'
+import { PlayerTypes } from '../utils/redux/reducers/player'
 
 @Component(
     'player-keyboard',
@@ -22,6 +24,16 @@ export class KeyboardComponent {
         this.init()
     }
 
+    @ConnectProps(state => ({
+        speed: state.player.speed
+    }))
+    watchPlayerSpeed(state?: { speed: number }) {
+        if (state) {
+            this.paly(state.speed)
+            this.setSpeed(state.speed)
+        }
+    }
+
     init() {
         this.controller = this.c.container.querySelector('.player-keyboard') as HTMLElement
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
@@ -34,13 +46,7 @@ export class KeyboardComponent {
             }
         })
 
-        reduxStore.subscribe('player', state => {
-            if (state) {
-                this.paly(state.speed)
-                this.setSpeed(state.speed)
-            }
-        })
-
+        this.watchPlayerSpeed()
         this.detectWindowIsActive()
     }
 
@@ -58,7 +64,7 @@ export class KeyboardComponent {
     }
 
     dispatchPlay(speed = 0) {
-        reduxStore.dispatch({
+        Store.dispatch({
             type: PlayerTypes.SPEED,
             data: {
                 speed
@@ -71,7 +77,7 @@ export class KeyboardComponent {
             'visibilitychange',
             () => {
                 if (document.visibilityState === 'hidden') {
-                    this.dispatchPlay()
+                    this.dispatchPlay(0)
                 }
             },
             false

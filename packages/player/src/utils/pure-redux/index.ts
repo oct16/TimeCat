@@ -1,21 +1,63 @@
-import { reduxStore } from '../redux'
-import { StateMap } from '../redux/types'
+import { Store } from '../redux'
+import { State } from '../redux/types'
+import { ValueOf } from '@timecat/share/src'
 
-type Props = { [key: string]: any } & Partial<StateMap>
+export type Props = Partial<ValueOf<State>>
 
-export const provider = (store: typeof reduxStore) => {
-    return (mapStateToProps: (state: StateMap) => Props) => {
+const shallowEqual = (prevProps: Props, nextProps: Props) => {
+    if (prevProps === nextProps) {
+        return true
+    }
+    if (
+        !(typeof prevProps === 'object' && prevProps != null) ||
+        !(typeof nextProps === 'object' && nextProps != null)
+    ) {
+        return false
+    }
+    const keysA = Object.keys(prevProps) as [keyof Props]
+    const keysB = Object.keys(nextProps) as [keyof Props]
+    if (keysA.length !== keysB.length) {
+        return false
+    }
+    for (let i = 0; i < keysA.length; i++) {
+        if (nextProps.hasOwnProperty(keysA[i])) {
+            if (prevProps[keysA[i]] !== nextProps[keysA[i]]) {
+                return false
+            }
+        } else {
+            return false
+        }
+    }
+    return true
+}
+
+const provider = (store: typeof Store) => {
+    return (mapStateToProps: (state: State) => Props) => {
+        let props: Props
         return (render: (state: Props) => void) => {
-            // const renderWrapper = () => {
-            const props = mapStateToProps(store.getState())
-            render(props)
-
-            store.subscribe(render)
-
-            // }
-            // return renderWrapper
+            const getProps = () => mapStateToProps(store.getState())
+            store.subscribe(() => {
+                const newProps = getProps()
+                if (shallowEqual(newProps, props)) {
+                    return
+                }
+                render((props = newProps))
+            })
         }
     }
 }
 
-export const connect = provider(reduxStore)
+export const connect = provider(Store)
+
+export const ConnectProps = (mapStateToProps: (state: State) => Props | ValueOf<State>) => {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        const originalMethod = descriptor.value
+
+        descriptor.value = function (cb?: Function) {
+            connect(mapStateToProps)(state => {
+                originalMethod.call(this, state)
+                cb && cb(state)
+            })
+        }
+    }
+}

@@ -16,7 +16,10 @@ import { waitStart, removeStartPage, showStartMask } from './dom'
 import { observer } from './utils/observer'
 import { PlayerEventTypes } from './types'
 import { FMP } from './utils/fmp'
-import { PlayerTypes, ProgressTypes, reduxStore } from './utils'
+
+import { Store } from './utils/redux'
+import { PlayerTypes } from './utils/redux/reducers/player'
+import { ProgressTypes } from './utils/redux/reducers/progress'
 
 const defaultReplayOptions = {
     autoplay: true,
@@ -59,7 +62,7 @@ export class PlayerModule {
 
         window.G_REPLAY_OPTIONS = opts
 
-        this.destroyStore.add(() => reduxStore.unsubscribe())
+        this.destroyStore.add(() => Store.unsubscribe())
 
         const replayPacks = await this.getReplayPacks(opts)
 
@@ -89,7 +92,7 @@ export class PlayerModule {
 
             if (records.length) {
                 if (opts.autoplay || hasAudio) {
-                    reduxStore.dispatch({
+                    Store.dispatch({
                         type: PlayerTypes.SPEED,
                         data: { speed: 1 }
                     })
@@ -130,7 +133,7 @@ export class PlayerModule {
             { endTime: startTime, frames: 0 }
         )
 
-        reduxStore.dispatch({
+        Store.dispatch({
             type: ProgressTypes.PROGRESS,
             data: {
                 frames,

@@ -1,9 +1,10 @@
 import { secondToTime, delay, getDateTime } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { Heat } from '../utils/heat'
-import { observer, reduxStore } from '../utils'
+import { observer } from '../utils'
 import { PlayerEventTypes } from '../types'
 import { Component, IComponent, html } from '../utils/component'
+import { Store } from '../utils/redux'
 
 @Component(
     'player-progress',
@@ -129,7 +130,7 @@ export class ProgressComponent implements IComponent {
         if (timeMode === 'durationTime') {
             time = secondToTime(seconds / 1000)
         } else {
-            const { startTime } = reduxStore.getState('progress')
+            const { startTime } = Store.getState().progress
             const timestamp = startTime + seconds + curViewDiffTime
             time = getDateTime(timestamp)
         }

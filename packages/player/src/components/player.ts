@@ -16,8 +16,10 @@ import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from '../animation-frame'
 import { observer } from '../utils/observer'
 import { PlayerEventTypes } from '../types'
-import { PlayerTypes, reduxStore } from '../utils'
+import { ConnectProps } from '../utils'
 import { Component, html } from '../utils/component'
+import { Store } from '../utils/redux'
+import { PlayerTypes } from '../utils/redux/reducers/player'
 
 @Component(
     'timecat-player',
@@ -71,6 +73,36 @@ export class PlayerComponent {
         this.init()
     }
 
+    @ConnectProps(state => ({
+        speed: state.player.speed
+    }))
+    watchPlayerSpeed(state?: { speed: number }) {
+        if (state) {
+            const speed = state.speed
+            const curSpeed = this.speed
+            this.speed = speed
+
+            observer.emit(PlayerEventTypes.SPEED, speed)
+
+            if (speed > 0) {
+                this.play()
+                if (curSpeed === 0) {
+                    observer.emit(PlayerEventTypes.PLAY)
+                }
+            } else {
+                this.pause()
+            }
+        }
+        this.setProgress()
+    }
+
+    @ConnectProps(state => ({
+        frames: state.progress.frames
+    }))
+    watchProgress() {
+        this.recalculateProgress()
+    }
+
     async init() {
         this.audioNode = new Audio()
         this.frames = this.calcFrames()
@@ -82,26 +114,8 @@ export class PlayerComponent {
             window.addEventListener('record-data', this.streamHandle.bind(this))
             this.options.destroyStore.add(() => window.removeEventListener('record-data', this.streamHandle.bind(this)))
         } else {
-            reduxStore.subscribe('progress', this.recalculateProgress.bind(this))
-            reduxStore.subscribe('player', state => {
-                if (state) {
-                    const speed = state.speed
-                    const curSpeed = this.speed
-                    this.speed = speed
-
-                    observer.emit(PlayerEventTypes.SPEED, speed)
-
-                    if (speed > 0) {
-                        this.play()
-                        if (curSpeed === 0) {
-                            observer.emit(PlayerEventTypes.PLAY)
-                        }
-                    } else {
-                        this.pause()
-                    }
-                }
-                this.setProgress()
-            })
+            this.watchProgress()
+            this.watchPlayerSpeed()
         }
     }
 
@@ -352,7 +366,7 @@ export class PlayerComponent {
         if (this.RAF) {
             this.RAF.stop()
         }
-        reduxStore.dispatch({
+        Store.dispatch({
             type: PlayerTypes.SPEED,
             data: {
                 speed: 0
@@ -386,7 +400,7 @@ export class PlayerComponent {
         if (this.options.mode === 'live') {
             return []
         }
-        const progressState = reduxStore.getState('progress')
+        const progressState = Store.getState().progress
         const { startTime, endTime } = progressState
 
         const result: number[] = []
