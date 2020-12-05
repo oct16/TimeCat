@@ -1,14 +1,21 @@
+import { ReplayOptions } from '@timecat/share'
+
 const initState = {
-    speed: 0
+    speed: 0,
+    options: {} as ReplayOptions
 }
 
 export type PlayerState = typeof initState
 
-export enum PlayerTypes {
-    SPEED = 'SPEED'
+export enum PlayerReducerTypes {
+    SPEED = 'SPEED',
+    OPTIONS = 'OPTIONS'
 }
 
-export function PlayerReducer(state: typeof initState, action: { type: PlayerTypes; data: Partial<typeof initState> }) {
+export function PlayerReducer(
+    state: typeof initState,
+    action: { type: PlayerReducerTypes; data: Partial<typeof initState> }
+) {
     if (!state) {
         state = initState
     }
@@ -20,10 +27,15 @@ export function PlayerReducer(state: typeof initState, action: { type: PlayerTyp
     const { type, data } = action
 
     switch (type) {
-        case PlayerTypes.SPEED:
+        case PlayerReducerTypes.OPTIONS:
             return {
                 ...state,
-                ...data
+                options: data.options
+            }
+        case PlayerReducerTypes.SPEED:
+            return {
+                ...state,
+                speed: data.speed
             }
         default:
             return state

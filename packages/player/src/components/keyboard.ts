@@ -1,6 +1,6 @@
 import { ContainerComponent } from './container'
 import { ReplayInternalOptions } from '@timecat/share'
-import { ConnectProps, Component, html, Store, PlayerTypes } from '../utils'
+import { ConnectProps, Component, html, Store, PlayerReducerTypes } from '../utils'
 
 @Component(
     'player-keyboard',
@@ -62,7 +62,7 @@ export class KeyboardComponent {
 
     dispatchPlay(speed = 0) {
         Store.dispatch({
-            type: PlayerTypes.SPEED,
+            type: PlayerReducerTypes.SPEED,
             data: {
                 speed
             }

@@ -11,7 +11,7 @@ import {
     Component,
     html,
     Store,
-    PlayerTypes,
+    PlayerReducerTypes,
     ReplayDataReducerTypes,
     ConnectProps,
     observer,
@@ -345,7 +345,7 @@ export class PlayerComponent {
             this.RAF.stop()
         }
         Store.dispatch({
-            type: PlayerTypes.SPEED,
+            type: PlayerReducerTypes.SPEED,
             data: {
                 speed: 0
             }

@@ -140,7 +140,7 @@ export class ContainerComponent {
             setWidth?: number,
             setHeight?: number
         ) {
-            const { mode: replayMode } = window.G_REPLAY_OPTIONS || {}
+            const { mode: replayMode } = Store.getState().player.options || {}
 
             const panelHeight = replayMode === 'live' ? 0 : 40 - 2 // subtract the gap
 

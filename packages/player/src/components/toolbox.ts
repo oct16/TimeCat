@@ -1,4 +1,4 @@
-import { Component, html, exportReplay } from '../utils'
+import { Component, html, exportReplay, Store } from '../utils'
 import { ContainerComponent } from './container'
 import { getRawScriptContent } from '@timecat/utils'
 
@@ -151,7 +151,7 @@ export class ToolboxComponent {
             src: source
         })
 
-        const replayOptions = window.G_REPLAY_OPTIONS
+        const replayOptions = Store.getState().player.options
         exportReplay({
             ...replayOptions,
             scripts: scriptList

@@ -25,6 +25,7 @@ import { PlayerComponent } from './components/player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
 import { setAttribute, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
 import { ContainerComponent } from './components/container'
+import { Store } from './utils'
 
 /**
  * if return true then revert
@@ -255,7 +256,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData) {
             await actionDelay()
             const { id, key, type: formType, value, patches } = data as FormElementRecordData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
-            const { mode } = window.G_REPLAY_OPTIONS
+            const { mode } = Store.getState().player.options
 
             if (node) {
                 if (formType === FormElementEvent.INPUT || formType === FormElementEvent.CHANGE) {

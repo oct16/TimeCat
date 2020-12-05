@@ -14,7 +14,7 @@ import {
     FMP,
     observer,
     Store,
-    PlayerTypes,
+    PlayerReducerTypes,
     getRecordsFromDB,
     ProgressTypes,
     ReplayDataReducerTypes,
@@ -62,8 +62,7 @@ export class PlayerModule {
             ...options
         } as ReplayInternalOptions
 
-        window.G_REPLAY_OPTIONS = opts
-
+        Store.dispatch({ type: PlayerReducerTypes.OPTIONS, data: { options: opts } })
         this.destroyStore.add(() => Store.unsubscribe())
 
         const records = await this.getRecords(opts)
@@ -95,7 +94,7 @@ export class PlayerModule {
                 if (opts.autoplay || hasAudio) {
                     if (opts.autoplay) {
                         Store.dispatch({
-                            type: PlayerTypes.SPEED,
+                            type: PlayerReducerTypes.SPEED,
                             data: { speed: 1 }
                         })
                     }
