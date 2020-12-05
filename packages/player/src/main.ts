@@ -103,6 +103,8 @@ export class PlayerModule {
         })
 
         if (records.length <= 2) {
+            // live mode
+            Store.dispatch({ type: PlayerReducerTypes.OPTIONS, data: { options: { mode: 'live' } } })
             const panel = this.c.container.querySelector('.player-panel')
             if (panel) {
                 panel.setAttribute('style', 'display: none')
