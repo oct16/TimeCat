@@ -95,9 +95,7 @@ new Recorder({ plugins: [new ExamplePlugin(options...)] })
 // replay record
 interface ReplayOptions {
     target: string | HTMLElement // which element has contained the Player, default is Body
-    mode: 'live' | 'default' // mode
     records: RecordData[] // play with records data
-    packs: ReplayPack[] // play with packs data
     // receive data in live mode, see examples/mirror
     receiver: ((data: RecordData) => void) => void
     autoplay: boolean // autoplay when data loaded

@@ -18,15 +18,6 @@ TimeCat is a website record tool, passing a unique recording method to provide u
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
-## Milestone
-    08.20 Prerelease V1.2.0-alpha
-    07.20 Support Iframe (V1.1.0)
-    06.07 Support Audio
-    05.24 Released V1.0.0
-    04.26 Live Mode    
-    03.31 Chrome Plugin Released
-    02.12 Departure
-
 ## Version 
 
 [![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)](https://www.npmjs.com/package/timecatjs)
