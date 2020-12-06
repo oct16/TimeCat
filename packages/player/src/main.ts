@@ -16,7 +16,7 @@ import {
     Store,
     PlayerReducerTypes,
     getRecordsFromDB,
-    ProgressTypes,
+    ProgressReducerTypes,
     ReplayDataReducerTypes,
     transToReplayData,
     getGZipData,
@@ -137,14 +137,20 @@ export class PlayerModule {
             startTime: number
             endTime: number
             duration: number
+            diffTime: number
         }[] = []
-        packs.forEach(pack => {
+        let diffTime = 0
+        packs.forEach((pack, index) => {
             const startTime = pack[0].time
             const endTime = pack.slice(-1)[0].time
+            if (index) {
+                diffTime += startTime - packs[index - 1].slice(-1)[0].time
+            }
             const info = {
                 startTime,
                 endTime,
-                duration: endTime - startTime
+                duration: endTime - startTime,
+                diffTime
             }
             packsInfo.push(info)
             duration += info.duration
@@ -152,7 +158,7 @@ export class PlayerModule {
         const endTime = startTime + duration
 
         Store.dispatch({
-            type: ProgressTypes.PROGRESS,
+            type: ProgressReducerTypes.PROGRESS,
             data: {
                 duration,
                 packsInfo,

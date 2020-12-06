@@ -6,12 +6,13 @@ const initState = {
         startTime: number
         endTime: number
         duration: number
+        diffTime: number
     }[]
 }
 
 export type ProgressState = typeof initState
 
-export enum ProgressTypes {
+export enum ProgressReducerTypes {
     PROGRESS = 'PROGRESS'
 }
 
@@ -27,7 +28,7 @@ export function ProgressReducer(state: ProgressState, action: { type: string; da
     const { type, data } = action
 
     switch (type) {
-        case ProgressTypes.PROGRESS:
+        case ProgressReducerTypes.PROGRESS:
             return {
                 ...state,
                 ...data

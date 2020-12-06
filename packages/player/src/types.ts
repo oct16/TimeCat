@@ -4,5 +4,6 @@ export enum PlayerEventTypes {
     STOP = 'stop',
     SPEED = 'speed',
     RESIZE = 'resize',
-    PROGRESS = 'progress'
+    PROGRESS = 'progress',
+    JUMP = 'jump'
 }

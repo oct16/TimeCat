@@ -48,7 +48,52 @@ export class ProgressComponent implements IComponent {
             }
             this.getThumb().removeAttribute('active')
         })
+
+        this.progress.addEventListener('click', e => {
+            const { left, width: sliderWidth } = this.slider.getBoundingClientRect()
+            const width = Math.max(0, Math.min(e.x - left, sliderWidth))
+            const percent = +(width / sliderWidth).toFixed(2)
+            const progress = this.findProgressByPosition(percent)
+            observer.emit(PlayerEventTypes.JUMP, progress)
+        })
     }
+
+    findProgressByPosition = (() => {
+        const cacheMap = new Map() as Map<number, number>
+        return function (percent: number) {
+            const result = cacheMap.get(percent)
+            if (result) {
+                return result
+            }
+            const { startTime, duration, packsInfo } = Store.getState().progress
+            const { packs } = Store.getState().replayData
+            const time = startTime + duration * percent
+
+            const index = packsInfo.findIndex(pack => {
+                const { startTime, endTime, diffTime } = pack
+                if (startTime - diffTime <= time && endTime - diffTime >= time) {
+                    return true
+                }
+            })
+
+            if (index !== undefined) {
+                const records = packs[index]
+                const packInfo = packsInfo[index]
+                const diffTime = packInfo.diffTime
+                for (let i = 0; i < records.length; i++) {
+                    const cur = records[i]
+                    const next = records[i + 1]
+                    if (next) {
+                        if (time >= cur.time - diffTime && time <= next.time - diffTime) {
+                            cacheMap.set(percent, cur.time)
+                            return { index, percent }
+                        }
+                    }
+                }
+            }
+            return null
+        }
+    })()
 
     listenElementOnHover = (el: HTMLElement) => {
         let hoverState = false
@@ -136,11 +181,16 @@ export class ProgressComponent implements IComponent {
         }
     }
 
-    resetThumb() {
+    moveThumb(percent: number) {
+        const left = percent * this.slider.offsetWidth + 'px'
+        this.resetThumb(left)
+    }
+
+    resetThumb(left = '0') {
         this.currentProgress.classList.remove('active')
         const currentProgress = this.currentProgress.cloneNode(true) as HTMLElement
         this.currentProgress.parentNode!.replaceChild(currentProgress, this.currentProgress)
-        currentProgress.style.width = '0'
+        currentProgress.style.width = left
         this.currentProgress = currentProgress as HTMLElement
     }
 
