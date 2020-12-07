@@ -10,7 +10,7 @@ import {
     nodeStore,
     logError
 } from '@timecat/utils'
-import pako from 'pako'
+import { compressWithGzip } from 'brick.json/gzip/esm'
 import { VNode, VSNode, AudioData, AudioOptionsData, RecordType, RecordData, DOMRecord } from '@timecat/share'
 import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks } from './common'
 import { recoverNative } from './polyfill/recover-native'
@@ -174,22 +174,9 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     extract(packs, exportOptions)
     await makeCssInline(records) // some link cross origin
 
-    const jsonStrData = JSON.stringify(records)
+    const compressStr = compressWithGzip(records as any)
 
-    const zipArray = pako.gzip(jsonStrData)
-    let outputStr = ''
-
-    for (let i = 0; i < zipArray.length; i++) {
-        let num = zipArray[i]
-
-        if (~[13, 34, 39, 44, 60, 62, 92, 96, 10, 0].indexOf(num)) {
-            num += 300
-        }
-
-        outputStr += String.fromCharCode(num)
-    }
-
-    const replayData = `var G_REPLAY_STR_RECORDS =  '${outputStr}'`
+    const replayData = `var G_REPLAY_STR_RECORDS =  '${compressStr}'`
 
     injectScripts(html, [{ src: replayData }])
 }

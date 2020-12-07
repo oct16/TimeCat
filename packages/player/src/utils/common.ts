@@ -9,7 +9,7 @@ import {
     HeadRecord,
     AudioStrList
 } from '@timecat/share'
-import pako from 'pako'
+import { decompressWithGzip } from 'brick.json/gzip/esm'
 import { getDBOperator } from '@timecat/utils'
 
 export function download(src: Blob | string, name: string) {
@@ -79,23 +79,12 @@ export function transToReplayData(records: RecordData[]): ReplayData {
 }
 
 export function getGZipData() {
-    const data = window.G_REPLAY_STR_RECORDS
-    if (!data) {
+    const str = window.G_REPLAY_STR_RECORDS
+    if (!str) {
         return null
     }
 
-    const codeArray: number[] = []
-    const strArray = data.split('')
-    for (let i = 0; i < strArray.length; i++) {
-        const num = strArray[i].charCodeAt(0)
-        codeArray.push(num >= 300 ? num - 300 : num)
-    }
-
-    const str = pako.ungzip(codeArray, {
-        to: 'string'
-    })
-    const records = JSON.parse(str) as RecordData[]
-    return records
+    return (decompressWithGzip(str) as unknown) as RecordData[]
 }
 
 export async function getRecordsFromDB() {
