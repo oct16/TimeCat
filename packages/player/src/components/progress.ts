@@ -59,7 +59,7 @@ export class ProgressComponent implements IComponent {
     }
 
     findProgressByPosition = (() => {
-        const cacheMap = new Map() as Map<number, number>
+        const cacheMap = new Map() as Map<number, { index: number; percent: number; time: number }>
         return function (percent: number) {
             const result = cacheMap.get(percent)
             if (result) {
@@ -85,8 +85,9 @@ export class ProgressComponent implements IComponent {
                     const next = records[i + 1]
                     if (next) {
                         if (time >= cur.time - diffTime && time <= next.time - diffTime) {
-                            cacheMap.set(percent, cur.time)
-                            return { index, percent }
+                            const data = { index, percent, time: cur.time - diffTime }
+                            cacheMap.set(percent, data)
+                            return data
                         }
                     }
                 }
@@ -182,15 +183,15 @@ export class ProgressComponent implements IComponent {
     }
 
     moveThumb(percent: number) {
-        const left = percent * this.slider.offsetWidth + 'px'
+        const left = percent * this.slider.offsetWidth
         this.resetThumb(left)
     }
 
-    resetThumb(left = '0') {
+    resetThumb(left = 0) {
         this.currentProgress.classList.remove('active')
         const currentProgress = this.currentProgress.cloneNode(true) as HTMLElement
         this.currentProgress.parentNode!.replaceChild(currentProgress, this.currentProgress)
-        currentProgress.style.width = left
+        currentProgress.style.width = left + 'px'
         this.currentProgress = currentProgress as HTMLElement
     }
 
