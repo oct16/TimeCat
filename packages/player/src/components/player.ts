@@ -1,6 +1,6 @@
 import { PointerComponent } from './pointer'
 import { updateDom } from '../dom'
-import { getTime, isSnapshot, toTimeStamp, base64ToFloat32Array, encodeWAV } from '@timecat/utils'
+import { getTime, isSnapshot, toTimeStamp, base64ToFloat32Array, encodeWAV, delay } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { RecordData, AudioData, SnapshotRecord, ReplayInternalOptions, RecordType } from '@timecat/share'
@@ -15,7 +15,8 @@ import {
     ReplayDataReducerTypes,
     ConnectProps,
     observer,
-    transToReplayData
+    transToReplayData,
+    normalLoading
 } from '../utils'
 
 @Component(
@@ -55,6 +56,7 @@ export class PlayerComponent {
     audioBlobUrl: string
 
     RAF: AnimationFrame
+    isJumping: boolean
 
     maxIntensityStep = 8
 
@@ -107,7 +109,10 @@ export class PlayerComponent {
         observer.on(
             PlayerEventTypes.JUMP,
             (state: { time: number; index: number; recordIndex: number; percent: number }) => {
-                this.jump(state)
+                if (this.isJumping) {
+                    return
+                }
+                this.jump(state, true)
             }
         )
     }
@@ -184,7 +189,18 @@ export class PlayerComponent {
         this.viewIndex = 0
     }
 
-    jump(state: { index: number; time: number; percent?: number }) {
+    async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
+        this.isJumping = true
+        let loading: HTMLElement | undefined = undefined
+
+        if (shouldLoading) {
+            const temp = document.createElement('div')
+            temp.innerHTML = normalLoading
+            loading = temp.firstElementChild as HTMLElement
+            this.c.container.appendChild(loading)
+            this.pause()
+        }
+
         const { index, time, percent } = state
 
         const nextReplayData = this.getNextReplayData(index)
@@ -224,6 +240,13 @@ export class PlayerComponent {
         if (!this.speed) {
             this.loopFramesByTime(this.startTime)
         }
+
+        if (loading) {
+            await delay(500)
+            this.c.container.removeChild(loading)
+            Store.dispatch({ type: PlayerReducerTypes.SPEED, data: { speed: 1 } })
+        }
+        this.isJumping = false
     }
 
     getNextReplayData(index: number) {
