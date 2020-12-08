@@ -83,8 +83,12 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     }
 }
 
-export async function updateDom(this: PlayerComponent, Record: RecordData) {
+export async function updateDom(this: PlayerComponent, Record: RecordData, delayTime = 200) {
     const { type, data } = Record
+
+    // waiting for mouse or scroll transform animation finish
+    const actionDelay = () => (delayTime ? delay(delayTime) : Promise.resolve())
+
     switch (type) {
         case RecordType.SNAPSHOT: {
             const snapshotData = data as SnapshotRecord['data']
@@ -366,11 +370,6 @@ export function injectIframeContent(contentDocument: Document, snapshotData: Sna
         content.scrollTop = snapshotData.scrollTop
         contentDocument.replaceChild(content, documentElement)
     }
-}
-
-// waiting for mouse or scroll transform animation finish
-async function actionDelay() {
-    return delay(200)
 }
 
 function renderCanvas(canvasRecordData: CanvasRecordData) {

@@ -30,12 +30,12 @@ export function PlayerReducer(
         case PlayerReducerTypes.OPTIONS:
             return {
                 ...state,
-                options: data.options
+                options: data.options!
             }
         case PlayerReducerTypes.SPEED:
             return {
                 ...state,
-                speed: data.speed
+                speed: data.speed!
             }
         default:
             return state
