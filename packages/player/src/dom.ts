@@ -83,7 +83,9 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     }
 }
 
-export async function updateDom(this: PlayerComponent, Record: RecordData, delayTime = 200) {
+export async function updateDom(this: PlayerComponent, Record: RecordData, opts?: { isJumping: boolean }) {
+    const { isJumping } = opts || {}
+    const delayTime = isJumping ? 0 : 200
     const { type, data } = Record
 
     // waiting for mouse or scroll transform animation finish
@@ -271,12 +273,9 @@ export async function updateDom(this: PlayerComponent, Record: RecordData, delay
                         ;(node as any)[key] = value
                     }
                 } else if (formType === FormElementEvent.FOCUS) {
-                    if (mode === 'live') {
-                        return
-                    }
-                    node.focus && node.focus()
+                    mode !== 'live' && !isJumping && node.focus && node.focus()
                 } else if (formType === FormElementEvent.BLUR) {
-                    node.blur && node.blur()
+                    mode !== 'live' && !isJumping && node.blur && node.blur()
                 } else if (formType === FormElementEvent.PROP) {
                     if (key) {
                         ;(node as any)[key] = value

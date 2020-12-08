@@ -193,6 +193,7 @@ export class PlayerComponent {
         this.isJumping = true
         let loading: HTMLElement | undefined = undefined
         const speed = this.speed
+        const { index, time, percent } = state
 
         if (shouldLoading) {
             const temp = document.createElement('div')
@@ -202,8 +203,6 @@ export class PlayerComponent {
             this.pause()
             await delay(100)
         }
-
-        const { index, time, percent } = state
 
         const nextReplayData = this.getNextReplayData(index)
         if (!nextReplayData) {
@@ -218,7 +217,7 @@ export class PlayerComponent {
             }
         })
 
-        if (this.viewIndex !== index || this.startTime > time) {
+        if (this.viewIndex !== index || this.startTime >= time) {
             const [{ packsInfo }, { packs }] = [Store.getState().progress, Store.getState().replayData]
             this.audioData = nextReplayData.audio
             this.initAudio()
@@ -433,8 +432,9 @@ export class PlayerComponent {
         observer.emit(PlayerEventTypes.STOP)
     }
 
-    execFrame(this: PlayerComponent, record: RecordData) {
-        updateDom.call(this, record, this.isJumping ? 0 : undefined)
+    execFrame(record: RecordData) {
+        const isJumping = this.isJumping
+        updateDom.call(this, record, { isJumping })
     }
 
     calcFrames(interval = this.frameInterval) {
