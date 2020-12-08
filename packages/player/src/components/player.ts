@@ -43,6 +43,7 @@ export class PlayerComponent {
 
     initTime: number
     startTime: number
+    animationDelayTime = 300
     elapsedTime = 0
     audioOffset = 500
 
@@ -192,7 +193,6 @@ export class PlayerComponent {
     async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
         this.isJumping = true
         let loading: HTMLElement | undefined = undefined
-        const speed = this.speed
         const { index, time, percent } = state
 
         if (shouldLoading) {
@@ -200,7 +200,6 @@ export class PlayerComponent {
             temp.innerHTML = normalLoading
             loading = temp.firstElementChild as HTMLElement
             this.c.container.appendChild(loading)
-            this.pause()
             await delay(100)
         }
 
@@ -231,7 +230,7 @@ export class PlayerComponent {
             this.frameIndex = frameIndex
         }
 
-        this.startTime = time
+        this.startTime = time - this.animationDelayTime
 
         if (percent !== undefined) {
             this.setProgress()
@@ -246,10 +245,6 @@ export class PlayerComponent {
             this.c.container.removeChild(loading)
         }
 
-        if (speed) {
-            Store.dispatch({ type: PlayerReducerTypes.SPEED, data: { speed } })
-        }
-
         this.isJumping = false
     }
 
@@ -257,7 +252,6 @@ export class PlayerComponent {
         const { packs } = Store.getState().replayData
 
         const nextPack = packs[index]
-
         if (nextPack) {
             const nextData = transToReplayData(nextPack)
             Store.dispatch({ type: ReplayDataReducerTypes.UPDATE_DATA, data: { currentData: nextData } })
@@ -303,7 +297,7 @@ export class PlayerComponent {
         this.RAF.start()
 
         this.initTime = getTime()
-        this.startTime = this.frames[this.frameIndex]
+        this.startTime = this.frames[this.frameIndex] - this.animationDelayTime
 
         async function loop(this: PlayerComponent, t: number, loopIndex: number) {
             const timeStamp = getTime() - this.initTime

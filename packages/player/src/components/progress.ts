@@ -79,13 +79,18 @@ export class ProgressComponent implements IComponent {
             if (index !== undefined) {
                 const records = packs[index]
                 const packInfo = packsInfo[index]
-                const diffTime = packInfo.diffTime
+                const { startTime, diffTime } = packInfo
+                const totalDurationTime = packsInfo.reduce((acc, info) => acc + info.duration, 0)
+                const beforeDurationTime = packsInfo.slice(0, index).reduce((acc, info) => acc + info.duration, 0)
                 for (let i = 0; i < records.length; i++) {
                     const cur = records[i]
                     const next = records[i + 1]
                     if (next) {
                         if (time >= cur.time - diffTime && time <= next.time - diffTime) {
-                            const data = { index, percent, time: cur.time - diffTime }
+                            // revise position between two records
+                            const reviseTime = totalDurationTime * percent - (cur.time - startTime) - beforeDurationTime
+                            const time = cur.time - diffTime + reviseTime
+                            const data = { index, percent, time }
                             cacheMap.set(percent, data)
                             return data
                         }
