@@ -78,13 +78,13 @@ export function transToReplayData(records: RecordData[]): ReplayData {
     return replayData
 }
 
-export function getGZipData() {
+export function getGZipData(): RecordData[] | null {
     const str = window.G_REPLAY_STR_RECORDS
     if (!str) {
         return null
     }
 
-    return (decompressWithGzip(str) as unknown) as RecordData[]
+    return decompressWithGzip(str) as RecordData[]
 }
 
 export async function getRecordsFromDB() {

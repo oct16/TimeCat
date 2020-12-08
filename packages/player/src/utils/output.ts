@@ -174,7 +174,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     extract(packs, exportOptions)
     await makeCssInline(records) // some link cross origin
 
-    const compressStr = compressWithGzip(records as any)
+    const compressStr = compressWithGzip(records)
 
     const replayData = `var G_REPLAY_STR_RECORDS =  '${compressStr}'`
 
