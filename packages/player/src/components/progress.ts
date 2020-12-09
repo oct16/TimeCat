@@ -2,15 +2,12 @@ import { secondToTime, delay, getDateTime } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { PlayerEventTypes } from '../types'
 import { observer, Heat, Store, Component, IComponent, html } from '../utils'
+import { Pillar } from '../utils/pillar'
 
 @Component(
     'player-progress',
     html`<div class="player-progress">
-        <div class="player-timer">
-            <time>
-                00:00
-            </time>
-        </div>
+        <div class="player-timer">00:00</div>
         <div class="player-slider-bar">
             <div class="player-heat-bar-container">
                 <canvas class="player-heat-bar"></canvas>
@@ -30,16 +27,15 @@ export class ProgressComponent implements IComponent {
     timer: HTMLElement
     slider: HTMLElement
     heatBar: HTMLCanvasElement
-    heatPoints: number[]
+    heatPoints: number[] = []
 
     constructor(c: ContainerComponent) {
         this.c = c
         this.progress = c.container.querySelector('.player-progress')! as HTMLElement
-        this.timer = c.container.querySelector('.player-timer time') as HTMLElement
+        this.timer = c.container.querySelector('.player-timer') as HTMLElement
         this.currentProgress = this.progress.querySelector('.player-current-progress') as HTMLElement
         this.slider = this.progress.querySelector('.player-slider-bar') as HTMLElement
         this.heatBar = this.progress.querySelector('.player-heat-bar') as HTMLCanvasElement
-        observer.on(PlayerEventTypes.RESIZE, this.resizeHeatBar.bind(this))
 
         this.listenElementOnHover(this.parent)(isHover => {
             if (isHover) {
@@ -201,15 +197,29 @@ export class ProgressComponent implements IComponent {
     }
 
     drawHeatPoints(points?: number[]) {
-        this.heatPoints = points || this.heatPoints
-        if (this.heatPoints && this.heatPoints.length) {
-            new Heat(this.heatBar, this.heatPoints)
+        if (points) {
+            if (isIntArrayEqual(this.heatPoints, points)) {
+                return
+            }
+            this.heatPoints = points
+        } else if (this.heatPoints.length) {
+            return
         }
-    }
 
-    async resizeHeatBar() {
-        // wait for scaling page finish to get target offsetWidth
-        await delay(500)
-        this.drawHeatPoints()
+        if (this.heatPoints.length) {
+            new Pillar(this.heatBar, this.heatPoints)
+        }
+
+        function isIntArrayEqual(a: number[], b: number[]) {
+            if (a.length !== b.length) {
+                return false
+            }
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] !== b[i]) {
+                    return false
+                }
+            }
+            return true
+        }
     }
 }

@@ -95,8 +95,8 @@ body {
     position: absolute;
     left: 0;
     bottom: -41px;
-    background: #535253;
-    opacity: 0.9;
+    background: black;
+    opacity: 0.8;
     display: flex;
     user-select: none;
 }
@@ -128,9 +128,11 @@ body {
 
 .player-keyboard {
     white-space: nowrap;
-    button[disabled] {
-        cursor: default;
-        color: #999;
+    button {
+        &[disabled]{
+            cursor: default;
+            color: #999;
+        }
     }
 }
 
@@ -142,8 +144,7 @@ body {
         color: white;
         outline: none;
         cursor: pointer;
-        font-size: 13px;
-        // line-height: 18px;
+        font-size: 14px;
         padding: 0 5px;
 
         &.play-or-pause {
@@ -163,22 +164,10 @@ body {
     align-items: center;
 }
 
-.player-timer {
-    margin-left: 2px;
-
-    time {
-        margin-top: 1px;
-        padding: 0 4px;
-        color: white;
-        font-size: 12px;
-        font-family: Helvetica;
-        vertical-align: middle;
-    }
-}
-
 .player-export {
+    display: flex;
     button {
-        padding: 0;
+        padding: 2px 0 0 0;
         padding-left: 2px;
     }
 }
@@ -186,19 +175,27 @@ body {
 .player-fullscreen {
     margin-left: 8px;
     cursor: pointer;
+    display: flex;
 }
 
 .player-progress {
     width: 100%;
     cursor: pointer;
+ 
+    .player-timer {
+        margin-left: 2px;
+        padding: 0 4px;
+        color: white;
+        font-size: 14px;
+        font-family: Helvetica;
+    }
 }
 
 .player-slider-bar {
     position: relative;
     width: calc(100% - 20px);
-    height: 7px;
+    height: 23px;
     margin: 7.5px 8px;
-    background: white;
     border-radius: 2.5px;
 }
 
@@ -207,39 +204,40 @@ body {
     width: 100%;
     position: absolute;
     overflow: hidden;
+    background: black;
 }
 
 .player-heat-bar {
-    height: 100%;
+    height: 16px;
     width: 100%;
     position: absolute;
     left: 0;
     top: 0;
+    margin: 2px 0px 0 0px;
+    background: black;
+    transform: rotateZ(180deg) rotateY(180deg);
 }
 
 .player-thumb {
-    width: 14px;
-    height: 14px;
-    box-sizing: border-box;
-    border: 2px solid white;
-    background: black;
-    border-radius: 100%;
+    width: 4px;
+    border: 1px slide white;
+    border-radius: 1px;
+    height: 100%;
+    background: #fff;
     cursor: pointer;
     position: absolute;
-    right: -5px;
-    top: -4px;
+    right: 0;
+    top: 0;
     z-index: 10;
-    opacity: 0;
-    transition: opacity .5s;
+    transition: all .3s;
 
     &[active] {
-        opacity: 1;
+        background: red;
+        border-color: red;
     }
 }
 
 .player-current-progress {
-    background: rgba(50, 50, 50, .75);
-    border-radius: 2.5px;
     position: absolute;
     left: 0;
     top: 0;

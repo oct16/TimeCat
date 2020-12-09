@@ -27,6 +27,7 @@ const defaultReplayOptions = {
     autoplay: true,
     mode: 'default',
     target: window,
+    heatPoints: true,
     timeMode: 'durationTime',
     fastForward: [4, 16]
 }

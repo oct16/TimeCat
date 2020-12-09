@@ -133,6 +133,8 @@ export class PlayerComponent {
             this.watchPlayerSpeed()
             this.watcherProgressJump()
         }
+
+        observer.on(PlayerEventTypes.RESIZE, this.resizeHeatBar.bind(this))
     }
 
     initAudio() {
@@ -283,7 +285,7 @@ export class PlayerComponent {
                 this.initViewState()
                 this.c.setViewState()
             } else {
-                this.progress.drawHeatPoints(this.calcHeatPointsData())
+                this.progress.drawHeatPoints()
             }
             this.isFirstTimePlay = false
         }
@@ -454,8 +456,9 @@ export class PlayerComponent {
         const state = Store.getState()
         const { packs } = state.replayData
         const { duration } = state.progress
-        const colum = 200
-        const gap = duration / colum
+        const sliderWidth = this.progress.slider.offsetWidth
+        const column = Math.floor(sliderWidth / 7)
+        const gap = duration / column
 
         const heatPoints = packs.reduce((acc, records) => {
             const counts: number[] = []
@@ -505,5 +508,11 @@ export class PlayerComponent {
         this.frames = this.calcFrames()
         this.progress.drawHeatPoints(this.calcHeatPointsData())
         this.setProgress()
+    }
+
+    async resizeHeatBar() {
+        // wait for scaling page finish to get target offsetWidth
+        await delay(500)
+        this.progress.drawHeatPoints(this.calcHeatPointsData())
     }
 }
