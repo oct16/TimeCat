@@ -208,6 +208,16 @@ export class PlayerComponent {
             return
         }
 
+        if (this.viewIndex !== index || this.startTime >= time) {
+            const [{ packsInfo }, { packs }] = [Store.getState().progress, Store.getState().replayData]
+
+            const diffTime = packsInfo[index].diffTime
+            this.curViewEndTime = packs[index].slice(-1)[0].time
+            this.curViewDiffTime = diffTime
+            this.viewIndex = index
+            this.records = packs[index]
+        }
+
         const frameIndex = this.frames.findIndex((t, i) => {
             const cur = t
             const next = this.frames[i + 1] || cur + 1
@@ -216,20 +226,11 @@ export class PlayerComponent {
             }
         })
 
-        if (this.viewIndex !== index || this.startTime >= time) {
-            const [{ packsInfo }, { packs }] = [Store.getState().progress, Store.getState().replayData]
-            this.audioData = nextReplayData.audio
-            this.initAudio()
-            const diffTime = packsInfo[index].diffTime
-            this.curViewEndTime = packs[index].slice(-1)[0].time
-            this.curViewDiffTime = diffTime
-            this.initTime = getTime()
-            this.recordIndex = 0
-            this.viewIndex = index
-            this.records = packs[index]
-            this.frameIndex = frameIndex
-        }
-
+        this.frameIndex = frameIndex
+        this.initTime = getTime()
+        this.recordIndex = 0
+        this.audioData = nextReplayData.audio
+        this.initAudio()
         this.startTime = time - this.animationDelayTime
 
         if (percent !== undefined) {
@@ -274,7 +275,7 @@ export class PlayerComponent {
 
     play() {
         this.playAudio()
-        if (this.recordIndex === 0) {
+        if (this.frameIndex === 0) {
             this.progress.resetThumb()
             if (!this.isFirstTimePlay) {
                 // Indicates the second times play
