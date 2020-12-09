@@ -104,6 +104,7 @@ export class PlayerComponent {
     }))
     watchProgress() {
         this.recalculateProgress()
+        this.viewsLength = Store.getState().replayData.packs.length
     }
 
     watcherProgressJump() {

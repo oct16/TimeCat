@@ -1,4 +1,5 @@
 import { RecordData, ReplayData } from '@timecat/timecat'
+import { getPacks } from '../..'
 
 const initState = {
     records: [] as RecordData[],
@@ -29,12 +30,11 @@ export function ReplayDataReducer(
 
     switch (type) {
         case ReplayDataReducerTypes.APPEND_RECORDS:
-            const records = state.records.slice()
+            const records = state.records
             records.push(...data.records!)
-            return {
-                ...state,
-                records
-            }
+            const packs = getPacks(records)
+            state.packs = packs
+            return state
         case ReplayDataReducerTypes.UPDATE_DATA:
             if (data.currentData && data.currentData) {
                 window.G_REPLAY_DATA = data.currentData
