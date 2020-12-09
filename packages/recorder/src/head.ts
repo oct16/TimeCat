@@ -14,6 +14,7 @@ export async function getHeadData() {
 
     return {
         href: location.href,
+        title: document.title,
         relatedId: getRandomCode(),
         userAgent: navigator.userAgent,
         platform: navigator.platform,

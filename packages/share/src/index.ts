@@ -166,6 +166,7 @@ export interface LocationRecordData {
     href: string
     path: string
     hash: string
+    title: string
     contextNodeId: number
 }
 export type CanvasRecord = BaseRecord<RecordType.CANVAS, CanvasRecordData>
@@ -279,6 +280,7 @@ export interface ReplayData {
 export interface ReplayHead {
     version: string
     href: string
+    title: string
     relatedId: string
     userAgent: string
     platform: string
@@ -311,6 +313,7 @@ export interface RecordOptionsBase {
     audio?: boolean
     write?: boolean
     keep?: boolean
+    emitLocationImmediate?: boolean
     font?: boolean
     plugins?: any[]
     rewriteResource?: any

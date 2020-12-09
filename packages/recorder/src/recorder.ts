@@ -4,6 +4,7 @@ import { RecordData, ValueOf, RecordType, TerminateRecord, RecordOptionsBase } f
 import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
+import { LocationWatcher } from './watchers/location'
 import { Pluginable, RecorderPlugin } from './pluginable'
 
 export interface RecordInternalOptions extends RecordOptions {
@@ -42,6 +43,7 @@ export class RecorderModule extends Pluginable {
         mode: 'default',
         write: true,
         keep: false,
+        emitLocationImmediate: true,
         context: window
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
@@ -79,7 +81,7 @@ export class RecorderModule extends Pluginable {
     }
 
     public async destroy() {
-        await this.cancelListen()
+        await this.cancelListener()
         this.destroyStore.forEach(un => un())
     }
 
@@ -87,7 +89,7 @@ export class RecorderModule extends Pluginable {
         await this.db.clear()
     }
 
-    private async cancelListen() {
+    private async cancelListener() {
         // wait for watchers loaded
         await this.watchesReadyPromise
         this.listenStore.forEach(un => un())
@@ -172,6 +174,13 @@ export class RecorderModule extends Pluginable {
             })
             this.watchersInstance.set(Watcher.name, watcher)
         })
+
+        if (options.emitLocationImmediate) {
+            const locationInstance = this.watchersInstance.get('LocationWatcher') as InstanceType<
+                typeof LocationWatcher
+            >
+            locationInstance.emitOne()
+        }
 
         this.watcherResolve()
         await this.recordSubIFrames(options.context)
@@ -260,10 +269,10 @@ export class RecorderModule extends Pluginable {
                         this.db.addRecord(data as TerminateRecord)
                         this.onDataCallback && this.onDataCallback(data)
                     }
-                    this.cancelListen()
+                    this.cancelListener()
                     this.hooks.end.call()
                 } else {
-                    this.record({ ...options, keep: true })
+                    this.record({ ...options, keep: true, emitLocationImmediate: false })
                 }
             }
 

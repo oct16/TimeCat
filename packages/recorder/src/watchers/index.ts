@@ -16,9 +16,9 @@ export const baseWatchers = {
 }
 
 export const watchers = {
+    LocationWatcher,
     ...baseWatchers,
     WindowWatcher,
-    LocationWatcher,
     CanvasWatcher,
     FontWatcher,
     TerminateWatcher
