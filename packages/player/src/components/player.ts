@@ -241,7 +241,7 @@ export class PlayerComponent {
         }
 
         this.c.setViewState()
-        this.loopFramesByTime(this.startTime)
+        this.loopFramesByTime(this.startTime + this.frameInterval)
 
         if (loading) {
             await delay(300)
