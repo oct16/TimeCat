@@ -11,6 +11,7 @@ import {
 } from '@timecat/share'
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
 import { getDBOperator } from '@timecat/utils'
+import { Store } from './redux'
 
 export function download(src: Blob | string, name: string) {
     const tag = document.createElement('a')
@@ -93,6 +94,11 @@ export function getGZipData(): RecordData[] | null {
     }
 
     return decompressWithGzipByte(byteArray) as RecordData[]
+}
+
+export function getRecordsFromStore() {
+    const records = Store.getState().replayData.records
+    return records.length ? records : null
 }
 
 export async function getRecordsFromDB() {

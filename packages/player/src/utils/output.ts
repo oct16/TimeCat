@@ -12,9 +12,8 @@ import {
 } from '@timecat/utils'
 import { compressWithGzipByte } from 'brick.json/gzip/esm'
 import { VNode, VSNode, AudioData, AudioOptionsData, RecordType, RecordData, DOMRecord } from '@timecat/share'
-import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks } from './common'
+import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks, getRecordsFromStore } from './common'
 import { recoverNative } from './polyfill/recover-native'
-import { Store } from './redux'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
@@ -166,7 +165,7 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const records = getGZipData() || Store.getState().replayData.records || (await getRecordsFromDB())
+    const records = getGZipData() || getRecordsFromStore() || (await getRecordsFromDB())
     if (!records) {
         return logError('Records not found')
     }
