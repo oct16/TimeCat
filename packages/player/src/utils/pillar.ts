@@ -23,28 +23,29 @@ export class Pillar {
         this.draw(points)
     }
 
-    initTarget() {}
-
     draw(points: number[]) {
         const len = points.length
+        const drawColor = '#fff'
+        this.context.fillStyle = drawColor
+        this.context.strokeStyle = drawColor
 
-        const reactWidth = (this.targetWidth / (len * 2 - 1)) * this.ratio
+        const reactWidth = (this.targetWidth / (len * 2)) * this.ratio
         const reactHeight = this.targetHeight * this.ratio
 
-        this.context.fillStyle = `#fff`
-        this.context.strokeStyle = `#fff`
+        const max = Math.max.apply(null, points)
 
         for (let i = 0; i < len; i++) {
-            const x = i * 2 * reactWidth
-            const y = 0
-            const w = reactWidth
-            const h = (points[i] / 8) * reactHeight * -1
-            if (!h) {
+            if (!points[i]) {
                 continue
             }
-
-            const H = (h: number) => 0.8 * h - 5
-            this.radiusRect(x, y, w, H(h) * -1, 2)
+            const x = i * 2 * reactWidth
+            const y = 2
+            const w = reactWidth
+            const sinCurve = Math.sin((points[i] / max) * (Math.PI / 2))
+            const z = 0.16
+            const scale = sinCurve * (1 - z) + z
+            const h = scale * (reactHeight * 0.9)
+            this.radiusRect(x, y, w, h, 2)
         }
     }
 
