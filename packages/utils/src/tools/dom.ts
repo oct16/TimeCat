@@ -1,4 +1,5 @@
 import { VNode } from '@timecat/share'
+import { logError } from './common'
 
 const snapshot = () => window.G_REPLAY_DATA && window.G_REPLAY_DATA.snapshot.data
 
@@ -104,5 +105,11 @@ function isValidUrl(url: string) {
 }
 
 export async function getScript(src: string) {
-    return await fetch(src).then(async res => filteringScriptTag(await res.text()))
+    return await fetch(src).then(
+        async res => filteringScriptTag(await res.text()),
+        reason => {
+            logError(reason)
+            return src
+        }
+    )
 }

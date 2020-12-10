@@ -9,7 +9,7 @@ import {
     HeadRecord,
     AudioStrList
 } from '@timecat/share'
-import { decompressWithGzip } from 'brick.json/gzip/esm'
+import { decompressWithGzipByte } from 'brick.json/gzip/esm'
 import { getDBOperator } from '@timecat/utils'
 
 export function download(src: Blob | string, name: string) {
@@ -84,7 +84,15 @@ export function getGZipData(): RecordData[] | null {
         return null
     }
 
-    return decompressWithGzip(str) as RecordData[]
+    const carry = 1 << 8
+    const strArray = str.split('')
+    const byteArray = new Uint8Array(strArray.length)
+    for (let i = 0; i < strArray.length; i++) {
+        const num = strArray[i].charCodeAt(0)
+        byteArray[i] = num >= carry ? num - carry : num
+    }
+
+    return decompressWithGzipByte(byteArray) as RecordData[]
 }
 
 export async function getRecordsFromDB() {

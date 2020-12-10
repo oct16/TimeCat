@@ -68,7 +68,7 @@
         "@typescript-eslint/eslint-plugin": "^3.9.0",
         "@typescript-eslint/parser": "^3.9.0",
         "@zerollup/ts-transform-paths": "^1.7.17",
-        "brick.json": "^0.0.4",
+        "brick.json": "^0.0.6",
         "brotli": "^1.3.2",
         "browser-sync": "^2.26.12",
         "chalk": "^4.1.0",

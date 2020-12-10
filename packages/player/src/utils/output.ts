@@ -10,7 +10,7 @@ import {
     nodeStore,
     logError
 } from '@timecat/utils'
-import { compressWithGzip } from 'brick.json/gzip/esm'
+import { compressWithGzipByte } from 'brick.json/gzip/esm'
 import { VNode, VSNode, AudioData, AudioOptionsData, RecordType, RecordData, DOMRecord } from '@timecat/share'
 import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks } from './common'
 import { recoverNative } from './polyfill/recover-native'
@@ -166,7 +166,7 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const records = getGZipData() || (await getRecordsFromDB()) || Store.getState().replayData.records
+    const records = getGZipData() || Store.getState().replayData.records || (await getRecordsFromDB())
     if (!records) {
         return logError('Records not found')
     }
@@ -174,9 +174,21 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     extract(packs, exportOptions)
     await makeCssInline(records) // some link cross origin
 
-    const compressStr = compressWithGzip(records)
+    const zipArray = compressWithGzipByte(records)
 
-    const replayData = `var G_REPLAY_STR_RECORDS =  '${compressStr}'`
+    let outputStr = ''
+    const carry = 1 << 8
+    for (let i = 0; i < zipArray.length; i++) {
+        let num = zipArray[i]
+
+        if (~[13, 34, 39, 44, 60, 62, 92, 96, 10, 0].indexOf(num)) {
+            num += carry
+        }
+
+        outputStr += String.fromCharCode(num)
+    }
+
+    const replayData = `var G_REPLAY_STR_RECORDS =  '${outputStr}'`
 
     injectScripts(html, [{ src: replayData }])
 }
