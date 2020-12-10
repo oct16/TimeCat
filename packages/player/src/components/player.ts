@@ -506,7 +506,9 @@ export class PlayerComponent {
     }
 
     recalculateProgress() {
+        const curFrame = this.frameIndex
         this.frames = this.calcFrames()
+        this.progress.moveThumb(curFrame / this.frames.length)
         this.progress.drawHeatPoints(this.calcHeatPointsData())
         this.setProgress()
     }
