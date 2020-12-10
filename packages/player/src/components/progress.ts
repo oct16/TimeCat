@@ -27,7 +27,7 @@ export class ProgressComponent implements IComponent {
     timer: HTMLElement
     slider: HTMLElement
     heatBar: HTMLCanvasElement
-    heatPoints: number[] = []
+    heatPoints: { step: number; snapshot: boolean }[] = []
 
     constructor(c: ContainerComponent) {
         this.c = c
@@ -196,9 +196,9 @@ export class ProgressComponent implements IComponent {
         this.currentProgress = currentProgress as HTMLElement
     }
 
-    drawHeatPoints(points?: number[]) {
+    drawHeatPoints(points?: { step: number; snapshot: boolean }[]) {
         if (points) {
-            if (isIntArrayEqual(this.heatPoints, points)) {
+            if (isPointsEqual(this.heatPoints, points)) {
                 return
             }
             this.heatPoints = points
@@ -210,12 +210,15 @@ export class ProgressComponent implements IComponent {
             new Pillar(this.heatBar, this.heatPoints)
         }
 
-        function isIntArrayEqual(a: number[], b: number[]) {
+        function isPointsEqual(a: { step: number; snapshot: boolean }[], b: { step: number; snapshot: boolean }[]) {
             if (a.length !== b.length) {
                 return false
             }
+
             for (let i = 0; i < a.length; i++) {
-                if (a[i] !== b[i]) {
+                const itemA = a[i]
+                const itemB = b[i]
+                if (itemA.step !== itemB.step || itemA.snapshot !== itemB.snapshot) {
                     return false
                 }
             }

@@ -135,7 +135,11 @@ export class PlayerComponent {
             this.watcherProgressJump()
         }
 
-        observer.on(PlayerEventTypes.RESIZE, this.resizeHeatBar.bind(this))
+        observer.on(PlayerEventTypes.RESIZE, async () => {
+            // wait for scaling page finish to get target offsetWidth
+            await delay(500)
+            this.recalculateProgress()
+        })
     }
 
     initAudio() {
@@ -462,26 +466,32 @@ export class PlayerComponent {
         const gap = duration / column
 
         const heatPoints = packs.reduce((acc, records) => {
-            const counts: number[] = []
             let index = 0
             let step = 0
+            let snapshot = false
+
             const endTime = records.slice(-1)[0].time
             let currentTime = records[0].time
 
             while (currentTime < endTime && index < records.length) {
                 const nextTime = currentTime + gap
-                if (records[index].time < nextTime) {
+                const record = records[index]
+                if (record.time < nextTime) {
                     index++
                     step++
+                    if (isSnapshot(record)) {
+                        snapshot = true
+                    }
                     continue
                 }
-                counts.push(step)
+                acc.push({ step, snapshot })
                 step = 0
+                snapshot = false
                 currentTime += gap
             }
-            acc.push(...counts)
+
             return acc
-        }, [] as number[])
+        }, [] as { step: number; snapshot: boolean }[])
 
         return heatPoints
     }
@@ -511,11 +521,5 @@ export class PlayerComponent {
         this.progress.moveThumb(curFrame / this.frames.length)
         this.progress.drawHeatPoints(this.calcHeatPointsData())
         this.setProgress()
-    }
-
-    async resizeHeatBar() {
-        // wait for scaling page finish to get target offsetWidth
-        await delay(500)
-        this.progress.drawHeatPoints(this.calcHeatPointsData())
     }
 }
