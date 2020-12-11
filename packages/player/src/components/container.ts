@@ -104,8 +104,6 @@ export class ContainerComponent {
         setTimeout(() => (this.container.style.opacity = '1'))
         this.container.style.display = 'block'
 
-        let setMaxScale: number
-
         triggerResize()
 
         function triggerResize(options?: Partial<{ setWidth: number; setHeight: number; maxScale: number }>) {
@@ -117,56 +115,54 @@ export class ContainerComponent {
             if (!e) {
                 return
             }
+            const { width: targetWidth, height: targetHeight } = getPageSize(self.container)
 
-            if (maxScale) {
-                setMaxScale = maxScale
-            }
+            setWidth = setWidth || targetWidth
+            setHeight = setHeight || targetHeight
+            const setMaxScale = maxScale || 1
 
             if (e.target instanceof Window) {
                 const { innerWidth: w, innerHeight: h } = e.target
-                scalePages(self.container, w, h, setWidth, setHeight)
+                scalePages(self.container, w, h, setWidth, setHeight, setMaxScale)
             } else {
                 const { offsetWidth: w, offsetHeight: h } = e.target as HTMLElement
-                scalePages(self.container, w, h, setWidth, setHeight)
+                scalePages(self.container, w, h, setWidth, setHeight, setMaxScale)
             }
-
-            observer.emit(PlayerEventTypes.RESIZE)
         }
 
         function scalePages(
             target: HTMLElement,
             maxWidth: number,
             maxHeight: number,
-            setWidth?: number,
-            setHeight?: number
+            setWidth: number,
+            setHeight: number,
+            setMaxScale: number
         ) {
             const { mode: replayMode } = Store.getState().player.options || {}
 
             const panelHeight = replayMode === 'live' ? 0 : 40 - 2 // subtract the gap
 
-            const { width: targetWidth, height: targetHeight } = getPageSize(target)
-
-            const scaleX = maxWidth / (setWidth || targetWidth)
-            const scaleY = maxHeight / ((setHeight || targetHeight) + panelHeight)
+            const scaleX = maxWidth / setWidth
+            const scaleY = maxHeight / (setHeight + panelHeight)
 
             // limit scale
             const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, setMaxScale || 1)
 
-            const left =
-                ((setWidth || targetWidth) * scale - (setWidth || targetWidth)) / 2 +
-                (maxWidth - (setWidth || targetWidth) * scale) / 2
+            const left = (setWidth * scale - setWidth) / 2 + (maxWidth - setWidth * scale) / 2
 
-            const top = (maxHeight - (setHeight || targetHeight) - panelHeight * scale) / 2
+            const top = (maxHeight - setHeight - panelHeight * scale) / 2
 
             target.style.transform = `scale(${scale})`
             target.style.left = left + 'px'
             target.style.top = top + 'px'
 
-            if (setWidth) {
+            const currentWidth = parseInt(target.style.width)
+            const currentHeight = parseInt(target.style.height)
+
+            if (setWidth !== currentWidth || setHeight !== currentHeight) {
                 target.style.width = setWidth + 'px'
-            }
-            if (setHeight) {
                 target.style.height = setHeight + 'px'
+                observer.emit(PlayerEventTypes.RESIZE)
             }
         }
 
