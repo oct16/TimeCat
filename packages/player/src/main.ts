@@ -29,7 +29,7 @@ const defaultReplayOptions = {
     target: window,
     heatPoints: true,
     timeMode: 'durationTime',
-    fastForward: [4, 16]
+    fastForward: [2, 8]
 }
 
 export class Player {
