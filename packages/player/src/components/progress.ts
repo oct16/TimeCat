@@ -133,36 +133,25 @@ export class ProgressComponent implements IComponent {
     }
 
     async setProgressAnimation(index: number, total: number, interval: number, speed: number) {
-        // progress end
         if (!index && !speed) {
             return
         }
+        const delayTime = 50
+        const percent = index / total
+        this.moveThumb(percent)
 
-        // set width 100%
         this.currentProgress.classList.remove('active')
-
-        // fix change class not trigger animate
-        await delay(20)
-
         this.currentProgress.style.removeProperty('transition')
+        await delay(delayTime)
 
-        // pause
         if (!speed) {
-            this.currentProgress.style.width = this.currentProgress.offsetWidth + 'px'
             this.currentProgress.style.setProperty('transition', 'none')
             return
         }
 
-        // remind animation seconds
-        const duration = ((total - index) * interval) / speed / 1000
-        this.currentProgress.style.transitionDuration = duration + 's'
-
-        // animate
+        const remindDuration = ((total - index) * interval) / speed / 1000 - delayTime / 1000 + 's'
+        this.currentProgress.style.transitionDuration = remindDuration
         this.currentProgress.classList.add('active')
-
-        // recalculate progress thumb position
-        const percent = index / total
-        this.currentProgress.style.width = percent * this.slider.offsetWidth + 'px'
     }
 
     updateTimer(frameIndex: number, frameInterval: number, curViewDiffTime: number) {

@@ -247,6 +247,7 @@ body {
     transition-property: width;
     transition-timing-function: linear;
     transition-duration: 0s;
+    transition-delay: .1s;
 
     &.active {
         width: 100% !important;
