@@ -1,5 +1,5 @@
 import { VNode } from '@timecat/share'
-import { logError } from './common'
+import { logError, createURL } from './common'
 
 const snapshot = () => window.G_REPLAY_DATA && window.G_REPLAY_DATA.snapshot.data
 
@@ -24,12 +24,9 @@ export function filteringScriptTag(str: string) {
 
 export function completeCssHref(str: string, parentVNode?: VNode) {
     return str.replace(/(url\(['"]?((\/{1,2}|\.\.?\/)?[^'"]*?)['"]?(?=\)))/g, (string, b, url) => {
-        if (!url.startsWith('data')) {
-            const baseUrl = parentVNode?.attrs['css-url'] || href()
-            const newUrl = new URL(url, baseUrl)
-            return string.replace(url, newUrl.href)
-        }
-        return string
+        const baseUrl = parentVNode?.attrs['css-url'] || href()
+        const newUrl = createURL(url, baseUrl)
+        return string.replace(url, newUrl.href)
     })
 }
 
@@ -46,12 +43,12 @@ export function completeAttrHref(str: string, node?: Element) {
             const { href, path } = context?.G_REPLAY_LOCATION || {}
 
             if (path && href) {
-                const relationHref = new URL(path, href)
+                const relationHref = createURL(path, href).href
                 const attrs = node.getAttributeNames()
                 attrs
                     .filter(key => ~['src', 'href'].indexOf(key))
                     .forEach(key => {
-                        const newHref = new URL(str, relationHref).href
+                        const newHref = createURL(str, relationHref).href
                         if (node.getAttribute(key) !== newHref) {
                             node.setAttribute(key, newHref)
                         }
@@ -59,7 +56,7 @@ export function completeAttrHref(str: string, node?: Element) {
             }
         })
     }
-    return new URL(str, href()).href
+    return createURL(str, href()).href
 }
 
 export function isHideComment(node: Node | null) {

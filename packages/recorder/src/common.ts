@@ -1,5 +1,5 @@
 import { VNode } from '@timecat/share'
-import { logError } from '@timecat/utils'
+import { logError, createURL } from '@timecat/utils'
 
 export function rewriteNodes(vNodes: VNode[]) {
     const { G_RECORD_OPTIONS: options } = window
@@ -25,10 +25,10 @@ export function rewriteNodes(vNodes: VNode[]) {
     }
 
     const rewrite = (target: { [key: string]: string }, [key, source]: [string, string]) => {
-        const url = new URL(source, base?.href || href)
+        const url = createURL(source, base?.href || href)
         const oldUrl = url.href
 
-        target[key] = new URL(url.pathname, replaceOrigin).href
+        target[key] = createURL(url.pathname, replaceOrigin).href
         target[key] = pathJoin(replaceOrigin, folderPath || '', url.pathname)
         const nextUrl = target[key]
 

@@ -8,7 +8,8 @@ import {
     isVNode,
     getScript,
     nodeStore,
-    logError
+    logError,
+    createURL
 } from '@timecat/utils'
 import { compressWithGzipByte } from 'brick.json/gzip/esm'
 import { VNode, VSNode, AudioData, AudioOptionsData, RecordType, RecordData, DOMRecord } from '@timecat/share'
@@ -227,7 +228,7 @@ async function makeCssInline(records: RecordData[]) {
 
         try {
             // try to extract css
-            const cssURL = new URL(href, base?.href || location.href).href
+            const cssURL = createURL(href, base?.href || location.href).href
             const cssValue = await fetch(cssURL).then(res => res.text())
             const textNode = {
                 id: nodeStore.createNodeId(),

@@ -214,3 +214,12 @@ export function debounce<F extends Procedure>(
         }
     }
 }
+
+export function createURL(url: string, base?: string) {
+    try {
+        return new URL(url, base)
+    } catch (e) {
+        logError(e)
+    }
+    return { href: url, pathname: url }
+}
