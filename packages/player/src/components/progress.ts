@@ -1,8 +1,7 @@
 import { secondToTime, delay, getDateTime } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { PlayerEventTypes } from '../types'
-import { observer, Heat, Store, Component, IComponent, html } from '../utils'
-import { Pillar } from '../utils/pillar'
+import { Pillar, NormalLine, observer, Store, Component, IComponent, html } from '../utils'
 
 @Component(
     'player-progress',
@@ -197,6 +196,8 @@ export class ProgressComponent implements IComponent {
 
         if (this.heatPoints.length) {
             new Pillar(this.heatBar, this.heatPoints)
+        } else {
+            new NormalLine(this.heatBar)
         }
 
         function isPointsEqual(a: { step: number; snapshot: boolean }[], b: { step: number; snapshot: boolean }[]) {
