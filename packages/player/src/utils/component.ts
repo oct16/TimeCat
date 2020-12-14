@@ -1,3 +1,5 @@
+import { parseHtmlStr } from '.'
+
 export interface IComponent {
     parent: HTMLElement
     target: HTMLElement
@@ -10,9 +12,7 @@ export function Component(name: string, html: string, opts?: Partial<{ isShadow:
             class extends HTMLElement {
                 constructor() {
                     super()
-                    const temp = document.createElement('div')
-                    temp.innerHTML = html
-                    const child = temp.firstElementChild!
+                    const child = parseHtmlStr(html)[0]
                     constructor.prototype.target = child
 
                     const slot = child.getElementsByTagName('slot')[0]
@@ -41,6 +41,6 @@ export function Component(name: string, html: string, opts?: Partial<{ isShadow:
  * highlight tagged string template
  * @param str
  */
-export const html = function (str: TemplateStringsArray) {
+export const html = function (str: TemplateStringsArray, ...args: any) {
     return str.raw[0]
 }

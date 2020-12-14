@@ -25,7 +25,7 @@ import { PlayerComponent } from './components/player'
 import { nodeStore, isElementNode, isExistingNode, delay, isVNode, revertStrByPatches } from '@timecat/utils'
 import { setAttribute, createSpecialNode, convertVNode } from '@timecat/virtual-dom'
 import { ContainerComponent } from './components/container'
-import { Store } from './utils'
+import { html, parseHtmlStr, Store } from './utils'
 
 /**
  * if return true then revert
@@ -360,8 +360,13 @@ export function injectIframeContent(contentDocument: Document, snapshotData: Sna
     if (content) {
         const head = content.querySelector('head')
         if (head) {
-            const style = document.createElement('style')
-            style.innerHTML = FIXED_CSS
+            const style = parseHtmlStr(
+                html`<div>
+                    <style>
+                        ${FIXED_CSS}
+                    </style>
+                </div>`
+            )[0].firstElementChild!
             head.appendChild(style)
         }
         const documentElement = contentDocument.documentElement

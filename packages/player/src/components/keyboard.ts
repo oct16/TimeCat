@@ -1,6 +1,6 @@
 import { ContainerComponent } from './container'
 import { ReplayInternalOptions } from '@timecat/share'
-import { ConnectProps, Component, html, Store, PlayerReducerTypes } from '../utils'
+import { ConnectProps, Component, html, Store, PlayerReducerTypes, parseHtmlStr } from '../utils'
 
 @Component(
     'player-keyboard',
@@ -50,13 +50,12 @@ export class KeyboardComponent {
     createFastForwardBtns(speeds: number[]) {
         speeds = Array.from(new Set([1].concat(speeds)))
         if (speeds) {
-            let html = ''
-            speeds.forEach(speed => {
-                html += `<button type="button" class="speed" speed="${speed}">${speed}x</button>`
-            })
-            const htmlTemp = document.createElement('div')
-            htmlTemp.innerHTML = html
-            this.controller.append(...htmlTemp.children)
+            const htmlStr = speeds.reduce(
+                (s, speed) => s + html`<button type="button" class="speed" speed="${speed}">${speed}x</button>`,
+                ''
+            )
+
+            this.controller.append(...parseHtmlStr(htmlStr))
         }
     }
 

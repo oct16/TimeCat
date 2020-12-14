@@ -4,7 +4,7 @@ import CSS from '../ui.scss'
 import { createIframeDOM, injectIframeContent } from '../dom'
 import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions, VNode, InfoData } from '@timecat/share'
-import { observer, Store, disableScrolling } from '../utils'
+import { observer, Store, disableScrolling, parseHtmlStr, html } from '../utils'
 import { PlayerEventTypes } from '../types'
 import { PanelComponent } from './panel'
 import { PageStartComponent } from './page-start'
@@ -71,8 +71,7 @@ export class ContainerComponent {
             this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
 
         if (targetElement.tagName === 'BODY') {
-            const shadowHost = document.createElement('div')
-            shadowHost.className = 'player-shadowhost'
+            const shadowHost = parseHtmlStr(html`<div class="player-shadowhost"></div>`)[0]
             targetElement.appendChild(shadowHost)
             targetElement = shadowHost
         }

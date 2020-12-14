@@ -16,7 +16,8 @@ import {
     ConnectProps,
     observer,
     transToReplayData,
-    normalLoading
+    normalLoading,
+    parseHtmlStr
 } from '../utils'
 
 @Component(
@@ -203,9 +204,7 @@ export class PlayerComponent {
         const { index, time, percent } = state
 
         if (shouldLoading) {
-            const temp = document.createElement('div')
-            temp.innerHTML = normalLoading
-            loading = temp.firstElementChild as HTMLElement
+            loading = parseHtmlStr(normalLoading)[0]
             this.c.container.appendChild(loading)
             await delay(100)
         }

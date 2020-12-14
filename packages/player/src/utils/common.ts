@@ -128,3 +128,9 @@ export function getPacks(records: RecordData[]) {
 
     return packs
 }
+
+export function parseHtmlStr(htmlStr: string) {
+    const parser = new DOMParser()
+    const children = parser.parseFromString(htmlStr, 'text/html').body.children
+    return [...children] as HTMLElement[]
+}
