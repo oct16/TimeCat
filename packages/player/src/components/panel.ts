@@ -12,8 +12,7 @@ import { ToolboxComponent } from './toolbox'
     'player-panel',
     html`<div class="player-panel">
         <slot></slot>
-    </div>`,
-    { replaceSlot: true }
+    </div>`
 )
 export class PanelComponent implements IComponent {
     target: HTMLElement

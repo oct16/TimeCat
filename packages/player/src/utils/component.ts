@@ -3,7 +3,7 @@ export interface IComponent {
     target: HTMLElement
 }
 
-export function Component(name: string, html: string, opts?: Partial<{ replaceSlot: boolean; isShadow: boolean }>) {
+export function Component(name: string, html: string, opts?: Partial<{ isShadow: boolean }>) {
     return function (constructor: Function) {
         customElements.define(
             name,
@@ -15,8 +15,9 @@ export function Component(name: string, html: string, opts?: Partial<{ replaceSl
                     const child = temp.firstElementChild!
                     constructor.prototype.target = child
 
-                    if (opts?.replaceSlot && this.children?.length > 0) {
-                        const slot = child.getElementsByTagName('slot')[0]
+                    const slot = child.getElementsByTagName('slot')[0]
+
+                    if (slot && this.children?.length > 0) {
                         const parent = slot.parentElement
                         ;[...this.children].forEach(el => parent?.insertBefore(el, null))
                         parent?.removeChild(slot)
