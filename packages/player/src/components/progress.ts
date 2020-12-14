@@ -1,4 +1,4 @@
-import { secondToTime, delay, getDateTime } from '@timecat/utils'
+import { secondToTime, delay, getDateTime, stateDebounce } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { PlayerEventTypes } from '../types'
 import { Pillar, NormalLine, observer, Store, Component, IComponent, html } from '../utils'
@@ -36,8 +36,8 @@ export class ProgressComponent implements IComponent {
         this.slider = this.progress.querySelector('.player-slider-bar') as HTMLElement
         this.heatBar = this.progress.querySelector('.player-heat-bar') as HTMLCanvasElement
 
-        this.listenElementOnHover(this.parent)(isHover => {
-            if (isHover) {
+        this.listenElementOnHover(this.parent)(state => {
+            if (state === 'in') {
                 this.getThumb().setAttribute('active', '')
                 return
             }
@@ -96,36 +96,16 @@ export class ProgressComponent implements IComponent {
         }
     })()
 
-    listenElementOnHover = (el: HTMLElement) => {
-        let hoverState = false
-        const delayTime = 1200
-        let timer = 0
-        return (cb: (isHover: boolean) => void) => {
-            el.addEventListener('mouseover', () => {
-                delayExec(true)
-            })
+    listenElementOnHover = (target: HTMLElement) =>
+        stateDebounce<'in' | 'out'>(
+            setState => {
+                target.addEventListener('mouseover', () => setState('in'))
 
-            el.addEventListener('mouseout', () => {
-                delayExec(false)
-            })
-
-            function delayExec(isHover: boolean) {
-                const preState = hoverState
-                hoverState = isHover
-                if (timer || preState === isHover) {
-                    return
-                }
-                timer = window.setTimeout(
-                    () => {
-                        cb(hoverState)
-                        clearTimeout(timer)
-                        timer = 0
-                    },
-                    hoverState ? delayTime / 5 : delayTime
-                )
-            }
-        }
-    }
+                target.addEventListener('mouseout', () => setState('out'))
+            },
+            state => (state === 'in' ? 200 : 1000),
+            'out'
+        )
 
     getThumb() {
         return this.progress.querySelector('.player-thumb') as HTMLElement

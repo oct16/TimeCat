@@ -1,18 +1,6 @@
 import diff from 'diff'
 import { radix64 } from '../performance/radix64'
-import {
-    VNode,
-    VSNode,
-    SnapshotRecord,
-    RecordData,
-    AudioRecord,
-    AudioStrList,
-    AudioOptionsData,
-    RecordType,
-    ReplayData,
-    ReplayHead,
-    HeadRecord
-} from '@timecat/share'
+import { VNode, VSNode, SnapshotRecord, RecordData, RecordType } from '@timecat/share'
 
 export const isDev = process.env.NODE_ENV === 'development'
 
@@ -222,4 +210,35 @@ export function createURL(url: string, base?: string) {
         logError(e)
     }
     return { href: url, pathname: url }
+}
+
+export function stateDebounce<T extends string | boolean | number>(
+    stateHandle: (setState: (state: T) => void) => void,
+    delay: ((state: T) => number) | number,
+    initState?: T
+) {
+    let preState = initState
+    let timer = 0
+    return (cb: (state: T) => void) => {
+        stateHandle(delayExec)
+
+        function delayExec(state: T) {
+            if (timer) {
+                clearTimeout(timer)
+            }
+
+            timer = window.setTimeout(
+                () => {
+                    if (preState === state) {
+                        return
+                    }
+                    cb(state)
+                    preState = state
+                    clearTimeout(timer)
+                    timer = 0
+                },
+                typeof delay === 'number' ? delay : delay(state)
+            )
+        }
+    }
 }
