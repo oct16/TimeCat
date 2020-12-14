@@ -104,6 +104,8 @@ export class ContainerComponent {
         setTimeout(() => (this.container.style.opacity = '1'))
         this.container.style.display = 'block'
 
+        let lockScale = 0
+
         triggerResize()
 
         function triggerResize(options?: Partial<{ setWidth: number; setHeight: number; maxScale: number }>) {
@@ -111,7 +113,7 @@ export class ContainerComponent {
             resizeHandle(({ target: self.target } as unknown) as Event, setWidth, setHeight, maxScale)
         }
 
-        async function resizeHandle(e?: Event, setWidth?: number, setHeight?: number, maxScale?: number) {
+        async function resizeHandle(e?: Event, setWidth?: number, setHeight?: number, maxScale = 1) {
             if (!e) {
                 return
             }
@@ -119,7 +121,17 @@ export class ContainerComponent {
 
             setWidth = setWidth || targetWidth
             setHeight = setHeight || targetHeight
-            const setMaxScale = maxScale || 1
+
+            switch (maxScale) {
+                case 0:
+                    lockScale = 0
+                    break
+                case 100:
+                    lockScale = 100
+                    break
+            }
+
+            const setMaxScale = lockScale || maxScale
 
             if (e.target instanceof Window) {
                 const { innerWidth: w, innerHeight: h } = e.target

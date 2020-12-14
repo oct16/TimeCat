@@ -158,7 +158,7 @@ export class ToolboxComponent {
         })
     }
 
-    setFullScreen(this: ToolboxComponent) {
+    setFullScreen() {
         this.c.resize({ maxScale: 100 })
         this.fullscreenTarget.requestFullscreen()
     }
@@ -167,6 +167,6 @@ export class ToolboxComponent {
         if (document.fullscreen) {
             return
         }
-        this.c.resize({ maxScale: 1 })
+        this.c.resize({ maxScale: 0 })
     }
 }
