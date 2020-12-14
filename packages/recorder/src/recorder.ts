@@ -1,7 +1,7 @@
 import { watchers, baseWatchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, ValueOf, RecordType, TerminateRecord, RecordOptionsBase } from '@timecat/share'
-import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime } from '@timecat/utils'
+import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime, stateDebounce } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
@@ -83,6 +83,7 @@ export class RecorderModule extends Pluginable {
     public async destroy() {
         await this.cancelListener()
         this.destroyStore.forEach(un => un())
+        this.destroyStore.clear()
     }
 
     public async clearDB() {
@@ -93,6 +94,7 @@ export class RecorderModule extends Pluginable {
         // wait for watchers loaded
         await this.watchesReadyPromise
         this.listenStore.forEach(un => un())
+        this.listenStore.clear()
         nodeStore.reset()
     }
 
@@ -257,8 +259,8 @@ export class RecorderModule extends Pluginable {
             const hidden = 'hidden'
             const visibilityChange = 'visibilitychange'
 
-            async function handleVisibilityChange(this: RecorderModule) {
-                if (document[hidden]) {
+            const viewChangeHandle = (state: 'show' | 'hide') => {
+                if (state === 'hide') {
                     const data = {
                         type: RecordType.TERMINATE,
                         data: null,
@@ -269,18 +271,28 @@ export class RecorderModule extends Pluginable {
                         this.db.addRecord(data as TerminateRecord)
                         this.onDataCallback && this.onDataCallback(data)
                     }
-                    this.cancelListener()
                     this.hooks.end.call()
+                    this.destroy()
                 } else {
                     this.record({ ...options, keep: true, emitLocationImmediate: false })
                 }
             }
 
-            const handle = handleVisibilityChange.bind(this)
+            stateDebounce<'show' | 'hide'>(
+                useState => {
+                    const handle = () => {
+                        if (document[hidden]) {
+                            useState('hide')
+                            return
+                        }
+                        useState('show')
+                    }
 
-            document.addEventListener(visibilityChange, handle, false)
-
-            this.destroyStore.add(() => document.removeEventListener(visibilityChange, handle, false))
+                    document.addEventListener(visibilityChange, handle, false)
+                },
+                state => (state === 'hide' ? 5000 : 0),
+                'show'
+            )(viewChangeHandle)
         }
     }
 }
