@@ -226,7 +226,7 @@ body {
     background: #fff;
     cursor: pointer;    
     position: absolute;
-    right: -2px;
+    right: 0px;
     top: 0;
     z-index: 10;
     transition: all .3s;
@@ -244,14 +244,6 @@ body {
     top: 0;
     width: 0;
     height: 100%;
-    transition-property: width;
-    transition-timing-function: linear;
-    transition-duration: 0s;
-    transition-delay: .1s;
-
-    &.active {
-        width: 100% !important;
-    }
 }
 
 

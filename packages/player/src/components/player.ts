@@ -39,7 +39,8 @@ export class PlayerComponent {
     recordIndex = 0
     frameIndex = 0
     isFirstTimePlay = true
-    frameInterval = 250
+    frameInterval: number
+    maxFrameInterval = 250
     frames: number[]
 
     initTime: number
@@ -97,7 +98,6 @@ export class PlayerComponent {
                 this.pause()
             }
         }
-        this.setProgress()
     }
 
     @ConnectProps(state => ({
@@ -109,20 +109,14 @@ export class PlayerComponent {
     }
 
     watcherProgressJump() {
-        observer.on(
-            PlayerEventTypes.JUMP,
-            (state: { time: number; index: number; recordIndex: number; percent: number }) => {
-                if (this.isJumping) {
-                    return
-                }
-                this.jump(state, true)
-            }
+        observer.on(PlayerEventTypes.JUMP, async (state: { index: number; time: number; percent?: number }) =>
+            this.jump(state, true)
         )
     }
 
     async init() {
         this.audioNode = new Audio()
-        this.frames = this.calcFrames()
+        this.calcFrames()
         this.viewsLength = Store.getState().replayData.packs.length
         this.initViewState()
 
@@ -140,6 +134,11 @@ export class PlayerComponent {
             // wait for scaling page finish to get target offsetWidth
             await delay(500)
             this.recalculateProgress()
+        })
+
+        observer.on(PlayerEventTypes.PROGRESS, (frame: number) => {
+            const percent = frame / (this.frames.length - 1)
+            this.progress.setProgressPosition(percent)
         })
     }
 
@@ -201,9 +200,11 @@ export class PlayerComponent {
     async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
         this.isJumping = true
         let loading: HTMLElement | undefined = undefined
+        const { speed } = Store.getState().player
         const { index, time, percent } = state
 
         if (shouldLoading) {
+            this.pause(false)
             loading = parseHtmlStr(normalLoading)[0]
             this.c.container.appendChild(loading)
             await delay(100)
@@ -224,32 +225,34 @@ export class PlayerComponent {
             this.records = packs[index]
         }
 
-        const frameIndex = this.frames.findIndex((t, i) => {
-            const cur = t
-            const next = this.frames[i + 1] || cur + 1
-            if (time >= cur && time <= next) {
-                return true
-            }
-        })
+        const frameIndex =
+            this.frames.findIndex((t, i) => {
+                const cur = t
+                const next = this.frames[i + 1] || cur + 1
+                if (time >= cur && time <= next) {
+                    return true
+                }
+            }) + 2
 
         this.frameIndex = frameIndex
         this.initTime = getTime()
         this.recordIndex = 0
         this.audioData = nextReplayData.audio
         this.initAudio()
-        this.startTime = time - this.animationDelayTime
+        this.startTime = time
 
         if (percent !== undefined) {
-            this.setProgress()
             this.progress.moveThumb(percent)
+            await delay(100)
         }
 
         this.c.setViewState()
-        this.loopFramesByTime(this.startTime + this.frameInterval)
+        this.loopFramesByTime(this.frames[this.frameIndex])
 
         if (loading) {
-            await delay(300)
+            await delay(100)
             this.c.container.removeChild(loading)
+            Store.dispatch({ type: PlayerReducerTypes.SPEED, data: { speed } })
         }
 
         this.isJumping = false
@@ -267,11 +270,13 @@ export class PlayerComponent {
         return null
     }
 
-    loopFramesByTime(currTime: number) {
+    loopFramesByTime(currTime: number, isJumping = false) {
         let nextTime = this.frames[this.frameIndex]
 
         while (nextTime && currTime >= nextTime) {
-            observer.emit(PlayerEventTypes.PROGRESS, this.frameIndex, this.frames.length - 1)
+            if (!isJumping) {
+                observer.emit(PlayerEventTypes.PROGRESS, this.frameIndex, this.frames.length - 1)
+            }
             this.frameIndex++
             this.renderEachFrame()
             nextTime = this.frames[this.frameIndex]
@@ -282,7 +287,7 @@ export class PlayerComponent {
     play() {
         this.playAudio()
         if (this.frameIndex === 0) {
-            this.progress.resetThumb()
+            this.progress.moveThumb()
             if (!this.isFirstTimePlay) {
                 // Indicates the second times play
                 this.getNextReplayData(0)
@@ -304,7 +309,7 @@ export class PlayerComponent {
         this.RAF.start()
 
         this.initTime = getTime()
-        this.startTime = this.frames[this.frameIndex] - this.animationDelayTime
+        this.startTime = this.frames[this.frameIndex]
 
         async function loop(this: PlayerComponent, t: number, loopIndex: number) {
             const timeStamp = getTime() - this.initTime
@@ -376,10 +381,6 @@ export class PlayerComponent {
         }
     }
 
-    setProgress() {
-        this.progress.setProgressAnimation(this.frameIndex, this.frames.length, this.frameInterval, this.speed)
-    }
-
     renderEachFrame() {
         this.progress.updateTimer(this.frameIndex, this.frameInterval, this.curViewDiffTime)
 
@@ -409,7 +410,7 @@ export class PlayerComponent {
         }
     }
 
-    pause() {
+    pause(emit = true) {
         if (this.RAF) {
             this.RAF.stop()
         }
@@ -420,7 +421,9 @@ export class PlayerComponent {
             }
         })
         this.pauseAudio()
-        observer.emit(PlayerEventTypes.PAUSE)
+        if (emit) {
+            observer.emit(PlayerEventTypes.PAUSE)
+        }
     }
 
     stop() {
@@ -438,18 +441,27 @@ export class PlayerComponent {
         updateDom.call(this, record, { isJumping })
     }
 
-    calcFrames(interval = this.frameInterval) {
+    calcFrames(maxInterval = this.maxFrameInterval) {
         if (this.options.mode === 'live') {
             return []
         }
-
-        const { startTime, endTime } = Store.getState().progress
-        const result: number[] = []
+        const preTime = this.frames && this.frames[this.frameIndex]
+        const { duration, startTime, endTime } = Store.getState().progress
+        this.frameInterval = Math.max(20, Math.min(maxInterval, (duration / 60 / 1000) * 60 - 40))
+        const interval = this.frameInterval
+        const frames: number[] = []
+        let nextFrameIndex: number | undefined
         for (let i = startTime; i < endTime + interval; i += interval) {
-            result.push(i)
+            frames.push(i)
+            if (!nextFrameIndex && preTime && i >= preTime) {
+                nextFrameIndex = frames.length - 1
+            }
         }
-        result.push(endTime)
-        return result
+        frames.push(endTime)
+        if (nextFrameIndex) {
+            this.frameIndex = nextFrameIndex!
+        }
+        this.frames = frames
     }
 
     calcHeatPointsData() {
@@ -515,10 +527,7 @@ export class PlayerComponent {
     }
 
     recalculateProgress() {
-        const curFrame = this.frameIndex
-        this.frames = this.calcFrames()
-        this.progress.moveThumb(curFrame / (this.frames.length - 1))
+        this.calcFrames()
         this.progress.drawHeatPoints(this.calcHeatPointsData())
-        this.setProgress()
     }
 }

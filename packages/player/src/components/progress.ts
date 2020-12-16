@@ -22,6 +22,7 @@ export class ProgressComponent implements IComponent {
     parent: HTMLElement
     c: ContainerComponent
     progress: HTMLElement
+    thumb: HTMLElement
     currentProgress: HTMLElement
     timer: HTMLElement
     slider: HTMLElement
@@ -31,23 +32,24 @@ export class ProgressComponent implements IComponent {
     constructor(c: ContainerComponent) {
         this.c = c
         this.progress = c.container.querySelector('.player-progress')! as HTMLElement
+        this.progress = c.container.querySelector('.player-progress')! as HTMLElement
         this.timer = c.container.querySelector('.player-timer') as HTMLElement
         this.currentProgress = this.progress.querySelector('.player-current-progress') as HTMLElement
         this.slider = this.progress.querySelector('.player-slider-bar') as HTMLElement
         this.heatBar = this.progress.querySelector('.player-heat-bar') as HTMLCanvasElement
-
+        this.thumb = this.progress.querySelector('.player-thumb') as HTMLElement
         this.listenElementOnHover(this.parent)(state => {
             if (state === 'in') {
-                this.getThumb().setAttribute('active', '')
+                this.thumb.setAttribute('active', '')
                 return
             }
-            this.getThumb().removeAttribute('active')
+            this.thumb.removeAttribute('active')
         })
 
         this.progress.addEventListener('click', e => {
             const { left, width: sliderWidth } = this.slider.getBoundingClientRect()
             const width = Math.max(0, Math.min(e.x - left, sliderWidth))
-            const percent = +(width / sliderWidth).toFixed(2)
+            const percent = +(width / sliderWidth).toFixed(3)
             const progress = this.findProgressByPosition(percent)
             observer.emit(PlayerEventTypes.JUMP, progress)
         })
@@ -107,32 +109,6 @@ export class ProgressComponent implements IComponent {
             'out'
         )
 
-    getThumb() {
-        return this.progress.querySelector('.player-thumb') as HTMLElement
-    }
-
-    async setProgressAnimation(index: number, total: number, interval: number, speed: number) {
-        if (!index && !speed) {
-            return
-        }
-        const delayTime = 50
-        const percent = index / total
-        this.moveThumb(percent)
-
-        this.currentProgress.classList.remove('active')
-        this.currentProgress.style.removeProperty('transition')
-        await delay(delayTime)
-
-        if (!speed) {
-            this.currentProgress.style.setProperty('transition', 'none')
-            return
-        }
-
-        const remindDuration = ((total - index) * interval) / speed / 1000 - delayTime / 1000 + 's'
-        this.currentProgress.style.transitionDuration = remindDuration
-        this.currentProgress.classList.add('active')
-    }
-
     updateTimer(frameIndex: number, frameInterval: number, curViewDiffTime: number) {
         const c = this.c.options
         const { timeMode } = c
@@ -151,17 +127,9 @@ export class ProgressComponent implements IComponent {
         }
     }
 
-    moveThumb(percent: number) {
+    moveThumb(percent = 0) {
         const left = percent * this.slider.offsetWidth
-        this.resetThumb(left)
-    }
-
-    resetThumb(left = 0) {
-        this.currentProgress.classList.remove('active')
-        const currentProgress = this.currentProgress.cloneNode(true) as HTMLElement
-        this.currentProgress.parentNode!.replaceChild(currentProgress, this.currentProgress)
-        currentProgress.style.width = left + 'px'
-        this.currentProgress = currentProgress as HTMLElement
+        this.currentProgress.style.width = left + 'px'
     }
 
     drawHeatPoints(points?: { step: number; snapshot: boolean }[]) {
@@ -194,5 +162,9 @@ export class ProgressComponent implements IComponent {
             }
             return true
         }
+    }
+
+    setProgressPosition(percent: number) {
+        this.currentProgress.style.width = this.slider.offsetWidth * percent + 'px'
     }
 }
