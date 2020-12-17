@@ -41,6 +41,10 @@ export function Component(name: string, html: string, opts?: Partial<{ isShadow:
  * highlight tagged string template
  * @param str
  */
-export const html = function (str: TemplateStringsArray, ...args: any) {
-    return str.raw[0]
+export const html = function (strings: TemplateStringsArray, ...values: any) {
+    let str = ''
+    strings.forEach((string, i) => {
+        str += string + values[i]
+    })
+    return str
 }

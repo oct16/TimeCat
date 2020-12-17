@@ -35,7 +35,7 @@ export class KeyboardComponent {
         this.controller = this.c.container.querySelector('.player-keyboard') as HTMLElement
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
 
-        this.createFastForwardBtns(this.options.fastForward)
+        this.createFastForwards(this.options.fastForward)
         this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
                 const speed = Number((e.target as HTMLElement).getAttribute('speed'))
@@ -47,7 +47,7 @@ export class KeyboardComponent {
         this.detectWindowIsActive()
     }
 
-    createFastForwardBtns(speeds: number[]) {
+    createFastForwards(speeds: number[]) {
         speeds = Array.from(new Set([1].concat(speeds)))
         if (speeds) {
             const htmlStr = speeds.reduce(
