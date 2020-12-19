@@ -83,6 +83,7 @@
         "fingerprintjs2": "^2.1.2",
         "fs-extra": "^8.1.0",
         "husky": "^4.2.5",
+        "is-mobile": "^2.2.2",
         "jest": "^26.0.1",
         "jest-canvas-mock": "^2.3.0",
         "koa": "^2.13.0",

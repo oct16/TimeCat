@@ -12,6 +12,7 @@ import {
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
 import { getDBOperator } from '@timecat/utils'
 import { Store } from './redux'
+import mobile from 'is-mobile'
 
 export function download(src: Blob | string, name: string) {
     const tag = document.createElement('a')
@@ -133,4 +134,12 @@ export function parseHtmlStr(htmlStr: string) {
     const parser = new DOMParser()
     const children = parser.parseFromString(htmlStr, 'text/html').body.children
     return [...children] as HTMLElement[]
+}
+
+export function isMobile(ua?: string) {
+    if (!ua) {
+        return false
+    }
+
+    return mobile({ ua })
 }

@@ -17,6 +17,7 @@ export class PointerComponent {
     x = 0
     y = 0
 
+    show: boolean
     pointer: HTMLElement
     c: ContainerComponent
     constructor(c: ContainerComponent) {
@@ -27,6 +28,11 @@ export class PointerComponent {
     initPointer() {
         this.pointer = this.c.container.querySelector('.player-pointer') as HTMLElement
         this.move(0, 0)
+    }
+
+    showPointer(show = true) {
+        this.show = show
+        ;(this.pointer.firstElementChild as HTMLElement).style.display = show ? 'inherit' : 'none'
     }
 
     move(x: number, y: number) {

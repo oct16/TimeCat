@@ -17,7 +17,8 @@ import {
     observer,
     transToReplayData,
     normalLoading,
-    parseHtmlStr
+    parseHtmlStr,
+    isMobile
 } from '../utils'
 
 @Component(
@@ -179,9 +180,11 @@ export class PlayerComponent {
 
     initViewState() {
         const { currentData } = Store.getState().replayData
-        const firstData = currentData
-        this.records = this.orderRecords(firstData.records)
-        this.audioData = firstData.audio
+        const { records, audio, head } = currentData
+        this.records = this.orderRecords(records)
+        this.audioData = audio
+        const { userAgent } = head?.data || {}
+        this.pointer.showPointer(!isMobile(userAgent as string))
         this.initAudio()
 
         // live mode
