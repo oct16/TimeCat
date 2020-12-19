@@ -226,13 +226,14 @@ export class PlayerComponent {
         }
 
         const frameIndex =
+            1 +
             this.frames.findIndex((t, i) => {
                 const cur = t
                 const next = this.frames[i + 1] || cur + 1
                 if (time >= cur && time <= next) {
                     return true
                 }
-            }) + 2
+            })
 
         this.frameIndex = frameIndex
         this.initTime = getTime()
