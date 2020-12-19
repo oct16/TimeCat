@@ -15,3 +15,11 @@ select,
 iframe {
     pointer-events: none;
 }
+
+html,body {
+    scrollbar-width: none; /* firefox */
+
+    &::-webkit-scrollbar {
+        overflow: hidden;
+    }
+}
