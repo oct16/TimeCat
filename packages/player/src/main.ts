@@ -67,6 +67,8 @@ export class PlayerModule {
         this.destroyStore.add(() => Store.unsubscribe())
 
         const records = await this.getRecords(opts)
+        window.G_REPLAY_RECORDS = records
+
         const packs = getPacks(records)
         const firstData = transToReplayData(packs[0])
         const { audio } = firstData
