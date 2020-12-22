@@ -17,7 +17,13 @@ import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks, g
 import { recoverNative } from './polyfill/recover-native'
 
 type ScriptItem = { name?: string; src: string }
-type ExportOptions = { scripts?: ScriptItem[]; autoplay?: boolean; audioExternal?: boolean; dataExternal?: boolean }
+type ExportOptions = Partial<{
+    scripts: ScriptItem[]
+    autoplay: boolean
+    audioExternal: boolean
+    dataExternal: boolean
+    records: RecordData[]
+}>
 
 const EXPORT_NAME_LABEL = 'TimeCat'
 const downloadAudioConfig = {
@@ -30,7 +36,7 @@ const downloadAudioConfig = {
 
 export async function exportReplay(exportOptions: ExportOptions) {
     recoveryMethods()
-    await addNoneFrame()
+    // await addNoneFrame()
     const parser = new DOMParser()
     const html = parser.parseFromString(emptyTemplate, 'text/html')
     await injectLoading(html)
@@ -166,7 +172,8 @@ async function injectLoading(html: Document) {
 }
 
 async function injectData(html: Document, exportOptions: ExportOptions) {
-    const records = getGZipData() || getRecordsFromStore() || (await getRecordsFromDB())
+    const records = exportOptions.records || getGZipData() || getRecordsFromStore() || (await getRecordsFromDB())
+
     if (!records) {
         return logError('Records not found')
     }
