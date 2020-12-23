@@ -316,5 +316,5 @@ export interface RecordOptionsBase {
     emitLocationImmediate?: boolean
     font?: boolean
     plugins?: any[]
-    rewriteResource?: any
+    visibleChange?: boolean
 }

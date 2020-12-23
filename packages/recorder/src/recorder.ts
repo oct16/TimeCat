@@ -44,7 +44,8 @@ export class RecorderModule extends Pluginable {
         write: true,
         keep: false,
         emitLocationImmediate: true,
-        context: window
+        context: window,
+        visibleChange: true
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
@@ -73,7 +74,9 @@ export class RecorderModule extends Pluginable {
         this.hooks.beforeRun.call(this)
         this.record(options)
         this.hooks.run.call(this)
-        this.listenVisibleChange(options)
+        if (options.visibleChange) {
+            this.listenVisibleChange(options)
+        }
     }
 
     public onData(cb: (data: RecordData) => void) {
@@ -181,7 +184,7 @@ export class RecorderModule extends Pluginable {
             const locationInstance = this.watchersInstance.get('LocationWatcher') as InstanceType<
                 typeof LocationWatcher
             >
-            locationInstance.emitOne()
+            locationInstance?.emitOne()
         }
 
         this.watcherResolve()
