@@ -306,15 +306,3 @@ export interface FontRecordData {
 }
 
 export type FontRecord = BaseRecord<RecordType.FONT, FontRecordData>
-
-export interface RecordOptionsBase {
-    context?: Window
-    mode?: 'live' | 'default'
-    audio?: boolean
-    write?: boolean
-    keep?: boolean
-    emitLocationImmediate?: boolean
-    font?: boolean
-    plugins?: any[]
-    visibleChange?: boolean
-}

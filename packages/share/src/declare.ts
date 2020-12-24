@@ -1,9 +1,8 @@
-import { RecordData } from '@timecat/timecat/src'
-import { ReplayData, LocationRecordData, RecordOptionsBase } from '.'
+import { ReplayData, LocationRecordData, RecordData } from '.'
 
 declare global {
     interface Window {
-        G_RECORD_OPTIONS: RecordOptionsBase
+        G_RECORD_OPTIONS: any
         G_RECORD_RELATED_ID: string
         G_REPLAY_RECORDS: RecordData[]
         G_REPLAY_STR_RECORDS: string

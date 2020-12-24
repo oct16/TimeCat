@@ -1,13 +1,23 @@
 import { watchers, baseWatchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, ValueOf, RecordType, TerminateRecord, RecordOptionsBase } from '@timecat/share'
+import { RecordData, ValueOf, RecordType, TerminateRecord } from '@timecat/share'
 import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime, stateDebounce } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
 import { Pluginable, RecorderPlugin } from './pluginable'
 
-export interface RecordInternalOptions extends RecordOptions {
+interface RecordOptionsBase {
+    context?: Window
+    audio?: boolean
+    write?: boolean
+    keep?: boolean
+    emitLocationImmediate?: boolean
+    font?: boolean
+    visibleChange?: boolean
+}
+
+interface RecordInternalOptions extends RecordOptions {
     context: Window
 }
 
@@ -16,7 +26,7 @@ export interface RecordOptions extends RecordOptionsBase {
     rewriteResource?: RewriteResource
 }
 
-export interface RewriteResource {
+interface RewriteResource {
     matches: string[]
     replaceOrigin: string
     folderPath?: string
