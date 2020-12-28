@@ -61,16 +61,12 @@ function getExtra(node: Element, isSVG?: boolean) {
     }
 
     if (tagName === 'STYLE') {
-        const { childNodes, sheet } = node as HTMLStyleElement
-
-        if (!childNodes.length || childNodes[0].textContent === '') {
-            const rules = sheet?.rules
-            if (rules && rules.length) {
-                const cssTexts = Array.from(rules)
-                    .map(rule => rule.cssText)
-                    .join(' ')
-                props.textContent = cssTexts
-            }
+        const rules = (node as HTMLStyleElement)?.sheet?.rules
+        if (rules && rules.length) {
+            const cssTexts = Array.from(rules)
+                .map(rule => rule.cssText)
+                .join(' ')
+            props.textContent = cssTexts
         }
     }
 
@@ -113,6 +109,10 @@ export const createElement = (el: Element, inheritSVG?: boolean): VNode | VSNode
     const vNode = getVNodeByEl(el, inheritSVG)
     const { id } = vNode
     nodeStore.addNode(el, id)
+
+    if ((vNode as VNode)?.extra?.props?.textContent) {
+        return vNode
+    }
 
     if (vNode.type === Node.ELEMENT_NODE) {
         const vn = vNode as VNode
