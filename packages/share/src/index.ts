@@ -15,11 +15,14 @@ export interface InfoData {
 export type SnapshotRecord = BaseRecord<RecordType.SNAPSHOT, { vNode: VNode } & InfoData>
 
 type Extra = {
-    props?: {
-        [key: string]: string | number | boolean | Object | undefined
+    props: {
+        textContent: string
+        value: string
+        checked: boolean
+        selected: boolean
         scroll?: { top: number; left: number }
     }
-    isSVG?: boolean
+    isSVG: boolean
 }
 
 type Children = (VNode | VSNode)[]
