@@ -1,2 +1,2 @@
 export { Player, PlayerModule } from './main'
-export { exportReplay } from './utils'
+export { exportReplay, createReplayHTML } from './utils'

@@ -36,13 +36,17 @@ const downloadAudioConfig = {
 
 export async function exportReplay(exportOptions: ExportOptions) {
     recoveryMethods()
+    downloadFiles(await createReplayHTML(exportOptions))
+}
+
+export async function createReplayHTML(exportOptions: ExportOptions) {
     // await addNoneFrame()
     const parser = new DOMParser()
     const html = parser.parseFromString(emptyTemplate, 'text/html')
     await injectLoading(html)
     await injectData(html, exportOptions)
     await initOptions(html, exportOptions)
-    downloadFiles(html)
+    return html
 }
 
 function recoveryMethods() {

@@ -6,6 +6,7 @@ import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
 import { Pluginable, RecorderPlugin } from './pluginable'
+export { RecordData } from '@timecat/share'
 
 interface RecordOptionsBase {
     context?: Window
