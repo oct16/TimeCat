@@ -12,7 +12,7 @@ import { updateDom } from '../dom'
 import { getTime, isSnapshot, toTimeStamp, base64ToFloat32Array, encodeWAV, delay } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData, SnapshotRecord, ReplayInternalOptions, RecordType } from '@timecat/share'
+import { RecordData, AudioData, SnapshotRecord, ReplayInternalOptions, RecordType, ReplayData } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from '../animation-frame'
 import { PlayerEventTypes } from '../types'
@@ -27,7 +27,8 @@ import {
     transToReplayData,
     normalLoading,
     parseHtmlStr,
-    isMobile
+    isMobile,
+    ReplayDataState
 } from '../utils'
 
 @Component(
@@ -271,7 +272,7 @@ export class PlayerComponent {
         this.isJumping = false
     }
 
-    getNextReplayData(index: number) {
+    getNextReplayData(index: number): ReplayData | null {
         const { packs } = Store.getState().replayData
 
         const nextPack = packs[index]
