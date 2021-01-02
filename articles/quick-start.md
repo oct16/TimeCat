@@ -31,12 +31,12 @@ const player = new Player()
 ```ts
 // record page
 interface RecordOptions {
-    mode: 'default' | 'live' // mode
     write: boolean // write data to indexedDB, default is true
     keep: boolean // keep data in DB otherwise auto-clear, default is true
     audio: boolean // if your want record audio, default is false
     font: boolean // record font, default is false
     plugins: RecorderPlugin[] // extend plugins here
+    visibleChange: boolean // stop or resume recorder when visibleChange
     rewriteResource: RewriteResource
 }
 
