@@ -1,7 +1,7 @@
 {
     "private": false,
     "name": "@timecat/utils",
-    "version": "1.2.0-alpha.15",
+    "version": "1.2.0-alpha.17",
     "description": "",
     "main": "index.js",
     "module": "dist/utils.esm.js",
@@ -10,7 +10,7 @@
     "jsdelivr": "dist/utils.global.prod.js",
     "scripts": {},
     "dependencies": {
-        "@timecat/share": "1.2.0-alpha.15"
+        "@timecat/share": "1.2.0-alpha.17"
     },
     "author": "",
     "license": "ISC"
