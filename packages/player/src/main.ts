@@ -7,7 +7,7 @@
  *
  */
 
-import { logError, nodeStore, debounce } from '@timecat/utils'
+import { logError, nodeStore, debounce, logInfo, isDev } from '@timecat/utils'
 import { ContainerComponent } from './components/container'
 import {
     SnapshotRecord,
@@ -66,6 +66,9 @@ export class PlayerModule {
     }
 
     private async init(options?: ReplayOptions) {
+        if (!isDev) {
+            logInfo()
+        }
         const opts = {
             destroyStore: this.destroyStore,
             ...defaultReplayOptions,

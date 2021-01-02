@@ -20,8 +20,5 @@ export {
     ReplayHead
 } from '@timecat/share'
 
-const version = '__VERSION__'
-export { version }
-
 export { Player, PlayerModule, Recorder, RecordData, RecorderModule, exportReplay, createReplayHTML }
-export { delay, debounce, throttle } from '@timecat/utils'
+export { version, delay, debounce, throttle } from '@timecat/utils'

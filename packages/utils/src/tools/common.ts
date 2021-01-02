@@ -13,6 +13,8 @@ import { VNode, VSNode, SnapshotRecord, RecordData, RecordType } from '@timecat/
 
 export const isDev = process.env.NODE_ENV === 'development'
 
+export const version = '__VERSION__'
+
 function logErrorOverload(e: Error): string
 function logErrorOverload(msg: string): string
 function logErrorOverload(e: Error | string): string {
@@ -250,4 +252,38 @@ export function stateDebounce<T extends string | boolean | number>(
             )
         }
     }
+}
+
+export function logAsciiLogo() {
+    /* eslint-disable */
+    return console.log(
+        `%c
+______ _                _____       _   
+|_   _(_)              /  __ \\     | |  
+  | |  _ _ __ ___   ___| /  \\/ __ _| |_ 
+  | | | | '_ \` _ \\ / _ \\ |    / _\` | __|
+  | | | | | | | | |  __/ \\__/\\ (_| | |_ 
+  \\_/ |_|_| |_| |_|\\___|\\____/\\__,_|\\__|
+    `,
+        'color: #1475b2;'
+    )
+}
+
+export function logBadge(opts: { title: string; content: string; titleColor?: string; backgroundColor?: string }) {
+    const { title, content, titleColor, backgroundColor } = opts
+    const tColor = titleColor || '#606060'
+    const bColor = backgroundColor || '#1475b2'
+
+    const args = [
+        '%c '.concat(title, ' %c ').concat(content, ' '),
+        'padding: 1px; border-radius: 3px 0 0 3px; color: #fff; background: '.concat(tColor, ';'),
+        'padding: 1px; border-radius: 0 3px 3px 0; color: #fff; background: '.concat(bColor, ';')
+    ]
+    console.log.apply(void 0, args)
+}
+
+export function logInfo() {
+    logAsciiLogo()
+    logBadge({ title: 'version', content: version })
+    logBadge({ title: 'more info', content: 'github.com/oct16/timecat' })
 }
