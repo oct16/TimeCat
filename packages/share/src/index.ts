@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) oct16.
+ * https://github.com/oct16
+ *
+ * This source code is licensed under the GPL-3.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
 export type ValueOf<T> = T[keyof T]
 export type ValueOfKey<T, K extends keyof T> = T[K]
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never

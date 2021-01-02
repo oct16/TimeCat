@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) oct16.
+ * https://github.com/oct16
+ *
+ * This source code is licensed under the GPL-3.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * Here is references and sources from https://github.com/vuejs/vue-next/tree/master/scripts
+ */
+
 const chalk = require('chalk')
 const msgPath = process.env.HUSKY_GIT_PARAMS || process.env.GIT_PARAMS
 const msg = require('fs').readFileSync(msgPath, 'utf-8').trim()

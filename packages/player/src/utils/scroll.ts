@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) oct16.
+ * https://github.com/oct16
+ *
+ * This source code is licensed under the GPL-3.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 
