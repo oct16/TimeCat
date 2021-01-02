@@ -130,7 +130,7 @@ export async function updateDom(this: PlayerComponent, Record: RecordData, opts?
             // prevent jump too long distance
             const behavior = Math.abs(top - curTop) > window.G_REPLAY_DATA.snapshot.data.height * 3 ? 'auto' : 'smooth'
 
-            target.scroll({
+            target?.scroll({
                 top,
                 left,
                 behavior
