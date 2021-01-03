@@ -1,7 +1,7 @@
 <p align="center">
 <h1 align="center">TimeCat</h1>
 <h6 align="center">
-A Magical Web Recorder 🖥 网页录屏器
+A Magical Web Recorder And Player
 </h6>
 <h6 align="center">
 
@@ -14,7 +14,7 @@ A Magical Web Recorder 🖥 网页录屏器
 
 English | [中文](./README.cn.md)
 
-TimeCat is a website record tool, passing a unique recording method to provide ultra-high performance and ultra-high compression ratio lossless video record and replay
+TimeCat is a open source web Page recording tool that generates files are not real video, but can be played like real video, completely restoring the user's actions in the browser.
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
@@ -30,8 +30,7 @@ TimeCat is a website record tool, passing a unique recording method to provide u
 ## Chrome Plugin
 
 Provides Chrome plugin and supports one-click record and export
-
-| <img src="articles/images/logo.png" width="30">| [TimeCat-Chrome](https://chrome.google.com/webstore/detail/timecat-chrome/jgnkkambbdmhfdbdbkljlenddlbplhal?hl=en&authuser=0) |
+| <img width=34 align=top src="https://www.google.com/chrome/static/images/chrome-logo.svg" />| [TimeCat-Chrome](https://chrome.google.com/webstore/detail/timecat-chrome/jgnkkambbdmhfdbdbkljlenddlbplhal) |
 |--|--|
 
 ## Installation
@@ -50,15 +49,15 @@ Add script tags in your browser and use the global variable ``TimeCat``, you can
 
 ## Usage
  - [Quick Start](articles/quick-start.md)
+ - [A Real Demo](https://github.com/oct16/timecat-demo)
 
 ## Articles
  - [How it works](articles/technology.md)
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/oct16/TimeCat/issues/new/choose) or submit PRs.
-
-Standard Readme follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct/) Code of Conduct.
+Feel free to dive in! [Open an issue](https://github.com/oct16/TimeCat/issues/new/choose) or submit [PRs](https://github.com/oct16/TimeCat/pulls)   
+Standard Readme follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct/) Code of Conduct
 
 ## Contributors
 
