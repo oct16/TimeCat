@@ -16,7 +16,6 @@ import {
     getRandomCode,
     isVNode,
     getScript,
-    nodeStore,
     logError,
     createURL
 } from '@timecat/utils'
@@ -217,7 +216,7 @@ async function makeCssInline(records: RecordData[]) {
     const tasks: VNode[] = []
     const extractLinkList: VNode[] = []
     const [base] = document.getElementsByTagName('base')
-
+    let inlineNodeId = 0
     records.forEach(record => {
         const { type, data } = record
         if (type === RecordType.SNAPSHOT) {
@@ -251,7 +250,7 @@ async function makeCssInline(records: RecordData[]) {
             const cssURL = createURL(href, base?.href || location.href).href
             const cssValue = await fetch(cssURL).then(res => res.text())
             const textNode = {
-                id: nodeStore.createNodeId(),
+                id: --inlineNodeId,
                 type: Node.TEXT_NODE,
                 value: cssValue
             } as VSNode
