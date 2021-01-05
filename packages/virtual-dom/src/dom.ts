@@ -60,9 +60,11 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     }
 
     // The srcset attribute specifies the URL of the image to use in different situations
-    if (name === 'srcset') {
+    if (name === 'srcset' || name === 'sizes') {
         const srcArray = value.split(',')
         value = srcArray.map(src => completeAttrHref(src.trim(), node)).toString()
+        // decode uri
+        value = decodeURIComponent(value)
     }
 
     if (value.startsWith('/')) {
