@@ -71,5 +71,5 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         value = completeAttrHref(value, node)
     }
 
-    return node.setAttribute(name, decodeURIComponent(value))
+    return node.setAttribute(name, value)
 }
