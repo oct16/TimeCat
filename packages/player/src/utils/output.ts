@@ -14,13 +14,11 @@ import {
     isDev,
     getDBOperator,
     getRandomCode,
-    isVNode,
     getScript,
-    logError,
-    createURL
+    logError
 } from '@timecat/utils'
 import { compressWithGzipByte } from 'brick.json/gzip/esm'
-import { VNode, VSNode, AudioData, AudioOptionsData, RecordType, RecordData, DOMRecord } from '@timecat/share'
+import { AudioData, AudioOptionsData, RecordType, RecordData } from '@timecat/share'
 import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks, getRecordsFromStore } from './common'
 import { recoverNative } from './polyfill/recover-native'
 
@@ -191,7 +189,6 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     }
     const packs = getPacks(records)
     extract(packs, exportOptions)
-    await makeCssInline(records) // some link cross origin
 
     const zipArray = compressWithGzipByte(records)
 
@@ -210,69 +207,4 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
     const replayData = `var G_REPLAY_STR_RECORDS =  '${outputStr}'`
 
     injectScripts(html, [{ src: replayData }])
-}
-
-async function makeCssInline(records: RecordData[]) {
-    const tasks: VNode[] = []
-    const extractLinkList: VNode[] = []
-    const [base] = document.getElementsByTagName('base')
-    let inlineNodeId = 0
-    records.forEach(record => {
-        const { type, data } = record
-        if (type === RecordType.SNAPSHOT) {
-            tasks.push((data as { vNode: VNode }).vNode)
-            let node: VNode
-            while ((node = tasks.shift()!)) {
-                if (isVNode(node)) {
-                    extractLink(node, extractLinkList)
-                    tasks.push(...(node.children as VNode[]))
-                }
-            }
-        } else if (type === RecordType.DOM) {
-            const { addedNodes } = (record as DOMRecord).data
-            if (addedNodes) {
-                for (let j = 0; j < addedNodes.length; j++) {
-                    const node = addedNodes[j].node
-                    if (isVNode(node as VNode)) {
-                        extractLink(node as VNode, extractLinkList)
-                    }
-                }
-            }
-        }
-    })
-
-    for (const node of extractLinkList) {
-        const { attrs } = node
-        const href = attrs.href
-
-        try {
-            // try to extract css
-            const cssURL = createURL(href, base?.href || location.href).href
-            const cssValue = await fetch(cssURL).then(res => res.text())
-            const textNode = {
-                id: --inlineNodeId,
-                type: Node.TEXT_NODE,
-                value: cssValue
-            } as VSNode
-
-            delete attrs.href
-            Object.keys(attrs).forEach(key => {
-                delete attrs[key]
-            })
-
-            node.tag = 'style'
-            node.attrs.type = 'text/css'
-            node.attrs['css-url'] = cssURL
-            node.children.push(textNode)
-        } catch (error) {
-            // maybe cross
-        }
-    }
-}
-
-function extractLink(node: VNode, extractLinkList: VNode[]) {
-    const { tag, attrs } = node
-    if (tag === 'link' && attrs.href && attrs.href.endsWith('.css')) {
-        extractLinkList.push(node)
-    }
 }
