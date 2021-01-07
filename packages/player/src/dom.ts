@@ -326,9 +326,12 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
             const { data } = record as PreFetchRecord
             const { id, key, url, tag, text } = data
             const node = nodeStore.getNode(id)
+            if (!node) {
+                await delay(1000)
+            }
             const n = node as HTMLElement
             if (n && n.getAttribute(key) === url && n.tagName === tag.toUpperCase()) {
-                if (key === 'link') {
+                if (tag === 'link') {
                     const replaceNode = document.createElement('style')
                     replaceNode.setAttribute('type', 'text/css')
                     replaceNode.setAttribute('css-url', url)
