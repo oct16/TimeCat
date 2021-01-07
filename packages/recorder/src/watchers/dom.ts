@@ -241,7 +241,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
     waitAndRecordIFrame(iframe: HTMLIFrameElement) {
         const contentWindow = iframe.contentWindow
-        ;(iframe as any)?.frameRecorder.destroy()
+        ;(iframe as any)?.frameRecorder?.destroy()
         const onLoadHandle = () => {
             this.recorder.recordIFrame(contentWindow!)
             iframe.removeEventListener('load', onLoadHandle)

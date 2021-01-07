@@ -103,14 +103,17 @@ export function rewriteNodes(
             const url = createURL(source, base?.href || href)
 
             const resText = await fetch(url.href)
-                .then(res => res.text())
+                .then(
+                    res => res.text(),
+                    () => ''
+                )
                 .catch(err => logWarn(err))
 
             if (!resText) {
                 return
             }
 
-            const text = completeCssHref(resText, undefined, preUrl => {
+            const text = completeCssHref(resText, url.href, preUrl => {
                 if (!subMatches) {
                     return preUrl
                 }

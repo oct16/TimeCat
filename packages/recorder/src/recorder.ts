@@ -252,7 +252,7 @@ export class RecorderModule extends Pluginable {
 
     private async waitingIFrameLoaded(frame: Window): Promise<Window | undefined> {
         try {
-            frame.frameElement.getAttribute('src')!
+            frame.document && frame.frameElement.getAttribute('src')!
         } catch (e) {
             logError(e)
             return

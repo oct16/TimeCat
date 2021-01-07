@@ -8,7 +8,7 @@
  */
 
 import { VNode, VSNode } from '@timecat/share'
-import { nodeStore, isElementNode } from '@timecat/utils'
+import { nodeStore, isElementNode, completeCssHref } from '@timecat/utils'
 
 const getVNodeByEl = (el: Element, isSVG?: boolean): VNode | VSNode => {
     return isElementNode(el)
@@ -75,7 +75,7 @@ function getExtra(node: Element, isSVG?: boolean) {
             const cssTexts = Array.from(rules)
                 .map(rule => rule.cssText)
                 .join(' ')
-            props.textContent = cssTexts
+            props.textContent = completeCssHref(cssTexts)
         }
     }
 
