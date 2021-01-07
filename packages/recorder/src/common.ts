@@ -87,6 +87,12 @@ export function rewriteNodes(
 
     preFetchConfigs.forEach(config => {
         const { rewrite, matches } = config
+        const strMatches = matches.filter(m => typeof m === 'string')
+
+        if (!strMatches.every(s => (s as string).endsWith('css'))) {
+            return logError('PreFetch Resource only support [css] currently')
+        }
+
         const { replaceOrigin, folderPath, crossUrl, fn, matches: subMatches } = rewrite
         const [base] = document.getElementsByTagName('base')
         const href = window.location.href
