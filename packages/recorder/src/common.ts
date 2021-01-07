@@ -101,7 +101,7 @@ export function rewriteNodes(
 
         const preFetchSource = async (vNode: VNode, key: string, source: string) => {
             const url = createURL(source, base?.href || href)
-            const resText = await fetch(crossOriginUrl(url.href)).then(res => res.text())
+            const resText = await fetch(url.href).then(res => res.text())
 
             const text = completeCssHref(resText, undefined, preUrl => {
                 if (!subMatches) {
