@@ -7,4 +7,4 @@
  *
  */
 
-export { Recorder, RecordData, RecorderModule } from './recorder'
+export { Recorder, RecordData, RecorderModule, RecordOptions } from './recorder'

@@ -7,8 +7,8 @@
  *
  */
 
-import { Recorder, RecordData, RecorderModule } from '@timecat/recorder'
-import { exportReplay, createReplayHTML, Player, PlayerModule } from '@timecat/player'
+export * from '@timecat/recorder'
+export * from '@timecat/player'
 
 export {
     DBRecordData,
@@ -20,5 +20,4 @@ export {
     ReplayHead
 } from '@timecat/share'
 
-export { Player, PlayerModule, Recorder, RecordData, RecorderModule, exportReplay, createReplayHTML }
 export { version, delay, debounce, throttle } from '@timecat/utils'
