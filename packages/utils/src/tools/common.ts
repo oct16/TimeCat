@@ -15,15 +15,17 @@ export const isDev = process.env.NODE_ENV === 'development'
 
 export const version = '__VERSION__'
 
-function logErrorOverload(e: Error): string
-function logErrorOverload(msg: string): string
-function logErrorOverload(e: Error | string): string {
+export function logError(e: Error | string): string {
     const msg = (e as Error).message || (e as string)
     console.error(`TimeCat Error: ${msg}`)
     return msg
 }
 
-export const logError = logErrorOverload
+export function logWarn(e: Error | string): string {
+    const msg = (e as Error).message || (e as string)
+    console.warn(`TimeCat Warning: ${msg}`)
+    return msg
+}
 
 export function getTime(): number {
     return Math.floor(performance.timing.navigationStart + performance.now())

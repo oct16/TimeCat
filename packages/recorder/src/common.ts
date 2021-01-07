@@ -8,7 +8,7 @@
  */
 
 import { PreFetchRecordData, VNode } from '@timecat/share'
-import { logError, createURL, completeCssHref, getTime } from '@timecat/utils'
+import { logError, createURL, completeCssHref, getTime, logWarn } from '@timecat/utils'
 import { RewriteItem, RewriteResource } from './recorder'
 
 export function rewriteNodes(
@@ -101,7 +101,14 @@ export function rewriteNodes(
 
         const preFetchSource = async (vNode: VNode, key: string, source: string) => {
             const url = createURL(source, base?.href || href)
-            const resText = await fetch(url.href).then(res => res.text())
+
+            const resText = await fetch(url.href)
+                .then(res => res.text())
+                .catch(err => logWarn(err))
+
+            if (!resText) {
+                return
+            }
 
             const text = completeCssHref(resText, undefined, preUrl => {
                 if (!subMatches) {
