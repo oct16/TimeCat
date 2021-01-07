@@ -44,12 +44,12 @@ export abstract class Watcher<T extends RecordData> {
         this.options.listenStore.add(fn)
     }
 
-    emitData(type: RecordType, record: RecordData['data'], callback?: (data: RecordData) => T) {
+    emitData(type: RecordType, record: RecordData['data'], time = getTime(), callback?: (data: RecordData) => T) {
         const data = {
             type,
             data: record,
             relatedId: this.relatedId,
-            time: getTime()
+            time
         } as RecordData
 
         if (callback) {

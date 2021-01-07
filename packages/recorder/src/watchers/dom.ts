@@ -8,7 +8,7 @@
  */
 
 import { createFlatVNode } from '@timecat/virtual-dom'
-import { isVNode, isExistingNode, nodeStore } from '@timecat/utils'
+import { isVNode, isExistingNode, nodeStore, getTime } from '@timecat/utils'
 import {
     WatcherOptions,
     RecordType,
@@ -226,14 +226,16 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             }
         })
 
+        const time = getTime()
+
         if (data.addedNodes) {
             this.watchCanvas(addedNodes)
             this.watchIFrames(addedNodes)
-            this.rewriteAddedSource(addedNodes)
+            this.rewriteAddedSource(addedNodes, time)
         }
 
         if (Object.values(data).some(item => item.length)) {
-            this.emitData(RecordType.DOM, data)
+            this.emitData(RecordType.DOM, data, time)
         }
     }
 
@@ -277,7 +279,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         }
     }
 
-    rewriteAddedSource(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+    rewriteAddedSource(addedNodes: UpdateNodeData<number | VSNode | VNode>[], time: number) {
         const { G_RECORD_OPTIONS: options } = window
         const configs = options?.rewriteResource || []
         if (!configs?.length) {
@@ -285,8 +287,6 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         }
 
         const vNodes = addedNodes.map(item => item.node).filter(node => isVNode(node as VNode) && node) as VNode[]
-        rewriteNodes(vNodes, configs, data => {
-            this.emitData(RecordType.PATCH, data)
-        })
+        rewriteNodes(vNodes, configs, data => this.emitData(RecordType.PATCH, data, time + 1))
     }
 }
