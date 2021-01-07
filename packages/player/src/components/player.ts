@@ -12,7 +12,7 @@ import { updateDom } from '../dom'
 import { getTime, isSnapshot, toTimeStamp, base64ToFloat32Array, encodeWAV, delay } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData, SnapshotRecord, ReplayInternalOptions, RecordType, ReplayData } from '@timecat/share'
+import { RecordData, AudioData, SnapshotRecord, ReplayInternalOptions, ReplayData } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from '../animation-frame'
 import { PlayerEventTypes } from '../types'
@@ -27,8 +27,7 @@ import {
     transToReplayData,
     normalLoading,
     parseHtmlStr,
-    isMobile,
-    ReplayDataState
+    isMobile
 } from '../utils'
 
 @Component(
@@ -521,21 +520,15 @@ export class PlayerComponent {
         return heatPoints
     }
 
+    // Lift Patch Record
     orderRecords(records: RecordData[]) {
         if (!records.length) {
             return []
         }
-        // Lift font records for canvas render
-        let insertIndex = 1
-        const startTime = records[0].time
-        for (let i = 0; i < records.length; i++) {
-            const record = records[i]
-            if (record.type === RecordType.FONT) {
-                const fontRecord = records.splice(i, 1)[0]
-                fontRecord.time = startTime + insertIndex
-                records.splice(insertIndex++, 0, fontRecord)
-            }
-        }
+
+        records.sort((a: RecordData, b: RecordData) => {
+            return a.time - b.time
+        })
 
         return records
     }

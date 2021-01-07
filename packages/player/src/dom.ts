@@ -27,7 +27,8 @@ import {
     CanvasRecordData,
     UnionToIntersection,
     SnapshotRecord,
-    FontRecordData
+    FontRecordData,
+    PreFetchRecord
 } from '@timecat/share'
 import FIXED_CSS from './fixed.scss'
 import { PlayerComponent } from './components/player'
@@ -92,10 +93,10 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     }
 }
 
-export async function updateDom(this: PlayerComponent, Record: RecordData, opts?: { isJumping: boolean }) {
+export async function updateDom(this: PlayerComponent, record: RecordData, opts?: { isJumping: boolean }) {
     const { isJumping } = opts || {}
     const delayTime = isJumping ? 0 : 200
-    const { type, data } = Record
+    const { type, data } = record
 
     // waiting for mouse or scroll transform animation finish
     const actionDelay = () => (delayTime ? delay(delayTime) : Promise.resolve())
@@ -319,6 +320,22 @@ export async function updateDom(this: PlayerComponent, Record: RecordData, opts?
             const font = new window.FontFace(family, buffer)
             this.c.sandBoxDoc.fonts.add(font)
             document.fonts.add(font)
+            break
+        }
+        case RecordType.PATCH: {
+            const { data } = record as PreFetchRecord
+            const { id, key, url, tag, text } = data
+            const node = nodeStore.getNode(id)
+            const n = node as HTMLElement
+            if (n && n.getAttribute(key) === url && n.tagName === tag.toUpperCase()) {
+                if (key === 'link') {
+                    const replaceNode = document.createElement('style')
+                    replaceNode.setAttribute('type', 'text/css')
+                    replaceNode.setAttribute('css-url', url)
+                    replaceNode.innerHTML = text
+                    n.replaceWith(replaceNode)
+                }
+            }
             break
         }
         default: {
