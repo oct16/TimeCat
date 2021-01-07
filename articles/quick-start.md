@@ -36,7 +36,7 @@ interface RecordOptions {
     audio: boolean // if your want record audio, default is false
     font: boolean // record font, default is false
     plugins: RecorderPlugin[] // extend plugins here
-    visibleChange: boolean // stop or resume recorder when visibleChange
+    visibleChange: boolean // stop or resume recorder when visibleChange, default is false
     rewriteResource: (RewriteItem | PreFetchItem)[]
 }
 

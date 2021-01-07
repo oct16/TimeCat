@@ -76,7 +76,7 @@ export class RecorderModule extends Pluginable {
         keep: false,
         emitLocationImmediate: true,
         context: window,
-        visibleChange: true
+        visibleChange: false
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
