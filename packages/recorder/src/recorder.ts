@@ -144,9 +144,6 @@ export class RecorderModule extends Pluginable {
         return watchersList
     }
 
-    private record(options: RecordOptions): void
-    private record(options: RecordInternalOptions): void
-
     private record(options: RecordOptions | RecordInternalOptions): void {
         const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
         this.startRecord((opts.context.G_RECORD_OPTIONS = opts))
@@ -284,8 +281,9 @@ export class RecorderModule extends Pluginable {
 
     private createIFrameRecorder(frameWindow: Window) {
         const frameRecorder = new RecorderModule({ context: frameWindow, keep: true })
-        const frameElement = frameWindow.frameElement as any
+        const frameElement = frameWindow.frameElement as Element & { frameRecorder: RecorderModule }
         frameElement.frameRecorder = frameRecorder
+        this.destroyStore.add(() => frameRecorder.destroy())
     }
 
     private listenVisibleChange(this: RecorderModule, options: RecordInternalOptions) {

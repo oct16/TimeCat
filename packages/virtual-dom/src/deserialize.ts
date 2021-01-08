@@ -83,10 +83,6 @@ function createAttributes(vNode: VNode, node: Element): void {
 
 function getAttributes(vNode: VNode) {
     const attrs = { ...vNode.attrs }
-    if (vNode.tag === 'iframe') {
-        attrs['disabled-src'] = attrs.src
-        delete attrs.src
-    }
     return attrs
 }
 

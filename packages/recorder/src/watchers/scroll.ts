@@ -22,7 +22,7 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
 
     init() {
         const { scrollingElement } = this.context.document
-        this.emitData(...this.wrapData(scrollingElement || document))
+        this.emitData(...this.wrapData(scrollingElement || document, true))
         this.registerEvent({
             context: this.context,
             eventTypes: ['scroll'],
@@ -34,18 +34,21 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
         })
     }
 
-    wrapData(target: Element | Document): [RecordType.SCROLL, ScrollRecord['data']] {
+    wrapData(target: Element | Document, isAuto = false): [RecordType.SCROLL, ScrollRecord['data']] {
         const element =
             target instanceof this.context.HTMLElement ? target : this.getCompatibleTarget(target as Document)
 
-        return [
-            RecordType.SCROLL,
-            {
-                id: this.getNodeId(element) || null, // if null, target is document
-                top: this.scrollTop(element),
-                left: this.scrollLeft(element)
-            }
-        ]
+        const data = {
+            id: this.getNodeId(element) || null, // if null, target is document
+            top: this.scrollTop(element),
+            left: this.scrollLeft(element)
+        } as ScrollRecord['data']
+
+        if (isAuto) {
+            data.behavior = 'auto'
+        }
+
+        return [RecordType.SCROLL, data]
     }
 
     handleFn(e: Event) {

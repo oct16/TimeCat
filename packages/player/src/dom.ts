@@ -109,6 +109,11 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
             if (frameId) {
                 const iframeNode = nodeStore.getNode(frameId) as HTMLIFrameElement
                 if (iframeNode) {
+                    const src = iframeNode.getAttribute('src')
+                    if (src) {
+                        setAttribute(iframeNode, 'disabled-src', src)
+                        setAttribute(iframeNode, 'src', null)
+                    }
                     const contentDocument = iframeNode.contentDocument!
                     createIframeDOM(contentDocument, snapshotData)
                     injectIframeContent(contentDocument, snapshotData)
@@ -119,7 +124,7 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
         }
 
         case RecordType.SCROLL: {
-            const { top, left, id } = data as ScrollRecordData
+            const { top, left, id, behavior: b } = data as ScrollRecordData
             const target = id ? (nodeStore.getNode(id) as HTMLElement) : this.c.sandBoxDoc.documentElement
 
             if (!target) {
@@ -129,7 +134,8 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
             const curTop = target.scrollTop
 
             // prevent jump too long distance
-            const behavior = Math.abs(top - curTop) > window.G_REPLAY_DATA.snapshot.data.height * 3 ? 'auto' : 'smooth'
+            const height = window.G_REPLAY_DATA.snapshot.data.height
+            const behavior = b || Math.abs(top - curTop) > height * 3 ? 'auto' : 'smooth'
 
             target?.scroll({
                 top,
@@ -242,11 +248,6 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
                     const node = nodeStore.getNode(id) as HTMLElement
 
                     if (node) {
-                        if (node.tagName === 'IFRAME' && key === 'src') {
-                            setAttribute(node as HTMLElement, 'disabled-src', value)
-                            setAttribute(node as HTMLElement, 'src', null)
-                            return
-                        }
                         setAttribute(node as HTMLElement, key, value)
                     }
                 })

@@ -97,6 +97,7 @@ export interface ScrollRecordData {
     id: number | null
     top: number
     left: number
+    behavior?: 'auto'
 }
 
 export type MouseRecord = BaseRecord<RecordType.MOUSE, MouseRecordData>

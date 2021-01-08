@@ -7,7 +7,7 @@
  *
  */
 
-import { completeAttrHref, completeCssHref } from '@timecat/utils'
+import { completeAttrHref, completeCssHref, logError } from '@timecat/utils'
 
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null | object): void {
     if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -33,7 +33,7 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         return
     }
 
-    if (!/^[\w\-\d]+$/.test(name)) {
+    if (/^\d+/.test(name)) {
         return
     }
 
@@ -62,7 +62,7 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
     // The srcset attribute specifies the URL of the image to use in different situations
     if (name === 'srcset' || name === 'sizes') {
         const srcArray = value.split(',')
-        value = srcArray.map(src => completeAttrHref(src.trim(), node)).toString()
+        value = srcArray.map(src => completeAttrHref(src.trim(), node)).join(', ')
         // decode uri
         value = decodeURIComponent(value)
     }
@@ -71,5 +71,9 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         value = completeAttrHref(value, node)
     }
 
-    return node.setAttribute(name, value)
+    try {
+        node.setAttribute(name, value)
+    } catch (err) {
+        logError(err)
+    }
 }
