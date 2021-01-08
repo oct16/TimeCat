@@ -55,7 +55,7 @@ export function rewriteNodes(
                     }
                     return matches.some(item => {
                         if (typeof item === 'string') {
-                            return source.endsWith(item)
+                            return source.endsWith('.' + item)
                         }
                         return (item as RegExp).test(source)
                     })
@@ -118,9 +118,11 @@ export function rewriteNodes(
                     return preUrl
                 }
 
+                let nextUrl: string
+                const url = createURL(preUrl, base?.href || href)
                 const anyMatched = subMatches.some(item => {
                     if (typeof item === 'string') {
-                        return preUrl.endsWith(item)
+                        return url.pathname.endsWith('.' + item)
                     }
                     return (item as RegExp).test(preUrl)
                 })
@@ -129,9 +131,7 @@ export function rewriteNodes(
                     return preUrl
                 }
 
-                let nextUrl: string
                 if (replaceOrigin && folderPath) {
-                    const url = createURL(preUrl, base?.href || href)
                     nextUrl = pathJoin(replaceOrigin, folderPath || '', url.pathname)
                 } else {
                     if (typeof crossUrl === 'string') {

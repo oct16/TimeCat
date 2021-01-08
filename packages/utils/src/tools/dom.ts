@@ -31,7 +31,7 @@ export function filteringScriptTag(str: string) {
 }
 
 export function completeCssHref(str: string, baseUrl?: string, setHref?: (url: string) => string) {
-    return str.replace(/(url\(['"]?((\/{1,2}|\.\.?\/)?[^'"]*?)['"]?(?=\)))/g, (string, b, url) => {
+    return str.replace(/(url\(['"]?((\/{1,2}|\.\.?\/)?.*?)(^\?.*?)?['"]?(?=\)))/g, (string, b, url) => {
         const newUrl = createURL(url, baseUrl || href())
         if (url.startsWith('data:')) {
             return url
