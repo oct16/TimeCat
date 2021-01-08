@@ -100,6 +100,10 @@ class RecoverNative {
     }
 }
 
+function recoverDefaults(list: string[]) {
+    list.forEach(recoverNative.recoverMethod.bind(recoverNative))
+}
+
 export const recoverNative = new RecoverNative()
 
-recoverNative.recoverMethod('MutationObserver')
+recoverDefaults(['MutationObserver', 'console.warn', 'console.error', 'console.log'])
