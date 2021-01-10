@@ -1,7 +1,7 @@
 {
     "private": false,
     "name": "@timecat/share",
-    "version": "1.2.0-alpha.17",
+    "version": "1.2.0-alpha.18",
     "description": "",
     "main": "index.js",
     "module": "dist/share.esm.js",
