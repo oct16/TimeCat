@@ -15,7 +15,7 @@ export const emptyTemplate = `<!DOCTYPE html>
     <meta http-equiv="Content-Security-Policy-Report-Only" />
     <title>TimeCat</title>
 </head>
-<body style="margin: 0">
+<body style="margin: 0; overflow: hidden">
 </body>
 </html>
 `

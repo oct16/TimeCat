@@ -85,7 +85,7 @@ export class ContainerComponent {
             this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
 
         if (targetElement.tagName === 'BODY') {
-            const shadowHost = parseHtmlStr(html`<div class="player-shadowhost" style="overflow: hidden"></div>`)[0]
+            const shadowHost = parseHtmlStr(html`<div class="player-shadowhost"></div>`)[0]
             targetElement.appendChild(shadowHost)
             targetElement = shadowHost
         }
