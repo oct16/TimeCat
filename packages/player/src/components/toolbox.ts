@@ -109,8 +109,8 @@ export class ToolboxComponent implements IComponent {
     }
 
     async export() {
-        const SDKScript = document.getElementById('timecat') as HTMLScriptElement
-        const initScript = document.getElementById('timecat-init') as HTMLScriptElement
+        const SDKScript = document.querySelector('#timecat') as HTMLScriptElement
+        const initScript = document.querySelector('#timecat-init') as HTMLScriptElement
         const scriptList = []
         const scripts = document.querySelectorAll('script')
 
