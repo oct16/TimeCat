@@ -53,7 +53,7 @@ export function Component(name: string, html: string, opts?: Partial<{ isShadow:
 export const html = function (strings: TemplateStringsArray, ...values: any) {
     let str = ''
     strings.forEach((string, i) => {
-        str += string + values[i]
+        str += string + (values[i] || '')
     })
     return str
 }

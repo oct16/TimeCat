@@ -12,6 +12,7 @@ if (!process.env.TARGET) {
     throw new Error('TARGET package must be specified via --environment flag.')
 }
 
+const env = process.env.NODE_ENV
 const masterVersion = require('./package.json').version
 const packagesDir = path.resolve(__dirname, 'packages')
 const packageDir = path.resolve(packagesDir, process.env.TARGET)
@@ -46,7 +47,7 @@ const packageConfigs = process.env.PROD_ONLY
     ? []
     : packageFormats.map(format => createConfig(format, outputConfigs[format]))
 
-if (process.env.NODE_ENV === 'production') {
+if (env === 'production') {
     packageFormats.forEach(format => {
         if (packageOptions.prod === false) {
             return
@@ -89,7 +90,7 @@ function createConfig(format, output, plugins = []) {
     const shouldEmitDeclarations = process.env.TYPES != null && !hasTSChecked
 
     const tsPlugin = ts({
-        check: process.env.NODE_ENV === 'production' && !hasTSChecked,
+        check: env === 'production' && !hasTSChecked,
         tsconfig: path.resolve(__dirname, 'tsconfig.json'),
         cacheRoot: path.resolve(__dirname, 'node_modules/.rts2_cache'),
         tsconfigOverride: {
@@ -128,9 +129,18 @@ function createConfig(format, output, plugins = []) {
             exclude: ['**/index.html', '**/index.css']
         }),
         replace({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+            'process.env.NODE_ENV': JSON.stringify(env),
             __VERSION__: masterVersion
-        })
+        }),
+        {
+            name: 'ReplaceHTMLSpace',
+            transform(code, id) {
+                if (env === 'production' && id.includes('player/src/components/')) {
+                    return { code: code.replace(/(<.*?>)|\s+/g, (m, $1) => ($1 ? $1 : ' ')), map: { mappings: '' } }
+                }
+                return { code, map: { mappings: '' } }
+            }
+        }
     ]
 
     return {
