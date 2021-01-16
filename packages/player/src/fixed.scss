@@ -29,6 +29,6 @@ html,body {
     scrollbar-width: none; /* firefox */
 
     &::-webkit-scrollbar {
-        overflow: hidden;
+        display: none;
     }
 }
