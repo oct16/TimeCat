@@ -18,6 +18,10 @@ TimeCat is a open source web Page recording tool that generates files are not re
 
 [🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
 
+## Documentation
+
+You can find the TimeCat documentation on the [website](https://docs.timecatjs.com). Check out the Introduction page for a quick overview. You can improve it by sending pull requests to this [repository](https://github.com/oct16/TimeCat-Docs)
+
 ## Version 
 
 [![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)](https://www.npmjs.com/package/timecatjs)
@@ -44,15 +48,12 @@ $ npm i timecatjs -D
 
 Add script tags in your browser and use the global variable ``TimeCat``, you can choose the follow CDN:
 
-- <a href="https://www.jsdelivr.com/package/npm/timecatjs"><img align="top" width="100" src="./articles/images/jsdelivr.png"></a>
-- <a href="https://unpkg.com/timecatjs"><img align="top" width="100" src="./articles/images/unpkg.png"></a>
+- <a href="https://www.jsdelivr.com/package/npm/timecatjs"><img align="top" width="100" src="./assets/images/jsdelivr.png"></a>
+- <a href="https://unpkg.com/timecatjs"><img align="top" width="100" src="./assets/images/unpkg.png"></a>
 
 ## Usage
- - [Quick Start](articles/quick-start.md)
- - [A Real Demo](https://github.com/oct16/timecat-demo)
-
-## Articles
- - [How it works](articles/technology.md)
+ - [Quick Start](https://docs.timecatjs.com/docs/)
+ - [Step By Step](https://docs.timecatjs.com/docs/step-by-step)
 
 ## Contributing
 
