@@ -27,6 +27,11 @@ export function logWarn(e: Error | string): string {
     return msg
 }
 
+export function logAdvice(msg: string): string {
+    console.log(`%c TimeCat Advice: ${msg}`, 'color:#0f0;')
+    return msg
+}
+
 export function getTime(): number {
     return Math.floor(performance.timing.navigationStart + performance.now())
 }

@@ -9,7 +9,7 @@
 
 import { Component, html, exportReplay, Store, IComponent } from '../utils'
 import { ContainerComponent } from './container'
-import { getRawScriptContent } from '@timecat/utils'
+import { getRawScriptContent, logAdvice, logError } from '@timecat/utils'
 
 @Component(
     'player-toolbox',
@@ -170,7 +170,10 @@ export class ToolboxComponent implements IComponent {
 
     setFullScreen() {
         this.c.resize({ maxScale: 100 })
-        this.fullscreenTarget.requestFullscreen()
+        this.fullscreenTarget.requestFullscreen().catch(msg => {
+            logError(msg)
+            logAdvice('If the Player within the iframe, you should be set the attribute: allowfullscreen')
+        })
     }
 
     cancelFullScreen() {
