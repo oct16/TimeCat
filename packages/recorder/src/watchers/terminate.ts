@@ -7,15 +7,10 @@
  *
  */
 
-import { WatcherOptions, TerminateRecord, RecordType } from '@timecat/share'
+import { TerminateRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class TerminateWatcher extends Watcher<TerminateRecord> {
-    constructor(options: WatcherOptions<TerminateRecord>) {
-        super(options)
-        this.init()
-    }
-
     init() {
         this.context.addEventListener('beforeunload', this.handleFn)
 

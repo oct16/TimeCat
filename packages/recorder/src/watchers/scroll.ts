@@ -7,18 +7,21 @@
  *
  */
 
-import { WatcherOptions, ScrollRecord, RecordType } from '@timecat/share'
+import { ScrollRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class ScrollWatcher extends Watcher<ScrollRecord> {
-    constructor(options: WatcherOptions<ScrollRecord>) {
-        super(options)
-        this.init()
+    getCompatibleTarget(target: Document) {
+        return (target.scrollingElement as HTMLElement) || target.documentElement
     }
 
-    getCompatibleTarget = (target: Document) => (target.scrollingElement as HTMLElement) || target.documentElement
-    scrollTop = (target: HTMLElement) => target.scrollTop
-    scrollLeft = (target: HTMLElement) => target.scrollLeft
+    scrollTop(target: HTMLElement) {
+        return target.scrollTop
+    }
+
+    scrollLeft(target: HTMLElement) {
+        return target.scrollLeft
+    }
 
     init() {
         const { scrollingElement } = this.context.document

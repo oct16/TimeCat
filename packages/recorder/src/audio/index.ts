@@ -8,11 +8,11 @@
  */
 
 import { AudioRecorder } from './audio-recorder'
-import { AudioRecord, RecordType, WatcherOptions } from '@timecat/share'
+import { AudioRecord, RecordType, WatcherArgs } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class RecordAudio extends Watcher<AudioRecord> {
-    constructor(options: WatcherOptions<AudioRecord>) {
+    constructor(options: WatcherArgs<AudioRecord>) {
         super(options)
         this.init()
     }

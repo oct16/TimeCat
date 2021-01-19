@@ -16,6 +16,7 @@ import { WindowWatcher } from './window'
 import { CanvasWatcher } from './canvas'
 import { TerminateWatcher } from './terminate'
 import { FontWatcher } from './font'
+import { Watcher } from '../watcher'
 
 export const baseWatchers = {
     DOMWatcher,
@@ -31,4 +32,4 @@ export const watchers = {
     CanvasWatcher,
     FontWatcher,
     TerminateWatcher
-}
+} as { [key: string]: typeof Watcher }

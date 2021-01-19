@@ -15,6 +15,9 @@ import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
 import { Pluginable, RecorderPlugin } from './pluginable'
+import { Watcher } from './watcher'
+
+export { Watcher, WatcherOptions } from './watcher'
 export { RecordData } from '@timecat/share'
 
 export type RewriteResource = (RewriteItem<'rewrite'> | RewriteItem<'preFetch'>)[]
@@ -81,8 +84,8 @@ export class RecorderModule extends Pluginable {
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
     private onDataCallback: Function
-    private watchers: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot>
-    private watchersInstance = new Map<string, InstanceType<ValueOf<typeof watchers>> | RecordAudio | Snapshot>()
+    private watchers: Array<typeof Watcher>
+    private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
     private watcherResolve: Function
 
@@ -93,7 +96,7 @@ export class RecorderModule extends Pluginable {
         super(options)
         const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
         this.options = opts
-        this.watchers = this.getWatchers()
+        this.watchers = this.getWatchers() as typeof Watcher[]
         this.init()
     }
 
@@ -134,12 +137,9 @@ export class RecorderModule extends Pluginable {
 
     private getWatchers() {
         const options = this.options
-        const watchersList: Array<ValueOf<typeof watchers> | typeof RecordAudio | typeof Snapshot> = [
-            Snapshot,
-            ...Object.values(watchers)
-        ]
+        const watchersList = [Snapshot, ...Object.values(watchers)] as typeof Watcher[]
         if (options && options.audio) {
-            watchersList.push(RecordAudio)
+            watchersList.push(RecordAudio as typeof Watcher)
         }
         return watchersList
     }
@@ -150,7 +150,7 @@ export class RecorderModule extends Pluginable {
     }
 
     private async startRecord(options: RecordInternalOptions) {
-        let activeWatchers = this.watchers
+        let activeWatchers = [...this.watchers, ...this.pluginWatchers]
 
         // is record iframe, switch context
         if (options.context === window) {
@@ -159,7 +159,7 @@ export class RecorderModule extends Pluginable {
             }
         } else {
             // for iframe watchers
-            activeWatchers = [Snapshot, ...Object.values(baseWatchers)]
+            activeWatchers = [Snapshot, ...Object.values(baseWatchers)] as typeof Watcher[]
         }
 
         const onEmit = (options: RecordOptions) => {

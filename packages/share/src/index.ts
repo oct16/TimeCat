@@ -66,7 +66,8 @@ export enum RecordType {
     'CANVAS',
     'TERMINATE',
     'FONT',
-    'PATCH'
+    'PATCH',
+    'CUSTOM'
 }
 
 export enum FormElementEvent {
@@ -223,6 +224,7 @@ export type RecordData =
     | TerminateRecord
     | FontRecord
     | PreFetchRecord
+    | CustomRecord
 
 export interface AudioData {
     src: string
@@ -251,7 +253,7 @@ export enum TransactionMode {
     'VERSIONCHANGE' = 'versionchange'
 }
 
-export type WatcherOptions<T extends RecordData | HeadRecord, WatchersInstance = any, Recorder = any> = {
+export type WatcherArgs<T extends RecordData | HeadRecord, WatchersInstance = any, Recorder = any> = {
     recorder: Recorder
     context: Window
     listenStore: Set<Function>
@@ -332,3 +334,7 @@ export interface PreFetchRecordData {
 }
 
 export type PreFetchRecord = BaseRecord<RecordType.PATCH, PreFetchRecordData>
+
+export type CustomRecordData = { [key: string]: any }
+
+export type CustomRecord = BaseRecord<RecordType.CUSTOM, CustomRecordData>

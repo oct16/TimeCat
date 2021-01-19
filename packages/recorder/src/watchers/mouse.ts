@@ -8,15 +8,10 @@
  */
 
 import { throttle, isExistingNode } from '@timecat/utils'
-import { WatcherOptions, MouseRecord, RecordType, MouseEventType } from '@timecat/share'
+import { MouseRecord, RecordType, MouseEventType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class MouseWatcher extends Watcher<MouseRecord> {
-    constructor(options: WatcherOptions<MouseRecord>) {
-        super(options)
-        this.init()
-    }
-
     scrolling: boolean
     latestMove: { x: number; y: number; id?: number } | null
 

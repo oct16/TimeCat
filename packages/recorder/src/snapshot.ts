@@ -8,17 +8,12 @@
  */
 
 import { Watcher } from './watcher'
-import { SnapshotRecord, WatcherOptions, RecordType, InfoData, VNode, VSNode, PreFetchRecordData } from '@timecat/share'
+import { SnapshotRecord, RecordType, InfoData, VNode, VSNode, PreFetchRecordData } from '@timecat/share'
 import { createElement } from '@timecat/virtual-dom'
 import { nodeStore, isVNode, getTime } from '@timecat/utils'
 import { rewriteNodes } from './common'
 
 export class Snapshot extends Watcher<SnapshotRecord> {
-    constructor(options: WatcherOptions<SnapshotRecord>) {
-        super(options)
-        this.init()
-    }
-
     init() {
         const snapshotData = this.DOMSnapshotData(this.options.context || window)
         const time = getTime()

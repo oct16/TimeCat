@@ -10,7 +10,6 @@
 import { createFlatVNode } from '@timecat/virtual-dom'
 import { isVNode, isExistingNode, nodeStore, getTime } from '@timecat/utils'
 import {
-    WatcherOptions,
     RecordType,
     DOMRecord,
     VNode,
@@ -27,11 +26,6 @@ import { CanvasWatcher } from './canvas'
 import { rewriteNodes } from '../common'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
-    constructor(options: WatcherOptions<DOMRecord>) {
-        super(options)
-        this.init()
-    }
-
     init() {
         const Watcher = new MutationObserver(callback => this.mutationCallback(callback))
         Watcher.observe(this.context.document.documentElement, {
@@ -263,7 +257,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 .map(node => nodeStore.getNode(node.node.id) as HTMLCanvasElement)
                 .filter(Boolean)
 
-            const watcher = this.options.watchers.get('CanvasWatcher') as CanvasWatcher
+            const watcher = (this.options.watchers.get('CanvasWatcher') as unknown) as CanvasWatcher
             watcher.watchCanvas(elements)
         }
     }

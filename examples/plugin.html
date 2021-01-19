@@ -67,9 +67,13 @@
     <script>
 
         class RunPlugin {
+            constructor(args) {
+                this.args = args
+            }
+
             apply(recorder) {
                 recorder.plugin('run', () => {
-                    console.log('record run')
+                    console.log('record run', this.args)
                 })
             }
         }
@@ -84,12 +88,36 @@
             }
         }
 
-        const { Recorder } = TimeCat
+        const { Recorder, Watcher } = TimeCat
+
+        class ErrorWatcher extends Watcher {
+            init(options) {
+                window.addEventListener('error', ErrorEvent => {
+                    const { message, filename, lineno, colno, error } = ErrorEvent
+                    this.emitData('type your define', {
+                        message, filename, lineno, colno, error
+                    })
+                })
+            }
+        }
+
+        class ErrorWatcherPlugin {
+            apply(recorder) {
+                recorder.addWatcher(ErrorWatcher)
+            }
+        }
+
+        setTimeout(() => {
+            const badCode = 'const s;';
+            eval(badCode);
+        }, 1000)
+
         const recorder = new Recorder({
             // register the plugins in here
             plugins: [
                 new RunPlugin({ test: true }),
-                new EmitPlugin({})
+                new EmitPlugin({}),
+                new ErrorWatcherPlugin()
             ]
         })
 

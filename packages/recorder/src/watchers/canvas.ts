@@ -7,17 +7,12 @@
  *
  */
 
-import { WatcherOptions, CanvasRecord, RecordType } from '@timecat/share'
+import { CanvasRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 type Prop = keyof CanvasRenderingContext2D
 
 export class CanvasWatcher extends Watcher<CanvasRecord> {
-    constructor(options: WatcherOptions<CanvasRecord>) {
-        super(options)
-        this.init()
-    }
-
     getCanvasInitState(ctx: CanvasRenderingContext2D) {
         const keys = [
             'direction',

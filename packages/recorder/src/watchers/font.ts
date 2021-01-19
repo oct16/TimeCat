@@ -14,15 +14,10 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/FontFace/FontFace
  *
  */
-import { WatcherOptions, FontRecord, RecordType } from '@timecat/share'
+import { FontRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class FontWatcher extends Watcher<FontRecord> {
-    constructor(options: WatcherOptions<FontRecord>) {
-        super(options)
-        this.init()
-    }
-
     init() {
         if (this.recordOptions.font) {
             this.interceptAddFont()

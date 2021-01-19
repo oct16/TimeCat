@@ -1,8 +1,3 @@
-import { WatcherOptions, RecordEvent, RecordData, RecordType, ValueOf } from '@timecat/share'
-import { debounce, throttle, nodeStore, getTime } from '@timecat/utils'
-import { watchers } from './watchers'
-import { RecordAudio } from './audio'
-import { Snapshot } from './snapshot'
 /**
  * Copyright (c) oct16.
  * https://github.com/oct16
@@ -12,30 +7,31 @@ import { Snapshot } from './snapshot'
  *
  */
 
+import { WatcherArgs, RecordEvent, RecordData, RecordType } from '@timecat/share'
+import { debounce, throttle, nodeStore, getTime } from '@timecat/utils'
+
 import { RecordOptions, RecorderModule } from './recorder'
 
-export abstract class Watcher<T extends RecordData> {
+export type WatcherOptions<T extends RecordData> = WatcherArgs<T, Map<string, Watcher<RecordData>>, RecorderModule>
+export class Watcher<T extends RecordData> {
     recorder: RecorderModule
     relatedId: string
     context: Window
     private emit: RecordEvent<RecordData>
-    options: WatcherOptions<
-        T,
-        Map<string, InstanceType<ValueOf<typeof watchers>> | RecordAudio | Snapshot>,
-        RecorderModule
-    >
+    options: WatcherArgs<T>
     recordOptions: RecordOptions = window.G_RECORD_OPTIONS
 
-    constructor(options: WatcherOptions<T>) {
+    constructor(options: WatcherArgs<T>) {
         const { emit, context, relatedId, recorder } = options
         this.options = options
         this.recorder = recorder
         this.relatedId = relatedId
         this.context = context
         this.emit = emit
+        this.init(options)
     }
 
-    abstract init(): void
+    init(options: WatcherOptions<T>): void {}
 
     getNode = (id: number): Node => nodeStore.getNode.call(nodeStore, id)
     getNodeId = (n: Node): number => nodeStore.getNodeId.call(nodeStore, n)

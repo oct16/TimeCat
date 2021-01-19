@@ -7,17 +7,17 @@
  *
  */
 
-import { WatcherOptions, WindowRecord, RecordType } from '@timecat/share'
+import { WindowRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class WindowWatcher extends Watcher<WindowRecord> {
-    constructor(options: WatcherOptions<WindowRecord>) {
-        super(options)
-        this.init()
+    width() {
+        return this.context.innerWidth
     }
 
-    width = () => this.context.innerWidth
-    height = () => this.context.innerHeight
+    height() {
+        return this.context.innerHeight
+    }
 
     init() {
         this.emitData(...this.wrapData(this.context.document))

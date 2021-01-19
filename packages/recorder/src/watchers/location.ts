@@ -7,15 +7,10 @@
  *
  */
 
-import { WatcherOptions, LocationRecord, RecordType } from '@timecat/share'
+import { LocationRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class LocationWatcher extends Watcher<LocationRecord> {
-    constructor(options: WatcherOptions<LocationRecord>) {
-        super(options)
-        this.init()
-    }
-
     init() {
         this.context.history.pushState = this.kidnapLocation('pushState')
         this.context.history.replaceState = this.kidnapLocation('replaceState')
@@ -33,7 +28,7 @@ export class LocationWatcher extends Watcher<LocationRecord> {
         this.context[methodType === 'add' ? 'addEventListener' : 'removeEventListener'](type, handle)
     }
 
-    kidnapLocation = (type: 'pushState' | 'replaceState') => {
+    kidnapLocation(type: 'pushState' | 'replaceState') {
         const ctx = this.context
         const original = ctx.history[type]
 

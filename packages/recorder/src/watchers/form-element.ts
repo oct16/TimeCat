@@ -8,15 +8,10 @@
  */
 
 import { getStrDiffPatches } from '@timecat/utils'
-import { WatcherOptions, FormElementEvent, RecordType, FormElementRecord } from '@timecat/share'
+import { WatcherArgs, FormElementEvent, RecordType, FormElementRecord } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class FormElementWatcher extends Watcher<FormElementRecord> {
-    constructor(options: WatcherOptions<FormElementRecord>) {
-        super(options)
-        this.init()
-    }
-
     init() {
         this.listenInputs(this.options)
 
@@ -24,7 +19,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         this.kidnapInputs(this.options)
     }
 
-    listenInputs(options: WatcherOptions<FormElementRecord>) {
+    listenInputs(options: WatcherArgs<FormElementRecord>) {
         const { context } = options
 
         const eventTypes = ['input', 'change', 'focus', 'blur']
@@ -98,7 +93,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         }
     }
 
-    kidnapInputs(options: WatcherOptions<FormElementRecord>) {
+    kidnapInputs(options: WatcherArgs<FormElementRecord>) {
         const { context } = options
         const self = this
 
