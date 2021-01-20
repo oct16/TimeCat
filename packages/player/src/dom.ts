@@ -137,11 +137,23 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
             const height = window.G_REPLAY_DATA.snapshot.data.height
             const behavior = b || Math.abs(top - curTop) > height * 3 ? 'auto' : 'smooth'
 
-            target?.scroll({
+            const opts = {
                 top,
                 left,
                 behavior
-            })
+            } as ScrollToOptions
+
+            try {
+                target.scroll(opts)
+            } catch (error) {
+                // fixed for in firefox
+                if (target.nodeName === 'HTML') {
+                    target.ownerDocument.defaultView?.scroll(opts)
+                } else {
+                    target.scrollLeft = left
+                    target.scrollTop = top
+                }
+            }
             break
         }
         case RecordType.WINDOW: {
