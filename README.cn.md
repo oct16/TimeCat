@@ -16,11 +16,11 @@ A Magical Web Recorder And Player
 
 TimeCat 是一个完全开源的网页录制工具，生成的文件不是真正的视频，但可以像真正的视频一样进行播放，完美的还原用户在浏览器中的操作行为
 
-[🖥 DEMO](https://www.timecatjs.com/) Chrome 浏览器
+[🖥 Examples](https://timecatjs.com/examples)
 
 ## 文档
 
-可以在 [TimeCat Docs](https://docs.timecatjs.com) 找到开发文档，进入 Introduction page 开始了解项目，可以在这个仓库 [repository](https://github.com/oct16/TimeCat-Docs) 中改进项目文档
+可以在 [TimeCat Docs](https://timecatjs.com) 找到开发文档，进入 Introduction page 开始了解项目，可以在这个仓库 [repository](https://github.com/oct16/TimeCat-Docs) 中改进项目文档
 ## 最新版本 
 
 [![npm (tag)](https://img.shields.io/npm/v/timecatjs/latest)](https://www.npmjs.com/package/timecatjs)
@@ -52,7 +52,7 @@ $ npm i timecatjs -D
 - <a href="https://unpkg.com/timecatjs"><img align="top" width="100" src="./assets/images/unpkg.png"></a>
 
 ## 使用
- - [快速开始](https://docs.timecatjs.com/docs/)
+ - [快速开始](https://timecatjs.com/docs/)
 
 ## 交流与建议
 

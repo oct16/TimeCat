@@ -16,11 +16,11 @@ English | [中文](./README.cn.md)
 
 TimeCat is a open source web Page recording tool that generates files are not real video, but can be played like real video, completely restoring the user's actions in the browser.
 
-[🖥 DEMO](https://oct16.github.io/TimeCat) Chrome Browser
+[🖥 Examples](https://timecatjs.com/examples)
 
 ## Documentation
 
-You can find the TimeCat documentation on the [website](https://docs.timecatjs.com). Check out the Introduction page for a quick overview. You can improve it by sending pull requests to this [repository](https://github.com/oct16/TimeCat-Docs)
+You can find the TimeCat documentation on the [website](https://timecatjs.com). Check out the Introduction page for a quick overview. You can improve it by sending pull requests to this [repository](https://github.com/oct16/TimeCat-Docs)
 
 ## Version 
 
@@ -52,8 +52,8 @@ Add script tags in your browser and use the global variable ``TimeCat``, you can
 - <a href="https://unpkg.com/timecatjs"><img align="top" width="100" src="./assets/images/unpkg.png"></a>
 
 ## Usage
- - [Quick Start](https://docs.timecatjs.com/docs/)
- - [Step By Step](https://docs.timecatjs.com/docs/step-by-step)
+ - [Quick Start](https://timecatjs.com/docs/)
+ - [Step By Step](https://timecatjs.com/docs/step-by-step)
 
 ## Contributing
 
