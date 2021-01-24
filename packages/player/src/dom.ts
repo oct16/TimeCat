@@ -296,7 +296,7 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
                         ;(node as any)[key] = value
                     }
                 } else if (formType === FormElementEvent.FOCUS) {
-                    mode !== 'live' && !isJumping && node.focus && node.focus()
+                    mode !== 'live' && !isJumping && node.focus && node.focus({ preventScroll: true })
                 } else if (formType === FormElementEvent.BLUR) {
                     mode !== 'live' && !isJumping && node.blur && node.blur()
                 } else if (formType === FormElementEvent.PROP) {
