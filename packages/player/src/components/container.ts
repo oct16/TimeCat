@@ -26,6 +26,7 @@ export class ContainerComponent {
     resize: (options?: Partial<{ setWidth: number; setHeight: number; maxScale: number }>) => void
     options: ReplayInternalOptions
     target: Element | Window
+    shadowHost: HTMLElement
 
     constructor(options: ReplayInternalOptions) {
         this.options = options
@@ -81,18 +82,16 @@ export class ContainerComponent {
     }
 
     initTemplate() {
-        let targetElement: HTMLElement =
+        const targetElement: HTMLElement =
             this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
 
-        if (targetElement.tagName === 'BODY') {
-            const shadowHost = parseHtmlStr(html`<div class="player-shadowhost"></div>`)[0]
-            targetElement.appendChild(shadowHost)
-            targetElement = shadowHost
-        }
+        const shadowHost = parseHtmlStr(html`<div class="player-shadowhost"></div>`)[0]
+        targetElement.appendChild(shadowHost)
 
-        const shadow = targetElement.attachShadow({ mode: 'open' })
+        const shadow = shadowHost.attachShadow({ mode: 'open' })
         shadow.appendChild(this.createStyle('player-css', CSS))
         shadow.appendChild(this.createContainer('player-main', HTML))
+        this.shadowHost = shadowHost
     }
 
     createContainer(className: string, html: string) {
