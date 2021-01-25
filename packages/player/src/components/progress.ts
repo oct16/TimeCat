@@ -11,6 +11,7 @@ import { secondToTime, getDateTime, stateDebounce } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { PlayerEventTypes } from '../types'
 import { Pillar, NormalLine, observer, Store, Component, IComponent, html } from '../utils'
+import { ReplayInternalOptions } from '@timecat/share'
 
 @Component(
     'player-progress',
@@ -37,8 +38,10 @@ export class ProgressComponent implements IComponent {
     slider: HTMLElement
     heatBar: HTMLCanvasElement
     heatPoints: { step: number; snapshot: boolean }[] = []
+    options: ReplayInternalOptions
 
-    constructor(c: ContainerComponent) {
+    constructor(options: ReplayInternalOptions, c: ContainerComponent) {
+        this.options = options
         this.c = c
         this.progress = c.container.querySelector('.player-progress')! as HTMLElement
         this.progress = c.container.querySelector('.player-progress')! as HTMLElement
@@ -55,12 +58,16 @@ export class ProgressComponent implements IComponent {
             this.thumb.removeAttribute('active')
         })
 
-        this.progress.addEventListener('click', e => {
+        const handle = (e: MouseEvent) => {
             const { left, width: sliderWidth } = this.slider.getBoundingClientRect()
             const width = Math.max(0, Math.min(e.x - left, sliderWidth))
             const percent = +(width / sliderWidth).toFixed(3)
             const progress = this.findProgressByPosition(percent)
             observer.emit(PlayerEventTypes.JUMP, progress)
+        }
+        this.progress.addEventListener('click', handle, false)
+        this.options.destroyStore.add(() => {
+            this.progress.removeEventListener('click', handle, false)
         })
     }
 
@@ -110,9 +117,14 @@ export class ProgressComponent implements IComponent {
     listenElementOnHover = (target: HTMLElement) =>
         stateDebounce<'in' | 'out'>(
             setState => {
-                target.addEventListener('mouseover', () => setState('in'))
-
-                target.addEventListener('mouseout', () => setState('out'))
+                const stateIn = () => setState('in')
+                const stateOut = () => setState('out')
+                target.addEventListener('mouseover', stateIn, false)
+                target.addEventListener('mouseout', stateOut, false)
+                this.options.destroyStore.add(() => {
+                    target.removeEventListener('mouseover', stateIn, false)
+                    target.removeEventListener('mouseout', stateOut, false)
+                })
             },
             state => (state === 'in' ? 200 : 1000),
             'out'

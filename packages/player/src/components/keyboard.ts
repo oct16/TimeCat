@@ -23,7 +23,6 @@ export class KeyboardComponent implements IComponent {
     c: ContainerComponent
     options: ReplayInternalOptions
     controller: HTMLElement
-
     playOrPauseBtn: HTMLButtonElement
 
     constructor(options: ReplayInternalOptions, container: ContainerComponent) {
@@ -47,11 +46,17 @@ export class KeyboardComponent implements IComponent {
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
 
         this.createFastForwards(this.options.fastForward)
-        this.controller.addEventListener('click', (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
+
+        const controllerHandler = (e: MouseEvent & { target: HTMLElement & { type: string } }) => {
             if (e.target && e.target.type === 'button') {
                 const speed = Number((e.target as HTMLElement).getAttribute('speed'))
                 this.dispatchPlay(speed)
             }
+        }
+
+        this.controller.addEventListener('click', controllerHandler, false)
+        this.options.destroyStore.add(() => {
+            this.controller.removeEventListener('click', controllerHandler, false)
         })
 
         this.watchPlayerSpeed()
@@ -80,15 +85,15 @@ export class KeyboardComponent implements IComponent {
     }
 
     detectWindowIsActive() {
-        document.addEventListener(
-            'visibilitychange',
-            () => {
-                if (document.visibilityState === 'hidden') {
-                    this.dispatchPlay(0)
-                }
-            },
-            false
-        )
+        const handler = () => {
+            if (document.visibilityState === 'hidden') {
+                this.dispatchPlay(0)
+            }
+        }
+        document.addEventListener('visibilitychange', handler, false)
+        this.options.destroyStore.add(() => {
+            document.removeEventListener('visibilitychange', handler, false)
+        })
     }
 
     paly(speed: number) {

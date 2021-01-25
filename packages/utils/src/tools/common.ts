@@ -294,3 +294,18 @@ export function logInfo() {
     logBadge({ title: 'version', content: version })
     logBadge({ title: 'more info', content: 'github.com/oct16/timecat' })
 }
+
+export function removeGlobalVariables() {
+    const keys = Object.keys(window)
+    const targetKeys = keys.filter(key => {
+        if (key) {
+            if (key.startsWith('G_RECORD') || key.startsWith('G_REPLAY')) {
+                return true
+            }
+        }
+    }) as (keyof Window)[]
+
+    targetKeys.forEach(key => {
+        delete window[key]
+    })
+}

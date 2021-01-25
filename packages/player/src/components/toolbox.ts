@@ -10,6 +10,7 @@
 import { Component, html, exportReplay, Store, IComponent } from '../utils'
 import { ContainerComponent } from './container'
 import { getRawScriptContent, logAdvice, logError } from '@timecat/utils'
+import { ReplayInternalOptions } from '@timecat/share'
 
 @Component(
     'player-toolbox',
@@ -95,8 +96,9 @@ export class ToolboxComponent implements IComponent {
     exportBtn: HTMLElement
     fullscreenBtn: HTMLElement
     fullscreenTarget: HTMLElement
-
-    constructor(c: ContainerComponent) {
+    options: ReplayInternalOptions
+    constructor(options: ReplayInternalOptions, c: ContainerComponent) {
+        this.options = options
         this.c = c
         this.exportBtn = this.target.querySelector('.player-export') as HTMLButtonElement
         this.exportBtn.addEventListener('click', this.export)
@@ -106,6 +108,12 @@ export class ToolboxComponent implements IComponent {
 
         this.fullscreenTarget.addEventListener('fullscreenchange', () => this.cancelFullScreen())
         this.fullscreenBtn.addEventListener('click', () => this.setFullScreen())
+
+        this.options.destroyStore.add(() => {
+            this.exportBtn.removeEventListener('click', this.export)
+            this.fullscreenTarget.removeEventListener('fullscreenchange', () => this.cancelFullScreen())
+            this.fullscreenBtn.removeEventListener('click', () => this.setFullScreen())
+        })
     }
 
     async export() {

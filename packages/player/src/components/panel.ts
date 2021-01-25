@@ -41,9 +41,9 @@ export class PanelComponent implements IComponent {
     }
 
     initComponent() {
-        new ToolboxComponent(this.c)
+        new ToolboxComponent(this.options, this.c)
         this.keyboard = new KeyboardComponent(this.options, this.c)
-        this.progress = new ProgressComponent(this.c)
+        this.progress = new ProgressComponent(this.options, this.c)
         this.pointer = new PointerComponent(this.c)
         this.broadcaster = new BroadcasterComponent(this.c)
         this.player = new PlayerComponent(this.options, this.c, this.pointer, this.progress, this.broadcaster)

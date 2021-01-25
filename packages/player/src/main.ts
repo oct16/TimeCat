@@ -7,7 +7,7 @@
  *
  */
 
-import { logError, nodeStore, debounce, logInfo, isDev } from '@timecat/utils'
+import { logError, nodeStore, debounce, logInfo, isDev, removeGlobalVariables, delay } from '@timecat/utils'
 import { ContainerComponent } from './components/container'
 import {
     SnapshotRecord,
@@ -60,6 +60,7 @@ export class PlayerModule {
     c: ContainerComponent
     fmp: FMP
     destroyStore = new Set<Function>()
+    options: ReplayInternalOptions
     constructor(options?: ReplayOptions) {
         nodeStore.reset()
         this.init(options)
@@ -75,6 +76,7 @@ export class PlayerModule {
             ...options
         } as ReplayInternalOptions
 
+        this.options = opts
         Store.dispatch({ type: PlayerReducerTypes.OPTIONS, data: { options: opts } })
         this.destroyStore.add(() => Store.unsubscribe())
 
@@ -214,9 +216,19 @@ export class PlayerModule {
 
     private triggerCalcProgress = debounce(() => this.calcProgress(), 500)
 
-    destroy() {
+    async destroy(opts: { removeDOM: boolean } = { removeDOM: true }) {
         this.destroyStore.forEach(un => un())
         observer.destroy()
+        Store.dispatch({
+            type: PlayerReducerTypes.SPEED,
+            data: { speed: 0 }
+        })
+        await delay(0)
+        removeGlobalVariables()
+        if (opts.removeDOM) {
+            const shadowHost = this.c.shadowHost
+            this.c.shadowHost.parentElement?.removeChild(shadowHost)
+        }
     }
 
     on(key: PlayerEventTypes, fn: Function) {
