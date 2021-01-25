@@ -16,7 +16,7 @@ English | [中文](./README.cn.md)
 
 TimeCat is a open source web Page recording tool that generates files are not real video, but can be played like real video, completely restoring the user's actions in the browser.
 
-[🖥 Examples](https://timecatjs.com/examples)
+[🖥 Demo](https://timecatjs.com/demo)
 
 ## Documentation
 

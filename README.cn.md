@@ -16,7 +16,7 @@ A Magical Web Recorder And Player
 
 TimeCat 是一个完全开源的网页录制工具，生成的文件不是真正的视频，但可以像真正的视频一样进行播放，完美的还原用户在浏览器中的操作行为
 
-[🖥 Examples](https://timecatjs.com/examples)
+[🖥 Demo](https://timecatjs.com/demo)
 
 ## 文档
 
@@ -71,12 +71,6 @@ $ npm i timecatjs -D
 
 ![https://github.com/oct16/TimeCat/graphs/contributors](https://opencollective.com/timecat/contributors.svg?width=890&button=false)
 
-## 捐助项目
-
-##### WeChat Pay and Alipay
-<img src="assets/images/donate.png" width="180" />
-
-<br>
 <br>
 <a href="https://opencollective.com/timecat">
 <img width=150 src="https://opencollective.com/static/images/opencollectivelogo-footer-n.svg" />
