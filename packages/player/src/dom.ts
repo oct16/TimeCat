@@ -442,20 +442,20 @@ function renderCanvas(canvasRecordData: CanvasRecordData) {
             ;(ctx as any)[key] = status[key]
         })
     } else {
-        // TODO expect stroke smooth (elapsed time)
         for (const stroke of strokes) {
-            // await delay(0) // have problem here
-            const { name, args } = stroke
-            if (Array.isArray(args)) {
+            const { name, args: strokeArgs } = stroke
+            if (!Array.isArray(strokeArgs)) {
+                ;(ctx[name] as Object) = strokeArgs
+            } else {
+                const args = strokeArgs.slice()
                 if (name === 'drawImage' || name === 'createPattern') {
-                    args[0] = nodeStore.getNode(args[0])
+                    const nodeId = args[0]
+                    args[0] = nodeStore.getNode(nodeId)
                 } else if (name === 'putImageData') {
                     const data = args[0].data
                     args[0] = new ImageData(new Uint8ClampedArray(data), args[1], args[2])
                 }
                 ;(ctx[name] as Function).apply(ctx, args)
-            } else {
-                ;(ctx[name] as Object) = args
             }
         }
     }
