@@ -305,15 +305,14 @@ export class PlayerComponent implements IComponent {
         if (this.frameIndex === 0) {
             this.progress.moveThumb()
             if (!this.isFirstTimePlay) {
-                // Indicates the second times play
                 this.getNextReplayData(0)
                 this.initViewState()
                 this.c.setViewState()
             } else {
                 this.progress.drawHeatPoints()
             }
-            this.isFirstTimePlay = false
         }
+        this.isFirstTimePlay = false
 
         if (this.RAF && this.RAF.requestID) {
             this.RAF.stop()
