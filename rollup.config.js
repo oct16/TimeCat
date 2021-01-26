@@ -132,15 +132,7 @@ function createConfig(format, output, plugins = []) {
             'process.env.NODE_ENV': JSON.stringify(env),
             __VERSION__: masterVersion
         }),
-        {
-            name: 'ReplaceHTMLSpace',
-            transform(code, id) {
-                if (env === 'production' && id.includes('player/src/components/')) {
-                    return { code: code.replace(/(<.*?>)|\s+/g, (m, $1) => ($1 ? $1 : ' ')), map: { mappings: '' } }
-                }
-                return { code, map: { mappings: '' } }
-            }
-        }
+        replaceHTMLSpacePlugin()
     ]
 
     return {
@@ -185,4 +177,18 @@ function createMinifiedConfig(format) {
             })
         ]
     )
+}
+
+function replaceHTMLSpacePlugin() {
+    const list = ['player/src/components/', '/player/src/dom.ts', '/player/src/utils/output.ts']
+
+    return {
+        name: 'ReplaceHTMLSpace',
+        transform(code, id) {
+            if (env === 'production' && list.some(path => id.includes(path))) {
+                return { code: code.replace(/(<.*?>)|\s+/g, (m, $1) => ($1 ? $1 : ' ')), map: { mappings: '' } }
+            }
+            return { code, map: { mappings: '' } }
+        }
+    }
 }
