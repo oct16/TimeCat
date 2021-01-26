@@ -19,6 +19,7 @@ const initState = {
 export type ReplayDataState = typeof initState
 
 export enum ReplayDataReducerTypes {
+    RESET = 'RESET',
     UPDATE_DATA = 'UPDATE_DATA',
     APPEND_RECORDS = 'APPEND_RECORDS'
 }
@@ -52,6 +53,8 @@ export function ReplayDataReducer(
                 ...state,
                 ...data
             }
+        case ReplayDataReducerTypes.RESET:
+            return { ...initState }
         default:
             return state
     }

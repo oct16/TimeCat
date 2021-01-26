@@ -17,6 +17,7 @@ const initState = {
 export type PlayerState = typeof initState
 
 export enum PlayerReducerTypes {
+    RESET = 'RESET',
     SPEED = 'SPEED',
     OPTIONS = 'OPTIONS'
 }
@@ -46,6 +47,8 @@ export function PlayerReducer(
                 ...state,
                 speed: data.speed!
             }
+        case PlayerReducerTypes.RESET:
+            return { ...initState }
         default:
             return state
     }

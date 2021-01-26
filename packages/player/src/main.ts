@@ -93,10 +93,6 @@ export class PlayerModule {
 
         const hasAudio = audio && (audio.src || audio.bufferStrList.length)
 
-        if (packs.length) {
-            this.calcProgress()
-        }
-
         this.c = new ContainerComponent(opts)
         const container = this.c.container
         showStartMask(this.c)
@@ -118,6 +114,10 @@ export class PlayerModule {
                 }
             }
         })
+
+        if (packs.length) {
+            this.calcProgress()
+        }
 
         if (records.length <= 2) {
             // live mode
@@ -219,10 +219,7 @@ export class PlayerModule {
     async destroy(opts: { removeDOM: boolean } = { removeDOM: true }) {
         this.destroyStore.forEach(un => un())
         observer.destroy()
-        Store.dispatch({
-            type: PlayerReducerTypes.SPEED,
-            data: { speed: 0 }
-        })
+        Store.unsubscribe()
         await delay(0)
         removeGlobalVariables()
         if (opts.removeDOM) {

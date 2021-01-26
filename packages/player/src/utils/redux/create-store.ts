@@ -13,7 +13,10 @@ export function createStore(reducer: RootReducer) {
     let state = reducer({} as State)
     const listeners: Array<(state: State) => void> = []
 
-    function unsubscribe() {}
+    function unsubscribe() {
+        listeners.length = 0
+        dispatch({ type: 'RESET', data: {} })
+    }
 
     function subscribe(listener: (state: State) => void): void {
         listeners.push(listener)

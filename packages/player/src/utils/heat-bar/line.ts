@@ -16,6 +16,9 @@ export class NormalLine extends HeatBarBase {
     }
 
     draw() {
+        if (!this.targetWidth) {
+            return
+        }
         const radius = 4
         this.radiusRect(radius, 2 * radius, this.targetWidth - 2 * radius, 8, radius)
     }

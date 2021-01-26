@@ -22,6 +22,7 @@ const initState = {
 export type ProgressState = typeof initState
 
 export enum ProgressReducerTypes {
+    RESET = 'RESET',
     PROGRESS = 'PROGRESS'
 }
 
@@ -42,6 +43,8 @@ export function ProgressReducer(state: ProgressState, action: { type: string; da
                 ...state,
                 ...data
             }
+        case ProgressReducerTypes.RESET:
+            return { ...initState }
         default:
             return state
     }
