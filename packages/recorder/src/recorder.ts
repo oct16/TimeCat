@@ -9,7 +9,7 @@
 
 import { watchers, baseWatchers } from './watchers'
 import { RecordAudio } from './audio'
-import { RecordData, ValueOf, RecordType, TerminateRecord } from '@timecat/share'
+import { RecordData, RecordType, TerminateRecord } from '@timecat/share'
 import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime, stateDebounce } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
@@ -83,7 +83,7 @@ export class RecorderModule extends Pluginable {
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
-    private onDataCallback: Function
+    private onDataCallbackList: ((data: RecordData) => void)[] = []
     private watchers: Array<typeof Watcher>
     private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
@@ -102,8 +102,7 @@ export class RecorderModule extends Pluginable {
 
     private async init() {
         const options = this.options
-        const db = await getDBOperator
-        this.db = db
+        this.db = await getDBOperator
         this.pluginsOnload()
         this.hooks.beforeRun.call(this)
         this.record(options)
@@ -114,7 +113,7 @@ export class RecorderModule extends Pluginable {
     }
 
     public onData(cb: (data: RecordData) => void) {
-        this.onDataCallback = cb
+        this.onDataCallbackList.unshift(cb)
     }
 
     public async destroy() {
@@ -171,7 +170,7 @@ export class RecorderModule extends Pluginable {
 
                 this.hooks.emit.call(data)
 
-                this.onDataCallback && this.onDataCallback(data)
+                this.onDataCallbackList.forEach(cb => cb(data))
 
                 if (write) {
                     this.db.addRecord(data)
@@ -301,7 +300,7 @@ export class RecorderModule extends Pluginable {
                     }
                     if (data.relatedId) {
                         this.db.addRecord(data as TerminateRecord)
-                        this.onDataCallback && this.onDataCallback(data)
+                        this.onDataCallbackList.forEach(cb => cb(data as RecordData))
                     }
                     this.hooks.end.call()
                     this.destroy()
