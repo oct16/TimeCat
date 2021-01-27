@@ -9,7 +9,7 @@
 
 import { PreFetchRecordData, VNode } from '@timecat/share'
 import { logError, createURL, completeCssHref, getTime, logWarn } from '@timecat/utils'
-import { RewriteItem, RewriteResource } from './recorder'
+import { RewriteItem, RewriteItemType, RewriteResource } from './recorder'
 
 // https://github.com/gnuns/allorigins
 // Pull contents from any page and avoid Same-origin policy problems
@@ -27,16 +27,16 @@ export function rewriteNodes(
 
     const { rewriteConfigs, preFetchConfigs } = configs.reduce(
         (collect, config) => {
-            if (config.type === 'preFetch') {
-                collect.preFetchConfigs.push(config as RewriteItem<'preFetch'>)
+            if (config.type === RewriteItemType.preFetch) {
+                collect.preFetchConfigs.push(config as RewriteItem<RewriteItemType.preFetch>)
             } else {
-                collect.rewriteConfigs.push(config as RewriteItem<'rewrite'>)
+                collect.rewriteConfigs.push(config as RewriteItem<RewriteItemType.rewrite>)
             }
             return collect
         },
         { rewriteConfigs: [], preFetchConfigs: [] } as {
-            rewriteConfigs: RewriteItem<'rewrite'>[]
-            preFetchConfigs: RewriteItem<'preFetch'>[]
+            rewriteConfigs: RewriteItem<RewriteItemType.rewrite>[]
+            preFetchConfigs: RewriteItem<RewriteItemType.preFetch>[]
         }
     )
 

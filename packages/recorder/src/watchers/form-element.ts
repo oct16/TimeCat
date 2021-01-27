@@ -14,19 +14,22 @@ import { Watcher } from '../watcher'
 export class FormElementWatcher extends Watcher<FormElementRecord> {
     init() {
         this.listenInputs(this.options)
-
-        // for sys write in input
         this.kidnapInputs(this.options)
     }
 
     listenInputs(options: WatcherArgs<FormElementRecord>) {
         const { context } = options
 
-        const eventTypes = ['input', 'change', 'focus', 'blur']
+        enum eventTypes {
+            'input' = 'input',
+            'change' = 'change',
+            'focus' = 'focus',
+            'blur' = 'blur'
+        }
 
         const eventListenerOptions = { once: false, passive: true, capture: true }
 
-        eventTypes
+        Object.values(eventTypes)
             .map(type => (fn: (e: InputEvent) => void) => {
                 context.document.addEventListener(type, fn, eventListenerOptions)
                 this.uninstall(() => context.document.removeEventListener(type, fn, eventListenerOptions))
@@ -37,8 +40,8 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
             const eventType = e.type
             let data!: FormElementRecord['data']
             switch (eventType) {
-                case 'input':
-                case 'change':
+                case eventTypes.input:
+                case eventTypes.change:
                     const target = (e.target as unknown) as HTMLInputElement
                     const inputType = target.getAttribute('type') || 'text'
 
@@ -73,13 +76,13 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                         patches
                     }
                     break
-                case 'focus':
+                case eventTypes.focus:
                     data = {
                         type: FormElementEvent.FOCUS,
                         id: this.getNodeId(e.target as Node)!
                     }
                     break
-                case 'blur':
+                case eventTypes.blur:
                     data = {
                         type: FormElementEvent.BLUR,
                         id: this.getNodeId(e.target as Node)!
@@ -97,38 +100,31 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         const { context } = options
         const self = this
 
-        const elementList: [HTMLElement, string][] = [
-            [context.HTMLInputElement.prototype, 'value'],
-            [context.HTMLInputElement.prototype, 'checked'],
-            [context.HTMLSelectElement.prototype, 'value'],
-            [context.HTMLTextAreaElement.prototype, 'value'],
-            [context.HTMLOptionElement.prototype, 'selected']
-        ]
-
-        const handles = elementList.map(item => {
-            return () => {
-                const [target, key] = item
-                const original = context.Object.getOwnPropertyDescriptor(target, key)
-                context.Object.defineProperty(target, key, {
-                    set: function (value: string | boolean) {
-                        setTimeout(() => {
-                            handleEvent.call(this, key, value)
-                        })
-                        if (original && original.set) {
-                            original.set.call(this, value)
-                        }
+        new Map<string, HTMLElement>([
+            ['value', context.HTMLInputElement.prototype],
+            ['checked', context.HTMLInputElement.prototype],
+            ['value', context.HTMLSelectElement.prototype],
+            ['value', context.HTMLTextAreaElement.prototype],
+            ['selected', context.HTMLOptionElement.prototype]
+        ]).forEach((target, key) => {
+            const original = context.Object.getOwnPropertyDescriptor(target, key)
+            context.Object.defineProperty(target, key, {
+                set: function (value: string | boolean) {
+                    setTimeout(() => {
+                        handleEvent.call(this, key, value)
+                    })
+                    if (original && original.set) {
+                        original.set.call(this, value)
                     }
-                })
+                }
+            })
 
-                this.uninstall(() => {
-                    if (original) {
-                        context.Object.defineProperty(target, key, original)
-                    }
-                })
-            }
+            this.uninstall(() => {
+                if (original) {
+                    context.Object.defineProperty(target, key, original)
+                }
+            })
         })
-
-        handles.concat([]).forEach(handle => handle())
 
         function handleEvent(this: HTMLElement, key: string, value: string) {
             const data = {

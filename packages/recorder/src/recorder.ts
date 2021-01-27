@@ -20,7 +20,12 @@ import { Watcher } from './watcher'
 export { Watcher, WatcherOptions } from './watcher'
 export { RecordData } from '@timecat/share'
 
-export type RewriteResource = (RewriteItem<'rewrite'> | RewriteItem<'preFetch'>)[]
+export enum RewriteItemType {
+    'rewrite',
+    'preFetch'
+}
+
+export type RewriteResource = (RewriteItem<RewriteItemType.rewrite> | RewriteItem<RewriteItemType.preFetch>)[]
 export interface RecordOptions extends RecordOptionsBase {
     plugins?: RecorderPlugin[]
     rewriteResource?: RewriteResource
@@ -34,16 +39,17 @@ interface RecordOptionsBase {
     emitLocationImmediate?: boolean
     font?: boolean
     visibleChange?: boolean
+    visibleChangeKeepTime?: number
 }
 
-interface RecordInternalOptions extends RecordOptions {
+interface RecordInternalOptions extends Required<RecordOptions> {
     context: Window
 }
 
-export type RewriteItem<Type extends 'rewrite' | 'preFetch'> = {
+export type RewriteItem<Type extends RewriteItemType> = {
     matches: (string | RegExp)[]
     type?: Type
-    rewrite: Type extends 'preFetch' ? PreFetchRewriteConfig : RewriteConfig
+    rewrite: Type extends RewriteItemType.preFetch ? PreFetchRewriteConfig : RewriteConfig
 }
 
 interface RewriteConfig {
@@ -56,19 +62,16 @@ interface PreFetchRewriteConfig extends RewriteConfig {
     matches?: (string | RegExp)[]
     crossUrl?: string
 }
-
+const tempEmptyFn = () => {}
+const tempEmptyPromise = () => Promise.resolve()
 export class Recorder {
-    onData: (cb: (data: RecordData) => void) => void
-    destroy: () => void
-    use: (plugin: RecorderPlugin) => void
-    clearDB: () => Promise<void>
+    onData: RecorderModule['onData'] = tempEmptyFn
+    destroy: RecorderModule['destroy'] = tempEmptyPromise
+    use: RecorderModule['use'] = tempEmptyFn
+    clearDB: RecorderModule['clearDB'] = tempEmptyPromise
     constructor(options?: RecordOptions) {
         const recorder = new RecorderModule(options)
-        const { onData, destroy, use, clearDB } = recorder
-        this.onData = onData.bind(recorder)
-        this.destroy = destroy.bind(recorder)
-        this.use = use.bind(recorder)
-        this.clearDB = clearDB.bind(recorder)
+        Object.keys(this).forEach((key: keyof Recorder) => (this[key] = recorder[key].bind(recorder)))
     }
 }
 
@@ -79,7 +82,8 @@ export class RecorderModule extends Pluginable {
         keep: false,
         emitLocationImmediate: true,
         context: window,
-        visibleChange: false
+        visibleChange: false,
+        visibleChangeKeepTime: 5000
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
@@ -208,7 +212,7 @@ export class RecorderModule extends Pluginable {
         })
 
         if (options.emitLocationImmediate) {
-            const locationInstance = this.watchersInstance.get('LocationWatcher') as InstanceType<
+            const locationInstance = this.watchersInstance.get(LocationWatcher.name) as InstanceType<
                 typeof LocationWatcher
             >
             locationInstance?.emitOne()
@@ -290,8 +294,13 @@ export class RecorderModule extends Pluginable {
             const hidden = 'hidden'
             const visibilityChange = 'visibilitychange'
 
-            const viewChangeHandle = (state: 'show' | 'hide') => {
-                if (state === 'hide') {
+            enum ViewChangeState {
+                'show' = 'show',
+                'hide' = 'hide'
+            }
+
+            const viewChangeHandle = (state: keyof typeof ViewChangeState) => {
+                if (state === ViewChangeState.hide) {
                     const data = {
                         type: RecordType.TERMINATE,
                         data: null,
@@ -309,20 +318,20 @@ export class RecorderModule extends Pluginable {
                 }
             }
 
-            stateDebounce<'show' | 'hide'>(
+            stateDebounce<keyof typeof ViewChangeState>(
                 useState => {
                     const handle = () => {
                         if (document[hidden]) {
-                            useState('hide')
+                            useState(ViewChangeState.hide)
                             return
                         }
-                        useState('show')
+                        useState(ViewChangeState.show)
                     }
 
                     document.addEventListener(visibilityChange, handle, false)
                 },
-                state => (state === 'hide' ? 5000 : 0),
-                'show'
+                state => (state === ViewChangeState.hide ? options.visibleChangeKeepTime : 0),
+                ViewChangeState.show
             )(viewChangeHandle)
         }
     }

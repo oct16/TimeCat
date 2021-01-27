@@ -10,25 +10,37 @@
 import { LocationRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
+enum MethodType {
+    'add' = 'add',
+    'rm' = 'rm'
+}
+
+enum LocationTypes {
+    'replaceState' = 'replaceState',
+    'pushState' = 'pushState',
+    'popstate' = 'popstate',
+    'hashchange' = 'hashchange'
+}
+
 export class LocationWatcher extends Watcher<LocationRecord> {
     init() {
-        this.context.history.pushState = this.kidnapLocation('pushState')
-        this.context.history.replaceState = this.kidnapLocation('replaceState')
+        this.context.history.pushState = this.kidnapLocation(LocationTypes.pushState)
+        this.context.history.replaceState = this.kidnapLocation(LocationTypes.replaceState)
 
-        const types = ['replaceState', 'pushState', 'popstate', 'hashchange']
+        const types = Object.values(LocationTypes)
 
-        types.forEach(type => this.toggleListener('add', type, this.locationHandle))
+        types.forEach(type => this.toggleListener(MethodType.add, type, this.locationHandle))
 
         this.uninstall(() => {
-            types.forEach(type => this.toggleListener('rm', type, this.locationHandle))
+            types.forEach(type => this.toggleListener(MethodType.rm, type, this.locationHandle))
         })
     }
 
-    toggleListener(methodType: 'add' | 'rm', type: string, handle: EventListenerOrEventListenerObject) {
-        this.context[methodType === 'add' ? 'addEventListener' : 'removeEventListener'](type, handle)
+    toggleListener(methodType: keyof typeof MethodType, type: string, handle: EventListenerOrEventListenerObject) {
+        this.context[methodType === MethodType.add ? 'addEventListener' : 'removeEventListener'](type, handle)
     }
 
-    kidnapLocation(type: 'pushState' | 'replaceState') {
+    kidnapLocation(type: LocationTypes.pushState | LocationTypes.replaceState) {
         const ctx = this.context
         const original = ctx.history[type]
 
