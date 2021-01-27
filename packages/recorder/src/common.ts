@@ -11,6 +11,11 @@ import { PreFetchRecordData, VNode } from '@timecat/share'
 import { logError, createURL, completeCssHref, getTime, logWarn } from '@timecat/utils'
 import { RewriteItem, RewriteResource } from './recorder'
 
+// https://github.com/gnuns/allorigins
+// Pull contents from any page and avoid Same-origin policy problems
+
+const defaultCrossUrl = 'https://timecatjs.com/all-origins?url='
+
 export function rewriteNodes(
     vNodes: VNode[],
     configs: RewriteResource,
@@ -134,11 +139,7 @@ export function rewriteNodes(
                 if (replaceOrigin && folderPath) {
                     nextUrl = pathJoin(replaceOrigin, folderPath || '', url.pathname)
                 } else {
-                    if (typeof crossUrl === 'string') {
-                        nextUrl = crossUrl + preUrl
-                    } else {
-                        nextUrl = crossOriginUrl(preUrl)
-                    }
+                    nextUrl = getCrossOriginUrl(preUrl, crossUrl)
                 }
                 return (fn && fn(preUrl, nextUrl)) || nextUrl
             })
@@ -186,6 +187,17 @@ function pathJoin(...urls: string[]) {
     }, '')
 }
 
-function crossOriginUrl(url: string) {
-    return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+function getCrossOriginUrl(preUrl: string, crossUrl?: string) {
+    const encodeUrl = encodeURIComponent(preUrl)
+    let nextUrl: string
+    if (crossUrl && typeof crossUrl === 'string') {
+        if (~crossUrl.indexOf('<$url>')) {
+            nextUrl = crossUrl.replace('<$url>', encodeUrl)
+        } else {
+            nextUrl = crossUrl + encodeUrl
+        }
+    } else {
+        nextUrl = defaultCrossUrl + encodeUrl
+    }
+    return nextUrl
 }
