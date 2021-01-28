@@ -66,7 +66,7 @@ export class Pluginable {
         this.plugins.push(...this.defaultPlugins, ...(plugins || []))
     }
 
-    protected pluginsOnload() {
+    protected loadPlugins() {
         this.plugins.forEach(plugin => {
             plugin.apply.call(plugin, this)
         })

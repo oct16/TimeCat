@@ -7,4 +7,13 @@
  *
  */
 
-export { Watcher, WatcherOptions, Recorder, RecordData, RecorderModule, RecordOptions } from './recorder'
+export {
+    Watcher,
+    WatcherOptions,
+    Recorder,
+    RecordData,
+    RecorderModule,
+    RecordOptions,
+    RewriteResource,
+    RewriteItem
+} from './recorder'

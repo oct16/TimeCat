@@ -20,16 +20,8 @@ import { Watcher } from './watcher'
 export { Watcher, WatcherOptions } from './watcher'
 export { RecordData } from '@timecat/share'
 
-export enum RewriteItemType {
-    'rewrite',
-    'preFetch'
-}
-
-export type RewriteResource = (RewriteItem<RewriteItemType.rewrite> | RewriteItem<RewriteItemType.preFetch>)[]
-export interface RecordOptions extends RecordOptionsBase {
-    plugins?: RecorderPlugin[]
-    rewriteResource?: RewriteResource
-}
+const tempEmptyFn = () => {}
+const tempEmptyPromise = () => Promise.resolve()
 
 type EmitDataFnType = (data: RecordData, n: () => Promise<void>) => Promise<void>
 
@@ -48,12 +40,6 @@ interface RecordInternalOptions extends Required<RecordOptions> {
     context: Window
 }
 
-export type RewriteItem<Type extends RewriteItemType> = {
-    matches: (string | RegExp)[]
-    type?: Type
-    rewrite: Type extends RewriteItemType.preFetch ? PreFetchRewriteConfig : RewriteConfig
-}
-
 interface RewriteConfig {
     replaceOrigin?: string
     folderPath?: string
@@ -64,8 +50,19 @@ interface PreFetchRewriteConfig extends RewriteConfig {
     matches?: (string | RegExp)[]
     crossUrl?: string
 }
-const tempEmptyFn = () => {}
-const tempEmptyPromise = () => Promise.resolve()
+
+export type RewriteResource = RewriteItem[]
+export interface RecordOptions extends RecordOptionsBase {
+    plugins?: RecorderPlugin[]
+    rewriteResource?: RewriteResource
+}
+
+export interface RewriteItem {
+    matches: (string | RegExp)[]
+    type?: string
+    rewrite: PreFetchRewriteConfig & RewriteConfig
+}
+
 export class Recorder {
     onData: RecorderModule['onData'] = tempEmptyFn
     destroy: RecorderModule['destroy'] = tempEmptyPromise
@@ -109,7 +106,7 @@ export class RecorderModule extends Pluginable {
     private async init() {
         const options = this.options
         this.db = await getDBOperator
-        this.pluginsOnload()
+        this.loadPlugins()
         this.hooks.beforeRun.call(this)
         this.record(options)
         this.hooks.run.call(this)
@@ -118,7 +115,7 @@ export class RecorderModule extends Pluginable {
         }
     }
 
-    public onData(fn: (data: RecordData, next?: () => Promise<void>) => Promise<void>) {
+    public onData(fn: (data: RecordData, next: () => Promise<void>) => Promise<void>) {
         this.onDataCallbackList.unshift(fn)
     }
 
@@ -174,9 +171,9 @@ export class RecorderModule extends Pluginable {
                     return
                 }
 
-                this.hooks.emit.call(data)
-
                 this.onDataCompose(data)
+
+                this.hooks.emit.call(data)
 
                 if (write) {
                     this.db.addRecord(data)
