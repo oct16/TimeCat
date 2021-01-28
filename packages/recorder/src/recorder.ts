@@ -31,6 +31,8 @@ export interface RecordOptions extends RecordOptionsBase {
     rewriteResource?: RewriteResource
 }
 
+type EmitDataFnType = (data: RecordData, n: () => Promise<void>) => Promise<void>
+
 interface RecordOptionsBase {
     context?: Window
     audio?: boolean
@@ -87,7 +89,7 @@ export class RecorderModule extends Pluginable {
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
-    private onDataCallbackList: ((data: RecordData) => void)[] = []
+    private onDataCallbackList: EmitDataFnType[] = []
     private watchers: Array<typeof Watcher>
     private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
@@ -116,8 +118,8 @@ export class RecorderModule extends Pluginable {
         }
     }
 
-    public onData(cb: (data: RecordData) => void) {
-        this.onDataCallbackList.unshift(cb)
+    public onData(fn: (data: RecordData, next?: () => Promise<void>) => Promise<void>) {
+        this.onDataCallbackList.unshift(fn)
     }
 
     public async destroy() {
@@ -174,7 +176,7 @@ export class RecorderModule extends Pluginable {
 
                 this.hooks.emit.call(data)
 
-                this.onDataCallbackList.forEach(cb => cb(data))
+                this.onDataCompose(data)
 
                 if (write) {
                     this.db.addRecord(data)
@@ -309,7 +311,7 @@ export class RecorderModule extends Pluginable {
                     }
                     if (data.relatedId) {
                         this.db.addRecord(data as TerminateRecord)
-                        this.onDataCallbackList.forEach(cb => cb(data as RecordData))
+                        this.onDataCompose(data as RecordData)
                     }
                     this.hooks.end.call()
                     this.destroy()
@@ -334,5 +336,18 @@ export class RecorderModule extends Pluginable {
                 ViewChangeState.show
             )(viewChangeHandle)
         }
+    }
+
+    onDataCompose(data: RecordData) {
+        this.onDataCallbackList.reduce(
+            (next: () => Promise<void>, fn: EmitDataFnType) => {
+                return this.createNext(fn, data, next)
+            },
+            () => Promise.resolve()
+        )()
+    }
+
+    createNext(fn: EmitDataFnType, data: RecordData, next: () => Promise<void>) {
+        return async () => await fn(data, next)
     }
 }
