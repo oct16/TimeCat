@@ -10,7 +10,16 @@
 import { watchers, baseWatchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordType, TerminateRecord } from '@timecat/share'
-import { getDBOperator, logError, IndexedDBOperator, nodeStore, getTime, stateDebounce } from '@timecat/utils'
+import {
+    getDBOperator,
+    logError,
+    IndexedDBOperator,
+    nodeStore,
+    getTime,
+    stateDebounce,
+    tempEmptyFn,
+    tempEmptyPromise
+} from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
@@ -19,9 +28,6 @@ import { Watcher } from './watcher'
 
 export { Watcher, WatcherOptions } from './watcher'
 export { RecordData } from '@timecat/share'
-
-const tempEmptyFn = () => {}
-const tempEmptyPromise = () => Promise.resolve()
 
 type EmitDataFnType = (data: RecordData, n: () => Promise<void>) => Promise<void>
 

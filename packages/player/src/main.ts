@@ -7,7 +7,16 @@
  *
  */
 
-import { logError, nodeStore, debounce, logInfo, isDev, removeGlobalVariables, delay } from '@timecat/utils'
+import {
+    logError,
+    nodeStore,
+    debounce,
+    logInfo,
+    isDev,
+    removeGlobalVariables,
+    delay,
+    tempEmptyFn
+} from '@timecat/utils'
 import { ContainerComponent } from './components/container'
 import {
     SnapshotRecord,
@@ -42,17 +51,12 @@ const defaultReplayOptions = {
 }
 
 export class Player {
-    on: (key: PlayerEventTypes, fn: Function) => void
-    destroy: () => void
-    append: (records: RecordData[]) => void
-
+    on: (key: PlayerEventTypes, fn: Function) => void = tempEmptyFn
+    destroy: () => void = tempEmptyFn
+    append: (records: RecordData[]) => void = tempEmptyFn
     constructor(options?: ReplayOptions) {
         const player = new PlayerModule(options)
-        const { on, destroy, append } = player
-
-        this.on = on.bind(player)
-        this.destroy = destroy.bind(player)
-        this.append = append.bind(player)
+        Object.keys(this).forEach((key: keyof Player) => (this[key] = player[key].bind(player)))
     }
 }
 
@@ -232,7 +236,8 @@ export class PlayerModule {
         observer.on(key, fn)
     }
 
-    append(records: RecordData[]) {
+    async append(records: RecordData[]) {
+        await delay(0)
         Store.dispatch({
             type: ReplayDataReducerTypes.APPEND_RECORDS,
             data: { records }

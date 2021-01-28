@@ -309,3 +309,6 @@ export function removeGlobalVariables() {
         delete window[key]
     })
 }
+
+export const tempEmptyFn = () => {}
+export const tempEmptyPromise = () => Promise.resolve()
