@@ -14,6 +14,7 @@ const env = 'development'
 const args = require('minimist')(process.argv.slice(2))
 const target = 'timecat'
 const formats = args.formats || args.f
+const sourceMap = args.sourcemap || args.s
 const resolveRoot = file => path.resolve('.', file)
 const resolvePackage = name => path.resolve(resolveRoot('packages'), target, name)
 
@@ -22,7 +23,16 @@ run()
 async function run() {
     execa(
         'rollup',
-        ['-wc', '--environment', [`NODE_ENV:${env}`, `TARGET:${target}`, `FORMATS:${formats || 'global|esm|cjs'}`]],
+        [
+            '-wc',
+            '--environment',
+            [
+                `NODE_ENV:${env}`,
+                `TARGET:${target}`,
+                `FORMATS:${formats || 'global|esm|cjs'}`,
+                sourceMap ? `SOURCE_MAP:true` : ``
+            ]
+        ],
         {
             stdio: 'inherit'
         }
