@@ -88,7 +88,8 @@ export class RecorderModule extends Pluginable {
         emitLocationImmediate: true,
         context: window,
         visibleChange: false,
-        visibleChangeKeepTime: 5000
+        visibleChangeKeepTime: 5000,
+        rewriteResource: []
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
@@ -172,12 +173,12 @@ export class RecorderModule extends Pluginable {
 
         const onEmit = (options: RecordOptions) => {
             const { write } = options
-            return (data: RecordData) => {
+            return async (data: RecordData) => {
                 if (!data) {
                     return
                 }
 
-                this.onDataCompose(data)
+                await this.onDataCompose(data)
 
                 this.hooks.emit.call(data)
 
@@ -341,8 +342,8 @@ export class RecorderModule extends Pluginable {
         }
     }
 
-    onDataCompose(data: RecordData) {
-        this.onDataCallbackList.reduce(
+    async onDataCompose(data: RecordData) {
+        await this.onDataCallbackList.reduce(
             (next: () => Promise<void>, fn: EmitDataFnType) => {
                 return this.createNext(fn, data, next)
             },
