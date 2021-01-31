@@ -404,7 +404,7 @@ export class PlayerComponent implements IComponent {
             this.recordIndex < this.records.length &&
             (data = this.records[this.recordIndex]).time - this.curViewDiffTime <= this.frames[this.frameIndex]
         ) {
-            this.execFrame.call(this, data)
+            this.execFrame(data)
             this.recordIndex++
         }
 
@@ -452,8 +452,8 @@ export class PlayerComponent implements IComponent {
     }
 
     execFrame(record: RecordData) {
-        const isJumping = this.isJumping
-        updateDom.call(this, record, { isJumping })
+        const { isJumping, speed } = this
+        updateDom.call(this, record, { isJumping, speed })
     }
 
     calcFrames(maxInterval = this.maxFrameInterval) {

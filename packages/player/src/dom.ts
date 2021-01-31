@@ -93,8 +93,12 @@ function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     }
 }
 
-export async function updateDom(this: PlayerComponent, record: RecordData, opts?: { isJumping: boolean }) {
-    const { isJumping } = opts || {}
+export async function updateDom(
+    this: PlayerComponent,
+    record: RecordData,
+    opts?: { speed: number; isJumping: boolean }
+) {
+    const { isJumping, speed } = opts || {}
     const delayTime = isJumping ? 0 : 200
     const { type, data } = record
 
@@ -195,7 +199,9 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
         }
         case RecordType.DOM: {
             // Reduce the delay caused by interactive animation
-            await actionDelay()
+            if (!isJumping && speed === 1) {
+                await actionDelay()
+            }
             const { addedNodes, movedNodes, removedNodes, attrs, texts } = data as DOMRecordData
             removedNodes &&
                 removedNodes.forEach((data: RemoveUpdateData) => {
@@ -282,7 +288,9 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
         }
         case RecordType.FORM_EL: {
             // Reduce the delay caused by interactive animation
-            await actionDelay()
+            if (!isJumping && speed === 1) {
+                await actionDelay()
+            }
             const { id, key, type: formType, value, patches } = data as FormElementRecordData
             const node = nodeStore.getNode(id) as HTMLInputElement | undefined
             const { mode } = Store.getState().player.options
@@ -319,7 +327,9 @@ export async function updateDom(this: PlayerComponent, record: RecordData, opts?
             break
         }
         case RecordType.CANVAS: {
-            await actionDelay()
+            if (!isJumping && speed === 1) {
+                await actionDelay()
+            }
             renderCanvas(data as CanvasRecordData)
             break
         }
