@@ -125,16 +125,14 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         const addedVNodesMap: Map<number, VNode> = new Map()
 
         addNodesSet.forEach(node => {
-            const parentId = this.getNodeId(node.parentNode!)!
-
-            const parentVn = addedVNodesMap.get(parentId)
-
-            const isParentSVG = parentVn && parentVn.extra.isSVG
-
+            const parentId = this.getNodeId(node.parentNode!)
             const vn = addedSiblingMap.get(node)!
 
-            if (isParentSVG && isVNode(vn)) {
-                ;(vn as VNode).extra.isSVG = true
+            if (isVNode(vn)) {
+                const name = (node as HTMLElement).constructor.name
+                if (name.startsWith('SVG')) {
+                    ;(vn as VNode).extra.isSVG = true
+                }
             }
 
             addedNodes.push({
