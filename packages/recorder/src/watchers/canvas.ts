@@ -35,12 +35,12 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
             'shadowOffsetY',
             'strokeStyle',
             'textAlign',
-            'textBaseline',
-            '__attrCachedBy'
-        ]
+            'textBaseline'
+        ] as (keyof CanvasRenderingContext2D)[]
+
         return Object.values(keys).reduce((obj, key) => {
             return { ...obj, [key]: ctx[key as keyof CanvasRenderingContext2D] }
-        }, {} as { [key: string]: any })
+        }, {} as { [key in keyof CanvasRenderingContext2D]: any })
     }
 
     init() {
