@@ -26,7 +26,7 @@ import {
     ReplayInternalOptions,
     HeadRecord
 } from '@timecat/share'
-import { waitStart, removeStartPage, showStartMask } from './dom'
+import { waitStart, removeStartPage, showStartMask } from './utils'
 import { PlayerEventTypes } from './types'
 import {
     FMP,

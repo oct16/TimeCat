@@ -19,9 +19,13 @@ import {
     AudioStrList
 } from '@timecat/share'
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
-import { getDBOperator } from '@timecat/utils'
+import { delay, getDBOperator } from '@timecat/utils'
 import { Store } from './redux'
 import mobile from 'is-mobile'
+import { ContainerComponent } from '../components/container'
+import FIXED_CSS from '../fixed.scss'
+import { html } from '.'
+import { convertVNode } from '@timecat/virtual-dom'
 
 export function download(src: Blob | string, name: string) {
     const tag = document.createElement('a')
@@ -151,4 +155,62 @@ export function isMobile(ua?: string) {
     }
 
     return mobile({ ua })
+}
+
+export function showStartMask(c: ContainerComponent) {
+    const startPage = c.container.querySelector('.player-start-page')! as HTMLElement
+    startPage.setAttribute('style', '')
+}
+
+function showStartBtn(el: HTMLElement) {
+    const startPage = el.querySelector('.player-start-page')! as HTMLElement
+    const btn = startPage.querySelector('.play-btn') as HTMLElement
+    btn.classList.add('show')
+    return btn
+}
+
+export function removeStartPage(el: HTMLElement) {
+    const startPage = el.querySelector('.player-start-page') as HTMLElement
+    startPage?.parentElement?.removeChild(startPage)
+}
+
+export async function waitStart(el: HTMLElement): Promise<void> {
+    const btn = showStartBtn(el)
+    return new Promise(r => {
+        btn.addEventListener('click', async () => {
+            btn.classList.remove('show')
+            await delay(500)
+            r()
+        })
+    })
+}
+
+export function createIframeDOM(contentDocument: Document, snapshotData: SnapshotRecord['data']) {
+    contentDocument.open()
+    const doctype = snapshotData.doctype
+    const doc = `<!DOCTYPE ${doctype.name} ${doctype.publicId ? 'PUBLIC ' + '"' + doctype.publicId + '"' : ''} ${
+        doctype.systemId ? '"' + doctype.systemId + '"' : ''
+    }><html><head></head><body></body></html>`
+    contentDocument.write(doc)
+}
+
+export function injectIframeContent(contentDocument: Document, snapshotData: SnapshotRecord['data']) {
+    const content = convertVNode(snapshotData.vNode)
+    if (content) {
+        const head = content.querySelector('head')
+        if (head) {
+            const style = parseHtmlStr(
+                html`<div>
+                    <style>
+                        ${FIXED_CSS}
+                    </style>
+                </div>`
+            )[0].firstElementChild!
+            head.appendChild(style)
+        }
+        const documentElement = contentDocument.documentElement
+        content.scrollLeft = snapshotData.scrollLeft
+        content.scrollTop = snapshotData.scrollTop
+        contentDocument.replaceChild(content, documentElement)
+    }
 }
