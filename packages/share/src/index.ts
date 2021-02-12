@@ -267,6 +267,7 @@ export interface Constructable<T> {
 }
 
 export interface ReplayOptions {
+    exportName?: string
     mode?: 'live' | 'default'
     receiver?: (sender: (data: RecordData) => void) => void
     autoplay?: boolean

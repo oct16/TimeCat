@@ -16,6 +16,7 @@ import { recoverNative } from './polyfill/recover-native'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = Partial<{
+    exportName: string
     scripts: ScriptItem[]
     autoplay: boolean
     audioExternal: boolean
@@ -34,10 +35,15 @@ const downloadAudioConfig = {
 
 export async function exportReplay(exportOptions: ExportOptions) {
     recoveryMethods()
-    downloadFiles(await createReplayHTML(exportOptions))
+    const html = await createReplayDocument(exportOptions)
+    const htmlStr = html.documentElement.outerHTML
+    const exportName = exportOptions.exportName
+    const fileName = `${exportName || EXPORT_NAME_LABEL}-${getRandomCode()}`
+    downloadHTML(fileName, htmlStr)
+    downloadAudios()
 }
 
-export async function createReplayHTML(exportOptions: ExportOptions) {
+export async function createReplayDocument(exportOptions: ExportOptions): Promise<Document> {
     // await addNoneFrame()
     const parser = new DOMParser()
     const html = parser.parseFromString(emptyTemplate, 'text/html')
@@ -57,14 +63,9 @@ function recoveryMethods() {
     methods.forEach(recoverNative.recoverMethod.bind(recoverNative))
 }
 
-function downloadHTML(content: string) {
+function downloadHTML(name: string, content: string) {
     const blob = new Blob([content], { type: 'text/html' })
-    download(blob, `${EXPORT_NAME_LABEL}-${getRandomCode()}.html`)
-}
-
-function downloadFiles(html: Document) {
-    downloadHTML(html.documentElement.outerHTML)
-    downloadAudios()
+    download(blob, `${name}.html`)
 }
 
 function downloadAudios() {

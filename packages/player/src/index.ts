@@ -8,4 +8,4 @@
  */
 
 export { Player, PlayerModule } from './main'
-export { exportReplay, createReplayHTML } from './utils'
+export { exportReplay, createReplayDocument } from './utils'
