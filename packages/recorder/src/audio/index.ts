@@ -17,7 +17,7 @@ export class RecordAudio extends Watcher<AudioRecord> {
         this.init()
     }
 
-    init() {
+    protected init() {
         const recorder = new AudioRecorder({
             sampleBits: 8,
             sampleRate: 8000,

@@ -23,7 +23,7 @@ enum LocationTypes {
 }
 
 export class LocationWatcher extends Watcher<LocationRecord> {
-    init() {
+    protected init() {
         this.context.history.pushState = this.kidnapLocation(LocationTypes.pushState)
         this.context.history.replaceState = this.kidnapLocation(LocationTypes.replaceState)
 
@@ -36,11 +36,15 @@ export class LocationWatcher extends Watcher<LocationRecord> {
         })
     }
 
-    toggleListener(methodType: keyof typeof MethodType, type: string, handle: EventListenerOrEventListenerObject) {
+    private toggleListener(
+        methodType: keyof typeof MethodType,
+        type: string,
+        handle: EventListenerOrEventListenerObject
+    ) {
         this.context[methodType === MethodType.add ? 'addEventListener' : 'removeEventListener'](type, handle)
     }
 
-    kidnapLocation(type: LocationTypes.pushState | LocationTypes.replaceState) {
+    private kidnapLocation(type: LocationTypes.pushState | LocationTypes.replaceState) {
         const ctx = this.context
         const original = ctx.history[type]
 
@@ -53,7 +57,7 @@ export class LocationWatcher extends Watcher<LocationRecord> {
         }
     }
 
-    locationHandle = (e: Event) => {
+    private locationHandle = (e: Event) => {
         const contextNodeId = this.getContextNodeId(e)
         const [, , path] = e.arguments || [, , this.context?.location?.pathname]
         const [base] = this.context.document.body.getElementsByTagName('base')
@@ -68,9 +72,9 @@ export class LocationWatcher extends Watcher<LocationRecord> {
         })
     }
 
-    emitOne = () => this.locationHandle(({ target: window } as unknown) as Event)
+    public emitOne = () => this.locationHandle(({ target: window } as unknown) as Event)
 
-    getContextNodeId(e: Event) {
+    private getContextNodeId(e: Event) {
         return this.getNodeId((e.target as Window).document.documentElement)!
     }
 }

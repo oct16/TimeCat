@@ -18,13 +18,13 @@ import { FontRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class FontWatcher extends Watcher<FontRecord> {
-    init() {
+    protected init() {
         if (this.recordOptions.font) {
             this.interceptAddFont()
         }
     }
 
-    interceptAddFont() {
+    private interceptAddFont() {
         const original = window.FontFace
         const self = this
         function FontFace(family: string, source: string | ArrayBuffer) {

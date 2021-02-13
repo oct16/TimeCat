@@ -11,19 +11,19 @@ import { ScrollRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class ScrollWatcher extends Watcher<ScrollRecord> {
-    getCompatibleTarget(target: Document) {
+    private getCompatibleTarget(target: Document) {
         return (target.scrollingElement as HTMLElement) || target.documentElement
     }
 
-    scrollTop(target: HTMLElement) {
+    private scrollTop(target: HTMLElement) {
         return target.scrollTop
     }
 
-    scrollLeft(target: HTMLElement) {
+    private scrollLeft(target: HTMLElement) {
         return target.scrollLeft
     }
 
-    init() {
+    protected init() {
         const { scrollingElement } = this.context.document
         this.emitData(...this.wrapData(scrollingElement || document, true))
         this.registerEvent({
@@ -37,7 +37,7 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
         })
     }
 
-    wrapData(target: Element | Document, isAuto = false): [RecordType.SCROLL, ScrollRecord['data']] {
+    private wrapData(target: Element | Document, isAuto = false): [RecordType.SCROLL, ScrollRecord['data']] {
         const element =
             target instanceof this.context.HTMLElement ? target : this.getCompatibleTarget(target as Document)
 
@@ -54,7 +54,7 @@ export class ScrollWatcher extends Watcher<ScrollRecord> {
         return [RecordType.SCROLL, data]
     }
 
-    handleFn(e: Event) {
+    private handleFn(e: Event) {
         const { type, target } = e
         if (type === 'scroll') {
             this.emitData(...this.wrapData(target as Element | Document))

@@ -15,13 +15,13 @@ export class MouseWatcher extends Watcher<MouseRecord> {
     scrolling: boolean
     latestMove: { x: number; y: number; id?: number } | null
 
-    init() {
+    protected init() {
         this.mouseMove()
         this.mouseClick()
         this.detectScrolling()
     }
 
-    detectScrolling() {
+    private detectScrolling() {
         let timer: number
         const evt = () => {
             this.scrolling = true
@@ -55,7 +55,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
         })
     }
 
-    mouseMove() {
+    private mouseMove() {
         const evt = (e: MouseEvent) => {
             const offsetPosition = this.getOffsetPosition(e, this.context)
             if (this.scrolling) {
@@ -78,7 +78,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
         })
     }
 
-    mouseClick() {
+    private mouseClick() {
         const evt = (e: MouseEvent) => {
             const offsetPosition = this.getOffsetPosition(e, this.context)
             if (offsetPosition) {
@@ -97,7 +97,7 @@ export class MouseWatcher extends Watcher<MouseRecord> {
         this.context.document.addEventListener(name, listenerHandle)
     }
 
-    getOffsetPosition(event: MouseEvent, context: Window) {
+    private getOffsetPosition(event: MouseEvent, context: Window) {
         const { mode } = context.G_RECORD_OPTIONS
 
         const { view, target, x, y, offsetX, offsetY } = event

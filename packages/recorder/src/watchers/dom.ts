@@ -26,7 +26,7 @@ import { CanvasWatcher } from './canvas'
 import { rewriteNodes } from '../common'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
-    init() {
+    protected init() {
         const Watcher = new MutationObserver(callback => this.mutationCallback(callback))
         Watcher.observe(this.context.document.documentElement, {
             attributeOldValue: true,
@@ -39,7 +39,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         this.uninstall(() => Watcher.disconnect())
     }
 
-    mutationCallback(records: MutationRecord[]) {
+    private mutationCallback(records: MutationRecord[]) {
         const addNodesSet: Set<Node> = new Set()
         const removeNodesMap: Map<Node, Node> = new Map()
         const moveNodesSet: Set<Node> = new Set()
@@ -231,7 +231,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         }
     }
 
-    waitAndRecordIFrame(iframe: HTMLIFrameElement) {
+    private waitAndRecordIFrame(iframe: HTMLIFrameElement) {
         const contentWindow = iframe.contentWindow
         ;(iframe as any)?.frameRecorder?.destroy()
         const onLoadHandle = () => {
@@ -241,14 +241,14 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         iframe.addEventListener('load', onLoadHandle)
     }
 
-    findElementsByTag(name: string, updateNodeData: UpdateNodeData[]) {
+    private findElementsByTag(name: string, updateNodeData: UpdateNodeData[]) {
         const elements = updateNodeData.filter(data => {
             return (data.node as VNode).tag === name
         })
         return elements as UpdateNodeData<VNode>[]
     }
 
-    watchCanvas(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+    private watchCanvas(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
         const canvasNodes = this.findElementsByTag('canvas', addedNodes)
         if (canvasNodes.length) {
             const elements = canvasNodes
@@ -260,7 +260,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         }
     }
 
-    watchIFrames(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+    private watchIFrames(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
         const iframeNodes = this.findElementsByTag('iframe', addedNodes)
         if (iframeNodes.length) {
             iframeNodes
@@ -271,7 +271,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         }
     }
 
-    rewriteAddedSource(addedNodes: UpdateNodeData<number | VSNode | VNode>[], time: number) {
+    private rewriteAddedSource(addedNodes: UpdateNodeData<number | VSNode | VNode>[], time: number) {
         const { G_RECORD_OPTIONS: options } = window
         const configs = options?.rewriteResource || []
         if (!configs?.length) {

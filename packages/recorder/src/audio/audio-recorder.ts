@@ -25,19 +25,19 @@ export class AudioRecorder {
     private processNode: ScriptProcessorNode
     private mediaNode: MediaStreamAudioSourceNode
 
-    generatedBlobBlobUrl: string
+    private generatedBlobBlobUrl: string
 
-    onProgress: ((audioBase64Data: string[]) => void) | null
+    public onProgress: ((audioBase64Data: string[]) => void) | null
 
     constructor(opts: Partial<AudioOptionsData> = AudioRecorder.defaultRecordOptions) {
         this.setOptions(opts)
     }
 
-    getOptions(): AudioOptionsData {
+    public getOptions(): AudioOptionsData {
         return this.opts
     }
 
-    setOptions(opts: Partial<AudioOptionsData> = AudioRecorder.defaultRecordOptions) {
+    private setOptions(opts: Partial<AudioOptionsData> = AudioRecorder.defaultRecordOptions) {
         this.opts = { ...this.opts, ...opts }
     }
 

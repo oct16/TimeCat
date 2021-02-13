@@ -14,21 +14,21 @@ import { nodeStore, isVNode, getTime } from '@timecat/utils'
 import { rewriteNodes } from './common'
 
 export class Snapshot extends Watcher<SnapshotRecord> {
-    init() {
+    protected init() {
         const snapshotData = this.DOMSnapshotData(this.options.context || window)
         const time = getTime()
         this.checkNodesData(snapshotData, time)
         this.emitData(RecordType.SNAPSHOT, snapshotData, time)
     }
 
-    DOMSnapshotData(context: Window): SnapshotRecord['data'] {
+    private DOMSnapshotData(context: Window): SnapshotRecord['data'] {
         return {
             vNode: createElement(context.document.documentElement) as VNode,
             ...this.getInitInfo(context)
         }
     }
 
-    getInitInfo(context: Window): InfoData {
+    private getInitInfo(context: Window): InfoData {
         const { name, publicId, systemId } = context.document.doctype || {}
         const doctype = () => ({ name, publicId, systemId } as DocumentType)
         const href = () => context.location.href
@@ -54,7 +54,7 @@ export class Snapshot extends Watcher<SnapshotRecord> {
         }
     }
 
-    checkNodesData({ vNode }: { vNode: VNode }, time: number) {
+    private checkNodesData({ vNode }: { vNode: VNode }, time: number) {
         const { G_RECORD_OPTIONS: options } = window
         const configs = options?.rewriteResource || []
         if (!configs?.length) {

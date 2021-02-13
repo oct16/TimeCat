@@ -11,7 +11,7 @@ import { TerminateRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class TerminateWatcher extends Watcher<TerminateRecord> {
-    init() {
+    protected init() {
         this.context.addEventListener('beforeunload', this.handleFn)
 
         this.uninstall(() => {
@@ -19,13 +19,13 @@ export class TerminateWatcher extends Watcher<TerminateRecord> {
         })
     }
 
-    handleFn() {
+    private handleFn() {
         // do some sync job
         // navigator.sendBeacon(url, data)
         // this.emitData(this.wrapData())
     }
 
-    wrapData() {
+    private wrapData() {
         return [RecordType.TERMINATE, null]
     }
 }

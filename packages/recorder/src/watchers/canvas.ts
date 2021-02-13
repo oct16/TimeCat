@@ -43,12 +43,12 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
         }, {} as { [key in keyof CanvasRenderingContext2D]: any })
     }
 
-    init() {
+    protected init() {
         const canvasElements = document.getElementsByTagName('canvas')
         this.watchCanvas(Array.from(canvasElements))
     }
 
-    watchCanvas(canvasList: Array<HTMLCanvasElement>) {
+    public watchCanvas(canvasList: Array<HTMLCanvasElement>) {
         const self = this
 
         const ctxProto = CanvasRenderingContext2D.prototype
@@ -126,14 +126,14 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
             })
     }
 
-    aggregateDataEmitter = this.aggregateManager((id: number, strokes: { name: Prop; args: any[] }[]) => {
+    private aggregateDataEmitter = this.aggregateManager((id: number, strokes: { name: Prop; args: any[] }[]) => {
         this.emitData(RecordType.CANVAS, {
             id,
             strokes
         })
     }, 30)
 
-    aggregateManager(func: Function, wait: number): any {
+    private aggregateManager(func: Function, wait: number): any {
         const tasks = Object.create(null) as { [key: number]: { name: Prop; args: any[] }[] }
         const timeouts = Object.create(null) as { [key: number]: number }
 

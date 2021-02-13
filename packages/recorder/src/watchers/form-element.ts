@@ -12,12 +12,12 @@ import { WatcherArgs, FormElementEvent, RecordType, FormElementRecord } from '@t
 import { Watcher } from '../watcher'
 
 export class FormElementWatcher extends Watcher<FormElementRecord> {
-    init() {
+    protected init() {
         this.listenInputs(this.options)
         this.kidnapInputs(this.options)
     }
 
-    listenInputs(options: WatcherArgs<FormElementRecord>) {
+    private listenInputs(options: WatcherArgs<FormElementRecord>) {
         const { context } = options
 
         enum eventTypes {
@@ -96,7 +96,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         }
     }
 
-    kidnapInputs(options: WatcherArgs<FormElementRecord>) {
+    private kidnapInputs(options: WatcherArgs<FormElementRecord>) {
         const { context } = options
         const self = this
 

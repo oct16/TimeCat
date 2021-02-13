@@ -11,15 +11,15 @@ import { WindowRecord, RecordType } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class WindowWatcher extends Watcher<WindowRecord> {
-    width() {
+    private width() {
         return this.context.innerWidth
     }
 
-    height() {
+    private height() {
         return this.context.innerHeight
     }
 
-    init() {
+    protected init() {
         this.emitData(...this.wrapData(this.context.document))
         this.registerEvent({
             context: this.context,
@@ -32,14 +32,14 @@ export class WindowWatcher extends Watcher<WindowRecord> {
         })
     }
 
-    handleFn(e: Event) {
+    private handleFn(e: Event) {
         const { type, target } = e
         if (type === 'resize') {
             this.emitData(...this.wrapData(target as Element | Document))
         }
     }
 
-    wrapData(target: Element | Document): [RecordType.WINDOW, WindowRecord['data']] {
+    private wrapData(target: Element | Document): [RecordType.WINDOW, WindowRecord['data']] {
         return [
             RecordType.WINDOW,
             {

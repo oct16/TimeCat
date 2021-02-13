@@ -31,7 +31,7 @@ export class Watcher<T extends RecordData> {
         this.init(options)
     }
 
-    init(options: WatcherOptions<T>): void {}
+    protected init(options: WatcherOptions<T>): void {}
 
     getNode = (id: number): Node => nodeStore.getNode.call(nodeStore, id)
     getNodeId = (n: Node): number => nodeStore.getNodeId.call(nodeStore, n)

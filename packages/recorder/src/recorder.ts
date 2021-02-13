@@ -342,7 +342,7 @@ export class RecorderModule extends Pluginable {
         }
     }
 
-    async onDataCompose(data: RecordData) {
+    private async onDataCompose(data: RecordData) {
         await this.onDataCallbackList.reduce(
             (next: () => Promise<void>, fn: EmitDataFnType) => {
                 return this.createNext(fn, data, next)
@@ -351,7 +351,7 @@ export class RecorderModule extends Pluginable {
         )()
     }
 
-    createNext(fn: EmitDataFnType, data: RecordData, next: () => Promise<void>) {
+    private createNext(fn: EmitDataFnType, data: RecordData, next: () => Promise<void>) {
         return async () => await fn(data, next)
     }
 }

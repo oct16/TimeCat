@@ -20,8 +20,8 @@ type IHOOK = Record<'beforeRun' | 'run' | 'emit' | 'end', SyncHook<any, any, any
 
 export class Pluginable {
     protected hooks: IHOOK
-    defaultPlugins: RecorderPlugin[] = [] // todo
-    pluginWatchers: typeof Watcher[] = []
+    private defaultPlugins: RecorderPlugin[] = [] // todo
+    public pluginWatchers: typeof Watcher[] = []
 
     constructor(options?: RecordOptions) {
         this.initPlugin(options)
