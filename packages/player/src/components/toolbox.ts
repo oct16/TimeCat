@@ -116,7 +116,7 @@ export class ToolboxComponent implements IComponent {
         })
     }
 
-    async export() {
+    public async export() {
         const SDKScript = document.querySelector('#timecat') as HTMLScriptElement
         const initScript = document.querySelector('#timecat-init') as HTMLScriptElement
         const scriptList = []
@@ -176,7 +176,7 @@ export class ToolboxComponent implements IComponent {
         })
     }
 
-    setFullScreen() {
+    private setFullScreen() {
         this.c.resize({ maxScale: 100 })
         this.fullscreenTarget.requestFullscreen().catch(msg => {
             logError(msg)
@@ -184,7 +184,7 @@ export class ToolboxComponent implements IComponent {
         })
     }
 
-    cancelFullScreen() {
+    private cancelFullScreen() {
         if (document.fullscreen) {
             return
         }

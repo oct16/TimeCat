@@ -17,7 +17,7 @@ export class AnimationFrame {
         this.animate = animate
     }
 
-    start() {
+    public start() {
         let then = performance.now()
         const interval = 1000 / this.fps
         const tolerance = 0.1
@@ -34,7 +34,7 @@ export class AnimationFrame {
         this.requestID = requestAnimationFrame(animateLoop)
     }
 
-    stop() {
+    public stop() {
         cancelAnimationFrame(this.requestID)
     }
 }

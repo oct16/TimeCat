@@ -37,24 +37,24 @@ export class PointerComponent implements IComponent {
         this.initPointer()
     }
 
-    initPointer() {
+    private initPointer() {
         this.pointer = this.c.container.querySelector('.player-pointer') as HTMLElement
         this.move(0, 0)
     }
 
-    showPointer(show = true) {
+    public showPointer(show = true) {
         this.show = show
         ;(this.pointer.firstElementChild as HTMLElement).style.display = show ? 'inherit' : 'none'
     }
 
-    move(x: number, y: number) {
+    public move(x: number, y: number) {
         this.x = x
         this.y = y
         this.pointer.style.left = this.x + 'px'
         this.pointer.style.top = this.y + 'px'
     }
 
-    async click(x: number, y: number) {
+    public async click(x: number, y: number) {
         this.move(x, y)
         if (this.pointer.hasAttribute('active')) {
             return

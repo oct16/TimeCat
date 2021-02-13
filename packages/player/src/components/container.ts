@@ -32,7 +32,7 @@ export class ContainerComponent {
         this.init()
     }
 
-    init() {
+    private init() {
         const target = this.options.target
         const targetElement = typeof target === 'string' ? document.querySelector(target) : target
         this.target = targetElement as HTMLElement
@@ -43,12 +43,12 @@ export class ContainerComponent {
         this.initPanel()
     }
 
-    initPanel() {
+    private initPanel() {
         this.panel = new PanelComponent(this)
         new PageStartComponent()
     }
 
-    initSandbox() {
+    private initSandbox() {
         this.sandBox = this.container.querySelector('.player-sandbox') as HTMLIFrameElement
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.setSmoothScroll(this.sandBox.contentWindow!)
@@ -57,20 +57,20 @@ export class ContainerComponent {
         this.setViewState()
     }
 
-    getSnapshotRecord() {
+    private getSnapshotRecord() {
         return Store.getState().replayData.currentData.snapshot.data as {
             vNode: VNode
         } & InfoData
     }
 
     // use scroll polyfill if browser (e.g. ios safari) not support
-    setSmoothScroll(context: Window) {
+    private setSmoothScroll(context: Window) {
         smoothScroll.polyfill()
         context.HTMLElement.prototype.scroll = window.scroll
         context.HTMLElement.prototype.scrollTo = window.scrollTo
     }
 
-    setViewState() {
+    public setViewState() {
         nodeStore.reset()
         const recordData = this.getSnapshotRecord()
         const { pathname, hash, href } = createURL(recordData.href) as URL
@@ -80,7 +80,7 @@ export class ContainerComponent {
         injectIframeContent(this.sandBoxDoc, recordData)
     }
 
-    initTemplate() {
+    private initTemplate() {
         const targetElement: HTMLElement =
             this.target instanceof Window ? (this.target as Window).document.body : (this.target as HTMLElement)
 
@@ -93,7 +93,7 @@ export class ContainerComponent {
         this.shadowHost = shadowHost
     }
 
-    createContainer(className: string, html: string) {
+    private createContainer(className: string, html: string) {
         const parser = new DOMParser()
         const el = parser.parseFromString(html, 'text/html').body.firstChild as HTMLElement
         el.className = className
@@ -103,7 +103,7 @@ export class ContainerComponent {
         return (this.container = el)
     }
 
-    makeItResponsive() {
+    private makeItResponsive() {
         const self = this
         const debounceResizeFn = debounce(resizeHandle, 500)
 
@@ -201,7 +201,7 @@ export class ContainerComponent {
         }
     }
 
-    createStyle(id: string, s: string) {
+    private createStyle(id: string, s: string) {
         const style = document.createElement('style')
         style.id = id
         style.innerHTML = s

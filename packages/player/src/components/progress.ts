@@ -71,7 +71,7 @@ export class ProgressComponent implements IComponent {
         })
     }
 
-    findProgressByPosition = (() => {
+    private findProgressByPosition = (() => {
         const cacheMap = new Map() as Map<number, { index: number; percent: number; time: number }>
         return function (percent: number) {
             const result = cacheMap.get(percent)
@@ -114,7 +114,7 @@ export class ProgressComponent implements IComponent {
         }
     })()
 
-    listenElementOnHover = (target: HTMLElement) =>
+    private listenElementOnHover = (target: HTMLElement) =>
         stateDebounce<'in' | 'out'>(
             setState => {
                 const stateIn = () => setState('in')
@@ -130,7 +130,7 @@ export class ProgressComponent implements IComponent {
             'out'
         )
 
-    updateTimer(frameIndex: number, frameInterval: number, curViewDiffTime: number) {
+    public updateTimer(frameIndex: number, frameInterval: number, curViewDiffTime: number) {
         const c = this.c.options
         const { timeMode } = c
         const seconds = (frameIndex + 1) * frameInterval
@@ -148,12 +148,12 @@ export class ProgressComponent implements IComponent {
         }
     }
 
-    moveThumb(percent = 0) {
+    public moveThumb(percent = 0) {
         const left = percent * this.slider.offsetWidth
         this.currentProgress.style.width = left + 'px'
     }
 
-    drawHeatPoints(points?: { step: number; snapshot: boolean }[]) {
+    public drawHeatPoints(points?: { step: number; snapshot: boolean }[]) {
         if (points) {
             if (isPointsEqual(this.heatPoints, points)) {
                 return
@@ -185,7 +185,7 @@ export class ProgressComponent implements IComponent {
         }
     }
 
-    setProgressPosition(percent: number) {
+    public setProgressPosition(percent: number) {
         this.currentProgress.style.width = this.slider.offsetWidth * percent + 'px'
     }
 }

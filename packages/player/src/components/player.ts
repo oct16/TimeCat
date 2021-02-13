@@ -94,7 +94,7 @@ export class PlayerComponent implements IComponent {
     @ConnectProps(state => ({
         speed: state.player.speed
     }))
-    watchPlayerSpeed(state?: { speed: number }) {
+    private watchPlayerSpeed(state?: { speed: number }) {
         if (state) {
             const speed = state.speed
             const curSpeed = this.speed
@@ -116,18 +116,18 @@ export class PlayerComponent implements IComponent {
     @ConnectProps(state => ({
         endTime: state.progress.endTime
     }))
-    watchProgress() {
+    private watchProgress() {
         this.recalculateProgress()
         this.viewsLength = Store.getState().replayData.packs.length
     }
 
-    watcherProgressJump() {
+    private watcherProgressJump() {
         observer.on(PlayerEventTypes.JUMP, async (state: { index: number; time: number; percent?: number }) =>
             this.jump(state, true)
         )
     }
 
-    async init() {
+    private async init() {
         this.audioNode = new Audio()
         this.calcFrames()
         this.viewsLength = Store.getState().replayData.packs.length
@@ -155,7 +155,7 @@ export class PlayerComponent implements IComponent {
         })
     }
 
-    initAudio() {
+    private initAudio() {
         if (!this.audioData) {
             return
         }
@@ -180,7 +180,7 @@ export class PlayerComponent implements IComponent {
         }
     }
 
-    streamHandle(this: PlayerComponent, e: CustomEvent) {
+    private streamHandle(this: PlayerComponent, e: CustomEvent) {
         const record = e.detail as RecordData
         if (isSnapshot(record)) {
             Store.getState().replayData.currentData.snapshot = record as SnapshotRecord
@@ -190,7 +190,7 @@ export class PlayerComponent implements IComponent {
         this.execFrame(record as RecordData)
     }
 
-    initViewState() {
+    private initViewState() {
         const { currentData } = Store.getState().replayData
         const { records, audio, head } = currentData
         this.records = this.orderRecords(records)
@@ -212,7 +212,7 @@ export class PlayerComponent implements IComponent {
         this.viewIndex = 0
     }
 
-    async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
+    private async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
         this.isJumping = true
         let loading: HTMLElement | undefined = undefined
         const { speed } = Store.getState().player
@@ -274,7 +274,7 @@ export class PlayerComponent implements IComponent {
         this.isJumping = false
     }
 
-    getNextReplayData(index: number): ReplayData | null {
+    private getNextReplayData(index: number): ReplayData | null {
         const { packs } = Store.getState().replayData
 
         const nextPack = packs[index]
@@ -286,7 +286,7 @@ export class PlayerComponent implements IComponent {
         return null
     }
 
-    loopFramesByTime(currTime: number, isJumping = false) {
+    private loopFramesByTime(currTime: number, isJumping = false) {
         let nextTime = this.frames[this.frameIndex]
 
         while (nextTime && currTime >= nextTime) {
@@ -300,7 +300,7 @@ export class PlayerComponent implements IComponent {
         return nextTime
     }
 
-    play() {
+    private play() {
         this.playAudio()
         if (this.frameIndex === 0) {
             this.progress.moveThumb()
@@ -362,7 +362,7 @@ export class PlayerComponent implements IComponent {
         }
     }
 
-    playAudio() {
+    private playAudio() {
         if (!this.audioData) {
             return
         }
@@ -386,17 +386,17 @@ export class PlayerComponent implements IComponent {
         }
     }
 
-    syncAudioCurrentTime(elapsedTime: number = this.elapsedTime, offset: number = this.audioOffset / 1000) {
+    private syncAudioCurrentTime(elapsedTime: number = this.elapsedTime, offset: number = this.audioOffset / 1000) {
         this.audioNode.currentTime = elapsedTime + offset
     }
 
-    pauseAudio() {
+    private pauseAudio() {
         if (this.audioNode) {
             this.audioNode.pause()
         }
     }
 
-    renderEachFrame() {
+    private renderEachFrame() {
         this.progress.updateTimer(this.frameIndex, this.frameInterval, this.curViewDiffTime)
 
         let data: RecordData
@@ -425,7 +425,7 @@ export class PlayerComponent implements IComponent {
         }
     }
 
-    pause(emit = true) {
+    private pause(emit = true) {
         if (this.RAF) {
             this.RAF.stop()
         }
@@ -441,7 +441,7 @@ export class PlayerComponent implements IComponent {
         }
     }
 
-    stop() {
+    private stop() {
         this.speed = 0
         this.recordIndex = 0
         this.frameIndex = 0
@@ -451,12 +451,12 @@ export class PlayerComponent implements IComponent {
         observer.emit(PlayerEventTypes.STOP)
     }
 
-    execFrame(record: RecordData) {
+    private execFrame(record: RecordData) {
         const { isJumping, speed } = this
         updateDom.call(this, record, { isJumping, speed })
     }
 
-    calcFrames(maxInterval = this.maxFrameInterval) {
+    private calcFrames(maxInterval = this.maxFrameInterval) {
         if (this.options.mode === 'live') {
             return []
         }
@@ -479,7 +479,7 @@ export class PlayerComponent implements IComponent {
         this.frames = frames
     }
 
-    calcHeatPointsData() {
+    private calcHeatPointsData() {
         const frames = this.frames
         if (!frames.length || !this.options.heatPoints) {
             return []
@@ -523,7 +523,7 @@ export class PlayerComponent implements IComponent {
     }
 
     // Lift Patch Record
-    orderRecords(records: RecordData[]) {
+    private orderRecords(records: RecordData[]) {
         if (!records.length) {
             return []
         }
@@ -535,7 +535,7 @@ export class PlayerComponent implements IComponent {
         return records
     }
 
-    recalculateProgress() {
+    private recalculateProgress() {
         this.calcFrames()
         this.progress.drawHeatPoints(this.calcHeatPointsData())
     }

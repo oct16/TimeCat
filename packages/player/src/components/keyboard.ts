@@ -34,14 +34,14 @@ export class KeyboardComponent implements IComponent {
     @ConnectProps(state => ({
         speed: state.player.speed
     }))
-    watchPlayerSpeed(state?: { speed: number }) {
+    private watchPlayerSpeed(state?: { speed: number }) {
         if (state) {
             this.paly(state.speed)
             this.setSpeed(state.speed)
         }
     }
 
-    init() {
+    private init() {
         this.controller = this.c.container.querySelector('.player-keyboard') as HTMLElement
         this.playOrPauseBtn = this.c.container.querySelector('.play-or-pause') as HTMLButtonElement
 
@@ -75,7 +75,7 @@ export class KeyboardComponent implements IComponent {
         }
     }
 
-    dispatchPlay(speed = 0) {
+    private dispatchPlay(speed = 0) {
         Store.dispatch({
             type: PlayerReducerTypes.SPEED,
             data: {
@@ -84,7 +84,7 @@ export class KeyboardComponent implements IComponent {
         })
     }
 
-    detectWindowIsActive() {
+    private detectWindowIsActive() {
         const handler = () => {
             if (document.visibilityState === 'hidden') {
                 this.dispatchPlay(0)
@@ -96,7 +96,7 @@ export class KeyboardComponent implements IComponent {
         })
     }
 
-    paly(speed: number) {
+    private paly(speed: number) {
         if (speed !== 0) {
             this.playOrPauseBtn.innerText = '〓'
             this.playOrPauseBtn.setAttribute('style', 'letter-spacing: 1px;font-weight: bold;')
@@ -108,7 +108,7 @@ export class KeyboardComponent implements IComponent {
         }
     }
 
-    setSpeed(speed: number) {
+    private setSpeed(speed: number) {
         const speedNodes = this.c.container.querySelectorAll('.speed') as NodeListOf<HTMLButtonElement>
         ;[...speedNodes].forEach(node => {
             node.removeAttribute('disabled')

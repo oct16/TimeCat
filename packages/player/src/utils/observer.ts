@@ -13,19 +13,19 @@ class Observer<T extends string> {
     id = 1
     listenersMap = new Map<T, Map<number, Function>>()
 
-    on(key: T, fn: Function): number {
+    public on(key: T, fn: Function): number {
         const map = this.getListenersByKey(key)
         map.set(++this.id, fn)
         return this.id
     }
 
-    emit(key: T, ...args: any): void {
+    public emit(key: T, ...args: any): void {
         this.getListenersByKey(key).forEach(fn => {
             fn(...args)
         })
     }
 
-    once(key: T, fn: Function): number {
+    public once(key: T, fn: Function): number {
         const onceFunc = (...args: any) => {
             fn(...args)
             this.off(key, id)
@@ -34,11 +34,11 @@ class Observer<T extends string> {
         return id
     }
 
-    flush(key: T): void {
+    public flush(key: T): void {
         this.getListenersByKey(key).clear()
     }
 
-    destroy(): void {
+    public destroy(): void {
         this.listenersMap.clear()
     }
 

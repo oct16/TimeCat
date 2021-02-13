@@ -30,13 +30,13 @@ export class BroadcasterComponent implements IComponent {
         this.init()
     }
 
-    init() {
+    private init() {
         this.broadcaster = this.c.container.querySelector('.player-broadcaster') as HTMLElement
         this.floatLayer = this.broadcaster.firstElementChild as HTMLElement
         this.subtitle = this.floatLayer.firstElementChild as HTMLElement
     }
 
-    updateText(text: string) {
+    public updateText(text: string) {
         text = text.trim()
         if (this.subtitle.innerText.trim() === text) {
             return
@@ -45,7 +45,8 @@ export class BroadcasterComponent implements IComponent {
         this.subtitle.innerText = text
         this.floatLayer.toggleAttribute('hidden', !text)
     }
-    cleanText() {
+
+    public cleanText() {
         this.updateText('')
     }
 }

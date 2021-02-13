@@ -40,7 +40,7 @@ export class PanelComponent implements IComponent {
         this.initComponent()
     }
 
-    initComponent() {
+    private initComponent() {
         new ToolboxComponent(this.options, this.c)
         this.keyboard = new KeyboardComponent(this.options, this.c)
         this.progress = new ProgressComponent(this.options, this.c)

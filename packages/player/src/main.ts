@@ -232,11 +232,11 @@ export class PlayerModule {
         }
     }
 
-    on(key: PlayerEventTypes, fn: Function) {
+    public on(key: PlayerEventTypes, fn: Function) {
         observer.on(key, fn)
     }
 
-    async append(records: RecordData[]) {
+    public async append(records: RecordData[]) {
         await delay(0)
         Store.dispatch({
             type: ReplayDataReducerTypes.APPEND_RECORDS,
