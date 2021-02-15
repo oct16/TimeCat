@@ -17,12 +17,15 @@
     ],
     "license": "GPL-3.0-or-later",
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "/*"
     ],
     "scripts": {
         "dev": "node scripts/dev.js",
         "build": "node scripts/build.js",
         "release": "node scripts/release.js",
+        "verifycommit": "node scripts/verifyCommit.js",
+        "postinstall": "husky install",
         "preinstall": "$npm_execpath --silent run checkyarn",
         "checkyarn": "node ./scripts/checkYarn.js",
         "ls-lint": "ls-lint",
@@ -32,12 +35,6 @@
         "embed": "cp packages/timecat/dist/timecat.global.prod.js ../TimeCatChrome/src/assets/",
         "gh": "node scripts/gh.js",
         "count": "git ls-files --exclude-standard -- ':!:**/*.[pjs][npv]g' ':!:.eslintrc' ':!: examples/*' ':!:.gitignore' ':!:README.*' ':!:LICENSE' ':!:yarn.lock' | xargs wc -l"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "ls-lint && lint-staged",
-            "commit-msg": "node ./scripts/verifyCommit.js"
-        }
     },
     "lint-staged": {
         "*.js": [
@@ -82,7 +79,7 @@
         "fake-indexeddb": "3.1.2",
         "fingerprintjs2": "^2.1.2",
         "fs-extra": "^9.1.0",
-        "husky": "4.3.8",
+        "husky": "^5.0.9",
         "is-mobile": "^2.2.2",
         "jest": "^26.6.3",
         "jest-canvas-mock": "^2.3.1",
