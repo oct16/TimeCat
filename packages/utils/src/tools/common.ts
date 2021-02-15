@@ -7,7 +7,7 @@
  *
  */
 
-import diff from 'diff'
+import * as diff from 'diff'
 import { radix64 } from '../performance/radix64'
 import { VNode, VSNode, SnapshotRecord, RecordData, RecordType } from '@timecat/share'
 
