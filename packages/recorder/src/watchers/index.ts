@@ -32,4 +32,4 @@ export const watchers = {
     CanvasWatcher,
     FontWatcher,
     TerminateWatcher
-} as { [key: string]: typeof Watcher }
+}
