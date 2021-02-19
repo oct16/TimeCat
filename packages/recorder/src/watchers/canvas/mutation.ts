@@ -8,11 +8,11 @@
  */
 
 import { CanvasRecord, RecordType } from '@timecat/share'
-import { Watcher } from '../watcher'
+import { Watcher } from '../../watcher'
 
 type Prop = keyof CanvasRenderingContext2D
 
-export class CanvasWatcher extends Watcher<CanvasRecord> {
+export class Canvas2DMutationWatcher extends Watcher<CanvasRecord> {
     getCanvasInitState(ctx: CanvasRenderingContext2D) {
         const keys = [
             'direction',
@@ -55,14 +55,6 @@ export class CanvasWatcher extends Watcher<CanvasRecord> {
         const names = Object.getOwnPropertyNames(ctxProto)
 
         canvasList
-            .map(canvas => {
-                const dataURL = canvas.toDataURL()
-                this.emitData(RecordType.CANVAS, {
-                    id: this.getNodeId(canvas),
-                    src: dataURL
-                })
-                return canvas
-            })
             .map(canvas => canvas.getContext('2d'))
             .forEach(ctx => {
                 if (!ctx) {
