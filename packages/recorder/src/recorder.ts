@@ -147,12 +147,15 @@ export class RecorderModule extends Pluginable {
     }
 
     private getWatchers() {
-        const options = this.options
+        const { audio, disableWatchers } = this.options
         const watchersList = [Snapshot, ...Object.values(watchers)] as typeof Watcher[]
-        if (options && options.audio) {
+        if (audio) {
             watchersList.push(RecordAudio as typeof Watcher)
         }
-        return watchersList
+
+        return watchersList.filter(watcher => {
+            return !~disableWatchers.indexOf(watcher.name as keyof typeof watchers)
+        })
     }
 
     private record(options: RecordOptions | RecordInternalOptions): void {
