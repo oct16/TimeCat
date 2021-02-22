@@ -22,7 +22,7 @@ import {
     CharacterDataUpdateData
 } from '@timecat/share'
 import { Watcher } from '../watcher'
-import { CanvasWatcher } from './canvas'
+import { Canvas2DMutationWatcher } from './canvas'
 import { rewriteNodes } from '../common'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
@@ -255,7 +255,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 .map(node => nodeStore.getNode(node.node.id) as HTMLCanvasElement)
                 .filter(Boolean)
 
-            const watcher = (this.options.watchers.get('CanvasWatcher') as unknown) as CanvasWatcher
+            const watcher: Canvas2DMutationWatcher = this.options.watchers.get('CanvasWatcher')
             watcher.watchCanvas(elements)
         }
     }
