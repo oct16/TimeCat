@@ -29,7 +29,7 @@ import { Watcher } from './watcher'
 export { Watcher, WatcherOptions } from './watcher'
 export { RecordData } from '@timecat/share'
 
-type EmitDataFnType = (data: RecordData, n: () => Promise<void>) => Promise<void>
+type RecorderMiddleware = (data: RecordData, n: () => Promise<void>) => Promise<void>
 
 interface RecordOptionsBase {
     context?: Window
@@ -95,7 +95,7 @@ export class RecorderModule extends Pluginable {
     } as RecordOptions
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
-    private onDataCallbackList: EmitDataFnType[] = []
+    private middlewares: RecorderMiddleware[] = []
     private watchers: Array<typeof Watcher>
     private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
@@ -125,7 +125,7 @@ export class RecorderModule extends Pluginable {
     }
 
     public onData(fn: (data: RecordData, next: () => Promise<void>) => Promise<void>) {
-        this.onDataCallbackList.unshift(fn)
+        this.middlewares.unshift(fn)
     }
 
     public async destroy() {
@@ -183,7 +183,7 @@ export class RecorderModule extends Pluginable {
                     return
                 }
 
-                await this.onDataCompose(data)
+                await this.connectCompose(this.middlewares)(data)
 
                 this.hooks.emit.call(data)
 
@@ -320,7 +320,7 @@ export class RecorderModule extends Pluginable {
                     }
                     if (data.relatedId) {
                         this.db.addRecord(data as TerminateRecord)
-                        this.onDataCompose(data as RecordData)
+                        this.connectCompose(this.middlewares)(data as RecordData)
                     }
                     this.hooks.end.call()
                     this.destroy()
@@ -347,16 +347,18 @@ export class RecorderModule extends Pluginable {
         }
     }
 
-    private async onDataCompose(data: RecordData) {
-        await this.onDataCallbackList.reduce(
-            (next: () => Promise<void>, fn: EmitDataFnType) => {
-                return this.createNext(fn, data, next)
-            },
-            () => Promise.resolve()
-        )()
+    private connectCompose(list: RecorderMiddleware[]) {
+        return async (data: RecordData) => {
+            await list.reduce(
+                (next: () => Promise<void>, fn: RecorderMiddleware) => {
+                    return this.createNext(fn, data, next)
+                },
+                () => Promise.resolve()
+            )()
+        }
     }
 
-    private createNext(fn: EmitDataFnType, data: RecordData, next: () => Promise<void>) {
+    private createNext(fn: RecorderMiddleware, data: RecordData, next: () => Promise<void>) {
         return async () => await fn(data, next)
     }
 }
