@@ -18,7 +18,8 @@ import {
     getTime,
     stateDebounce,
     tempEmptyFn,
-    tempEmptyPromise
+    tempEmptyPromise,
+    delay
 } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
@@ -166,7 +167,6 @@ export class RecorderModule extends Pluginable {
     private async startRecord(options: RecordInternalOptions) {
         let activeWatchers = [...this.watchers, ...this.pluginWatchers]
 
-        // is record iframe, switch context
         if (options.context === window) {
             if (!options.keep) {
                 this.db.clear()
@@ -178,18 +178,36 @@ export class RecorderModule extends Pluginable {
 
         const onEmit = (options: RecordOptions) => {
             const { write } = options
+            const emitTasks: Array<RecordData> = []
+
+            const execTasksChain = (() => {
+                let concurrency = 0
+                const MAX_CONCURRENCY = 1
+                return async () => {
+                    if (concurrency >= MAX_CONCURRENCY) {
+                        return
+                    }
+
+                    concurrency++
+                    while (emitTasks.length) {
+                        const record = emitTasks.shift()!
+                        await this.connectCompose(this.middlewares)(record)
+                        this.hooks.emit.call(record)
+                        if (write) {
+                            this.db.addRecord(record)
+                        }
+                    }
+                    concurrency--
+                }
+            })()
+
             return async (data: RecordData) => {
                 if (!data) {
                     return
                 }
 
-                await this.connectCompose(this.middlewares)(data)
-
-                this.hooks.emit.call(data)
-
-                if (write) {
-                    this.db.addRecord(data)
-                }
+                emitTasks.push(data)
+                execTasksChain()
             }
         }
 
@@ -349,7 +367,7 @@ export class RecorderModule extends Pluginable {
 
     private connectCompose(list: RecorderMiddleware[]) {
         return async (data: RecordData) => {
-            await list.reduce(
+            return await list.reduce(
                 (next: () => Promise<void>, fn: RecorderMiddleware) => {
                     return this.createNext(fn, data, next)
                 },
