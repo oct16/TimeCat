@@ -19,7 +19,7 @@ import {
     stateDebounce,
     tempEmptyFn,
     tempEmptyPromise,
-    delay
+    throttle
 } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
@@ -30,7 +30,7 @@ import { Watcher } from './watcher'
 export { Watcher, WatcherOptions } from './watcher'
 export { RecordData } from '@timecat/share'
 
-type RecorderMiddleware = (data: RecordData, n: () => Promise<void>) => Promise<void>
+export type RecorderMiddleware = (data: RecordData, n: () => Promise<void>) => Promise<void>
 
 interface RecordOptionsBase {
     context?: Window
@@ -42,6 +42,7 @@ interface RecordOptionsBase {
     visibleChange?: boolean
     visibleChangeKeepTime?: number
     disableWatchers?: Array<keyof typeof watchers>
+    keepAlive?: number
 }
 
 interface RecordInternalOptions extends Required<RecordOptions> {
@@ -92,11 +93,13 @@ export class RecorderModule extends Pluginable {
         visibleChange: false,
         visibleChangeKeepTime: 5000,
         rewriteResource: [],
-        disableWatchers: []
+        disableWatchers: [],
+        keepAlive: 0
     } as RecordOptions
+    private defaultMiddlewares: RecorderMiddleware[] = []
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
-    private middlewares: RecorderMiddleware[] = []
+    private middlewares: RecorderMiddleware[] = [...this.defaultMiddlewares]
     private watchers: Array<typeof Watcher>
     private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
@@ -122,6 +125,10 @@ export class RecorderModule extends Pluginable {
         this.hooks.run.call(this)
         if (options.visibleChange) {
             this.listenVisibleChange(options)
+        }
+
+        if (options.keepAlive) {
+            this.enableKeepAlive(options.keepAlive)
         }
     }
 
@@ -378,5 +385,27 @@ export class RecorderModule extends Pluginable {
 
     private createNext(fn: RecorderMiddleware, data: RecordData, next: () => Promise<void>) {
         return async () => await fn(data, next)
+    }
+
+    private enableKeepAlive(this: RecorderModule, waitTime: number) {
+        const eventNames = ['click', 'mousemove', 'scroll']
+        let timer = 0
+        let active = true
+        return (() => {
+            const handle = () => {
+                if (!active) {
+                    this.record({ ...this.options, keep: true, emitLocationImmediate: false })
+                    active = true
+                }
+                clearTimeout(timer)
+                timer = window.setTimeout(() => {
+                    this.destroy()
+                    active = false
+                }, waitTime)
+            }
+
+            eventNames.forEach(name => document.addEventListener(name, throttle(handle, 500)))
+            handle()
+        })()
     }
 }
