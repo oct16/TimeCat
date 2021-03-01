@@ -75,13 +75,22 @@ export interface RewriteItem {
 }
 
 export class Recorder {
-    onData: RecorderModule['onData'] = tempEmptyFn
-    destroy: RecorderModule['destroy'] = tempEmptyPromise
-    use: RecorderModule['use'] = tempEmptyFn
-    clearDB: RecorderModule['clearDB'] = tempEmptyPromise
+    public status: Status = 'stop'
+    public onData: RecorderModule['onData'] = tempEmptyFn
+    public destroy: RecorderModule['destroy'] = tempEmptyPromise
+    public use: RecorderModule['use'] = tempEmptyFn
+    public clearDB: RecorderModule['clearDB'] = tempEmptyPromise
     constructor(options?: RecordOptions) {
         const recorder = new RecorderModule(options)
-        Object.keys(this).forEach((key: keyof Recorder) => (this[key] = recorder[key].bind(recorder)))
+        Object.keys(this).forEach((key: keyof Recorder) => {
+            Object.defineProperty(this, key, {
+                get() {
+                    return typeof recorder[key] === 'function'
+                        ? (recorder[key] as Function).bind(recorder)
+                        : recorder[key]
+                }
+            })
+        })
     }
 }
 
