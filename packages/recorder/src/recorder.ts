@@ -17,9 +17,9 @@ import {
     nodeStore,
     getTime,
     stateDebounce,
+    throttle,
     tempEmptyFn,
-    tempEmptyPromise,
-    throttle
+    tempEmptyPromise
 } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
@@ -59,6 +59,8 @@ interface PreFetchRewriteConfig extends RewriteConfig {
     matches?: (string | RegExp)[]
     crossUrl?: string
 }
+
+type Status = 'running' | 'destroyed' | 'stop'
 
 export type RewriteResource = RewriteItem[]
 export interface RecordOptions extends RecordOptionsBase {
@@ -105,6 +107,7 @@ export class RecorderModule extends Pluginable {
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
     private watcherResolve: Function
 
+    public status: Status = 'stop'
     public db: IndexedDBOperator
     public options: RecordInternalOptions
 
@@ -123,12 +126,15 @@ export class RecorderModule extends Pluginable {
         this.hooks.beforeRun.call(this)
         this.record(options)
         this.hooks.run.call(this)
-        if (options.visibleChange) {
-            this.listenVisibleChange(options)
-        }
 
+        let refresh: (() => void) | undefined = undefined
+        let clear: (() => void) | undefined = undefined
         if (options.keepAlive) {
-            this.enableKeepAlive(options.keepAlive)
+            const { refresh: r, clear: c } = this.enableKeepAlive(options.keepAlive)
+            ;(refresh = r), (clear = c)
+        }
+        if (options.visibleChange) {
+            this.listenVisibleChange(options, { keepAlive: { refresh, clear } })
         }
     }
 
@@ -137,9 +143,34 @@ export class RecorderModule extends Pluginable {
     }
 
     public async destroy() {
-        await this.cancelListener()
-        this.destroyStore.forEach(un => un())
-        this.destroyStore.clear()
+        if (this.status === 'destroyed') {
+            return
+        }
+
+        await this.stop()
+        this.status = 'destroyed'
+    }
+
+    private async stop() {
+        if (this.status === 'running') {
+            this.status = 'stop'
+            const last = await this.db.last()
+            const data = {
+                type: RecordType.TERMINATE,
+                data: null,
+                relatedId: window.G_RECORD_RELATED_ID,
+                time: last.time + 1
+            }
+            if (data.relatedId) {
+                if (this.options.write) {
+                    await this.db.addRecord(data as TerminateRecord)
+                }
+                this.connectCompose(this.middlewares)(data as RecordData)
+            }
+            await this.cancelListener()
+            this.destroyStore.forEach(un => un())
+            this.destroyStore.clear()
+        }
     }
 
     public async clearDB() {
@@ -167,8 +198,11 @@ export class RecorderModule extends Pluginable {
     }
 
     private record(options: RecordOptions | RecordInternalOptions): void {
-        const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
-        this.startRecord((opts.context.G_RECORD_OPTIONS = opts))
+        if (this.status === 'stop') {
+            const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
+            this.startRecord((opts.context.G_RECORD_OPTIONS = opts))
+            return
+        }
     }
 
     private async startRecord(options: RecordInternalOptions) {
@@ -178,6 +212,7 @@ export class RecorderModule extends Pluginable {
             if (!options.keep) {
                 this.db.clear()
             }
+            this.status = 'running'
         } else {
             // for iframe watchers
             activeWatchers = [Snapshot, ...Object.values(baseWatchers)] as typeof Watcher[]
@@ -325,7 +360,11 @@ export class RecorderModule extends Pluginable {
         this.destroyStore.add(() => frameRecorder.destroy())
     }
 
-    private listenVisibleChange(this: RecorderModule, options: RecordInternalOptions) {
+    private listenVisibleChange(
+        this: RecorderModule,
+        options: RecordInternalOptions,
+        ref?: { keepAlive?: { refresh?: () => void; clear?: () => void } }
+    ) {
         if (typeof document.hidden !== 'undefined') {
             const hidden = 'hidden'
             const visibilityChange = 'visibilitychange'
@@ -335,22 +374,16 @@ export class RecorderModule extends Pluginable {
                 'hide' = 'hide'
             }
 
+            const { clear, refresh } = ref?.keepAlive || {}
+
             const viewChangeHandle = (state: keyof typeof ViewChangeState) => {
                 if (state === ViewChangeState.hide) {
-                    const data = {
-                        type: RecordType.TERMINATE,
-                        data: null,
-                        relatedId: window.G_RECORD_RELATED_ID,
-                        time: getTime()
-                    }
-                    if (data.relatedId) {
-                        this.db.addRecord(data as TerminateRecord)
-                        this.connectCompose(this.middlewares)(data as RecordData)
-                    }
                     this.hooks.end.call()
-                    this.destroy()
+                    this.stop()
+                    clear && clear()
                 } else {
                     this.record({ ...options, keep: true, emitLocationImmediate: false })
+                    refresh && refresh()
                 }
             }
 
@@ -366,7 +399,8 @@ export class RecorderModule extends Pluginable {
 
                     document.addEventListener(visibilityChange, handle, false)
                 },
-                state => (state === ViewChangeState.hide ? options.visibleChangeKeepTime : 0),
+                state =>
+                    state !== ViewChangeState.hide || this.status !== 'running' ? 0 : options.visibleChangeKeepTime,
                 ViewChangeState.show
             )(viewChangeHandle)
         }
@@ -390,22 +424,34 @@ export class RecorderModule extends Pluginable {
     private enableKeepAlive(this: RecorderModule, waitTime: number) {
         const eventNames = ['click', 'mousemove', 'scroll']
         let timer = 0
-        let active = true
         return (() => {
-            const handle = () => {
-                if (!active) {
-                    this.record({ ...this.options, keep: true, emitLocationImmediate: false })
-                    active = true
-                }
+            const clear = () => {
                 clearTimeout(timer)
+                timer = 0
+            }
+            const refresh = () => {
+                clear()
+                if (this.status !== 'running') {
+                    return
+                }
                 timer = window.setTimeout(() => {
-                    this.destroy()
-                    active = false
+                    this.stop()
                 }, waitTime)
+            }
+            const handle = () => {
+                if (this.status !== 'running') {
+                    this.record({ ...this.options, keep: true, emitLocationImmediate: false })
+                }
+                refresh()
             }
 
             eventNames.forEach(name => document.addEventListener(name, throttle(handle, 500)))
             handle()
+
+            return {
+                refresh,
+                clear
+            }
         })()
     }
 }
