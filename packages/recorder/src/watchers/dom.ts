@@ -249,13 +249,17 @@ export class DOMWatcher extends Watcher<DOMRecord> {
     }
 
     private watchCanvas(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+        const { G_RECORD_OPTIONS: options } = window
+        if (options.disableWatchers.includes(Canvas2DMutationWatcher.name)) {
+            return
+        }
         const canvasNodes = this.findElementsByTag('canvas', addedNodes)
         if (canvasNodes.length) {
             const elements = canvasNodes
                 .map(node => nodeStore.getNode(node.node.id) as HTMLCanvasElement)
                 .filter(Boolean)
 
-            const watcher: Canvas2DMutationWatcher = this.options.watchers.get('CanvasWatcher')
+            const watcher: Canvas2DMutationWatcher = this.options.watchers.get(Canvas2DMutationWatcher.name)
             watcher.watchCanvas(elements)
         }
     }
