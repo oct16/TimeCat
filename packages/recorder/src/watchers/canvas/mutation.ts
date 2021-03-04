@@ -8,39 +8,17 @@
  */
 
 import { CanvasRecord, RecordType } from '@timecat/share'
+import { canvasContext2DAttrs, canvasContext2DKeys } from '@timecat/utils'
 import { Watcher } from '../../watcher'
 
-type Prop = keyof CanvasRenderingContext2D
+type CanvasContext2DKeys = typeof canvasContext2DKeys[number]
 
 export class Canvas2DMutationWatcher extends Watcher<CanvasRecord> {
     getCanvasInitState(ctx: CanvasRenderingContext2D) {
-        const keys = [
-            'direction',
-            'dpr',
-            'fillStyle',
-            'filter',
-            'font',
-            'globalAlpha',
-            'globalCompositeOperation',
-            'imageSmoothingEnabled',
-            'imageSmoothingQuality',
-            'lineCap',
-            'lineDashOffset',
-            'lineJoin',
-            'lineWidth',
-            'miterLimit',
-            'shadowBlur',
-            'shadowColor',
-            'shadowOffsetX',
-            'shadowOffsetY',
-            'strokeStyle',
-            'textAlign',
-            'textBaseline'
-        ] as (keyof CanvasRenderingContext2D)[]
-
+        const keys = canvasContext2DAttrs
         return Object.values(keys).reduce((obj, key) => {
-            return { ...obj, [key]: ctx[key as keyof CanvasRenderingContext2D] }
-        }, {} as { [key in keyof CanvasRenderingContext2D]: any })
+            return { ...obj, [key]: ctx[key as CanvasContext2DKeys] }
+        }, {} as { [key in CanvasContext2DKeys]: any })
     }
 
     protected init() {
@@ -52,7 +30,7 @@ export class Canvas2DMutationWatcher extends Watcher<CanvasRecord> {
         const self = this
 
         const ctxProto = CanvasRenderingContext2D.prototype
-        const names = Object.getOwnPropertyNames(ctxProto)
+        const names = canvasContext2DKeys
 
         canvasList
             .map(canvas => canvas.getContext('2d'))
@@ -70,10 +48,7 @@ export class Canvas2DMutationWatcher extends Watcher<CanvasRecord> {
                 names.forEach(name => {
                     const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
                     const method = original.value
-                    if (name === 'canvas') {
-                        return
-                    }
-                    const val = ctx[name as keyof CanvasRenderingContext2D]
+                    const val = ctx[name as CanvasContext2DKeys]
                     ctxTemp[name] = val
 
                     const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
@@ -118,20 +93,23 @@ export class Canvas2DMutationWatcher extends Watcher<CanvasRecord> {
             })
     }
 
-    private aggregateDataEmitter = this.aggregateManager((id: number, strokes: { name: Prop; args: any[] }[]) => {
-        this.emitData(RecordType.CANVAS, {
-            id,
-            strokes
-        })
-    }, 30)
+    private aggregateDataEmitter = this.aggregateManager(
+        (id: number, strokes: { name: CanvasContext2DKeys; args: any[] }[]) => {
+            this.emitData(RecordType.CANVAS, {
+                id,
+                strokes
+            })
+        },
+        30
+    )
 
-    private aggregateManager(func: Function, wait: number): any {
-        const tasks = Object.create(null) as { [key: number]: { name: Prop; args: any[] }[] }
+    private aggregateManager(func: Function, wait: number) {
+        const tasks = Object.create(null) as { [key: number]: { name: CanvasContext2DKeys | number; args: any[] }[] }
         const timeouts = Object.create(null) as { [key: number]: number }
 
         const blockInstances = [CanvasGradient, CanvasPattern]
 
-        return function (this: any, id: number, prop: Prop, args: any) {
+        return function (this: any, id: number, name: CanvasContext2DKeys, args: any) {
             const context = this
 
             function emitData(id: number) {
@@ -155,8 +133,9 @@ export class Canvas2DMutationWatcher extends Watcher<CanvasRecord> {
             }
 
             if (!blockInstances.some(instance => args instanceof instance)) {
+                const index = canvasContext2DKeys.indexOf(name)
                 tasks[id].push({
-                    name: prop,
+                    name: index,
                     args
                 })
             }

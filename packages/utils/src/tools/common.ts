@@ -312,3 +312,74 @@ export function removeGlobalVariables() {
 
 export const tempEmptyFn = () => {}
 export const tempEmptyPromise = () => Promise.resolve()
+
+export const canvasContext2DAttrs: (keyof CanvasRenderingContext2D)[] = [
+    'direction',
+    'fillStyle',
+    'filter',
+    'font',
+    'globalAlpha',
+    'globalCompositeOperation',
+    'imageSmoothingEnabled',
+    'imageSmoothingQuality',
+    'lineCap',
+    'lineDashOffset',
+    'lineJoin',
+    'lineWidth',
+    'miterLimit',
+    'shadowBlur',
+    'shadowColor',
+    'shadowOffsetX',
+    'shadowOffsetY',
+    'strokeStyle',
+    'textAlign',
+    'textBaseline'
+]
+
+export const canvasContext2DMethods: (keyof CanvasRenderingContext2D)[] = [
+    'arc',
+    'arcTo',
+    'beginPath',
+    'bezierCurveTo',
+    'clearRect',
+    'clip',
+    'closePath',
+    'createImageData',
+    'createLinearGradient',
+    'createPattern',
+    'createRadialGradient',
+    'drawFocusIfNeeded',
+    'drawImage',
+    'ellipse',
+    'fill',
+    'fillRect',
+    'fillText',
+    'getImageData',
+    'getLineDash',
+    'getTransform',
+    'isPointInPath',
+    'isPointInStroke',
+    'lineTo',
+    'measureText',
+    'moveTo',
+    'putImageData',
+    'quadraticCurveTo',
+    'rect',
+    'resetTransform',
+    'restore',
+    'rotate',
+    'save',
+    'scale',
+    'setLineDash',
+    'setTransform',
+    'stroke',
+    'strokeRect',
+    'strokeText',
+    'transform',
+    'translate'
+]
+
+export const canvasContext2DKeys: (keyof CanvasRenderingContext2D)[] = [
+    ...canvasContext2DAttrs,
+    ...canvasContext2DMethods
+]

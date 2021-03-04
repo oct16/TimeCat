@@ -1,5 +1,5 @@
 import { CanvasRecordData, UnionToIntersection } from '@timecat/share'
-import { nodeStore } from '@timecat/utils'
+import { canvasContext2DKeys, nodeStore } from '@timecat/utils'
 
 export function renderCanvas(canvasRecordData: CanvasRecordData) {
     const data = canvasRecordData as UnionToIntersection<CanvasRecordData>
@@ -26,7 +26,9 @@ export function renderCanvas(canvasRecordData: CanvasRecordData) {
         })
     } else {
         for (const stroke of strokes) {
-            const { name, args: strokeArgs } = stroke
+            const { name: key, args: strokeArgs } = stroke
+            const name = typeof key === 'number' ? canvasContext2DKeys[key] : key
+
             if (!Array.isArray(strokeArgs)) {
                 ;(ctx[name] as Object) = strokeArgs
             } else {
