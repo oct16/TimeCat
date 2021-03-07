@@ -18,5 +18,5 @@ module.exports = {
     testPathIgnorePatterns: process.env.SKIP_E2E ? ['/node_modules/', '/examples/__tests__'] : ['/node_modules/'],
     verbose: true,
     testEnvironment: 'jsdom',
-    setupFiles: ['<rootDir>/jest-setup.js', 'jest-canvas-mock']
+    setupFiles: ['<rootDir>/jest-setup.js']
 }
