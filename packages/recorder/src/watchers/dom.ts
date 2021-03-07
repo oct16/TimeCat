@@ -24,6 +24,7 @@ import {
 import { Watcher } from '../watcher'
 import { Canvas2DMutationWatcher } from './canvas'
 import { rewriteNodes } from '../common'
+import { Recorder } from '../recorder'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
     protected init() {
@@ -233,7 +234,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
     private waitAndRecordIFrame(iframe: HTMLIFrameElement) {
         const contentWindow = iframe.contentWindow
-        ;(iframe as any)?.frameRecorder?.destroy()
+        ;(iframe as HTMLIFrameElement & { frameRecorder: Recorder })?.frameRecorder?.destroy()
         const onLoadHandle = () => {
             this.recorder.recordIFrame(contentWindow!)
             iframe.removeEventListener('load', onLoadHandle)
