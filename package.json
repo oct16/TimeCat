@@ -29,7 +29,7 @@
         "checkyarn": "node ./scripts/checkYarn.js",
         "ls-lint": "ls-lint",
         "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix",
-        "test": "jest",
+        "test": "jest --coverage --verbose",
         "live": "node scripts/live.js",
         "embed": "cp packages/timecat/dist/timecat.global.prod.js ../TimeCatChrome/src/assets/",
         "gh": "node scripts/gh.js",
@@ -104,5 +104,8 @@
     "bugs": {
         "url": "https://github.com/oct16/TimeCat/issues"
     },
-    "homepage": "https://github.com/oct16/TimeCat#readme"
+    "homepage": "https://github.com/oct16/TimeCat#readme",
+    "dependencies": {
+        "fake-indexeddb": "^3.1.2"
+    }
 }
