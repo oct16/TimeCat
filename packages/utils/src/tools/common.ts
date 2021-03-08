@@ -144,11 +144,7 @@ export function isNumeric(n: string) {
     return !isNaN(parseFloat(n)) && isFinite(parseFloat(n))
 }
 
-export function throttle(
-    func: Function,
-    wait: number,
-    options: { leading?: boolean; trailing?: boolean } = { leading: false, trailing: false }
-): any {
+export function throttle(func: Function, wait: number, options: { leading?: boolean; trailing?: boolean } = {}): any {
     let context: any
     let args: any
     let result: any
