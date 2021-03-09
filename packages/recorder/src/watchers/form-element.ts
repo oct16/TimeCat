@@ -32,7 +32,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         Object.values(eventTypes)
             .map(type => (fn: (e: InputEvent) => void) => {
                 context.document.addEventListener(type, fn, eventListenerOptions)
-                this.uninstall(() => context.document.removeEventListener(type, fn, eventListenerOptions))
+                this.uninstall(() => context.removeEventListener(type, fn, eventListenerOptions))
             })
             .forEach(call => call(handleFn.bind(this)))
 

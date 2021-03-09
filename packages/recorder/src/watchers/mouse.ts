@@ -38,9 +38,9 @@ export class MouseWatcher extends Watcher<MouseRecord> {
 
         const eventNames = ['mousewheel', 'scroll']
         eventNames.forEach(name => {
-            this.context.document.addEventListener(name, evt, true)
+            this.context.addEventListener(name, evt, true)
             this.uninstall(() => {
-                this.context.document.removeEventListener(name, evt, true)
+                this.context.removeEventListener(name, evt, true)
             })
         })
     }
@@ -71,10 +71,10 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             leading: true
         })
 
-        this.context.document.addEventListener(name, listenerHandle)
+        this.context.addEventListener(name, listenerHandle)
 
         this.uninstall(() => {
-            this.context.document.removeEventListener(name, listenerHandle)
+            this.context.removeEventListener(name, listenerHandle)
         })
     }
 
@@ -92,9 +92,9 @@ export class MouseWatcher extends Watcher<MouseRecord> {
         const name = 'click'
         const listenerHandle = throttle(evt, 250)
         this.uninstall(() => {
-            this.context.document.removeEventListener(name, listenerHandle)
+            this.context.removeEventListener(name, listenerHandle)
         })
-        this.context.document.addEventListener(name, listenerHandle)
+        this.context.addEventListener(name, listenerHandle)
     }
 
     private getOffsetPosition(event: MouseEvent, context: Window) {

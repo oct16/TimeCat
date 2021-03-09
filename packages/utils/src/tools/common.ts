@@ -33,7 +33,7 @@ export function logAdvice(msg: string): string {
 }
 
 export function getTime(): number {
-    return Math.floor(performance.timing.navigationStart + performance.now())
+    return Date.now()
 }
 
 export function getRadix64TimeStr() {
