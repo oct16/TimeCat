@@ -307,7 +307,7 @@ export class RecorderModule extends Pluginable {
         const validFrames = Array.from(frames)
             .filter(frame => {
                 try {
-                    return frame.frameElement.getAttribute('src')
+                    return frame.frameElement && frame.frameElement.getAttribute('src')
                 } catch (e) {
                     logError(e)
                     return false
@@ -332,7 +332,7 @@ export class RecorderModule extends Pluginable {
 
     private async waitingIFrameLoaded(frame: Window): Promise<Window | undefined> {
         try {
-            frame.document && frame.frameElement.getAttribute('src')!
+            frame.document && frame.frameElement && frame.frameElement.getAttribute('src')!
         } catch (e) {
             logError(e)
             return
