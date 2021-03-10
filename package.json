@@ -29,10 +29,7 @@
         "checkyarn": "node ./scripts/checkYarn.js",
         "ls-lint": "ls-lint",
         "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix",
-        "test": "jest --coverage --verbose",
-        "live": "node scripts/live.js",
-        "embed": "cp packages/timecat/dist/timecat.global.prod.js ../TimeCatChrome/src/assets/",
-        "gh": "node scripts/gh.js",
+        "test": "jest --verbose",
         "count": "git ls-files --exclude-standard -- ':!:**/*.[pjs][npv]g' ':!:.eslintrc' ':!: examples/*' ':!:.gitignore' ':!:README.*' ':!:LICENSE' ':!:yarn.lock' | xargs wc -l"
     },
     "lint-staged": {
