@@ -15,7 +15,8 @@ import {
     LocationRecordData,
     CanvasRecordData,
     SnapshotRecord,
-    PreFetchRecordData
+    PreFetchRecordData,
+    WebGLRecordData
 } from '@timecat/share'
 import { PlayerComponent } from './components/player'
 import { delay } from '@timecat/utils'
@@ -29,6 +30,7 @@ import { renderWindow } from './renders/window'
 import { renderMouse } from './renders/mouse'
 import { renderFormEl } from './renders/form-el'
 import { renderDom } from './renders/dom'
+import { renderWebGL } from './renders/webgl'
 
 export async function updateDom(
     this: PlayerComponent,
@@ -91,6 +93,10 @@ export async function updateDom(
         }
         case RecordType.PATCH: {
             renderPatch(data as PreFetchRecordData)
+            break
+        }
+        case RecordType.WEBGL: {
+            renderWebGL(data as WebGLRecordData)
             break
         }
         default: {

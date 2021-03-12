@@ -67,7 +67,8 @@ export enum RecordType {
     'TERMINATE',
     'FONT',
     'PATCH',
-    'CUSTOM'
+    'CUSTOM',
+    'WEBGL'
 }
 
 export enum FormElementEvent {
@@ -225,6 +226,7 @@ export type RecordData =
     | FontRecord
     | PreFetchRecord
     | CustomRecord
+    | WebGLRecord
 
 export interface AudioData {
     src: string
@@ -339,3 +341,10 @@ export type PreFetchRecord = BaseRecord<RecordType.PATCH, PreFetchRecordData>
 export type CustomRecordData = { [key: string]: any }
 
 export type CustomRecord = BaseRecord<RecordType.CUSTOM, CustomRecordData>
+
+export type WebGLRecord = BaseRecord<RecordType.WEBGL, WebGLRecordData>
+
+export interface WebGLRecordData {
+    id: number
+    args: any[]
+}
