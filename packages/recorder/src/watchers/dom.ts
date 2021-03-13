@@ -22,7 +22,7 @@ import {
     CharacterDataUpdateData
 } from '@timecat/share'
 import { Watcher } from '../watcher'
-import { Canvas2DMutationWatcher } from './canvas'
+import { Canvas2DWatcher } from './canvas'
 import { rewriteNodes } from '../common'
 import { Recorder } from '../recorder'
 
@@ -251,7 +251,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
 
     private watchCanvas(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
         const { G_RECORD_OPTIONS: options } = window
-        if (options.disableWatchers.includes(Canvas2DMutationWatcher.name)) {
+        if (options.disableWatchers.includes(Canvas2DWatcher.name)) {
             return
         }
         const canvasNodes = this.findElementsByTag('canvas', addedNodes)
@@ -260,7 +260,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 .map(node => nodeStore.getNode(node.node.id) as HTMLCanvasElement)
                 .filter(Boolean)
 
-            const watcher: Canvas2DMutationWatcher = this.options.watchers.get(Canvas2DMutationWatcher.name)
+            const watcher: Canvas2DWatcher = this.options.watchers.get(Canvas2DWatcher.name)
             watcher.watchCanvas(elements)
         }
     }

@@ -13,7 +13,7 @@ import { LocationWatcher } from './location'
 import { MouseWatcher } from './mouse'
 import { ScrollWatcher } from './scroll'
 import { WindowWatcher } from './window'
-import { CanvasSnapshotWatcher, Canvas2DMutationWatcher, CanvasWebGLWatcher } from './canvas'
+import { CanvasSnapshotWatcher, Canvas2DWatcher, CanvasWebGLWatcher } from './canvas'
 import { TerminateWatcher } from './terminate'
 import { FontWatcher } from './font'
 
@@ -29,7 +29,7 @@ export const watchers = {
     ...baseWatchers,
     WindowWatcher,
     CanvasSnapshotWatcher,
-    Canvas2DMutationWatcher,
+    Canvas2DWatcher,
     CanvasWebGLWatcher,
     FontWatcher,
     TerminateWatcher

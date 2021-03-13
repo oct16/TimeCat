@@ -20,7 +20,7 @@ import {
 } from '@timecat/share'
 import { PlayerComponent } from './components/player'
 import { delay } from '@timecat/utils'
-import { renderCanvas } from './renders/canvas'
+import { renderCanvas2D, renderWebGL } from './renders/canvas'
 import { renderFont } from './renders/font'
 import { renderPatch } from './renders/patch'
 import { renderLocation } from './renders/location'
@@ -30,7 +30,6 @@ import { renderWindow } from './renders/window'
 import { renderMouse } from './renders/mouse'
 import { renderFormEl } from './renders/form-el'
 import { renderDom } from './renders/dom'
-import { renderWebGL } from './renders/webgl'
 
 export async function updateDom(
     this: PlayerComponent,
@@ -84,7 +83,7 @@ export async function updateDom(
             if (!isJumping && speed === 1) {
                 await actionDelay()
             }
-            renderCanvas(data as CanvasRecordData)
+            renderCanvas2D(data as CanvasRecordData)
             break
         }
         case RecordType.FONT: {

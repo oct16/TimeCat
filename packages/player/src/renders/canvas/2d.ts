@@ -1,7 +1,7 @@
 import { CanvasRecordData, UnionToIntersection } from '@timecat/share'
 import { canvasContext2DKeys, nodeStore } from '@timecat/utils'
 
-export function renderCanvas(canvasRecordData: CanvasRecordData) {
+export function renderCanvas2D(canvasRecordData: CanvasRecordData) {
     const data = canvasRecordData as UnionToIntersection<CanvasRecordData>
     const { src, status, id, strokes } = data
     const canvas = nodeStore.getNode(id) as HTMLCanvasElement

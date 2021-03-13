@@ -13,7 +13,7 @@ import { Watcher } from '../../watcher'
 
 type CanvasContext2DKeys = typeof canvasContext2DKeys[number]
 
-export class Canvas2DMutationWatcher extends Watcher<CanvasRecord> {
+export class Canvas2DWatcher extends Watcher<CanvasRecord> {
     getCanvasInitState(ctx: CanvasRenderingContext2D) {
         const keys = canvasContext2DAttrs
         return Object.values(keys).reduce((obj, key) => {
