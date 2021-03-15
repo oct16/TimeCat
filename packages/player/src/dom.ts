@@ -16,11 +16,12 @@ import {
     CanvasRecordData,
     SnapshotRecord,
     PreFetchRecordData,
-    WebGLRecordData
+    WebGLRecordData,
+    CanvasSnapshotRecordData
 } from '@timecat/share'
 import { PlayerComponent } from './components/player'
 import { delay } from '@timecat/utils'
-import { renderCanvas2D, renderWebGL } from './renders/canvas'
+import { renderCanvasSnapshot, renderCanvas2D, renderWebGL } from './renders/canvas'
 import { renderFont } from './renders/font'
 import { renderPatch } from './renders/patch'
 import { renderLocation } from './renders/location'
@@ -77,6 +78,10 @@ export async function updateDom(
         }
         case RecordType.LOCATION: {
             renderLocation(data as LocationRecordData)
+            break
+        }
+        case RecordType.CANVAS_SNAPSHOT: {
+            renderCanvasSnapshot(data as CanvasSnapshotRecordData)
             break
         }
         case RecordType.CANVAS: {

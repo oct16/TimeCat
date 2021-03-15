@@ -32,3 +32,38 @@ export function strokesManager(opts: { keys: string[]; fn: Function; wait: numbe
         }
     }
 }
+
+type WatchedCanvas = HTMLCanvasElement & { typeWatchers: Function[] }
+
+export function detectCanvasContextType(
+    canvasElement: HTMLCanvasElement,
+    callback: (this: HTMLCanvasElement, contextId: string, options?: CanvasRenderingContext2DSettings) => void
+) {
+    const canvas = canvasElement as WatchedCanvas
+
+    if (!canvas.typeWatchers) {
+        canvas.typeWatchers = []
+
+        const original = canvas.getContext
+        canvas.getContext = function (
+            this: HTMLCanvasElement,
+            contextId: string,
+            options?: CanvasRenderingContext2DSettings
+        ) {
+            canvas.getContext = original
+            canvas.typeWatchers.forEach(callback => callback.call(this, contextId, options))
+            canvas.typeWatchers.length = 0
+            delete (canvas as any).typeWatchers
+            return original.apply(this, arguments)
+        } as typeof original
+    }
+
+    canvas.typeWatchers.push(callback)
+}
+
+export function isCanvasBlank(canvas: HTMLCanvasElement) {
+    const blank = document.createElement('canvas')
+    blank.width = canvas.width
+    blank.height = canvas.height
+    return canvas.toDataURL() === blank.toDataURL()
+}

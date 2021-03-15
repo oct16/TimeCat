@@ -1,11 +1,21 @@
 import { CanvasRecordData, UnionToIntersection } from '@timecat/share'
 import { canvasContext2DKeys, nodeStore } from '@timecat/utils'
 
+type CanvasElementWithContextType = {
+    contextType?: 'webgl' | '2d'
+} & HTMLCanvasElement
+
 export function renderCanvas2D(canvasRecordData: CanvasRecordData) {
     const data = canvasRecordData as UnionToIntersection<CanvasRecordData>
     const { src, status, id, strokes } = data
-    const canvas = nodeStore.getNode(id) as HTMLCanvasElement
+    const canvas = nodeStore.getNode(id) as CanvasElementWithContextType | null
     if (!canvas || canvas.constructor.name !== 'HTMLCanvasElement') {
+        return
+    }
+
+    if (!canvas.contextType) {
+        canvas.contextType = '2d'
+    } else if (canvas.contextType === 'webgl') {
         return
     }
 

@@ -10,7 +10,7 @@
 import { CanvasRecord, RecordType } from '@timecat/share'
 import { canvasContextWebGLKeys } from '@timecat/utils'
 import { Watcher } from '../../watcher'
-import { strokesManager } from './utils'
+import { detectCanvasContextType, isCanvasBlank, strokesManager } from './utils'
 
 const WebGLConstructors = [
     WebGLActiveInfo,
@@ -28,72 +28,77 @@ const WebGLConstructors = [
 export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     protected init() {
         const canvasElements = document.getElementsByTagName('canvas')
-        this.watchCanvas(Array.from(canvasElements))
+        Array.from(canvasElements).forEach(canvas => {
+            if (isCanvasBlank(canvas)) {
+                detectCanvasContextType(canvas, contextId => {
+                    if (contextId === 'webgl') {
+                        this.watchCanvas(canvas)
+                    }
+                })
+            }
+        })
     }
 
     private GLVars = Object.create(null) as { [key: string]: any }
 
-    public watchCanvas(canvasList: Array<HTMLCanvasElement>) {
+    public watchCanvas(canvasElement: HTMLCanvasElement) {
         const self = this
 
         const ctxProto = WebGLRenderingContext.prototype
-        Array.from(canvasList)
-            .map(canvas => canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
-            .forEach(ctx => {
-                if (!ctx) {
-                    return
-                }
-                const ctxTemp: { [key: string]: any } = {}
+        const ctx = canvasElement.getContext('webgl') || canvasElement.getContext('experimental-webgl')
+        if (!ctx) {
+            return
+        }
+        const ctxTemp: { [key: string]: any } = {}
 
-                for (const key in ctx) {
-                    const name = key as keyof RenderingContext
-                    if (name === 'canvas') {
-                        continue
+        for (const key in ctx) {
+            const name = key as keyof RenderingContext
+            if (name === 'canvas') {
+                continue
+            }
+
+            if (key === 'drawingBufferHeight' || key === 'drawingBufferWidth') {
+                continue
+            }
+
+            const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
+            const value = original.value
+            ctxTemp[name] = value
+
+            const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
+            if (descriptor && (!descriptor.configurable || descriptor.get)) {
+                return
+            }
+
+            Object.defineProperty(ctx, name, {
+                get() {
+                    const context = this
+                    const id = self.getNodeId(this.canvas)
+
+                    return typeof value === 'function'
+                        ? function () {
+                              const args = [...arguments]
+                              self.emitStroke(id, name, args)
+                              return value.apply(context, arguments)
+                          }
+                        : ctxTemp[name]
+                },
+                set: function (value: any) {
+                    const id = self.getNodeId(this.canvas)
+
+                    if (typeof value !== 'function') {
+                        this.emitStroke(id, name, value)
                     }
 
-                    if (key === 'drawingBufferHeight' || key === 'drawingBufferWidth') {
-                        continue
-                    }
-
-                    const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
-                    const value = original.value
                     ctxTemp[name] = value
-
-                    const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
-                    if (descriptor && (!descriptor.configurable || descriptor.get)) {
-                        return
-                    }
-
-                    Object.defineProperty(ctx, name, {
-                        get() {
-                            const context = this
-                            const id = self.getNodeId(this.canvas)
-
-                            return typeof value === 'function'
-                                ? function () {
-                                      const args = [...arguments]
-                                      self.emitStroke(id, name, args)
-                                      return value.apply(context, arguments)
-                                  }
-                                : ctxTemp[name]
-                        },
-                        set: function (value: any) {
-                            const id = self.getNodeId(this.canvas)
-
-                            if (typeof value !== 'function') {
-                                this.emitStroke(id, name, value)
-                            }
-
-                            ctxTemp[name] = value
-                            return original.set?.apply(this, arguments)
-                        }
-                    })
-
-                    this.uninstall(() => {
-                        Object.defineProperty(ctxProto, name, original)
-                    })
+                    return original.set?.apply(this, arguments)
                 }
             })
+
+            this.uninstall(() => {
+                Object.defineProperty(ctxProto, name, original)
+            })
+        }
     }
 
     parseArgs(argsList: any[]) {

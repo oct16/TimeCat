@@ -1,6 +1,10 @@
 import { WebGLRecordData } from '@timecat/share'
 import { nodeStore } from '@timecat/utils'
 
+type CanvasElementWithContextType = {
+    contextType?: 'webgl' | '2d'
+} & HTMLCanvasElement
+
 const WebGLConstructors = [
     WebGLActiveInfo,
     WebGLBuffer,
@@ -22,13 +26,18 @@ const getWebGLVariable = (value: any) => {
 
 export async function renderWebGL(data: WebGLRecordData) {
     const { id, args } = data
-    const node = nodeStore.getNode(id)
-    if (!node) {
+    const canvas = nodeStore.getNode(id) as CanvasElementWithContextType | null
+    if (!canvas) {
         return
     }
 
-    const canvasElement = node as HTMLCanvasElement
-    const gl = canvasElement.getContext('webgl')!
+    if (!canvas.contextType) {
+        canvas.contextType = 'webgl'
+    } else if (canvas.contextType === '2d') {
+        return
+    }
+
+    const gl = canvas.getContext('webgl')!
     args.forEach(({ name, args }: { name: keyof WebGLRenderingContext; args: any }) => {
         const command = gl[name]
         if (typeof command === 'function') {

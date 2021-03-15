@@ -68,7 +68,8 @@ export enum RecordType {
     'FONT',
     'PATCH',
     'CUSTOM',
-    'WEBGL'
+    'WEBGL',
+    'CANVAS_SNAPSHOT'
 }
 
 export enum FormElementEvent {
@@ -227,6 +228,7 @@ export type RecordData =
     | PreFetchRecord
     | CustomRecord
     | WebGLRecord
+    | CanvasSnapshotRecord
 
 export interface AudioData {
     src: string
@@ -347,4 +349,11 @@ export type WebGLRecord = BaseRecord<RecordType.WEBGL, WebGLRecordData>
 export interface WebGLRecordData {
     id: number
     args: any[]
+}
+
+export type CanvasSnapshotRecord = BaseRecord<RecordType.CANVAS_SNAPSHOT, CanvasSnapshotRecordData>
+
+export interface CanvasSnapshotRecordData {
+    id: number
+    src: string
 }

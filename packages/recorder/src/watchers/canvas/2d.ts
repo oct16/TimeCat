@@ -10,6 +10,7 @@
 import { CanvasRecord, RecordType } from '@timecat/share'
 import { canvasContext2DAttrs, canvasContext2DKeys } from '@timecat/utils'
 import { Watcher } from '../../watcher'
+import { detectCanvasContextType, isCanvasBlank } from './utils'
 
 type CanvasContext2DKeys = typeof canvasContext2DKeys[number]
 
@@ -23,74 +24,83 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
 
     protected init() {
         const canvasElements = document.getElementsByTagName('canvas')
-        this.watchCanvas(Array.from(canvasElements))
+        Array.from(canvasElements).forEach(canvas => {
+            if (isCanvasBlank(canvas)) {
+                detectCanvasContextType(canvas, contextId => {
+                    if (contextId === '2d') {
+                        this.watchCanvas(canvas)
+                    }
+                })
+            } else {
+                // assert is 2d
+                this.watchCanvas(canvas)
+            }
+        })
     }
 
-    public watchCanvas(canvasList: Array<HTMLCanvasElement>) {
+    public watchCanvas(canvasElement: HTMLCanvasElement) {
         const self = this
 
         const ctxProto = CanvasRenderingContext2D.prototype
         const names = canvasContext2DKeys
 
-        canvasList
-            .map(canvas => canvas.getContext('2d'))
-            .forEach(ctx => {
-                if (!ctx) {
-                    return
-                }
+        const ctx = canvasElement.getContext('2d')
 
-                this.emitData(RecordType.CANVAS, {
-                    id: this.getNodeId(ctx.canvas),
-                    status: this.getCanvasInitState(ctx)
-                })
+        if (!ctx) {
+            return
+        }
 
-                const ctxTemp: { [key: string]: any } = {}
-                names.forEach(name => {
-                    const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
-                    const method = original.value
-                    const val = ctx[name as CanvasContext2DKeys]
-                    ctxTemp[name] = val
+        this.emitData(RecordType.CANVAS, {
+            id: this.getNodeId(ctx.canvas),
+            status: this.getCanvasInitState(ctx)
+        })
 
-                    const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
-                    if (descriptor && (!descriptor.configurable || descriptor.get)) {
-                        return
+        const ctxTemp: { [key: string]: any } = {}
+        names.forEach(name => {
+            const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
+            const method = original.value
+            const val = ctx[name as CanvasContext2DKeys]
+            ctxTemp[name] = val
+
+            const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
+            if (descriptor && (!descriptor.configurable || descriptor.get)) {
+                return
+            }
+
+            Object.defineProperty(ctx, name, {
+                get() {
+                    const context = this
+                    const id = self.getNodeId(this.canvas)
+
+                    return typeof method === 'function'
+                        ? function () {
+                              const args = [...arguments]
+                              if (name === 'drawImage' || name === 'createPattern') {
+                                  args[0] = id
+                              }
+
+                              self.aggregateDataEmitter(id, name, args)
+                              return method.apply(context, arguments)
+                          }
+                        : ctxTemp[name]
+                },
+                set: function (value: any) {
+                    const id = self.getNodeId(this.canvas)
+
+                    if (typeof value !== 'function') {
+                        self.aggregateDataEmitter(id, name, value)
                     }
 
-                    Object.defineProperty(ctx, name, {
-                        get() {
-                            const context = this
-                            const id = self.getNodeId(this.canvas)
+                    ctxTemp[name] = value
 
-                            return typeof method === 'function'
-                                ? function () {
-                                      const args = [...arguments]
-                                      if (name === 'drawImage' || name === 'createPattern') {
-                                          args[0] = id
-                                      }
-
-                                      self.aggregateDataEmitter(id, name, args)
-                                      return method.apply(context, arguments)
-                                  }
-                                : ctxTemp[name]
-                        },
-                        set: function (value: any) {
-                            const id = self.getNodeId(this.canvas)
-
-                            if (typeof value !== 'function') {
-                                self.aggregateDataEmitter(id, name, value)
-                            }
-
-                            ctxTemp[name] = value
-
-                            return original.set?.apply(this, arguments)
-                        }
-                    })
-
-                    this.uninstall(() => {
-                        Object.defineProperty(ctxProto, name, original)
-                    })
-                })
+                    return original.set?.apply(this, arguments)
+                }
             })
+
+            this.uninstall(() => {
+                Object.defineProperty(ctxProto, name, original)
+            })
+        })
     }
 
     private aggregateDataEmitter = this.aggregateManager(
