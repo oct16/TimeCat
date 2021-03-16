@@ -22,9 +22,10 @@ import {
     CharacterDataUpdateData
 } from '@timecat/share'
 import { Watcher } from '../watcher'
-import { Canvas2DWatcher } from './canvas'
+import { Canvas2DWatcher, CanvasWebGLWatcher } from './canvas'
 import { rewriteNodes } from '../common'
 import { Recorder } from '../recorder'
+import { detectCanvasContextType } from './canvas/utils'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
     protected init() {
@@ -260,8 +261,17 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 .map(node => nodeStore.getNode(node.node.id) as HTMLCanvasElement)
                 .filter(Boolean)
 
-            const watcher: Canvas2DWatcher = this.options.watchers.get(Canvas2DWatcher.name)
-            watcher.watchCanvas(elements)
+            const canvas2DWatcher: Canvas2DWatcher = this.options.watchers.get(Canvas2DWatcher.name)
+            const canvasWebGLWatcher: CanvasWebGLWatcher = this.options.watchers.get(CanvasWebGLWatcher.name)
+            elements.forEach(canvas => {
+                detectCanvasContextType(canvas, type => {
+                    if (type === '2d') {
+                        canvas2DWatcher.watchCanvas(canvas)
+                    } else if (type === 'webgl') {
+                        canvasWebGLWatcher.watchCanvas(canvas)
+                    }
+                })
+            })
         }
     }
 

@@ -33,13 +33,11 @@ export function strokesManager(opts: { keys: string[]; fn: Function; wait: numbe
     }
 }
 
-type WatchedCanvas = HTMLCanvasElement & { typeWatchers: Function[] }
-
 export function detectCanvasContextType(
     canvasElement: HTMLCanvasElement,
     callback: (this: HTMLCanvasElement, contextId: string, options?: CanvasRenderingContext2DSettings) => void
 ) {
-    const canvas = canvasElement as WatchedCanvas
+    const canvas = canvasElement as HTMLCanvasElement & { typeWatchers: Function[] }
 
     if (!canvas.typeWatchers) {
         canvas.typeWatchers = []
