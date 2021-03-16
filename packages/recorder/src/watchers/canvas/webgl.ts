@@ -31,7 +31,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         Array.from(canvasElements).forEach(canvas => {
             if (isCanvasBlank(canvas)) {
                 detectCanvasContextType(canvas, contextId => {
-                    if (contextId === 'webgl') {
+                    if (contextId === 'webgl' || contextId === 'experimental-webgl') {
                         this.watchCanvas(canvas)
                     }
                 })

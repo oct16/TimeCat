@@ -2,7 +2,7 @@ import { WebGLRecordData } from '@timecat/share'
 import { nodeStore } from '@timecat/utils'
 
 type CanvasElementWithContextType = {
-    contextType?: 'webgl' | '2d'
+    contextType?: 'webgl' | 'experimental-webgl' | '2d'
 } & HTMLCanvasElement
 
 const WebGLConstructors = [

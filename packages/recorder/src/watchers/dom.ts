@@ -267,7 +267,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 detectCanvasContextType(canvas, type => {
                     if (type === '2d') {
                         canvas2DWatcher.watchCanvas(canvas)
-                    } else if (type === 'webgl') {
+                    } else if (type === 'webgl' || type === 'experimental-webgl') {
                         canvasWebGLWatcher.watchCanvas(canvas)
                     }
                 })

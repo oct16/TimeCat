@@ -2,7 +2,7 @@ import { CanvasRecordData, UnionToIntersection } from '@timecat/share'
 import { canvasContext2DKeys, nodeStore } from '@timecat/utils'
 
 type CanvasElementWithContextType = {
-    contextType?: 'webgl' | '2d'
+    contextType?: 'webgl' | 'experimental-webgl' | '2d'
 } & HTMLCanvasElement
 
 export function renderCanvas2D(canvasRecordData: CanvasRecordData) {
@@ -15,7 +15,7 @@ export function renderCanvas2D(canvasRecordData: CanvasRecordData) {
 
     if (!canvas.contextType) {
         canvas.contextType = '2d'
-    } else if (canvas.contextType === 'webgl') {
+    } else if (canvas.contextType === 'webgl' || canvas.contextType === 'experimental-webgl') {
         return
     }
 
