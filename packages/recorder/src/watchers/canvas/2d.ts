@@ -94,7 +94,8 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
                     ctxTemp[name] = value
 
                     return original.set?.apply(this, arguments)
-                }
+                },
+                configurable: true
             })
 
             this.uninstall(() => {

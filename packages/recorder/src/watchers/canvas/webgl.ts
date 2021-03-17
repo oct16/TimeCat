@@ -92,11 +92,12 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
 
                     ctxTemp[name] = value
                     return original.set?.apply(this, arguments)
-                }
+                },
+                configurable: true
             })
 
             this.uninstall(() => {
-                Object.defineProperty(ctxProto, name, original)
+                Object.defineProperty(ctx, name, original)
             })
         }
     }
