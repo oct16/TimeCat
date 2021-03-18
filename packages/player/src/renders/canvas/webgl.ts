@@ -1,5 +1,5 @@
 import { WebGLRecordData } from '@timecat/share'
-import { delay, nodeStore } from '@timecat/utils'
+import { delay, isNumeric, nodeStore } from '@timecat/utils'
 
 type CanvasElementWithContextType = {
     contextType?: 'webgl' | 'experimental-webgl' | '2d'
@@ -44,13 +44,21 @@ export async function renderWebGL(data: WebGLRecordData) {
         if (typeof command === 'function') {
             args = args.map((arg: any) => {
                 if (typeof arg === 'string') {
-                    if (arg.startsWith('*')) {
-                        const floatArr = arg.slice(1).split(',')
-                        return new Float32Array(floatArr as any)
+                    if (arg.startsWith('$f32arr')) {
+                        const float32Arr = arg.slice(7).split(',')
+                        return new Float32Array(float32Arr as any)
+                    } else if (arg.startsWith('$arr')) {
+                        const arr = new Array(...(arg.slice(4).split(',') as string[]))
+                        return arr.map(i => (isNumeric(i) ? +i : i))
                     } else if (arg.startsWith('$')) {
-                        const [name, index] = arg.slice(1).split('@')
-                        const varList = getWebGLVariable(name) as any[]
-                        return varList[+index]
+                        const [name, val] = arg.slice(1).split('@')
+                        if (name === 'src') {
+                            const img = document.createElement('img')
+                            img.setAttribute(name, val)
+                            return img
+                        }
+                        const varList = getWebGLVariable(name)
+                        return varList[+val]
                     }
                 }
                 return arg

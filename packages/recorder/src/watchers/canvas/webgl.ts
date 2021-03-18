@@ -70,7 +70,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         const ctxTemp: { [key: string]: any } = {}
 
         for (const key in ctx) {
-            const name = key as keyof RenderingContext
+            const name = key as keyof WebGLRenderingContext
             if (name === 'canvas') {
                 continue
             }
@@ -138,7 +138,11 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     // inspired by https://github.com/evanw/webgl-recorder/blob/master/webgl-recorder.js
     private getWebGLVariable(arg: any) {
         if (ArrayBuffer.isView(arg)) {
-            return '*' + Array.prototype.slice.call(arg)
+            return '$f32arr' + Array.prototype.slice.call(arg)
+        } else if (arg instanceof Array) {
+            return '$arr' + Array.prototype.slice.call(arg)
+        } else if (arg instanceof HTMLImageElement) {
+            return '$src@' + arg.src
         } else if (
             WebGLConstructors.some(ctor => arg instanceof ctor) ||
             (typeof arg === 'object' && arg !== null) ||
