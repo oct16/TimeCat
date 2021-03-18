@@ -1,5 +1,5 @@
 import { WebGLRecordData } from '@timecat/share'
-import { nodeStore } from '@timecat/utils'
+import { delay, nodeStore } from '@timecat/utils'
 
 type CanvasElementWithContextType = {
     contextType?: 'webgl' | 'experimental-webgl' | '2d'
@@ -25,6 +25,7 @@ const getWebGLVariable = (value: any) => {
 }
 
 export async function renderWebGL(data: WebGLRecordData) {
+    await delay()
     const { id, args } = data
     const canvas = nodeStore.getNode(id) as CanvasElementWithContextType | null
     if (!canvas) {

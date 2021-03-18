@@ -22,10 +22,8 @@ import {
     CharacterDataUpdateData
 } from '@timecat/share'
 import { Watcher } from '../watcher'
-import { Canvas2DWatcher, CanvasWebGLWatcher } from './canvas'
 import { rewriteNodes } from '../common'
 import { Recorder } from '../recorder'
-import { detectCanvasContextType } from './canvas/utils'
 
 export class DOMWatcher extends Watcher<DOMRecord> {
     protected init() {
@@ -223,7 +221,7 @@ export class DOMWatcher extends Watcher<DOMRecord> {
         const time = getTime()
 
         if (data.addedNodes) {
-            this.watchCanvas(addedNodes)
+            // this.watchCanvas(addedNodes)
             this.watchIFrames(addedNodes)
             this.rewriteAddedSource(addedNodes, time)
         }
@@ -248,31 +246,6 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             return (data.node as VNode).tag === name
         })
         return elements as UpdateNodeData<VNode>[]
-    }
-
-    private watchCanvas(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
-        const { G_RECORD_OPTIONS: options } = window
-        if (options.disableWatchers.includes(Canvas2DWatcher.name)) {
-            return
-        }
-        const canvasNodes = this.findElementsByTag('canvas', addedNodes)
-        if (canvasNodes.length) {
-            const elements = canvasNodes
-                .map(node => nodeStore.getNode(node.node.id) as HTMLCanvasElement)
-                .filter(Boolean)
-
-            const canvas2DWatcher: Canvas2DWatcher = this.options.watchers.get(Canvas2DWatcher.name)
-            const canvasWebGLWatcher: CanvasWebGLWatcher = this.options.watchers.get(CanvasWebGLWatcher.name)
-            elements.forEach(canvas => {
-                detectCanvasContextType(canvas, type => {
-                    if (type === '2d') {
-                        canvas2DWatcher.watchCanvas(canvas)
-                    } else if (type === 'webgl' || type === 'experimental-webgl') {
-                        canvasWebGLWatcher.watchCanvas(canvas)
-                    }
-                })
-            })
-        }
     }
 
     private watchIFrames(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {

@@ -8,7 +8,8 @@
  */
 
 import { CanvasRecord, RecordType } from '@timecat/share'
-import { canvasContextWebGLKeys } from '@timecat/utils'
+import { canvasContextWebGLKeys, nodeStore } from '@timecat/utils'
+import { hijackCreateCanvasElement, removeHijacks } from '../../hijack'
 import { Watcher } from '../../watcher'
 import { detectCanvasContextType, isCanvasBlank, strokesManager } from './utils'
 
@@ -27,6 +28,13 @@ const WebGLConstructors = [
 
 export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     protected init() {
+        this.watchCreatedCanvas()
+        this.watchCreatingCanvas()
+    }
+
+    private GLVars = Object.create(null) as { [key: string]: any }
+
+    private watchCreatedCanvas() {
         const canvasElements = document.getElementsByTagName('canvas')
         Array.from(canvasElements).forEach(canvas => {
             if (isCanvasBlank(canvas)) {
@@ -39,9 +47,19 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         })
     }
 
-    private GLVars = Object.create(null) as { [key: string]: any }
+    private watchCreatingCanvas() {
+        hijackCreateCanvasElement(canvas => {
+            detectCanvasContextType(canvas, contextId => {
+                if (contextId === 'webgl' || contextId === 'experimental-webgl') {
+                    this.watchCanvas(canvas)
+                }
+            })
+        })
 
-    public watchCanvas(canvasElement: HTMLCanvasElement) {
+        this.uninstall(() => removeHijacks())
+    }
+
+    private watchCanvas(canvasElement: HTMLCanvasElement) {
         const self = this
 
         const ctxProto = WebGLRenderingContext.prototype
@@ -73,22 +91,25 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
             Object.defineProperty(ctx, name, {
                 get() {
                     const context = this
-                    const id = self.getNodeId(this.canvas)
 
                     return typeof value === 'function'
                         ? function () {
                               const args = [...arguments]
-                              self.emitStroke(id, name, args)
+                              setTimeout(() => {
+                                  const id = self.getNodeId(context.canvas) || nodeStore.addNode(canvasElement)
+                                  self.emitStroke(id, name, args)
+                              })
                               return value.apply(context, arguments)
                           }
                         : ctxTemp[name]
                 },
                 set: function (value: any) {
-                    const id = self.getNodeId(this.canvas)
-
-                    if (typeof value !== 'function') {
-                        this.emitStroke(id, name, value)
-                    }
+                    setTimeout(() => {
+                        const id = self.getNodeId(this.canvas) || nodeStore.addNode(canvasElement)
+                        if (typeof value !== 'function') {
+                            this.emitStroke(id, name, value)
+                        }
+                    })
 
                     ctxTemp[name] = value
                     return original.set?.apply(this, arguments)
@@ -102,7 +123,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         }
     }
 
-    parseArgs(argsList: any[]) {
+    private parseArgs(argsList: any[]) {
         return argsList.map(({ name, args }) => {
             return {
                 name,
@@ -137,14 +158,15 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         return arg
     }
 
-    emitStroke = strokesManager({
+    private emitStroke = strokesManager({
         keys: canvasContextWebGLKeys,
         wait: 20,
         blockInstances: [],
         fn: (id: number, args: { name: keyof typeof canvasContextWebGLKeys; args: any[] }[]) => {
+            args = this.parseArgs(args)
             this.emitData(RecordType.WEBGL, {
                 id,
-                args: this.parseArgs(args)
+                args
             })
         }
     })

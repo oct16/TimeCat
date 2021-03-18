@@ -306,6 +306,13 @@ export function removeGlobalVariables() {
     })
 }
 
+export function isNativeFunction(fn: Function) {
+    if (fn.toString().indexOf('[native code]') > -1) {
+        return true
+    }
+    return false
+}
+
 export const tempEmptyFn = () => {}
 export const tempEmptyPromise = () => Promise.resolve()
 

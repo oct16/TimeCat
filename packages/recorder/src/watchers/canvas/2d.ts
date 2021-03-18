@@ -9,6 +9,7 @@
 
 import { CanvasRecord, RecordType } from '@timecat/share'
 import { canvasContext2DAttrs, canvasContext2DKeys } from '@timecat/utils'
+import { hijackCreateCanvasElement, removeHijacks } from '../../hijack'
 import { Watcher } from '../../watcher'
 import { detectCanvasContextType, isCanvasBlank } from './utils'
 
@@ -23,6 +24,11 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
     }
 
     protected init() {
+        this.watchCreatedCanvas()
+        this.watchCreatingCanvas()
+    }
+
+    private watchCreatedCanvas() {
         const canvasElements = document.getElementsByTagName('canvas')
         Array.from(canvasElements).forEach(canvas => {
             if (isCanvasBlank(canvas)) {
@@ -32,10 +38,20 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
                     }
                 })
             } else {
-                // assert is 2d
                 this.watchCanvas(canvas)
             }
         })
+    }
+
+    private watchCreatingCanvas() {
+        hijackCreateCanvasElement(canvas => {
+            detectCanvasContextType(canvas, contextId => {
+                if (contextId === '2d') {
+                    this.watchCanvas(canvas)
+                }
+            })
+        })
+        this.uninstall(() => removeHijacks())
     }
 
     public watchCanvas(canvasElement: HTMLCanvasElement) {
