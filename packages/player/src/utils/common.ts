@@ -19,7 +19,7 @@ import {
     AudioStrList
 } from '@timecat/share'
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
-import { delay, getDBOperator } from '@timecat/utils'
+import { delay, idb } from '@timecat/utils'
 import { Store } from './redux'
 import mobile from 'is-mobile'
 import { ContainerComponent } from '../components/container'
@@ -116,8 +116,7 @@ export function getRecordsFromStore() {
 }
 
 export async function getRecordsFromDB() {
-    const DBOperator = await getDBOperator
-    const records: DBRecordData[] | null = await DBOperator.readAllRecords()
+    const records: DBRecordData[] | null = await idb.readAll()
     if (records && records.length) {
         return records
     }

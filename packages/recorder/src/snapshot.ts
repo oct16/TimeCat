@@ -40,7 +40,7 @@ export class Snapshot extends Watcher<SnapshotRecord> {
 
         const getFrameElement = () => context.frameElement
         const frameElement = getFrameElement()
-        const frameId = nodeStore.getNodeId(frameElement) || null
+        const frameId = nodeStore.getNodeId(frameElement!) || null
         const baseHref = base?.href
 
         return {

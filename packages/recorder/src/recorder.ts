@@ -11,15 +11,15 @@ import { watchers, baseWatchers } from './watchers'
 import { RecordAudio } from './audio'
 import { RecordData, RecordType, TerminateRecord } from '@timecat/share'
 import {
-    getDBOperator,
     logError,
-    IndexedDBOperator,
     nodeStore,
     getTime,
     stateDebounce,
     throttle,
     tempEmptyFn,
-    tempEmptyPromise
+    tempEmptyPromise,
+    IDB,
+    idb
 } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
@@ -117,7 +117,7 @@ export class RecorderModule extends Pluginable {
     private watcherResolve: Function
 
     public status: Status = 'stop'
-    public db: IndexedDBOperator
+    public db: IDB
     public options: RecordInternalOptions
 
     constructor(options?: RecordOptions) {
@@ -130,7 +130,7 @@ export class RecorderModule extends Pluginable {
 
     private async init() {
         const options = this.options
-        this.db = await getDBOperator
+        this.db = idb
         this.loadPlugins()
         this.hooks.beforeRun.call(this)
         this.record(options)
@@ -172,7 +172,7 @@ export class RecorderModule extends Pluginable {
             }
             if (data.relatedId) {
                 if (this.options.write) {
-                    await this.db.addRecord(data as TerminateRecord)
+                    this.db.add(data as TerminateRecord)
                 }
                 this.connectCompose(this.middlewares)(data as RecordData)
             }
@@ -182,8 +182,8 @@ export class RecorderModule extends Pluginable {
         }
     }
 
-    public async clearDB() {
-        await this.db.clear()
+    public clearDB() {
+        this.db.clear()
     }
 
     private async cancelListener() {
@@ -245,14 +245,14 @@ export class RecorderModule extends Pluginable {
                         await this.connectCompose(this.middlewares)(record)
                         this.hooks.emit.call(record)
                         if (write) {
-                            this.db.addRecord(record)
+                            this.db.add(record)
                         }
                     }
                     concurrency--
                 }
             })()
 
-            return async (data: RecordData) => {
+            return (data: RecordData) => {
                 if (!data) {
                     return
                 }
