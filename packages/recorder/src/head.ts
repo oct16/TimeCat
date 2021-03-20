@@ -10,17 +10,8 @@
 import { ReplayHead } from '@timecat/share'
 import { getRandomCode, getTime } from '@timecat/utils'
 import pkg from 'pkg'
-import Fingerprint2 from 'fingerprintjs2'
 
-export async function getHeadData() {
-    const fp = await Fingerprint2.getPromise({}).then(components => {
-        const values = components.map(component => {
-            return component.value
-        })
-        const murmur = Fingerprint2.x64hash128(values.join(''), 31)
-        return murmur
-    })
-
+export function getHeadData() {
     return {
         href: location.href,
         title: document.title,
@@ -28,7 +19,6 @@ export async function getHeadData() {
         userAgent: navigator.userAgent,
         platform: navigator.platform,
         beginTime: getTime(),
-        version: pkg.version,
-        fp
+        version: pkg.version
     } as ReplayHead
 }

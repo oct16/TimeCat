@@ -128,7 +128,7 @@ export class RecorderModule extends Pluginable {
         this.init()
     }
 
-    private async init() {
+    private init() {
         const options = this.options
         this.db = idb
         this.loadPlugins()
@@ -264,7 +264,7 @@ export class RecorderModule extends Pluginable {
 
         const emit = onEmit(options)
 
-        const headData = await getHeadData()
+        const headData = getHeadData()
 
         const relatedId = headData.relatedId
 
