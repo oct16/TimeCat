@@ -7,7 +7,7 @@
  *
  */
 
-import { createFlatVNode } from '@timecat/virtual-dom'
+import { createFlatVNode, getVNode } from '@timecat/virtual-dom'
 import { isVNode, isExistingNode, nodeStore, getTime } from '@timecat/utils'
 import {
     RecordType,
@@ -115,21 +115,16 @@ export class DOMWatcher extends Watcher<DOMRecord> {
             }
         })
 
-        const addedSiblingMap: Map<Node, VNode | VSNode> = new Map()
-        addNodesSet.forEach(node => {
-            const vn: VNode | VSNode = createFlatVNode(node as Element)
-            addedSiblingMap.set(node, vn)
-        })
-
         const addedNodes: UpdateNodeData[] = []
         const addedVNodesMap: Map<number, VNode> = new Map()
 
-        addNodesSet.forEach(node => {
+        addNodesSet.forEach((node: Element) => {
             const parentId = this.getNodeId(node.parentNode!)
-            const vn = addedSiblingMap.get(node)!
+            const id = nodeStore.getNodeId(node)
+            const vn: VNode | VSNode = id ? getVNode(node, { id }) : createFlatVNode(node as Element)
 
             if (isVNode(vn)) {
-                const name = (node as HTMLElement).constructor.name
+                const name = node.constructor.name
                 if (name.startsWith('SVG')) {
                     ;(vn as VNode).extra.isSVG = true
                 }

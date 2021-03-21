@@ -10,18 +10,18 @@
 import { VNode, VSNode } from '@timecat/share'
 import { nodeStore, isElementNode, completeCssHref } from '@timecat/utils'
 
-const getVNodeByEl = (el: Element, isSVG?: boolean): VNode | VSNode => {
+export const getVNode = (el: Element, opts: { isSVG?: boolean; id?: number } = {}): VNode | VSNode => {
     return isElementNode(el)
         ? {
-              id: nodeStore.createNodeId(),
+              id: opts.id || nodeStore.createNodeId(),
               type: el.nodeType,
               attrs: getAttr(el as HTMLElement & { checked: boolean }),
               tag: el.tagName.toLocaleLowerCase(),
               children: [] as VNode[],
-              extra: getExtra(el, isSVG)
+              extra: getExtra(el, opts.isSVG)
           }
         : {
-              id: nodeStore.createNodeId(),
+              id: opts.id || nodeStore.createNodeId(),
               type: el.nodeType,
               value: el.textContent as string
           }
@@ -108,14 +108,14 @@ const extraAttr = (attr: Attr) => {
 }
 
 export const createFlatVNode = (el: Element, isSVG = false) => {
-    const vNode = getVNodeByEl(el, isSVG)
+    const vNode = getVNode(el, { isSVG })
     const { id } = vNode
     nodeStore.addNode(el, id)
     return vNode
 }
 
 export const createElement = (el: Element, inheritSVG?: boolean): VNode | VSNode | null => {
-    const vNode = getVNodeByEl(el, inheritSVG)
+    const vNode = getVNode(el, { isSVG: inheritSVG })
     const { id } = vNode
     nodeStore.addNode(el, id)
 
