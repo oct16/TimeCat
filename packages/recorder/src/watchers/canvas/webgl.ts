@@ -28,8 +28,60 @@ const WebGLConstructors = [
 
 export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     protected init() {
-        this.watchCreatedCanvas()
-        this.watchCreatingCanvas()
+        // this.watchCreatedCanvas()
+        // this.watchCreatingCanvas()
+
+        this.patchWebGLProto(WebGLRenderingContext.prototype)
+        if (window.WebGL2RenderingContext !== undefined) {
+            this.patchWebGLProto(WebGL2RenderingContext.prototype)
+        }
+    }
+
+    patchWebGLProto(proto: WebGLRenderingContext | WebGL2RenderingContext) {
+        Object.getOwnPropertyNames(proto).forEach(
+            (name: keyof (WebGLRenderingContext | WebGL2RenderingContext) | 'constructor') => {
+                if (name === 'canvas' || name === 'constructor') {
+                    return
+                }
+                if ((proto as any).__lookupGetter__(name) !== undefined) {
+                    return
+                }
+
+                if (typeof proto[name] === 'function') {
+                    this.patchProtoFunc(proto, name)
+                }
+            }
+        )
+    }
+
+    private patchProtoFunc(
+        proto: WebGLRenderingContext | WebGL2RenderingContext,
+        name: keyof (WebGLRenderingContext | WebGL2RenderingContext)
+    ) {
+        const original = proto[name] as Function
+        const self = this
+        if ('isPatch' in original) {
+            return
+        }
+
+        const patch = function (this: WebGLRenderingContext) {
+            const ret = original.apply(this, arguments)
+            const args = [...arguments]
+            setTimeout(() => {
+                const canvas = this.canvas as HTMLCanvasElement
+                const id = self.getNodeId(canvas) || nodeStore.addNode(canvas)
+                self.emitStroke(id, name, args)
+            })
+            return ret
+        }
+
+        ;(patch as any).isPatch = true
+        ;(proto[name] as Function) = patch
+
+        this.uninstall(() => {
+            delete (patch as any).isPatch
+            ;(proto[name] as Function) = original
+        })
     }
 
     private GLVars = Object.create(null) as { [key: string]: any }
