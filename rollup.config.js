@@ -129,6 +129,7 @@ function createConfig(format, output, plugins = []) {
             exclude: ['**/index.html', '**/index.css']
         }),
         replace({
+            preventAssignment: true,
             'process.env.NODE_ENV': JSON.stringify(env),
             __VERSION__: masterVersion
         }),
