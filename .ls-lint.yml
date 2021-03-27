@@ -1,8 +1,0 @@
-ls:
-  packages/*/{src,__tests__}:
-    .js: kebab-case
-    .ts: kebab-case
-    .d.ts: camelCase
-    .spec.ts: camelCase | PascalCase
-    .spec.js: camelCase | PascalCase
-    .mock.ts: camelCase

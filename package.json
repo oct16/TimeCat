@@ -27,7 +27,6 @@
         "postinstall": "husky install",
         "preinstall": "$npm_execpath --silent run checkyarn",
         "checkyarn": "node ./scripts/checkYarn.js",
-        "ls-lint": "ls-lint",
         "lint": "eslint 'packages/**/*.{js,ts}' --quiet --fix",
         "test": "jest --verbose",
         "count": "git ls-files --exclude-standard -- ':!:**/*.[pjs][npv]g' ':!:.eslintrc' ':!: examples/*' ':!:.gitignore' ':!:README.*' ':!:LICENSE' ':!:yarn.lock' | xargs wc -l"
@@ -45,7 +44,6 @@
         "node": ">=10.0.0"
     },
     "devDependencies": {
-        "@ls-lint/ls-lint": "^1.9.2",
         "@microsoft/api-extractor": "^7.13.1",
         "@rollup/plugin-commonjs": "^17.1.0",
         "@rollup/plugin-html": "^0.2.3",
