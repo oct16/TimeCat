@@ -32,14 +32,14 @@ import { renderMouse } from './renders/mouse'
 import { renderFormEl } from './renders/form-el'
 import { renderDom } from './renders/dom'
 
-export async function updateDom(
+export async function renderAll(
     this: PlayerComponent,
-    record: RecordData,
+    recordData: RecordData,
     opts?: { speed: number; isJumping: boolean }
 ) {
     const { isJumping, speed } = opts || {}
     const delayTime = isJumping ? 0 : 200
-    const { type, data } = record
+    const { type, data } = recordData
 
     // waiting for mouse or scroll transform animation finish
     const actionDelay = () => (delayTime ? delay(delayTime) : Promise.resolve())

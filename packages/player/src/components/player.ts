@@ -8,7 +8,7 @@
  */
 
 import { PointerComponent } from './pointer'
-import { updateDom } from '../dom'
+import { renderAll } from '../render'
 import { getTime, isSnapshot, toTimeStamp, base64ToFloat32Array, encodeWAV, delay } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
@@ -453,7 +453,7 @@ export class PlayerComponent implements IComponent {
 
     private execFrame(record: RecordData) {
         const { isJumping, speed } = this
-        updateDom.call(this, record, { isJumping, speed })
+        renderAll.call(this, record, { isJumping, speed })
     }
 
     private calcFrames(maxInterval = this.maxFrameInterval) {
