@@ -38,7 +38,11 @@ export async function renderWebGL(data: WebGLRecordData) {
         return
     }
 
-    const gl = canvas.getContext('webgl')!
+    const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true })
+    if (!gl) {
+        return
+    }
+
     args.forEach(({ name, args }: { name: keyof WebGLRenderingContext; args: any }) => {
         const command = gl[name]
         if (typeof command === 'function') {
@@ -63,10 +67,11 @@ export async function renderWebGL(data: WebGLRecordData) {
                 }
                 return arg
             })
-            const ret = (command as any).call(gl, ...args)
+
+            const ret = command.apply(gl, args)
             if (ret?.constructor) {
                 const ctorName = ret.constructor.name
-                if (WebGLConstructors.some(item => item.name === ctorName)) {
+                if (WebGLConstructors.some(item => item.name === ctorName) || name === 'getExtension') {
                     const varList = getWebGLVariable(ctorName)
                     if (ret && Array.isArray(varList)) {
                         if (!~varList.indexOf(ret)) {

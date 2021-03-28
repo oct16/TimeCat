@@ -179,10 +179,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         return argsList.map(({ name, args }) => {
             return {
                 name,
-                args: args.map((arg: any[]) => {
-                    const variable = this.getWebGLVariable(arg)
-                    return variable
-                })
+                args: args.map((arg: any[]) => this.getWebGLVariable(arg))
             }
         })
     }
@@ -200,17 +197,15 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
             (typeof arg === 'object' && arg !== null) ||
             (arg && arg.constructor.name === 'WebGLVertexArrayObjectOES')
         ) {
-            const name = arg.constructor.name
-            const glVars = this.GLVars[name] || (this.GLVars[name] = [])
+            const ctorName = arg.constructor.name
+            const glVars = this.GLVars[ctorName] || (this.GLVars[ctorName] = [])
             let index = glVars.indexOf(arg)
             if (!~index) {
                 index = glVars.length
                 glVars.push(arg)
             }
-
-            return '$' + name + '@' + index
+            return '$' + ctorName + '@' + index
         }
-
         return arg
     }
 
@@ -218,7 +213,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         keys: canvasContextWebGLKeys,
         wait: 20,
         blockInstances: [],
-        fn: (id: number, args: { name: keyof typeof canvasContextWebGLKeys; args: any[] }[]) => {
+        fn: (id: number, args: Array<{ name: keyof typeof canvasContextWebGLKeys; args: any[] }>) => {
             args = this.parseArgs(args)
             this.emitData(RecordType.WEBGL, {
                 id,
