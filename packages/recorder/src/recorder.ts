@@ -60,7 +60,7 @@ interface PreFetchRewriteConfig extends RewriteConfig {
     crossUrl?: string
 }
 
-type Status = 'running' | 'destroyed' | 'stop'
+type Status = 'running' | 'halt' | 'pause'
 
 export type RewriteResource = RewriteItem[]
 export interface RecordOptions extends RecordOptionsBase {
@@ -75,7 +75,7 @@ export interface RewriteItem {
 }
 
 export class Recorder {
-    public status: Status = 'stop'
+    public status: Status = 'pause'
     public onData: RecorderModule['onData'] = tempEmptyFn
     public destroy: RecorderModule['destroy'] = tempEmptyPromise
     public use: RecorderModule['use'] = tempEmptyFn
@@ -116,7 +116,7 @@ export class RecorderModule extends Pluginable {
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
     private watcherResolve: Function
 
-    public status: Status = 'stop'
+    public status: Status = 'pause'
     public db: IDB
     public options: RecordInternalOptions
 
@@ -152,17 +152,17 @@ export class RecorderModule extends Pluginable {
     }
 
     public async destroy() {
-        if (this.status === 'destroyed') {
+        if (this.status === 'halt') {
             return
         }
 
-        await this.stop()
-        this.status = 'destroyed'
+        await this.pause()
+        this.status = 'halt'
     }
 
-    private async stop() {
+    private async pause() {
         if (this.status === 'running') {
-            this.status = 'stop'
+            this.status = 'pause'
             const last = await this.db.last()
             const data = {
                 type: RecordType.TERMINATE,
@@ -207,7 +207,7 @@ export class RecorderModule extends Pluginable {
     }
 
     private record(options: RecordOptions | RecordInternalOptions): void {
-        if (this.status === 'stop') {
+        if (this.status === 'pause') {
             const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
             this.startRecord((opts.context.G_RECORD_OPTIONS = opts))
             return
@@ -388,7 +388,7 @@ export class RecorderModule extends Pluginable {
             const viewChangeHandle = (state: keyof typeof ViewChangeState) => {
                 if (state === ViewChangeState.hide) {
                     this.hooks.end.call()
-                    this.stop()
+                    this.pause()
                     clear && clear()
                 } else {
                     this.record({ ...options, keep: true, emitLocationImmediate: false })
@@ -443,9 +443,7 @@ export class RecorderModule extends Pluginable {
                 if (this.status !== 'running') {
                     return
                 }
-                timer = window.setTimeout(() => {
-                    this.stop()
-                }, waitTime)
+                timer = window.setTimeout(() => this.pause(), waitTime)
             }
             const handle = () => {
                 if (this.status !== 'running') {
