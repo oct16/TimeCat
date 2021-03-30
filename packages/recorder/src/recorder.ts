@@ -115,6 +115,8 @@ export class RecorderModule extends Pluginable {
     private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
     private watcherResolve: Function
+    private destroyTime: number
+    private destroyWaitTime = 200
 
     public status: Status = 'pause'
     public db: IDB
@@ -156,19 +158,23 @@ export class RecorderModule extends Pluginable {
             return
         }
 
-        await this.pause()
-        this.status = 'halt'
+        const ret = await this.pause()
+        if (ret) {
+            this.status = 'halt'
+            this.destroyTime = ret.lastTime
+        }
     }
 
     private async pause() {
         if (this.status === 'running') {
             this.status = 'pause'
             const last = await this.db.last()
+            const lastTime = last.time + 1
             const data = {
                 type: RecordType.TERMINATE,
                 data: null,
                 relatedId: window.G_RECORD_RELATED_ID,
-                time: last.time + 1
+                time: lastTime
             }
             if (data.relatedId) {
                 if (this.options.write) {
@@ -179,6 +185,7 @@ export class RecorderModule extends Pluginable {
             await this.cancelListener()
             this.destroyStore.forEach(un => un())
             this.destroyStore.clear()
+            return { lastTime }
         }
     }
 
@@ -238,14 +245,15 @@ export class RecorderModule extends Pluginable {
                     if (concurrency >= MAX_CONCURRENCY) {
                         return
                     }
-
                     concurrency++
                     while (emitTasks.length) {
                         const record = emitTasks.shift()!
                         await this.connectCompose(this.middlewares)(record)
-                        this.hooks.emit.call(record)
-                        if (write) {
-                            this.db.add(record)
+                        if (!this.destroyTime || getTime() < this.destroyTime + this.destroyWaitTime) {
+                            this.hooks.emit.call(record)
+                            if (write) {
+                                this.db.add(record)
+                            }
                         }
                     }
                     concurrency--
