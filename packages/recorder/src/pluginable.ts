@@ -16,7 +16,14 @@ export interface RecorderPlugin {
     apply(recorder: Pluginable): void
 }
 
-type IHOOK = Record<'beforeRun' | 'run' | 'emit' | 'end', SyncHook<any, any, any>>
+enum HookStatus {
+    beforeRun = 'beforeRun',
+    run = 'run',
+    emit = 'emit',
+    end = 'end'
+}
+
+type IHOOK = Record<HookStatus, SyncHook<any, any, any>>
 
 export class Pluginable {
     protected hooks: IHOOK
