@@ -20,7 +20,7 @@ export class WindowWatcher extends Watcher<WindowRecord> {
     }
 
     protected init() {
-        this.emitData(...this.wrapData(this.context.document))
+        this.emitData(...this.wrapData(null))
         this.registerEvent({
             context: this.context,
             eventTypes: ['resize'],
@@ -34,16 +34,25 @@ export class WindowWatcher extends Watcher<WindowRecord> {
 
     private handleFn(e: Event) {
         const { type, target } = e
+        let id: number | null = null
+
+        if (target && target instanceof HTMLElement) {
+            if (target.constructor.name === HTMLVideoElement.name) {
+                return
+            }
+            id = this.getNodeId(target as Element | Document)
+        }
+
         if (type === 'resize') {
-            this.emitData(...this.wrapData(target as Element | Document))
+            this.emitData(...this.wrapData(id))
         }
     }
 
-    private wrapData(target: Element | Document): [RecordType.WINDOW, WindowRecord['data']] {
+    private wrapData(id: number | null): [RecordType.WINDOW, WindowRecord['data']] {
         return [
             RecordType.WINDOW,
             {
-                id: this.getNodeId(target) || null,
+                id,
                 width: this.width(),
                 height: this.height()
             }
