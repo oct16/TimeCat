@@ -8,7 +8,7 @@
  */
 
 import { throttle, isExistingNode } from '@timecat/utils'
-import { MouseRecord, RecordType, MouseEventType } from '@timecat/share'
+import { MouseRecord, RecordType, MouseEventType, MouseRecordData } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class MouseWatcher extends Watcher<MouseRecord> {
@@ -139,13 +139,17 @@ export class MouseWatcher extends Watcher<MouseRecord> {
             }
 
             const deg = getRotate(node)
-            const position = deg
-                ? { x, y } // downgrading
-                : {
-                      id,
-                      x: offsetX,
-                      y: offsetY
-                  }
+            let position: Omit<MouseRecordData, 'type'>
+
+            if (deg || !id) {
+                return null
+            } else {
+                position = {
+                    id,
+                    x: offsetX,
+                    y: offsetY
+                }
+            }
 
             const frameElement = doc?.defaultView?.frameElement as HTMLElement
             if (frameElement && mode === 'default') {
