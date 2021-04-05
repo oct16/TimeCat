@@ -165,27 +165,32 @@ export class RecorderModule extends Pluginable {
         const ret = await this.pause()
         if (ret) {
             this.status = Status.HALT
-            this.destroyTime = ret.lastTime
+            this.destroyTime = ret.lastTime || getTime()
         }
     }
 
     private async pause() {
         if (this.status === Status.RUNNING) {
             this.status = Status.PAUSE
-            const last = await this.db.last()
-            const lastTime = last.time + 1
-            const data = {
-                type: RecordType.TERMINATE,
-                data: null,
-                relatedId: window.G_RECORD_RELATED_ID,
-                time: lastTime
-            }
-            if (data.relatedId) {
-                if (this.options.write) {
-                    this.db.add(data as TerminateRecord)
+            const last = await this.db.last().catch(() => {})
+            let lastTime: number | null = null
+            if (last) {
+                lastTime = last.time + 1
+                const data = {
+                    type: RecordType.TERMINATE,
+                    data: null,
+                    relatedId: window.G_RECORD_RELATED_ID,
+                    time: lastTime
                 }
-                this.connectCompose(this.middlewares)(data as RecordData)
+
+                if (data.relatedId) {
+                    if (this.options.write) {
+                        this.db.add(data as TerminateRecord)
+                    }
+                    this.connectCompose(this.middlewares)(data as RecordData)
+                }
             }
+
             await this.cancelListener()
             this.destroyStore.forEach(un => un())
             this.destroyStore.clear()

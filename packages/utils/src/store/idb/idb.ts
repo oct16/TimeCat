@@ -60,7 +60,7 @@ export class IDB extends Database {
             openCursorRequest.onsuccess = () => {
                 const cursor = openCursorRequest.result
                 if (!cursor) {
-                    return reject()
+                    return reject('DB is empty')
                 }
                 const request = store.get(cursor.key)
                 request.onsuccess = () => {
