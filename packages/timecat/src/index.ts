@@ -8,7 +8,7 @@
  */
 
 export * from '@timecat/recorder'
-export * from '@timecat/player'
+export { Player, PlayerModule, exportReplay, createReplayDocument } from '@timecat/player'
 
 export {
     DBRecordData,
