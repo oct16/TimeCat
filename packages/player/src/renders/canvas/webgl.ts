@@ -14,8 +14,8 @@ const WebGLConstructors = [
     WebGLShader,
     WebGLShaderPrecisionFormat,
     WebGLTexture,
-    WebGLUniformLocation,
-    WebGLVertexArrayObject
+    WebGLUniformLocation
+    // WebGLVertexArrayObject
 ]
 
 const GLVars = Object.create(null) as { [key: string]: any[] }

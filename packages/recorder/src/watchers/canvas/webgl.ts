@@ -22,8 +22,8 @@ const WebGLConstructors = [
     WebGLShader,
     WebGLShaderPrecisionFormat,
     WebGLTexture,
-    WebGLUniformLocation,
-    WebGLVertexArrayObject
+    WebGLUniformLocation
+    // WebGLVertexArrayObject
 ]
 
 export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
