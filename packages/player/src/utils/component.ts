@@ -7,7 +7,7 @@
  *
  */
 
-import { parseHtmlStr } from '.'
+import { parseHtmlStr } from './common'
 
 export interface IComponent {
     parent: HTMLElement

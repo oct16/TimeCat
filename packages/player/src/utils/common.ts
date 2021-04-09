@@ -24,7 +24,6 @@ import { Store } from './redux'
 import mobile from 'is-mobile'
 import { ContainerComponent } from '../components/container'
 import FIXED_CSS from '../fixed.scss'
-import { html } from '.'
 import { convertVNode } from '@timecat/virtual-dom'
 
 export function download(src: Blob | string, name: string) {
@@ -199,7 +198,7 @@ export function injectIframeContent(contentDocument: Document, snapshotData: Sna
         const head = content.querySelector('head')
         if (head) {
             const style = parseHtmlStr(
-                html`<div>
+                `<div>
                     <style>
                         ${FIXED_CSS}
                     </style>

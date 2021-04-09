@@ -142,9 +142,7 @@ function createConfig(format, output, plugins = []) {
         plugins: [tsPlugin, ...defaultPlugins, ...plugins],
         output,
         onwarn: (msg, warn) => {
-            if (!/Circular/.test(msg)) {
-                warn(msg)
-            }
+            warn(msg)
         },
         treeshake: {
             moduleSideEffects: false

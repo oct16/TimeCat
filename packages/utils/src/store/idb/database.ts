@@ -7,7 +7,7 @@
  *
  */
 
-import { logError } from '@timecat/utils'
+import { logError } from '../../tools/common'
 import { TimeCatModel } from './model'
 
 export class Database {
