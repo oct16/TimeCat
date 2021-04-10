@@ -2,11 +2,8 @@ import path from 'path'
 import ts from 'rollup-plugin-typescript2'
 import json from '@rollup/plugin-json'
 import replace from '@rollup/plugin-replace'
-import commonjs from '@rollup/plugin-commonjs'
 import { string } from 'rollup-plugin-string'
 import scss from 'rollup-plugin-scss'
-import node from '@rollup/plugin-node-resolve'
-import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 if (!process.env.TARGET) {
     throw new Error('TARGET package must be specified via --environment flag.')
@@ -103,6 +100,12 @@ function createConfig(format, output, plugins = []) {
         }
     })
 
+    const nodePlugins = [
+        require('@rollup/plugin-commonjs')(),
+        require('rollup-plugin-node-polyfills')(),
+        require('@rollup/plugin-node-resolve').nodeResolve()
+    ]
+
     hasTSChecked = true
 
     const entryFile = /runtime$/.test(format) ? `src/runtime.ts` : `src/index.ts`
@@ -115,14 +118,6 @@ function createConfig(format, output, plugins = []) {
             output: false,
             failOnError: true
         }),
-        commonjs({
-            include: /node_modules/
-        }),
-        node({
-            browser: true,
-            mainFields: ['module', 'main']
-        }),
-        nodePolyfills(),
         json(),
         string({
             include: ['**/*.html', '**/*.css'],
@@ -139,7 +134,7 @@ function createConfig(format, output, plugins = []) {
     return {
         input: resolve(entryFile),
         external,
-        plugins: [tsPlugin, ...defaultPlugins, ...plugins],
+        plugins: [tsPlugin, ...defaultPlugins, ...nodePlugins, ...plugins],
         output,
         onwarn: (msg, warn) => {
             warn(msg)
@@ -187,7 +182,6 @@ function replaceHTMLSpacePlugin() {
             if (env === 'production' && list.some(path => id.includes(path))) {
                 return { code: code.replace(/(<.*?>)|\s+/g, (m, $1) => ($1 ? $1 : ' ')), map: { mappings: '' } }
             }
-            return { code, map: { mappings: '' } }
         }
     }
 }

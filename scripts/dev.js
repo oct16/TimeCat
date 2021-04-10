@@ -14,7 +14,7 @@ const env = 'development'
 const args = require('minimist')(process.argv.slice(2))
 const target = 'timecat'
 const formats = args.formats || args.f
-const sourceMap = args.sourcemap || args.s
+const sourceMap = args.sourcemap || args.s || true
 const resolveRoot = file => path.resolve('.', file)
 const resolvePackage = name => path.resolve(resolveRoot('packages'), target, name)
 
