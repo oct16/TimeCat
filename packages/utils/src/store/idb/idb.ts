@@ -43,7 +43,7 @@ export class IDB extends Database {
     }
 
     public async count(): Promise<number> {
-        const store = await this.getIDBObjectStore(TransactionMode.READONLY)
+        const store = this.getIDBObjectStore(TransactionMode.READONLY)
         return new Promise(resolve => {
             store.count().onsuccess = event => {
                 const count = event!.target!.result
@@ -53,7 +53,7 @@ export class IDB extends Database {
     }
 
     public async last(): Promise<RecordData> {
-        const store = await this.getIDBObjectStore(TransactionMode.READONLY)
+        const store = this.getIDBObjectStore(TransactionMode.READONLY)
 
         return new Promise((resolve, reject) => {
             const openCursorRequest = store.openKeyCursor(null, 'prev')
@@ -73,7 +73,7 @@ export class IDB extends Database {
     public async readAll(options?: { limit: number }) {
         const { limit } = options || {}
         await this.dbResolve
-        const store = await this.getIDBObjectStore(TransactionMode.READONLY)
+        const store = this.getIDBObjectStore(TransactionMode.READONLY)
         const records: DBRecordData[] = []
 
         // This would be store.getAll(), but it isn't supported by IE now.
@@ -118,7 +118,7 @@ export class IDB extends Database {
     }
 
     private async execAddTask(data: RecordData): Promise<void> {
-        const objectStore = await this.getIDBObjectStore(TransactionMode.READWRITE)
+        const objectStore = this.getIDBObjectStore(TransactionMode.READWRITE)
         objectStore.add(data)
     }
 
@@ -126,7 +126,7 @@ export class IDB extends Database {
         const { lowerBound, upperBound } = options || {}
         if (lowerBound && upperBound) {
             const keyRange = IDBKeyRange.bound(lowerBound, upperBound)
-            const store = await this.getIDBObjectStore(TransactionMode.READWRITE)
+            const store = this.getIDBObjectStore(TransactionMode.READWRITE)
             store.delete(keyRange)
         } else {
             logError('Options lowerBound and upperBound is required')
@@ -134,7 +134,7 @@ export class IDB extends Database {
     }
 
     async execClearTask(): Promise<void> {
-        const objectStore = await this.getIDBObjectStore(TransactionMode.READWRITE)
+        const objectStore = this.getIDBObjectStore(TransactionMode.READWRITE)
         objectStore.clear()
     }
 

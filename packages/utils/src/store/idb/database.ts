@@ -53,15 +53,14 @@ export class Database {
         })
     }
 
-    protected getIDBObjectStore(type: IDBTransactionMode): Promise<IDBObjectStore> {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db!.transaction(this.storeName, type)
-            transaction.oncomplete = () => {}
-            transaction.onabort = transaction.onerror = () => {
-                const err = transaction.error
-                logError(err) && reject(err)
-            }
-            resolve(transaction.objectStore(this.storeName))
-        })
+    protected getIDBObjectStore(type: IDBTransactionMode) {
+        const transaction = this.db!.transaction(this.storeName, type)
+
+        transaction.onabort = transaction.onerror = () => {
+            const err = transaction.error
+            logError(err)
+        }
+
+        return transaction.objectStore(this.storeName)
     }
 }
