@@ -61,9 +61,9 @@ interface PreFetchRewriteConfig extends RewriteConfig {
 }
 
 enum Status {
-    RUNNING,
-    PAUSE,
-    HALT
+    RUNNING = 'running',
+    PAUSE = 'pause',
+    HALT = 'halt'
 }
 
 export type RewriteResource = RewriteItem[]
