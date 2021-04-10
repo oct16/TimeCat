@@ -11,8 +11,9 @@ import { emptyTemplate, loadingScriptContent } from './tpl'
 import { base64ToFloat32Array, encodeWAV, isDev, getRandomCode, getScript, logError } from '@timecat/utils'
 import { compressWithGzipByte } from 'brick.json/gzip/esm'
 import { AudioData, AudioOptionsData, RecordData } from '@timecat/share'
-import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks, getRecordsFromStore } from './common'
+import { download, transToReplayData, getGZipData, getRecordsFromDB, getRecordsFromStore } from './common'
 import { recoverNative } from './polyfill/recover-native'
+import { getPacks } from './transform'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = Partial<{

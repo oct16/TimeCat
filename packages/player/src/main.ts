@@ -37,9 +37,9 @@ import {
     ProgressReducerTypes,
     ReplayDataReducerTypes,
     transToReplayData,
-    getGZipData,
-    getPacks
+    getGZipData
 } from './utils'
+import { getPacks } from './utils/transform'
 
 const defaultReplayOptions = {
     autoplay: true,
