@@ -4,21 +4,19 @@ import { delay } from '@timecat/utils'
 describe('Testing Recorder', () => {
     test('Recorder status', async done => {
         const recorder = new Recorder()
-        expect(recorder.status).toBe('stop')
-        await delay(200)
         expect(recorder.status).toBe('running')
-        recorder.destroy()
-        expect(recorder.status).toBe('stop')
+        await recorder.destroy()
+        expect(recorder.status).toBe('halt')
         done()
 
         const module = new RecorderModule()
-        expect(module.status).toBe('stop')
+        expect(module.status).toBe('running')
+        module.destroy()
+        expect(module.status).toBe('pause')
         setTimeout(() => {
-            expect(module.status).toBe('running')
-            module.destroy()
-            expect(module.status).toBe('stop')
-            done()
+            expect(module.status).toBe('halt')
         }, 200)
+        done()
     })
 
     test('Recorder Listeners', async () => {
@@ -28,7 +26,7 @@ describe('Testing Recorder', () => {
         expect(recorder['watchersInstance'].size).toBeGreaterThan(0)
         expect(recorder['destroyStore'].size).toBeGreaterThanOrEqual(0)
         expect(recorder['listenStore'].size).toBeGreaterThan(0)
-        await recorder['stop']()
+        await recorder['pause']()
         expect(recorder['listenStore'].size).toBeLessThanOrEqual(0)
         expect(recorder['watchers'].length).toBeGreaterThan(0)
         recorder['record']({})
