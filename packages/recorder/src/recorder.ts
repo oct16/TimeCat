@@ -19,7 +19,8 @@ import {
     tempEmptyFn,
     tempEmptyPromise,
     IDB,
-    idb
+    idb,
+    delay
 } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
@@ -257,6 +258,7 @@ export class RecorderModule extends Pluginable {
                     concurrency++
                     while (emitTasks.length) {
                         const record = emitTasks.shift()!
+                        await delay(0)
                         await this.connectCompose(this.middlewares)(record)
                         if (!this.destroyTime || getTime() < this.destroyTime + this.destroyWaitTime) {
                             this.hooks.emit.call(record)
