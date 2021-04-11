@@ -33,14 +33,19 @@ export class Watcher<T extends RecordData> {
 
     protected init(options: WatcherOptions<T>): void {}
 
-    getNode = (id: number): Node => nodeStore.getNode.call(nodeStore, id)
-    getNodeId = (n: Node): number => nodeStore.getNodeId.call(nodeStore, n)
+    public getNode = (id: number): Node => nodeStore.getNode.call(nodeStore, id)
+    public getNodeId = (n: Node): number => nodeStore.getNodeId.call(nodeStore, n)
 
-    uninstall(fn: Function) {
+    public uninstall(fn: Function) {
         this.options.listenStore.add(fn)
     }
 
-    emitData(type: RecordType, record: RecordData['data'], time = getTime(), callback?: (data: RecordData) => T) {
+    public emitData(
+        type: RecordType,
+        record: RecordData['data'],
+        time = getTime(),
+        callback?: (data: RecordData) => T
+    ) {
         const data = {
             type,
             data: record,
@@ -55,7 +60,7 @@ export class Watcher<T extends RecordData> {
         this.emit(data)
     }
 
-    registerEvent(options: {
+    public registerEvent(options: {
         context: Window
         eventTypes: string[]
         handleFn: (...args: any[]) => void
