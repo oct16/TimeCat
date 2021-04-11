@@ -196,7 +196,9 @@ export class PlayerComponent implements IComponent {
         this.records = this.orderRecords(records)
         this.audioData = audio
         const { userAgent } = head?.data || {}
-        this.pointer.showPointer(!isMobile(userAgent as string))
+        if (isMobile(userAgent as string)) {
+            this.pointer.hidePointer()
+        }
         this.initAudio()
 
         // live mode

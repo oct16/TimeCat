@@ -23,28 +23,32 @@ import { Component, html, IComponent } from '../utils'
     </div>`
 )
 export class PointerComponent implements IComponent {
-    parent: HTMLElement
-    target: HTMLElement
+    public parent: HTMLElement
+    public target: HTMLElement
 
-    x = 0
-    y = 0
+    private x = 0
+    private y = 0
 
-    show: boolean
-    pointer: HTMLElement
-    c: ContainerComponent
+    private show: boolean
+    private pointer: HTMLElement
+    private c: ContainerComponent
     constructor(c: ContainerComponent) {
         this.c = c
         this.initPointer()
+        this.togglePointer(true)
     }
 
     private initPointer() {
         this.pointer = this.c.container.querySelector('.player-pointer') as HTMLElement
-        this.move(0, 0)
     }
 
-    public showPointer(show = true) {
+    private togglePointer(show = !this.show) {
         this.show = show
-        ;(this.pointer.firstElementChild as HTMLElement).style.display = show ? 'inherit' : 'none'
+        ;(this.pointer.firstElementChild as HTMLElement).style.display = this.show ? 'inherit' : 'none'
+    }
+
+    public hidePointer() {
+        this.togglePointer((this.show = false))
     }
 
     public move(x: number, y: number) {
