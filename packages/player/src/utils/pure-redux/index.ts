@@ -9,7 +9,7 @@
 
 import { Store } from '../redux'
 import { State } from '../redux/types'
-import { ValueOf } from '@timecat/share/src'
+import { ValueOf } from '@timecat/share'
 
 export type Props = Partial<ValueOf<State>>
 

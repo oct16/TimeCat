@@ -13,7 +13,7 @@ import { PointerComponent } from './pointer'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
 import { BroadcasterComponent } from './broadcaster'
-import { ReplayInternalOptions } from '@timecat/share/src'
+import { ReplayInternalOptions } from '@timecat/share'
 import { Component, IComponent, html } from '../utils'
 import { ToolboxComponent } from './toolbox'
 

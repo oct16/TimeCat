@@ -8,7 +8,7 @@ import {
     VSNode
 } from '@timecat/share'
 import { isElementNode, isExistingNode, isVNode, nodeStore } from '@timecat/utils'
-import { convertVNode, createSpecialNode, setAttribute } from '@timecat/virtual-dom/src'
+import { convertVNode, createSpecialNode, setAttribute } from '@timecat/virtual-dom'
 
 function insertOrMoveNode(data: UpdateNodeData, orderSet: Set<number>) {
     const { parentId, nextId, node } = data
