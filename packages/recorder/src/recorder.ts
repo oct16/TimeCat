@@ -43,7 +43,7 @@ interface RecordOptionsBase {
     visibleChange?: boolean
     visibleChangeKeepTime?: number
     disableWatchers?: Array<keyof typeof watchers>
-    keepAlive?: number
+    keepAlive?: number | false
 }
 
 interface RecordInternalOptions extends Required<RecordOptions> {
@@ -110,7 +110,7 @@ export class RecorderModule extends Pluginable {
         visibleChangeKeepTime: 5000,
         rewriteResource: [],
         disableWatchers: [],
-        keepAlive: 0
+        keepAlive: false
     } as RecordOptions
     private defaultMiddlewares: RecorderMiddleware[] = []
     private destroyStore: Set<Function> = new Set()
