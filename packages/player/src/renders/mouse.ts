@@ -1,5 +1,5 @@
 import { MouseEventType, MouseRecordData } from '@timecat/share'
-import { nodeStore } from '@timecat/utils/src'
+import { nodeStore } from '@timecat/utils'
 import { PlayerComponent } from '../components/player'
 
 export function renderMouse(this: PlayerComponent, data: MouseRecordData) {

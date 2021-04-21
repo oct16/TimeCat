@@ -1,6 +1,6 @@
 import { SnapshotRecord } from '@timecat/share'
 import { nodeStore } from '@timecat/utils'
-import { setAttribute } from '@timecat/virtual-dom/src'
+import { setAttribute } from '@timecat/virtual-dom'
 import { createIframeDOM, injectIframeContent } from '../utils'
 
 export async function renderSnapshot(data: SnapshotRecord['data']) {
