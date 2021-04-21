@@ -34,7 +34,10 @@ import {
 @Component(
     'timecat-player',
     html`<div class="timecat-player">
-        <iframe class="player-sandbox" sandbox="allow-same-origin allow-scripts allow-popups"></iframe>
+        <iframe
+            class="player-sandbox"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox"
+        ></iframe>
     </div>`
 )
 export class PlayerComponent implements IComponent {
