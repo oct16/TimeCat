@@ -34,7 +34,8 @@ export { RecordData } from '@timecat/share'
 export type RecorderMiddleware = (data: RecordData, n: () => Promise<void>) => Promise<void>
 
 interface RecordOptionsBase {
-    context?: Window
+    context?: Window,
+    rootContext?: Window,
     audio?: boolean
     write?: boolean
     keep?: boolean
@@ -130,6 +131,7 @@ export class RecorderModule extends Pluginable {
     constructor(options?: RecordOptions) {
         super(options)
         const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
+        opts.rootContext = opts.rootContext || opts.context
         this.options = opts
         this.watchers = this.getWatchers() as typeof Watcher[]
         this.init()
@@ -234,7 +236,7 @@ export class RecorderModule extends Pluginable {
     private async startRecord(options: RecordInternalOptions) {
         let activeWatchers = [...this.watchers, ...this.pluginWatchers]
 
-        if (options.context === window) {
+        if (options.context === this.options.rootContext) {
             if (!options.keep) {
                 this.db.clear()
             }
@@ -289,7 +291,7 @@ export class RecorderModule extends Pluginable {
 
         options.context.G_RECORD_RELATED_ID = relatedId
 
-        if (options.context === window) {
+        if (options.context === this.options.rootContext) {
             emit({
                 type: RecordType.HEAD,
                 data: headData,
@@ -388,7 +390,11 @@ export class RecorderModule extends Pluginable {
     }
 
     private createIFrameRecorder(frameWindow: Window) {
-        const frameRecorder = new RecorderModule({ context: frameWindow, keep: true })
+        const frameRecorder = new RecorderModule({ 
+            context: frameWindow, 
+            keep: true,
+            rootContext: this.options.rootContext 
+        })
         const frameElement = frameWindow.frameElement as Element & { frameRecorder: RecorderModule }
         frameElement.frameRecorder = frameRecorder
         this.destroyStore.add(() => frameRecorder.destroy())
