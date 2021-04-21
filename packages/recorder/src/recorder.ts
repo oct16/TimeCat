@@ -359,9 +359,15 @@ export class RecorderModule extends Pluginable {
 
         return new Promise(resolve => {
             const timer = window.setInterval(() => {
-                if (frame.document) {
+                try {
+                    if (frame.document) {
+                        clearInterval(timer)
+                        resolve(frame)
+                    }
+                } catch (e) {
+                    logError(e)
                     clearInterval(timer)
-                    resolve(frame)
+                    resolve(undefined)
                 }
             }, 200)
         })
