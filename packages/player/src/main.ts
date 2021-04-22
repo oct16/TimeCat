@@ -47,7 +47,8 @@ const defaultReplayOptions = {
     target: window,
     heatPoints: true,
     timeMode: 'durationTime',
-    fastForward: [2, 8]
+    fastForward: [2, 8],
+    disableScaling: false
 }
 
 export class Player {
