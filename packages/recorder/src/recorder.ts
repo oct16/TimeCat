@@ -34,8 +34,8 @@ export { RecordData } from '@timecat/share'
 export type RecorderMiddleware = (data: RecordData, n: () => Promise<void>) => Promise<void>
 
 interface RecordOptionsBase {
-    context?: Window,
-    rootContext?: Window,
+    context?: Window
+    rootContext?: Window
     audio?: boolean
     write?: boolean
     keep?: boolean
@@ -390,10 +390,10 @@ export class RecorderModule extends Pluginable {
     }
 
     private createIFrameRecorder(frameWindow: Window) {
-        const frameRecorder = new RecorderModule({ 
-            context: frameWindow, 
+        const frameRecorder = new RecorderModule({
+            context: frameWindow,
             keep: true,
-            rootContext: this.options.rootContext 
+            rootContext: this.options.rootContext
         })
         const frameElement = frameWindow.frameElement as Element & { frameRecorder: RecorderModule }
         frameElement.frameRecorder = frameRecorder
