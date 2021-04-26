@@ -161,23 +161,25 @@ export class ContainerComponent {
             setHeight: number,
             setMaxScale: number
         ) {
-            const { mode: replayMode } = Store.getState().player.options || {}
+            if (!self.options.disableScaling) {
+                const { mode: replayMode } = Store.getState().player.options || {}
 
-            const panelHeight = replayMode === 'live' ? 0 : 40 - 2 // subtract the gap
+                const panelHeight = replayMode === 'live' ? 0 : 40 - 2 // subtract the gap
 
-            const scaleX = maxWidth / setWidth
-            const scaleY = maxHeight / (setHeight + panelHeight)
+                const scaleX = maxWidth / setWidth
+                const scaleY = maxHeight / (setHeight + panelHeight)
 
-            // limit scale
-            const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, setMaxScale || 1)
+                // limit scale
+                const scale = Math.min(scaleX > scaleY ? scaleY : scaleX, setMaxScale || 1)
 
-            const left = (setWidth * scale - setWidth) / 2 + (maxWidth - setWidth * scale) / 2
+                const left = (setWidth * scale - setWidth) / 2 + (maxWidth - setWidth * scale) / 2
 
-            const top = (maxHeight - setHeight - panelHeight * scale) / 2
+                const top = (maxHeight - setHeight - panelHeight * scale) / 2
 
-            target.style.transform = `scale(${scale})`
-            target.style.left = left + 'px'
-            target.style.top = top + 'px'
+                target.style.transform = `scale(${scale})`
+                target.style.left = left + 'px'
+                target.style.top = top + 'px'
+            }
 
             const currentWidth = parseInt(target.style.width)
             const currentHeight = parseInt(target.style.height)
