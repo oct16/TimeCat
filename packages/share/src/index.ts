@@ -280,7 +280,7 @@ export interface ReplayOptions {
     heatPoints?: boolean
     timeMode?: 'recordingTime' | 'durationTime'
     fastForward?: number[]
-    disableScaling?: false
+    disableScaling?: boolean
 }
 
 export interface ReplayInternalOptions extends ReplayOptions {
