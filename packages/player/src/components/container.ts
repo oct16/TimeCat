@@ -53,7 +53,9 @@ export class ContainerComponent {
         this.sandBoxDoc = this.sandBox.contentDocument!
         this.setSmoothScroll(this.sandBox.contentWindow!)
         createIframeDOM(this.sandBoxDoc, this.getSnapshotRecord())
-        disableScrolling(this.sandBox.contentWindow!.document)
+        if (this.options.disableScrolling) {
+            disableScrolling(this.sandBox.contentWindow!.document)
+        }
         this.setViewState()
     }
 
