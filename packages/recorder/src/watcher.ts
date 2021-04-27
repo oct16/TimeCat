@@ -19,7 +19,7 @@ export class Watcher<T extends RecordData> {
     context: Window
     private emit: RecordEvent<RecordData>
     options: WatcherArgs<T>
-    recordOptions: RecordOptions = window.G_RECORD_OPTIONS
+    recordOptions: RecordOptions
 
     constructor(options: WatcherArgs<T>) {
         const { emit, context, relatedId, recorder } = options
@@ -27,6 +27,7 @@ export class Watcher<T extends RecordData> {
         this.recorder = recorder
         this.relatedId = relatedId
         this.context = context
+        this.recordOptions = context.G_RECORD_OPTIONS || window.G_RECORD_OPTIONS || {}
         this.emit = emit
         this.init(options)
     }
