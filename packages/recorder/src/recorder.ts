@@ -301,15 +301,19 @@ export class RecorderModule extends Pluginable {
         }
 
         activeWatchers.forEach(Watcher => {
-            const watcher = new Watcher({
-                recorder: this,
-                context: options && options.context,
-                listenStore: this.listenStore,
-                relatedId,
-                emit,
-                watchers: this.watchersInstance
-            })
-            this.watchersInstance.set(Watcher.name, watcher)
+            try {
+                const watcher = new Watcher({
+                    recorder: this,
+                    context: options && options.context,
+                    listenStore: this.listenStore,
+                    relatedId,
+                    emit,
+                    watchers: this.watchersInstance
+                })
+                this.watchersInstance.set(Watcher.name, watcher)
+            } catch (e) {
+                logError(e)
+            }
         })
 
         if (options.emitLocationImmediate) {
