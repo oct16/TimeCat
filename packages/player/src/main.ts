@@ -204,15 +204,16 @@ export class PlayerModule {
                 if (isResolved) {
                     this.dispatchEvent('record-data', data as RecordData)
                 } else {
+                    if (data.type === RecordType.HEAD) {
+                        head = data
+                    } else if (data.type === RecordType.SNAPSHOT) {
+                        snapshot = data
+                    }
+
                     if (head && snapshot) {
                         isResolved = true
                         resolve([head, snapshot])
-                    } else {
-                        if (data.type === RecordType.HEAD) {
-                            head = data
-                        } else if (data.type === RecordType.SNAPSHOT) {
-                            snapshot = data
-                        }
+                        this.dispatchEvent('record-data', data as RecordData)
                     }
                 }
             })
