@@ -167,7 +167,7 @@ interface FormElementStrPatches {
     len?: number | undefined
 }
 
-export type AudioRecord = BaseRecord<RecordType.AUDIO, AudioStrList | AudioOptions>
+export type AudioRecord = BaseRecord<RecordType.AUDIO, AudioStrList | AudioOptions | AudioData>
 export interface AudioOptions {
     type: 'opts'
     data: AudioOptionsData

@@ -16,7 +16,9 @@ import {
     DBRecordData,
     AudioRecord,
     HeadRecord,
-    AudioStrList
+    AudioStrList,
+    AudioData,
+    AudioOptions
 } from '@timecat/share'
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
 import { delay, idb } from '@timecat/utils'
@@ -40,8 +42,8 @@ export function download(src: Blob | string, name: string) {
 }
 
 export function transToReplayData(records: RecordData[]): ReplayData {
-    function isAudioBufferStr(record: AudioRecord) {
-        return record.data.type === 'base64'
+    function isAudioBufferStr(record: AudioStrList) {
+        return record.type === 'base64'
     }
 
     const replayData: ReplayData = {
@@ -73,14 +75,17 @@ export function transToReplayData(records: RecordData[]): ReplayData {
                 }
                 break
             case RecordType.AUDIO:
-                if (isAudioBufferStr(record as AudioRecord)) {
-                    const audioData = record as AudioRecord
-                    replayData.audio.bufferStrList.push(...(audioData.data as AudioStrList).data)
+                const { data: audioData } = record as AudioRecord
+                if ((audioData as AudioData).src) {
+                    const data = audioData as AudioData
+                    replayData.audio.src = data.src
+                    replayData.audio.subtitles = data.subtitles
+                } else if (isAudioBufferStr(audioData as AudioStrList)) {
+                    replayData.audio.bufferStrList.push(...(audioData as AudioStrList).data)
                 } else {
-                    replayData.audio.opts = (record as AudioRecord).data.data as AudioOptionsData
+                    replayData.audio.opts = (audioData as AudioOptions).data
                 }
                 break
-
             default:
                 if (replayData) {
                     replayData.records.push(record as RecordData)
@@ -88,7 +93,6 @@ export function transToReplayData(records: RecordData[]): ReplayData {
                 break
         }
     })
-
     return replayData
 }
 
