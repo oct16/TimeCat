@@ -58,6 +58,7 @@ export class PlayerComponent implements IComponent {
     frameInterval: number
     maxFrameInterval = 250
     frames: number[]
+    maxFps = 30
 
     initTime: number
     startTime: number
@@ -76,6 +77,7 @@ export class PlayerComponent implements IComponent {
 
     RAF: AnimationFrame
     isJumping: boolean
+    shouldWaitForSync: boolean
 
     maxIntensityStep = 8
 
@@ -219,6 +221,7 @@ export class PlayerComponent implements IComponent {
 
     private async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
         this.isJumping = true
+        this.shouldWaitForSync = true
         let loading: HTMLElement | undefined = undefined
         const { speed } = Store.getState().player
         const { index, time, percent } = state
@@ -261,6 +264,7 @@ export class PlayerComponent implements IComponent {
         this.audioData = nextReplayData.audio
         this.initAudio()
         this.startTime = time
+        this.subtitlesIndex = 0
 
         if (percent !== undefined) {
             this.progress.moveThumb(percent)
@@ -277,6 +281,7 @@ export class PlayerComponent implements IComponent {
         }
 
         this.isJumping = false
+        setTimeout(() => (this.shouldWaitForSync = false), 100)
     }
 
     private getNextReplayData(index: number): ReplayData | null {
@@ -323,8 +328,7 @@ export class PlayerComponent implements IComponent {
             this.RAF.stop()
         }
 
-        const maxFps = 30
-        this.RAF = new AnimationFrame(loop.bind(this), maxFps)
+        this.RAF = new AnimationFrame(loop.bind(this), this.maxFps)
         this.options.destroyStore.add(() => this.RAF.stop())
         this.RAF.start()
 
@@ -413,20 +417,34 @@ export class PlayerComponent implements IComponent {
             this.recordIndex++
         }
 
+        this.syncSubtitles()
+    }
+
+    private async syncSubtitles() {
+        if (this.shouldWaitForSync) {
+            return
+        }
+
         if (this.audioData && this.audioData.subtitles.length) {
             const subtitles = this.audioData.subtitles
-            const { start, end, text } = subtitles[this.subtitlesIndex]
-            const audioStartTime = toTimeStamp(start)
+            let { text } = subtitles[this.subtitlesIndex]
+            const { end } = subtitles[this.subtitlesIndex]
             const audioEndTime = toTimeStamp(end)
 
             if (this.elapsedTime > audioEndTime / 1000) {
                 this.broadcaster.cleanText()
                 if (this.subtitlesIndex < subtitles.length - 1) {
-                    this.subtitlesIndex++
+                    while (true) {
+                        const nextEndTime = toTimeStamp(subtitles[this.subtitlesIndex].end)
+                        if (nextEndTime / 1000 > this.elapsedTime) {
+                            break
+                        }
+                        this.subtitlesIndex++
+                    }
+                    text = subtitles[this.subtitlesIndex].text
                 }
-            } else if (this.elapsedTime > audioStartTime / 1000) {
-                this.broadcaster.updateText(text)
             }
+            this.broadcaster.updateText(text)
         }
     }
 
