@@ -280,8 +280,6 @@ export interface ReplayOptions {
     heatPoints?: boolean
     timeMode?: 'recordingTime' | 'durationTime'
     fastForward?: number[]
-    disableScaling?: boolean
-    disableScrolling?: boolean
     cssOptions?: {
         disablePointerEvents?: boolean
         disableScrollbars?: boolean

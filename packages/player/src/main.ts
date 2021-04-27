@@ -48,8 +48,6 @@ const defaultReplayOptions = {
     heatPoints: true,
     timeMode: 'durationTime',
     fastForward: [2, 8],
-    disableScaling: false,
-    disableScrolling: true,
     cssOptions: {
         disablePointerEvents: true,
         disableScrollbars: true
