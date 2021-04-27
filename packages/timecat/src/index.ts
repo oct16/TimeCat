@@ -9,6 +9,7 @@
 
 export * from '@timecat/recorder'
 export { Player, PlayerModule, exportReplay, createReplayDocument } from '@timecat/player'
+export { nodeStore } from '@timecat/utils'
 
 export {
     DBRecordData,
