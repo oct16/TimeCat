@@ -77,7 +77,7 @@ export class ContainerComponent {
         const doc = this.sandBoxDoc
         const context = doc.defaultView as Window
         context.G_REPLAY_LOCATION = { ...(context.G_REPLAY_LOCATION || {}), ...{ path: pathname, hash, href } }
-        injectIframeContent(this.sandBoxDoc, recordData)
+        injectIframeContent(this.sandBoxDoc, recordData, this.options.cssOptions)
     }
 
     private initTemplate() {

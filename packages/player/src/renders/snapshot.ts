@@ -1,9 +1,9 @@
-import { SnapshotRecord } from '@timecat/share'
+import { ReplayInternalOptions, SnapshotRecord } from '@timecat/share'
 import { nodeStore } from '@timecat/utils'
 import { setAttribute } from '@timecat/virtual-dom'
 import { createIframeDOM, injectIframeContent } from '../utils'
 
-export async function renderSnapshot(data: SnapshotRecord['data']) {
+export async function renderSnapshot(data: SnapshotRecord['data'], cssOptions: ReplayInternalOptions['cssOptions']) {
     const snapshotData = data
     const { frameId } = snapshotData
 
@@ -17,7 +17,7 @@ export async function renderSnapshot(data: SnapshotRecord['data']) {
             }
             const contentDocument = iframeNode.contentDocument!
             createIframeDOM(contentDocument, snapshotData)
-            injectIframeContent(contentDocument, snapshotData)
+            injectIframeContent(contentDocument, snapshotData, cssOptions)
         }
     }
 }

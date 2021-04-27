@@ -7,24 +7,6 @@
  *
  */
 
-textarea,
-button,
-datalist,
-fieldset,
-form,
-input,
-label,
-legend,
-meter,
-optgroup,
-option,
-output,
-progress,
-select,
-iframe {
-    pointer-events: none;
-}
-
 html,body {
     scrollbar-width: none; /* firefox */
 

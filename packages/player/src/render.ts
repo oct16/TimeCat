@@ -46,7 +46,7 @@ export async function renderAll(
 
     switch (type) {
         case RecordType.SNAPSHOT: {
-            renderSnapshot(data as SnapshotRecord['data'])
+            renderSnapshot(data as SnapshotRecord['data'], this.options.cssOptions)
             break
         }
 

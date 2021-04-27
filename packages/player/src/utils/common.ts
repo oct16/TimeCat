@@ -16,14 +16,16 @@ import {
     DBRecordData,
     AudioRecord,
     HeadRecord,
-    AudioStrList
+    AudioStrList,
+    ReplayInternalOptions
 } from '@timecat/share'
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
 import { delay, idb } from '@timecat/utils'
 import { Store } from './redux'
 import mobile from 'is-mobile'
 import { ContainerComponent } from '../components/container'
-import FIXED_CSS from '../fixed.scss'
+import DISABLE_POINTER_EVENTS_CSS from '../disable-pointer-events.scss'
+import DISABLE_SCROLLBARS_CSS from '../disable-scrollbars.scss'
 import { convertVNode } from '@timecat/virtual-dom'
 
 export function download(src: Blob | string, name: string) {
@@ -173,7 +175,11 @@ export function createIframeDOM(contentDocument: Document, snapshotData: Snapsho
     contentDocument.write(doc)
 }
 
-export function injectIframeContent(contentDocument: Document, snapshotData: SnapshotRecord['data']) {
+export function injectIframeContent(
+    contentDocument: Document,
+    snapshotData: SnapshotRecord['data'],
+    cssOptions: ReplayInternalOptions['cssOptions']
+) {
     const content = convertVNode(snapshotData.vNode)
     if (content) {
         const head = content.querySelector('head')
@@ -181,7 +187,8 @@ export function injectIframeContent(contentDocument: Document, snapshotData: Sna
             const style = parseHtmlStr(
                 `<div>
                     <style>
-                        ${FIXED_CSS}
+                        ${cssOptions.disablePointerEvents ? DISABLE_POINTER_EVENTS_CSS : ''}
+                        ${cssOptions.disableScrollbars ? DISABLE_SCROLLBARS_CSS : ''}
                     </style>
                 </div>`
             )[0].firstElementChild!
