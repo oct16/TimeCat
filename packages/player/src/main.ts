@@ -17,6 +17,8 @@ import {
     delay,
     tempEmptyFn
 } from '@timecat/utils'
+import { Recorder } from '@timecat/recorder'
+import { watchers } from '@timecat/recorder/src/watchers'
 import { ContainerComponent } from './components/container'
 import {
     SnapshotRecord,
@@ -47,7 +49,8 @@ const defaultReplayOptions = {
     target: window,
     heatPoints: true,
     timeMode: 'durationTime',
-    fastForward: [2, 8]
+    fastForward: [2, 8],
+    enableWatchers: []
 }
 
 export class Player {
@@ -65,6 +68,7 @@ export class PlayerModule {
     fmp: FMP
     destroyStore = new Set<Function>()
     options: ReplayInternalOptions
+    recorder?: Recorder
     constructor(options?: ReplayOptions) {
         nodeStore.reset()
         this.init(options)
@@ -130,6 +134,35 @@ export class PlayerModule {
             if (panel) {
                 panel.setAttribute('style', 'display: none')
             }
+        }
+
+        if (this.options.enableWatchers?.length && this.options.onRecorderData) {
+            const context = this.c.sandBox.contentWindow || undefined
+
+            const watchersList = ['Snapshot', ...Object.keys(watchers)] as Array<keyof typeof watchers | 'Snapshot'>
+            const disableWatchers = watchersList.filter(watcher => {
+                return !(this.options.enableWatchers as string[]).includes(watcher)
+            })
+
+            this.recorder = new Recorder({
+                context,
+                write: false,
+                keep: false,
+                audio: false,
+                font: false,
+                plugins: [],
+                visibleChange: false,
+                rewriteResource: [],
+                disableWatchers,
+                keepAlive: false
+            })
+
+            this.recorder.onData((data, next) => {
+                this.options.onRecorderData!(data)
+                return next()
+            })
+
+            this.destroyStore.add(() => this.recorder?.destroy())
         }
     }
 

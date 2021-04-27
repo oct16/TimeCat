@@ -26,9 +26,10 @@
         ]
     },
     "dependencies": {
-        "@timecat/share": "1.2.0-alpha.21",
-        "@timecat/utils": "1.2.0-alpha.21",
-        "@timecat/virtual-dom": "1.2.0-alpha.21"
+        "@timecat/recorder": "1.2.0-alpha.25",
+        "@timecat/share": "1.2.0-alpha.25",
+        "@timecat/utils": "1.2.0-alpha.25",
+        "@timecat/virtual-dom": "1.2.0-alpha.25"
     },
     "author": "",
     "license": "ISC"

@@ -17,11 +17,15 @@ import { CanvasSnapshotWatcher, Canvas2DWatcher, CanvasWebGLWatcher } from './ca
 import { TerminateWatcher } from './terminate'
 import { FontWatcher } from './font'
 
-export const baseWatchers = {
-    DOMWatcher,
+export const playerWatchers = {
     FormElementWatcher,
     MouseWatcher,
     ScrollWatcher
+}
+
+export const baseWatchers = {
+    DOMWatcher,
+    ...playerWatchers
 }
 
 export const watchers = {
