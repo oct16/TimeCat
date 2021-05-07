@@ -34,7 +34,7 @@ export function completeCssHref(str: string, baseUrl?: string, setHref?: (url: s
     return str.replace(/(url\(['"]?((\/{1,2}|\.\.?\/)?.*?)(^\?.*?)?['"]?(?=\)))/g, (string, b, url) => {
         const newUrl = createURL(url, baseUrl || href())
         if (url.startsWith('data:')) {
-            return url
+            return string
         }
         return string.replace(url, setHref ? setHref(newUrl.href) : newUrl.href)
     })
