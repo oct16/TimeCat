@@ -43,14 +43,22 @@ export function renderCanvas2D(canvasRecordData: CanvasRecordData) {
                 ;(ctx[name] as Object) = strokeArgs
             } else {
                 const args = strokeArgs.slice()
-                if (name === 'drawImage' || name === 'createPattern') {
+                if (name === 'createPattern') {
                     const nodeId = args[0]
                     args[0] = nodeStore.getNode(nodeId)
+                } else if (name === 'drawImage') {
+                    const img = new Image()
+                    const src = args[0]
+                    if (src.length < 10) {
+                        continue
+                    }
+                    img.src = src
+                    args[0] = img
                 } else if (name === 'putImageData') {
                     const data = args[0].data
                     args[0] = new ImageData(new Uint8ClampedArray(data), args[1], args[2])
                 }
-                ;(ctx[name] as Function).apply(ctx, args)
+                setTimeout(() => (ctx[name] as Function).apply(ctx, args))
             }
         }
     }

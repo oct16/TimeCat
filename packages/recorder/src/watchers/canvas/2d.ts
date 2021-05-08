@@ -8,7 +8,7 @@
  */
 
 import { CanvasRecord, RecordType } from '@timecat/share'
-import { canvasContext2DAttrs, canvasContext2DKeys } from '@timecat/utils'
+import { canvasContext2DAttrs, canvasContext2DKeys, nodeStore } from '@timecat/utils'
 import { hijackCreateCanvasElement, removeHijacks } from '../../hijack'
 import { Watcher } from '../../watcher'
 import { detectCanvasContextType, isCanvasBlank } from './utils'
@@ -91,8 +91,23 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
                     return typeof method === 'function'
                         ? function () {
                               const args = [...arguments]
-                              if (name === 'drawImage' || name === 'createPattern') {
+                              if (name === 'createPattern') {
                                   args[0] = id
+                              } else if (name === 'drawImage') {
+                                  const elType = args[0]?.constructor.name
+                                  if (elType === 'HTMLCanvasElement') {
+                                      const dataUrl = (args[0] as HTMLCanvasElement).toDataURL()
+                                      args[0] = dataUrl
+                                  } else if (elType === 'HTMLImageElement') {
+                                      const img = args[0] as HTMLImageElement
+                                      img.setAttribute('crossorigin', 'anonymous')
+                                      const imgCanvas = (document.createElement as any)('canvas', false)
+                                      imgCanvas.width = img.width
+                                      imgCanvas.height = img.height
+                                      const ctx = imgCanvas.getContext('2d')!
+                                      ctx.drawImage(img, 0, 0, img.width, img.height)
+                                      args[0] = imgCanvas.toDataURL()
+                                  }
                               }
 
                               self.aggregateDataEmitter(id, name, args)
@@ -135,24 +150,34 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
         const timeouts = Object.create(null) as { [key: number]: number }
 
         const blockInstances = [CanvasGradient, CanvasPattern]
-
         return function (this: any, id: number, name: CanvasContext2DKeys, args: any) {
+            if (!id) {
+                return
+            }
             const context = this
+            const clearRectIndex = canvasContext2DKeys.indexOf('clearRect')
 
             function emitData(id: number) {
+                const canvas = nodeStore.getNode(id) as HTMLCanvasElement
+                const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect()
                 const timeout = timeouts[id]
                 clearTimeout(timeout)
                 timeouts[id] = 0
                 const strokes = tasks[id].slice()
-                // TODO have problem here
+
+                // Ignore duplicate rendering
                 const clearIndex = strokes.reverse().findIndex(stroke => {
-                    if (stroke.name === 'clearRect') {
-                        return true
+                    if (stroke.name === clearRectIndex) {
+                        const args = stroke.args
+                        if (args[0] === 0 && args[1] === 0 && args[2] === canvasWidth && args[3] === canvasHeight) {
+                            return true
+                        }
                     }
                 })
-                const aSliceOfShit = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
+                const latestStrokes = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
+
                 tasks[id].length = 0
-                func.call(context, id, aSliceOfShit)
+                func.call(context, id, latestStrokes)
             }
 
             if (!tasks[id]) {

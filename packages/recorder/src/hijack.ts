@@ -13,10 +13,12 @@ function hijackCreateElement(callback: (element: HTMLElement) => void) {
     document.createElement = function (
         this: Document,
         tagName: keyof HTMLElementTagNameMap,
-        options?: ElementCreationOptions
+        options?: ElementCreationOptions | false
     ) {
         const ret = originalCreateElement.call(this, tagName, options)
-        listeners.forEach(listener => listener(ret))
+        if (options !== false) {
+            listeners.forEach(listener => listener(ret))
+        }
         return ret
     } as typeof originalCreateElement
 }
