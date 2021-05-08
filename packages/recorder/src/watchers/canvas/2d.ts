@@ -153,31 +153,33 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             if (!id) {
                 return
             }
+            const canvas = nodeStore.getNode(id) as HTMLCanvasElement | null
+            if (!canvas) {
+                return
+            }
+
             const context = this
             const clearRectIndex = canvasContext2DKeys.indexOf('clearRect')
 
-            function emitData(id: number) {
+            const emitStrokes = (id: number) => {
                 const timeout = timeouts[id]
                 clearTimeout(timeout)
                 timeouts[id] = 0
                 const strokes = tasks[id].slice()
 
                 // Ignore duplicate rendering
-                const canvas = nodeStore.getNode(id) as HTMLCanvasElement | null
-                if (canvas) {
-                    const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect()
-                    const clearIndex = strokes.reverse().findIndex(stroke => {
-                        if (stroke.name === clearRectIndex) {
-                            const args = stroke.args
-                            if (args[0] === 0 && args[1] === 0 && args[2] === canvasWidth && args[3] === canvasHeight) {
-                                return true
-                            }
+                const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect()
+                const clearIndex = strokes.reverse().findIndex(stroke => {
+                    if (stroke.name === clearRectIndex) {
+                        const args = stroke.args
+                        if (args[0] === 0 && args[1] === 0 && args[2] === canvasWidth && args[3] === canvasHeight) {
+                            return true
                         }
-                    })
-                    const latestStrokes = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
-                    func.call(context, id, latestStrokes)
-                }
+                    }
+                })
+                const latestStrokes = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
 
+                func.call(context, id, latestStrokes)
                 tasks[id].length = 0
             }
 
@@ -195,7 +197,7 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
 
             if (!timeouts[id]) {
                 const timeout = window.setTimeout(() => {
-                    emitData(id)
+                    emitStrokes(id)
                 }, wait)
                 timeouts[id] = timeout
             }
