@@ -9,7 +9,7 @@
 
 import { CanvasRecord, RecordType } from '@timecat/share'
 import { canvasContextWebGLKeys, nodeStore } from '@timecat/utils'
-import { hijackCreateCanvasElement, removeHijacks } from '../../hijack'
+import { proxyCreateCanvasElement, removeProxies } from '../../proxy'
 import { Watcher } from '../../watcher'
 import { detectCanvasContextType, isCanvasBlank, strokesManager } from './utils'
 
@@ -100,7 +100,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     }
 
     private watchCreatingCanvas() {
-        hijackCreateCanvasElement(canvas => {
+        proxyCreateCanvasElement(canvas => {
             detectCanvasContextType(canvas, contextId => {
                 if (contextId === 'webgl' || contextId === 'experimental-webgl') {
                     this.watchCanvas(canvas)
@@ -108,7 +108,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
             })
         })
 
-        this.uninstall(() => removeHijacks())
+        this.uninstall(() => removeProxies())
     }
 
     private watchCanvas(canvasElement: HTMLCanvasElement) {

@@ -9,7 +9,7 @@
 
 import { CanvasRecord, RecordType } from '@timecat/share'
 import { canvasContext2DAttrs, canvasContext2DKeys, nodeStore } from '@timecat/utils'
-import { hijackCreateCanvasElement, removeHijacks } from '../../hijack'
+import { proxyCreateCanvasElement, removeProxies } from '../../proxy'
 import { Watcher } from '../../watcher'
 import { detectCanvasContextType, isCanvasBlank } from './utils'
 
@@ -44,14 +44,14 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
     }
 
     private watchCreatingCanvas() {
-        hijackCreateCanvasElement(canvas => {
+        proxyCreateCanvasElement(canvas => {
             detectCanvasContextType(canvas, contextId => {
                 if (contextId === '2d') {
                     this.watchCanvas(canvas)
                 }
             })
         })
-        this.uninstall(() => removeHijacks())
+        this.uninstall(() => removeProxies())
     }
 
     public watchCanvas(canvasElement: HTMLCanvasElement) {
@@ -135,17 +135,16 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
         })
     }
 
-    private aggregateDataEmitter = this.aggregateManager(
+    private aggregateDataEmitter = this.strokesManager(
         (id: number, strokes: { name: CanvasContext2DKeys; args: any[] }[]) => {
             this.emitData(RecordType.CANVAS, {
                 id,
                 strokes
             })
-        },
-        30
+        }
     )
 
-    private aggregateManager(func: Function, wait: number) {
+    private strokesManager(func: Function, wait = 30) {
         const tasks = Object.create(null) as { [key: number]: { name: CanvasContext2DKeys | number; args: any[] }[] }
         const timeouts = Object.create(null) as { [key: number]: number }
 

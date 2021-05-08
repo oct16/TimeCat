@@ -2,7 +2,7 @@ import { isNativeFunction } from '@timecat/utils'
 
 const listeners: Array<(element: HTMLElement) => void> = []
 
-function hijackCreateElement(callback: (element: HTMLElement) => void) {
+function proxyCreateElement(callback: (element: HTMLElement) => void) {
     listeners.push(callback)
     const originalCreateElement = document.createElement
 
@@ -23,14 +23,14 @@ function hijackCreateElement(callback: (element: HTMLElement) => void) {
     } as typeof originalCreateElement
 }
 
-export function hijackCreateCanvasElement(callback: (canvas: HTMLCanvasElement) => void) {
-    hijackCreateElement(element => {
+export function proxyCreateCanvasElement(callback: (canvas: HTMLCanvasElement) => void) {
+    proxyCreateElement(element => {
         if (element.tagName === 'CANVAS') {
             callback(element as HTMLCanvasElement)
         }
     })
 }
 
-export function removeHijacks() {
+export function removeProxies() {
     listeners.length = 0
 }
