@@ -157,26 +157,28 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             const clearRectIndex = canvasContext2DKeys.indexOf('clearRect')
 
             function emitData(id: number) {
-                const canvas = nodeStore.getNode(id) as HTMLCanvasElement
-                const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect()
                 const timeout = timeouts[id]
                 clearTimeout(timeout)
                 timeouts[id] = 0
                 const strokes = tasks[id].slice()
 
                 // Ignore duplicate rendering
-                const clearIndex = strokes.reverse().findIndex(stroke => {
-                    if (stroke.name === clearRectIndex) {
-                        const args = stroke.args
-                        if (args[0] === 0 && args[1] === 0 && args[2] === canvasWidth && args[3] === canvasHeight) {
-                            return true
+                const canvas = nodeStore.getNode(id) as HTMLCanvasElement | null
+                if (canvas) {
+                    const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect()
+                    const clearIndex = strokes.reverse().findIndex(stroke => {
+                        if (stroke.name === clearRectIndex) {
+                            const args = stroke.args
+                            if (args[0] === 0 && args[1] === 0 && args[2] === canvasWidth && args[3] === canvasHeight) {
+                                return true
+                            }
                         }
-                    }
-                })
-                const latestStrokes = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
+                    })
+                    const latestStrokes = !~clearIndex ? strokes.reverse() : strokes.slice(0, clearIndex + 1).reverse()
+                    func.call(context, id, latestStrokes)
+                }
 
                 tasks[id].length = 0
-                func.call(context, id, latestStrokes)
             }
 
             if (!tasks[id]) {
