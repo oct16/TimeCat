@@ -30,6 +30,6 @@
         "@timecat/utils": "1.2.0-alpha.21",
         "@timecat/virtual-dom": "1.2.0-alpha.21"
     },
-    "author": "",
-    "license": "ISC"
+    "author": "oct16",
+    "license": "GPL-3.0-or-later"
 }

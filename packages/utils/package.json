@@ -2,7 +2,7 @@
     "private": false,
     "name": "@timecat/utils",
     "version": "1.2.0-alpha.21",
-    "description": "",
+    "description": "@timecat/utils",
     "main": "index.js",
     "module": "dist/utils.esm.js",
     "types": "dist/utils.d.ts",
@@ -12,6 +12,6 @@
     "dependencies": {
         "@timecat/share": "1.2.0-alpha.21"
     },
-    "author": "",
-    "license": "ISC"
+    "author": "oct16",
+    "license": "GPL-3.0-or-later"
 }

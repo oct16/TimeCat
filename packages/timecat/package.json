@@ -17,8 +17,8 @@
         "player"
     ],
     "scripts": {},
-    "author": "",
-    "license": "ISC",
+    "author": "oct16",
+    "license": "GPL-3.0-or-later",
     "buildOptions": {
         "name": "TimeCat",
         "formats": [

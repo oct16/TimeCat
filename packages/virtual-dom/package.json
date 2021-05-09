@@ -2,7 +2,7 @@
     "private": false,
     "name": "@timecat/virtual-dom",
     "version": "1.2.0-alpha.21",
-    "description": "",
+    "description": "@timecat/virtual-dom",
     "main": "index.js",
     "module": "dist/virtual-dom.esm.js",
     "types": "dist/virtual-dom.d.ts",
@@ -13,6 +13,6 @@
         "@timecat/utils": "1.2.0-alpha.21",
         "@timecat/share": "1.2.0-alpha.21"
     },
-    "author": "",
-    "license": "ISC"
+    "author": "oct16",
+    "license": "GPL-3.0-or-later"
 }

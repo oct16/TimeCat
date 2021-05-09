@@ -2,13 +2,13 @@
     "private": false,
     "name": "@timecat/share",
     "version": "1.2.0-alpha.21",
-    "description": "",
+    "description": "@timecat/share",
     "main": "index.js",
     "module": "dist/share.esm.js",
     "types": "dist/share.d.ts",
     "unpkg": "dist/share.global.prod.js",
     "jsdelivr": "dist/share.global.prod.js",
     "scripts": {},
-    "author": "",
-    "license": "ISC"
+    "author": "oct16",
+    "license": "GPL-3.0-or-later"
 }
