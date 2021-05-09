@@ -28,6 +28,7 @@ export function renderVideo(this: PlayerComponent, data: VideoRecordData) {
 
     targetVideo.autoplay = true
     targetVideo.muted = true
+    targetVideo.loop = false
     targetVideo.controls = false
     targetVideo.src = blobUrl
 }
