@@ -10,15 +10,15 @@
 import { VNode, VSNode } from '@timecat/share'
 import { nodeStore, isElementNode, completeCssHref } from '@timecat/utils'
 
-export const getVNode = (el: Element, opts: { isSVG?: boolean; id?: number } = {}): VNode | VSNode => {
+export const getVNode = (el: Node, opts: { isSVG?: boolean; id?: number } = {}): VNode | VSNode => {
     return isElementNode(el)
         ? {
               id: opts.id || nodeStore.createNodeId(),
               type: el.nodeType,
               attrs: getAttr(el as HTMLElement & { checked: boolean }),
-              tag: el.tagName.toLocaleLowerCase(),
+              tag: (el as Element).tagName.toLocaleLowerCase(),
               children: [] as VNode[],
-              extra: getExtra(el, opts.isSVG)
+              extra: getExtra(el as Element, opts.isSVG)
           }
         : {
               id: opts.id || nodeStore.createNodeId(),
@@ -114,7 +114,7 @@ export const createFlatVNode = (el: Element, isSVG = false) => {
     return vNode
 }
 
-export const createElement = (el: Element, inheritSVG?: boolean): VNode | VSNode | null => {
+export const createElement = (el: Node, inheritSVG?: boolean): VNode | VSNode | null => {
     const vNode = getVNode(el, { isSVG: inheritSVG })
     const { id } = vNode
     nodeStore.addNode(el, id)
