@@ -50,9 +50,7 @@ function getExtra(node: Element, isSVG?: boolean) {
 
     if (isSVG || tagName.toLowerCase() === 'svg') {
         extra.isSVG = true
-    }
-
-    if (tagName === 'INPUT') {
+    } else if (tagName === 'INPUT') {
         const { checked, value } = node as HTMLInputElement
         if (value !== undefined) {
             props.value = value
@@ -60,16 +58,12 @@ function getExtra(node: Element, isSVG?: boolean) {
         if (checked !== undefined) {
             props.checked = checked
         }
-    }
-
-    if (tagName === 'OPTION') {
+    } else if (tagName === 'OPTION') {
         const { selected } = node as HTMLOptionElement
         if (selected === true) {
             props.selected = true
         }
-    }
-
-    if (tagName === 'STYLE') {
+    } else if (tagName === 'STYLE') {
         const rules = (node as HTMLStyleElement)?.sheet?.rules
         if (rules && rules.length) {
             const cssTexts = Array.from(rules)
@@ -77,6 +71,9 @@ function getExtra(node: Element, isSVG?: boolean) {
                 .join(' ')
             props.textContent = completeCssHref(cssTexts)
         }
+    } else if (tagName === 'VIDEO') {
+        props.autoplay = false
+        props.controls = false
     }
 
     // find the scrolled elements

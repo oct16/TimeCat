@@ -30,6 +30,8 @@ type Extra = {
         checked: boolean
         selected: boolean
         scroll?: { top: number; left: number }
+        autoplay: boolean
+        controls: boolean
     }
     isSVG: boolean
 }
