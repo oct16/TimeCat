@@ -12,6 +12,8 @@ import { bufferArrayToBase64, getRandomCode, nodeStore } from '@timecat/utils'
 import { Watcher } from '../watcher'
 
 export class VideoWatcher extends Watcher<VideoRecord> {
+    private fps = 5
+
     protected init() {
         this.watchVideos()
     }
@@ -31,12 +33,20 @@ export class VideoWatcher extends Watcher<VideoRecord> {
             return
         }
 
-        videoElement.addEventListener('timeupdate', () => {
+        const timeupdateHandle = () => {
             drawCanvas(videoElement, ctx)
+        }
+        videoElement.addEventListener('timeupdate', timeupdateHandle)
+        this.uninstall(() => {
+            videoElement.removeEventListener('timeupdate', timeupdateHandle)
         })
 
-        videoElement.addEventListener('resize', () => {
+        const resizeHandle = () => {
             this.resizeCanvasSize(canvas, videoElement)
+        }
+        videoElement.addEventListener('resize', resizeHandle)
+        this.uninstall(() => {
+            videoElement.removeEventListener('resize', resizeHandle)
         })
 
         drawCanvas(videoElement, ctx)
@@ -50,7 +60,7 @@ export class VideoWatcher extends Watcher<VideoRecord> {
         const recorder = new MediaRecorder(canvas.captureStream(60), {
             mimeType: 'video/webm;codecs=vp9'
         })
-        recorder.start(250)
+        recorder.start(1000 / this.fps)
         recorder.ondataavailable = async e => {
             const blob = e.data
             const buffer = await blob.arrayBuffer()
@@ -62,6 +72,9 @@ export class VideoWatcher extends Watcher<VideoRecord> {
             }
             this.emitData(RecordType.VIDEO, data)
         }
+        this.uninstall(() => {
+            recorder.stop()
+        })
     }
 
     private createMirrorCanvas(videoElement: HTMLVideoElement) {
