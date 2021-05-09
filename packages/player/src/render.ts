@@ -17,7 +17,8 @@ import {
     SnapshotRecord,
     PreFetchRecordData,
     WebGLRecordData,
-    CanvasSnapshotRecordData
+    CanvasSnapshotRecordData,
+    VideoRecordData
 } from '@timecat/share'
 import { PlayerComponent } from './components/player'
 import { delay } from '@timecat/utils'
@@ -31,6 +32,7 @@ import { renderWindow } from './renders/window'
 import { renderMouse } from './renders/mouse'
 import { renderFormEl } from './renders/form-el'
 import { renderDom } from './renders/dom'
+import { renderVideo } from './renders/video'
 
 export async function renderAll(
     this: PlayerComponent,
@@ -101,6 +103,10 @@ export async function renderAll(
         }
         case RecordType.WEBGL: {
             renderWebGL(data as WebGLRecordData)
+            break
+        }
+        case RecordType.VIDEO: {
+            renderVideo.call(this, data as VideoRecordData)
             break
         }
         default: {

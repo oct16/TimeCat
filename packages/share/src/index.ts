@@ -69,7 +69,8 @@ export enum RecordType {
     'PATCH',
     'CUSTOM',
     'WEBGL',
-    'CANVAS_SNAPSHOT'
+    'CANVAS_SNAPSHOT',
+    'VIDEO'
 }
 
 export enum FormElementEvent {
@@ -229,6 +230,7 @@ export type RecordData =
     | CustomRecord
     | WebGLRecord
     | CanvasSnapshotRecord
+    | VideoRecord
 
 export interface AudioData {
     src: string
@@ -321,6 +323,7 @@ export interface BaseRecord<T, D = any> {
     data: D
     time: number
     relatedId: string
+    id?: number
 }
 
 export interface FontRecordData {
@@ -357,4 +360,13 @@ export type CanvasSnapshotRecord = BaseRecord<RecordType.CANVAS_SNAPSHOT, Canvas
 export interface CanvasSnapshotRecordData {
     id: number
     src: string
+}
+
+export type VideoRecord = BaseRecord<RecordType.VIDEO, VideoRecordData>
+
+export interface VideoRecordData {
+    id: number
+    uid: string
+    dataStr?: string
+    blobUrl?: string
 }

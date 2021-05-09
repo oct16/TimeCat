@@ -113,15 +113,19 @@ function writeUTFBytes(view: DataView, offset: number, string: string) {
 }
 
 export function float32ArrayToBase64(data: Float32Array) {
-    // Convert F32 to Uint8
-    const uint = new Uint8Array(data.buffer)
-
-    // Convert Uint8 to Base64
-    const str = btoa(String.fromCharCode.apply(null, uint))
-    return str
+    return bufferArrayToBase64(data.buffer)
 }
 
 export function base64ToFloat32Array(str: string) {
+    return new Float32Array(base64ToBufferArray(str))
+}
+
+export function bufferArrayToBase64(arrayBuffer: ArrayBufferLike) {
+    const uint = new Uint8Array(arrayBuffer)
+    return btoa(String.fromCharCode.apply(null, uint))
+}
+
+export function base64ToBufferArray(str: string) {
     const blob = atob(str)
     const bLength = blob.length
     const arrayBuffer = new ArrayBuffer(bLength)
@@ -130,5 +134,5 @@ export function base64ToFloat32Array(str: string) {
         dataView.setUint8(i, blob.charCodeAt(i))
     }
 
-    return new Float32Array(arrayBuffer)
+    return arrayBuffer
 }

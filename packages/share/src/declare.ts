@@ -28,6 +28,10 @@ declare global {
         webkitAudioContext?: typeof AudioContext
     }
 
+    interface Document {
+        createElement(tagName: string, xx: boolean): HTMLElement
+    }
+
     interface IDBDatabase {
         continue: Function
         value: any
@@ -44,6 +48,10 @@ declare global {
     interface HTMLInputElement {
         oldValue: string
         value: string
+    }
+
+    interface HTMLCanvasElement {
+        captureStream(frameRate?: number): MediaStream
     }
 }
 

@@ -11,7 +11,7 @@ import { AudioRecorder } from './audio-recorder'
 import { AudioRecord, RecordType, WatcherArgs } from '@timecat/share'
 import { Watcher } from '../watcher'
 
-export class RecordAudio extends Watcher<AudioRecord> {
+export class AudioWatcher extends Watcher<AudioRecord> {
     constructor(options: WatcherArgs<AudioRecord>) {
         super(options)
         this.init()

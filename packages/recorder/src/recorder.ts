@@ -8,7 +8,7 @@
  */
 
 import { watchers, baseWatchers } from './watchers'
-import { RecordAudio } from './audio'
+import { AudioWatcher } from './audio'
 import { RecordData, RecordType, TerminateRecord } from '@timecat/share'
 import {
     logError,
@@ -27,6 +27,7 @@ import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
 import { Pluginable, RecorderPlugin } from './pluginable'
 import { Watcher } from './watcher'
+import { VideoWatcher } from './watchers/video'
 
 export { Watcher, WatcherOptions } from './watcher'
 export { RecordData } from '@timecat/share'
@@ -37,6 +38,7 @@ interface RecordOptionsBase {
     context?: Window
     rootContext?: Window
     audio?: boolean
+    video?: boolean
     write?: boolean
     keep?: boolean
     emitLocationImmediate?: boolean
@@ -214,10 +216,13 @@ export class RecorderModule extends Pluginable {
     }
 
     private getWatchers() {
-        const { audio, disableWatchers } = this.options
+        const { video, audio, disableWatchers } = this.options
         const watchersList = [Snapshot, ...Object.values(watchers)] as typeof Watcher[]
         if (audio) {
-            watchersList.push(RecordAudio as typeof Watcher)
+            watchersList.push(AudioWatcher as typeof Watcher)
+        }
+        if (video) {
+            watchersList.push(VideoWatcher as typeof Watcher)
         }
 
         return watchersList.filter(watcher => {

@@ -9,10 +9,27 @@
 
 import { PointerComponent } from './pointer'
 import { renderAll } from '../render'
-import { getTime, isSnapshot, toTimeStamp, base64ToFloat32Array, encodeWAV, delay } from '@timecat/utils'
+import {
+    getTime,
+    isSnapshot,
+    toTimeStamp,
+    base64ToFloat32Array,
+    encodeWAV,
+    delay,
+    base64ToBufferArray
+} from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import { RecordData, AudioData, SnapshotRecord, ReplayInternalOptions, ReplayData } from '@timecat/share'
+import {
+    RecordData,
+    AudioData,
+    SnapshotRecord,
+    ReplayInternalOptions,
+    ReplayData,
+    RecordType,
+    VideoRecordData,
+    VideoRecord
+} from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { AnimationFrame } from '../animation-frame'
 import { PlayerEventTypes } from '../types'
@@ -198,7 +215,7 @@ export class PlayerComponent implements IComponent {
     private initViewState() {
         const { currentData } = Store.getState().replayData
         const { records, audio, head } = currentData
-        this.records = this.orderRecords(records)
+        this.records = this.processing(records)
         this.audioData = audio
         const { userAgent } = head?.data || {}
         if (isMobile(userAgent as string)) {
@@ -545,7 +562,6 @@ export class PlayerComponent implements IComponent {
         return heatPoints
     }
 
-    // Lift Patch Record
     private orderRecords(records: RecordData[]) {
         if (!records.length) {
             return []
@@ -561,5 +577,64 @@ export class PlayerComponent implements IComponent {
     private recalculateProgress() {
         this.calcFrames()
         this.progress.drawHeatPoints(this.calcHeatPointsData())
+    }
+
+    // TODO should support multiple video
+    private mergeRecords(records: RecordData[]) {
+        let max = records.length - 1
+        let i = 0
+        const dataMap = new Map<string, VideoRecord>()
+        const dataStrMap = new Map<string, string[]>()
+        const idxMap = new Map<string, number>()
+        const mergedRecords = records.slice()
+        while (i <= max) {
+            const record = mergedRecords[i]
+            const { type, data } = record
+
+            switch (type) {
+                case RecordType.VIDEO:
+                    const { uid, dataStr } = data as VideoRecordData
+                    const array = dataStrMap.get(uid)
+                    if (array) {
+                        array.push(dataStr!)
+                        mergedRecords.splice(i, 1)
+                        i--
+                        max--
+                    } else {
+                        dataStrMap.set(uid, [dataStr!])
+                        dataMap.set(uid, record as VideoRecord)
+                        idxMap.set(uid, i)
+                    }
+
+                    break
+            }
+            i++
+        }
+
+        dataStrMap.forEach((array, uid) => {
+            const chunks = array.map(str => {
+                const buffer = base64ToBufferArray(str)
+                const blob = new Blob([buffer], { type: 'video/webm;codecs=vp9' })
+                return blob
+            })
+
+            const steam = new Blob(chunks, { type: 'video/webm' })
+            const blobUrl = window.URL.createObjectURL(steam)
+            const obj = dataMap.get(uid)!
+
+            obj.data.blobUrl = blobUrl
+            obj.data.dataStr = ''
+
+            const idx = idxMap.get(uid)!
+            mergedRecords[idx] = obj
+        })
+
+        return mergedRecords
+    }
+
+    private processing(records: RecordData[]) {
+        records = this.orderRecords(records)
+        records = this.mergeRecords(records)
+        return records
     }
 }
