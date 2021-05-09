@@ -344,8 +344,9 @@ export class RecorderModule extends Pluginable {
                     return false
                 }
             })
-            .map(frame => {
-                return new Promise(resolve => {
+            .map(async frame => {
+                await delay(0)
+                return await new Promise(resolve => {
                     if (frame.document.readyState === 'complete') {
                         resolve(frame)
                     } else {
