@@ -35,6 +35,10 @@ export class VideoWatcher extends Watcher<VideoRecord> {
             drawCanvas(videoElement, ctx)
         })
 
+        videoElement.addEventListener('resize', () => {
+            this.resizeCanvasSize(canvas, videoElement)
+        })
+
         drawCanvas(videoElement, ctx)
 
         function drawCanvas(videoElement: HTMLVideoElement, ctx: CanvasRenderingContext2D) {
@@ -62,9 +66,13 @@ export class VideoWatcher extends Watcher<VideoRecord> {
 
     private createMirrorCanvas(videoElement: HTMLVideoElement) {
         const canvas = document.createElement('canvas', false) as HTMLCanvasElement
-        const { width, height } = videoElement.getBoundingClientRect()
+        this.resizeCanvasSize(canvas, videoElement)
+        return canvas
+    }
+
+    private resizeCanvasSize(canvas: HTMLCanvasElement, el: HTMLElement) {
+        const { width, height } = el.getBoundingClientRect()
         canvas.width = width
         canvas.height = height
-        return canvas
     }
 }
