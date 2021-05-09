@@ -14,7 +14,6 @@ import { Watcher } from '../watcher'
 export class AudioWatcher extends Watcher<AudioRecord> {
     constructor(options: WatcherArgs<AudioRecord>) {
         super(options)
-        this.init()
     }
 
     protected init() {
