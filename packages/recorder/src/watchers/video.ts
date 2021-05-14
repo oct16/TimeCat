@@ -12,9 +12,12 @@ import { bufferArrayToBase64, getRandomCode, nodeStore } from '@timecat/utils'
 import { Watcher } from '../watcher'
 
 export class VideoWatcher extends Watcher<VideoRecord> {
-    private fps = 5
+    private fps: number
 
     protected init() {
+        const recordOptions = this.recordOptions
+        const { video } = recordOptions
+        this.fps = video.fps
         this.watchVideos()
     }
 

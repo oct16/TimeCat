@@ -34,11 +34,15 @@ export { RecordData } from '@timecat/share'
 
 export type RecorderMiddleware = (data: RecordData, n: () => Promise<void>) => Promise<void>
 
+interface RecordVideoOptions {
+    fps: number
+}
+
 interface RecordOptionsBase {
     context?: Window
     rootContext?: Window
     audio?: boolean
-    video?: boolean
+    video?: boolean | RecordVideoOptions
     write?: boolean
     keep?: boolean
     emitLocationImmediate?: boolean
@@ -49,8 +53,9 @@ interface RecordOptionsBase {
     keepAlive?: number | false
 }
 
-interface RecordInternalOptions extends Required<RecordOptions> {
+export interface RecordInternalOptions extends Required<RecordOptions> {
     context: Window
+    video: RecordVideoOptions
 }
 
 interface RewriteConfig {
@@ -134,11 +139,19 @@ export class RecorderModule extends Pluginable {
 
     constructor(options?: RecordOptions) {
         super(options)
-        const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
+        const opts = this.initOptions(options)
         opts.rootContext = opts.rootContext || opts.context
         this.options = opts
         this.watchers = this.getWatchers() as typeof Watcher[]
         this.init()
+    }
+
+    private initOptions(options?: RecordOptions) {
+        const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
+        if (opts.video === true) {
+            opts.video = { fps: 5 }
+        }
+        return opts
     }
 
     private init() {
