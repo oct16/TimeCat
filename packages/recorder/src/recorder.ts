@@ -107,6 +107,8 @@ export class RecorderModule extends Pluginable {
         mode: 'default',
         write: true,
         keep: false,
+        audio: false,
+        video: false,
         emitLocationImmediate: true,
         context: window,
         visibleChange: false,
@@ -290,14 +292,12 @@ export class RecorderModule extends Pluginable {
         }
 
         const emit = onEmit(options)
-
         const headData = getHeadData()
-
         const relatedId = headData.relatedId
-
         options.context.G_RECORD_RELATED_ID = relatedId
 
-        if (isSameCtx) {
+        const isInRoot = options.context === this.options.rootContext
+        if (isInRoot) {
             emit({
                 type: RecordType.HEAD,
                 data: headData,
@@ -322,7 +322,7 @@ export class RecorderModule extends Pluginable {
             }
         })
 
-        if (options.emitLocationImmediate && isSameCtx) {
+        if (isInRoot && options.emitLocationImmediate) {
             const locationInstance = this.watchersInstance.get(LocationWatcher.name) as InstanceType<
                 typeof LocationWatcher
             >
