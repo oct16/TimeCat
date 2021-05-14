@@ -10,7 +10,8 @@
 import { WatcherArgs, RecordEvent, RecordData, RecordType } from '@timecat/share'
 import { debounce, throttle, nodeStore, getTime } from '@timecat/utils'
 
-import { RecordInternalOptions, RecorderModule } from './recorder'
+import { RecorderModule } from './recorder'
+import { RecordInternalOptions } from './types'
 
 export type WatcherOptions<T extends RecordData> = WatcherArgs<T, Map<string, Watcher<RecordData>>, RecorderModule>
 export class Watcher<T extends RecordData> {

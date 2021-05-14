@@ -25,70 +25,13 @@ import {
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
-import { Pluginable, RecorderPlugin } from './pluginable'
+import { Pluginable } from './pluginable'
 import { Watcher } from './watcher'
 import { VideoWatcher } from './watchers/video'
-
-export { Watcher, WatcherOptions } from './watcher'
-export { RecordData } from '@timecat/share'
-
-export type RecorderMiddleware = (data: RecordData, n: () => Promise<void>) => Promise<void>
-
-interface RecordVideoOptions {
-    fps: number
-}
-
-interface RecordOptionsBase {
-    context?: Window
-    rootContext?: Window
-    audio?: boolean
-    video?: boolean | RecordVideoOptions
-    write?: boolean
-    keep?: boolean
-    emitLocationImmediate?: boolean
-    font?: boolean
-    visibleChange?: boolean
-    visibleChangeKeepTime?: number
-    disableWatchers?: Array<keyof typeof watchers>
-    keepAlive?: number | false
-}
-
-export interface RecordInternalOptions extends Required<RecordOptions> {
-    context: Window
-    video: RecordVideoOptions
-}
-
-interface RewriteConfig {
-    replaceOrigin?: string
-    folderPath?: string
-    fn?: (pre: string, next: string) => string | void
-}
-
-interface PreFetchRewriteConfig extends RewriteConfig {
-    matches?: (string | RegExp)[]
-    crossUrl?: string
-}
-
-enum Status {
-    RUNNING = 'running',
-    PAUSE = 'pause',
-    HALT = 'halt'
-}
-
-export type RewriteResource = RewriteItem[]
-export interface RecordOptions extends RecordOptionsBase {
-    plugins?: RecorderPlugin[]
-    rewriteResource?: RewriteResource
-}
-
-export interface RewriteItem {
-    matches: (string | RegExp)[]
-    type?: string
-    rewrite: PreFetchRewriteConfig & RewriteConfig
-}
+import { RecorderMiddleware, RecorderStatus, RecordInternalOptions, RecordOptions } from './types'
 
 export class Recorder {
-    public status: Status = Status.PAUSE
+    public status: RecorderStatus = RecorderStatus.PAUSE
     public onData: RecorderModule['onData'] = tempEmptyFn
     public destroy: RecorderModule['destroy'] = tempEmptyPromise
     public use: RecorderModule['use'] = tempEmptyFn
@@ -133,7 +76,7 @@ export class RecorderModule extends Pluginable {
     private destroyTime: number
     private destroyWaitTime = 200
 
-    public status: Status = Status.PAUSE
+    public status: RecorderStatus = RecorderStatus.PAUSE
     public db: IDB
     public options: RecordInternalOptions
 
@@ -178,20 +121,20 @@ export class RecorderModule extends Pluginable {
     }
 
     public async destroy() {
-        if (this.status === Status.HALT) {
+        if (this.status === RecorderStatus.HALT) {
             return
         }
 
         const ret = await this.pause()
         if (ret) {
-            this.status = Status.HALT
+            this.status = RecorderStatus.HALT
             this.destroyTime = ret.lastTime || getTime()
         }
     }
 
     private async pause() {
-        if (this.status === Status.RUNNING) {
-            this.status = Status.PAUSE
+        if (this.status === RecorderStatus.RUNNING) {
+            this.status = RecorderStatus.PAUSE
             const last = await this.db.last().catch(() => {})
             let lastTime: number | null = null
             if (last) {
@@ -246,7 +189,7 @@ export class RecorderModule extends Pluginable {
     }
 
     private record(options: RecordOptions | RecordInternalOptions): void {
-        if (this.status === Status.PAUSE) {
+        if (this.status === RecorderStatus.PAUSE) {
             const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
             this.startRecord((opts.context.G_RECORD_OPTIONS = opts))
             return
@@ -261,7 +204,7 @@ export class RecorderModule extends Pluginable {
             if (!options.keep) {
                 this.db.clear()
             }
-            this.status = Status.RUNNING
+            this.status = RecorderStatus.RUNNING
         } else {
             // for iframe watchers
             activeWatchers = [Snapshot, ...Object.values(baseWatchers)] as typeof Watcher[]
@@ -464,7 +407,7 @@ export class RecorderModule extends Pluginable {
                     document.addEventListener(visibilityChange, handle, false)
                 },
                 state =>
-                    state !== ViewChangeState.hide || this.status !== Status.RUNNING
+                    state !== ViewChangeState.hide || this.status !== RecorderStatus.RUNNING
                         ? 0
                         : options.visibleChangeKeepTime,
                 ViewChangeState.show
@@ -497,13 +440,13 @@ export class RecorderModule extends Pluginable {
             }
             const refresh = () => {
                 clear()
-                if (this.status !== Status.RUNNING) {
+                if (this.status !== RecorderStatus.RUNNING) {
                     return
                 }
                 timer = window.setTimeout(() => this.pause(), waitTime)
             }
             const handle = () => {
-                if (this.status !== Status.RUNNING) {
+                if (this.status !== RecorderStatus.RUNNING) {
                     this.record({ ...this.options, keep: true, emitLocationImmediate: false })
                 }
                 refresh()

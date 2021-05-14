@@ -9,7 +9,7 @@
 
 import { PreFetchRecordData, VNode } from '@timecat/share'
 import { logError, createURL, completeCssHref, getTime, logWarn } from '@timecat/utils'
-import { RewriteItem, RewriteResource } from './recorder'
+import { RewriteItem, RewriteResource } from './types'
 
 // https://github.com/gnuns/allorigins
 // Pull contents from any page and avoid Same-origin policy problems

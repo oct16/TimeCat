@@ -7,13 +7,5 @@
  *
  */
 
-export {
-    Watcher,
-    WatcherOptions,
-    Recorder,
-    RecordData,
-    RecorderModule,
-    RecordOptions,
-    RewriteResource,
-    RewriteItem
-} from './recorder'
+export { Recorder, RecorderModule } from './recorder'
+export * from './types'

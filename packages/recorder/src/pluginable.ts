@@ -8,7 +8,7 @@
  */
 
 import { SyncHook } from 'tapable'
-import { RecordOptions } from './recorder'
+import { RecordOptions } from './types'
 import { logError } from '@timecat/utils'
 import { Watcher } from './watcher'
 

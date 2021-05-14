@@ -17,7 +17,7 @@ export class VideoWatcher extends Watcher<VideoRecord> {
     protected init() {
         const recordOptions = this.recordOptions
         const { video } = recordOptions
-        this.fps = video.fps
+        this.fps = (<Exclude<typeof video, boolean>>video).fps
         this.watchVideos()
     }
 
