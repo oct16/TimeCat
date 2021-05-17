@@ -93,6 +93,10 @@ export class RecorderModule extends Pluginable {
         const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
         if (opts.video === true) {
             opts.video = { fps: 5 }
+        } else if (opts.video && 'fps' in opts.video) {
+            if (opts.video.fps > 24) {
+                opts.video.fps = 24
+            }
         }
         return opts
     }

@@ -8,7 +8,7 @@
  */
 
 import { RecordType, VideoRecord, VideoRecordData } from '@timecat/share'
-import { bufferArrayToBase64, getRandomCode, nodeStore } from '@timecat/utils'
+import { bufferArrayToBase64, getRandomCode, nodeStore, debounce, AnimationFrame } from '@timecat/utils'
 import { Watcher } from '../watcher'
 
 export class VideoWatcher extends Watcher<VideoRecord> {
@@ -36,12 +36,27 @@ export class VideoWatcher extends Watcher<VideoRecord> {
             return
         }
 
-        const timeupdateHandle = () => {
+        let isRecording = false
+        const drawRAF = new AnimationFrame(() => {
             drawCanvas(videoElement, ctx)
-        }
-        videoElement.addEventListener('timeupdate', timeupdateHandle)
+        }, this.fps)
+
+        const triggerDraw = debounce(
+            () => {
+                isRecording = !isRecording
+                if (isRecording) {
+                    drawRAF.start()
+                } else {
+                    drawRAF.stop()
+                }
+            },
+            300,
+            { isTrailing: true, isImmediate: true }
+        )
+
+        videoElement.addEventListener('timeupdate', triggerDraw)
         this.uninstall(() => {
-            videoElement.removeEventListener('timeupdate', timeupdateHandle)
+            videoElement.removeEventListener('timeupdate', triggerDraw)
         })
 
         const resizeHandle = () => {
@@ -52,16 +67,17 @@ export class VideoWatcher extends Watcher<VideoRecord> {
             videoElement.removeEventListener('resize', resizeHandle)
         })
 
-        drawCanvas(videoElement, ctx)
-
         function drawCanvas(videoElement: HTMLVideoElement, ctx: CanvasRenderingContext2D) {
             const canvas = ctx.canvas
             ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height)
         }
 
+        drawCanvas(videoElement, ctx)
+
         const uid = getRandomCode()
         const recorder = new MediaRecorder(canvas.captureStream(60), {
-            mimeType: 'video/webm;codecs=vp9'
+            mimeType: 'video/webm;codecs=vp9',
+            bitsPerSecond: 100_000
         })
         recorder.start(1000 / this.fps)
         recorder.ondataavailable = async e => {

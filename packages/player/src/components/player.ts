@@ -16,7 +16,8 @@ import {
     base64ToFloat32Array,
     encodeWAV,
     delay,
-    base64ToBufferArray
+    base64ToBufferArray,
+    AnimationFrame
 } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
@@ -31,7 +32,6 @@ import {
     VideoRecord
 } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
-import { AnimationFrame } from '../animation-frame'
 import { PlayerEventTypes } from '../types'
 import {
     Component,

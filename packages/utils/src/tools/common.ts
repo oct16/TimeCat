@@ -182,13 +182,17 @@ type Procedure = (...args: any[]) => void
 
 type Options = {
     isImmediate?: boolean
+
+    // not standard
+    isTrailing?: boolean
 }
 
 export function debounce<F extends Procedure>(
     func: F,
     waitMilliseconds: number,
     options: Options = {
-        isImmediate: false
+        isImmediate: false,
+        isTrailing: false
     }
 ): (this: ThisParameterType<F>, ...args: Parameters<F>) => void {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
@@ -198,7 +202,7 @@ export function debounce<F extends Procedure>(
 
         const doLater = function () {
             timeoutId = undefined
-            if (!options.isImmediate) {
+            if (!options.isImmediate || options.isTrailing) {
                 func.apply(context, args)
             }
         }
