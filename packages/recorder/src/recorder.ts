@@ -358,6 +358,7 @@ export class RecorderModule extends Pluginable {
 
     private createIFrameRecorder(frameWindow: Window) {
         const frameRecorder = new RecorderModule({
+            ...this.options,
             context: frameWindow,
             keep: true,
             rootContext: this.options.rootContext
