@@ -143,8 +143,8 @@ export class ProgressComponent implements IComponent {
             const timestamp = startTime + seconds + curViewDiffTime
             time = getDateTime(timestamp)
         }
-        if (time) {
-            this.timer.innerHTML = time
+        if (time !== this.timer.innerText) {
+            this.timer.innerText = time
         }
     }
 
