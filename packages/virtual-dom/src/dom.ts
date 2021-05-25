@@ -9,6 +9,8 @@
 
 import { completeAttrHref, completeCssHref, logError } from '@timecat/utils'
 
+const ignoreNodeNames = ['VIDEO', 'IFRAME']
+
 export function setAttribute(node: HTMLElement, name: string, value: string | boolean | null | object): void {
     if (node.nodeType !== Node.ELEMENT_NODE) {
         return
@@ -25,6 +27,10 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
                 }
             }
         }
+        return
+    }
+
+    if (name === 'src' && ~ignoreNodeNames.indexOf(node.tagName)) {
         return
     }
 

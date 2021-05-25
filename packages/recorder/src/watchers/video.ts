@@ -8,7 +8,7 @@
  */
 
 import { RecordType, VideoRecord, VideoRecordData } from '@timecat/share'
-import { bufferArrayToBase64, getRandomCode, nodeStore, debounce, AnimationFrame } from '@timecat/utils'
+import { bufferArrayToBase64, nodeStore, debounce, AnimationFrame } from '@timecat/utils'
 import { Watcher } from '../watcher'
 
 export class VideoWatcher extends Watcher<VideoRecord> {
@@ -36,36 +36,10 @@ export class VideoWatcher extends Watcher<VideoRecord> {
             return
         }
 
-        let isRecording = false
-        const drawRAF = new AnimationFrame(() => {
-            drawCanvas(videoElement, ctx)
-        }, this.fps)
-
-        const triggerDraw = debounce(
-            () => {
-                isRecording = !isRecording
-                if (isRecording) {
-                    drawRAF.start()
-                } else {
-                    drawRAF.stop()
-                }
-            },
-            300,
-            { isTrailing: true, isImmediate: true }
-        )
-
-        videoElement.addEventListener('timeupdate', triggerDraw)
-        this.uninstall(() => {
-            videoElement.removeEventListener('timeupdate', triggerDraw)
-        })
-
         const resizeHandle = () => {
             this.resizeCanvasSize(canvas, videoElement)
         }
         videoElement.addEventListener('resize', resizeHandle)
-        this.uninstall(() => {
-            videoElement.removeEventListener('resize', resizeHandle)
-        })
 
         function drawCanvas(videoElement: HTMLVideoElement, ctx: CanvasRenderingContext2D) {
             const canvas = ctx.canvas
@@ -74,25 +48,48 @@ export class VideoWatcher extends Watcher<VideoRecord> {
 
         drawCanvas(videoElement, ctx)
 
-        const uid = getRandomCode()
         const recorder = new MediaRecorder(canvas.captureStream(60), {
             mimeType: 'video/webm;codecs=vp9',
-            bitsPerSecond: 100_000
+            bitsPerSecond: 600_000
         })
-        recorder.start(1000 / this.fps)
         recorder.ondataavailable = async e => {
             const blob = e.data
             const buffer = await blob.arrayBuffer()
             const dataStr = bufferArrayToBase64(buffer)
             const data: VideoRecordData = {
                 id: nodeStore.getNodeId(videoElement)!,
-                uid,
                 dataStr
             }
             this.emitData(RecordType.VIDEO, data)
         }
+
+        const stopRecord = () => {
+            recorder.state === 'recording' && recorder.stop()
+        }
+
+        let isRecording = false
+        const drawRAF = new AnimationFrame(() => drawCanvas(videoElement, ctx), this.fps)
+
+        const triggerDraw = debounce(
+            () => {
+                isRecording = !isRecording
+                if (isRecording) {
+                    drawRAF.start()
+                    recorder.start(1000 / this.fps)
+                } else {
+                    drawRAF.stop()
+                    stopRecord()
+                }
+            },
+            300,
+            { isTrailing: true, isImmediate: true }
+        )
+
+        videoElement.addEventListener('timeupdate', triggerDraw)
         this.uninstall(() => {
-            recorder.stop()
+            stopRecord()
+            videoElement.removeEventListener('timeupdate', triggerDraw)
+            videoElement.removeEventListener('resize', resizeHandle)
         })
     }
 

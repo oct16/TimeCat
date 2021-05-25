@@ -253,6 +253,13 @@ export interface AudioOptionsData {
     channelCount: 1 | 2
 }
 
+export interface VideoData {
+    id: number
+    src: string
+    startTime: number
+    endTime: number
+}
+
 export type IRecorderStatus = 'PAUSE' | 'RECORDING' | 'STOP'
 
 export enum TransactionMode {
@@ -302,6 +309,7 @@ export interface ReplayData {
     snapshot: SnapshotRecord
     records: RecordData[]
     audio: AudioData
+    videos: VideoData[]
 }
 
 export interface ReplayHead {
@@ -368,7 +376,6 @@ export type VideoRecord = BaseRecord<RecordType.VIDEO, VideoRecordData>
 
 export interface VideoRecordData {
     id: number
-    uid: string
     dataStr?: string
     blobUrl?: string
 }

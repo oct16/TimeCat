@@ -18,10 +18,12 @@ import {
     HeadRecord,
     AudioStrList,
     AudioData,
-    AudioOptions
+    AudioOptions,
+    VideoData,
+    VideoRecord
 } from '@timecat/share'
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
-import { delay, idb } from '@timecat/utils'
+import { base64ToBufferArray, delay, idb } from '@timecat/utils'
 import { Store } from './redux'
 import mobile from 'is-mobile'
 import { ContainerComponent } from '../components/container'
@@ -46,17 +48,23 @@ export function transToReplayData(records: RecordData[]): ReplayData {
         return record.type === 'base64'
     }
 
+    const audio = {
+        src: '',
+        bufferStrList: [],
+        subtitles: [],
+        opts: {} as AudioOptionsData
+    }
+
     const replayData: ReplayData = {
         head: {} as HeadRecord,
         snapshot: {} as SnapshotRecord,
         records: [],
-        audio: {
-            src: '',
-            bufferStrList: [],
-            subtitles: [],
-            opts: {} as AudioOptionsData
-        }
+        audio,
+        videos: [] as VideoData[]
     }
+
+    const videosMap = new Map<number, VideoData & { bufferStrList: string[] }>()
+
     records.forEach((record, index) => {
         const next = records[index + 1]
         switch (record.type) {
@@ -86,6 +94,28 @@ export function transToReplayData(records: RecordData[]): ReplayData {
                     replayData.audio.opts = (audioData as AudioOptions).data
                 }
                 break
+            case RecordType.VIDEO:
+                const { data, time } = record as VideoRecord
+                const { id, dataStr } = data
+
+                if (!dataStr) {
+                    break
+                }
+
+                const videoData = videosMap.get(id)
+                if (videoData) {
+                    videoData.bufferStrList.push(dataStr)
+                    videoData.endTime = time
+                } else {
+                    const newVideoData = {
+                        id,
+                        startTime: time,
+                        endTime: time,
+                        bufferStrList: [dataStr]
+                    } as VideoData & { bufferStrList: string[] }
+                    videosMap.set(id, newVideoData)
+                }
+                break
             default:
                 if (replayData) {
                     replayData.records.push(record as RecordData)
@@ -93,6 +123,30 @@ export function transToReplayData(records: RecordData[]): ReplayData {
                 break
         }
     })
+
+    if (videosMap.size) {
+        const videos = Array.from(videosMap.entries()).map(([, video]) => {
+            const { bufferStrList, startTime, endTime, id } = video
+
+            const chunks = bufferStrList.map(str => {
+                const buffer = base64ToBufferArray(str)
+                const blob = new Blob([buffer], { type: 'video/webm;codecs=vp9' })
+                return blob
+            })
+
+            const steam = new Blob(chunks, { type: 'video/webm' })
+            const blobUrl = window.URL.createObjectURL(steam)
+
+            return {
+                id,
+                src: blobUrl,
+                startTime,
+                endTime
+            } as VideoData
+        })
+        replayData.videos.push(...videos)
+    }
+
     return replayData
 }
 

@@ -16,21 +16,12 @@ import {
     base64ToFloat32Array,
     encodeWAV,
     delay,
-    base64ToBufferArray,
-    AnimationFrame
+    AnimationFrame,
+    nodeStore
 } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
-import {
-    RecordData,
-    AudioData,
-    SnapshotRecord,
-    ReplayInternalOptions,
-    ReplayData,
-    RecordType,
-    VideoRecordData,
-    VideoRecord
-} from '@timecat/share'
+import { RecordData, AudioData, SnapshotRecord, ReplayInternalOptions, ReplayData, VideoData } from '@timecat/share'
 import { BroadcasterComponent } from './broadcaster'
 import { PlayerEventTypes } from '../types'
 import {
@@ -81,16 +72,20 @@ export class PlayerComponent implements IComponent {
     startTime: number
     animationDelayTime = 300
     elapsedTime = 0
-    audioOffset = 500
+    audioOffset = 150
 
+    curViewStartTime: number
     curViewEndTime: number
     curViewDiffTime = 0
+    preViewsDurationTime = 0
     viewIndex = 0
     viewsLength: number
 
     subtitlesIndex = 0
     audioData: AudioData
     audioBlobUrl: string
+
+    videos: VideoData[]
 
     RAF: AnimationFrame
     isJumping: boolean
@@ -154,6 +149,7 @@ export class PlayerComponent implements IComponent {
         this.calcFrames()
         this.viewsLength = Store.getState().replayData.packs.length
         this.initViewState()
+        this.setViewState()
 
         if (this.records.length <= 2) {
             // is live mode
@@ -202,11 +198,29 @@ export class PlayerComponent implements IComponent {
         }
     }
 
+    private mountVideos() {
+        if (!this.videos || !this.videos.length) {
+            return
+        }
+
+        this.videos.forEach(video => {
+            const { src, id } = video
+            const videoElement = nodeStore.getNode(id)
+
+            if (videoElement) {
+                const target = videoElement as HTMLVideoElement
+                target.muted = true
+                target.autoplay = target.loop = target.controls = false
+                target.src = src
+            }
+        })
+    }
+
     private streamHandle(this: PlayerComponent, e: CustomEvent) {
         const record = e.detail as RecordData
         if (isSnapshot(record)) {
             Store.getState().replayData.currentData.snapshot = record as SnapshotRecord
-            this.c.setViewState()
+            this.setViewState()
             return
         }
         this.execFrame(record as RecordData)
@@ -214,14 +228,14 @@ export class PlayerComponent implements IComponent {
 
     private initViewState() {
         const { currentData } = Store.getState().replayData
-        const { records, audio, head } = currentData
+        const { records, audio, videos, head } = currentData
         this.records = this.processing(records)
         this.audioData = audio
+        this.videos = videos
         const { userAgent } = head?.data || {}
         if (isMobile(userAgent as string)) {
             this.pointer.hidePointer()
         }
-        this.initAudio()
 
         // live mode
         if (!this.records.length) {
@@ -231,9 +245,18 @@ export class PlayerComponent implements IComponent {
         this.subtitlesIndex = 0
         this.broadcaster.cleanText()
 
-        this.curViewEndTime = this.records.slice(-1)[0].time
+        this.curViewStartTime = (head && head.time) || records[0].time
+        this.curViewEndTime = records.slice(-1)[0].time
+
+        this.preViewsDurationTime = 0
         this.curViewDiffTime = 0
         this.viewIndex = 0
+    }
+
+    private setViewState() {
+        this.c.setViewState()
+        this.initAudio()
+        this.mountVideos()
     }
 
     private async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
@@ -255,12 +278,15 @@ export class PlayerComponent implements IComponent {
             return
         }
 
+        this.initViewState()
+
         if (this.viewIndex !== index || this.startTime >= time) {
             const [{ packsInfo }, { packs }] = [Store.getState().progress, Store.getState().replayData]
 
             const diffTime = packsInfo[index].diffTime
             this.curViewEndTime = packs[index].slice(-1)[0].time
             this.curViewDiffTime = diffTime
+            this.preViewsDurationTime = packsInfo.slice(0, index).reduce((a, b) => a + b.duration, 0)
             this.viewIndex = index
             this.records = packs[index]
         }
@@ -279,7 +305,6 @@ export class PlayerComponent implements IComponent {
         this.initTime = getTime()
         this.recordIndex = 0
         this.audioData = nextReplayData.audio
-        this.initAudio()
         this.startTime = time
         this.subtitlesIndex = 0
 
@@ -288,7 +313,8 @@ export class PlayerComponent implements IComponent {
             await delay(100)
         }
 
-        this.c.setViewState()
+        this.setViewState()
+        this.playAudio()
         this.loopFramesByTime(this.frames[this.frameIndex])
 
         if (loading) {
@@ -328,17 +354,18 @@ export class PlayerComponent implements IComponent {
     }
 
     private play() {
-        this.playAudio()
         if (this.frameIndex === 0) {
             this.progress.moveThumb()
             if (!this.isFirstTimePlay) {
                 this.getNextReplayData(0)
                 this.initViewState()
-                this.c.setViewState()
+                this.setViewState()
             } else {
                 this.progress.drawHeatPoints()
             }
         }
+
+        this.playAudio()
         this.isFirstTimePlay = false
 
         if (this.RAF && this.RAF.requestID) {
@@ -371,20 +398,8 @@ export class PlayerComponent implements IComponent {
 
             this.elapsedTime = (currTime - this.frames[0]) / 1000
 
-            // sync audio time
-            // every 2s check once
-
-            const frameCount = Math.floor(2 / (this.frameInterval / 1000))
-            const checkInterval = !(this.frameIndex % frameCount)
-
-            const shouldCheckAudioTime = this.audioNode.src && checkInterval && !((loopIndex % frameCount) * 2)
-
-            if (shouldCheckAudioTime) {
-                const allowDiff = 200
-                if (Math.abs((this.elapsedTime - this.audioNode.currentTime) * 1000) > this.audioOffset + allowDiff) {
-                    this.syncAudioCurrentTime()
-                }
-            }
+            this.syncAudio()
+            this.syncVideos()
         }
     }
 
@@ -402,7 +417,7 @@ export class PlayerComponent implements IComponent {
                 this.audioNode.src = this.audioBlobUrl
             }
 
-            this.syncAudioCurrentTime()
+            this.syncAudioTargetNode()
 
             if (this.speed > 1) {
                 this.audioNode.pause()
@@ -412,13 +427,73 @@ export class PlayerComponent implements IComponent {
         }
     }
 
-    private syncAudioCurrentTime(elapsedTime: number = this.elapsedTime, offset: number = this.audioOffset / 1000) {
+    private syncAudio() {
+        if (!this.audioNode) {
+            return
+        }
+        const targetCurrentTime = this.audioNode.currentTime
+        const targetExpectTime = this.elapsedTime - this.preViewsDurationTime / 1000
+        const diffTime = Math.abs(targetExpectTime - targetCurrentTime)
+        const allowDiff = (100 + this.audioOffset) / 1000
+        if (diffTime > allowDiff) {
+            this.syncAudioTargetNode()
+        }
+    }
+
+    private syncAudioTargetNode() {
+        const elapsedTime = this.elapsedTime - this.preViewsDurationTime / 1000
+        const offset = this.audioOffset / 1000
         this.audioNode.currentTime = elapsedTime + offset
+    }
+
+    private syncVideos() {
+        const initTime = this.curViewStartTime
+        const currentTime = initTime + (this.elapsedTime * 1000 - this.preViewsDurationTime)
+        const allowDiff = 100
+
+        this.videos.forEach(video => {
+            const { startTime, endTime, id } = video
+            const target = nodeStore.getNode(id) as HTMLVideoElement
+
+            if (!target) {
+                return
+            }
+
+            if (currentTime >= startTime && currentTime < endTime) {
+                if (target.paused && this.speed > 0) {
+                    target.play()
+                }
+
+                const targetCurrentTime = target.currentTime
+                const targetExpectTime =
+                    this.elapsedTime - this.preViewsDurationTime / 1000 - (startTime - initTime) / 1000
+
+                const diffTime = Math.abs(targetExpectTime - targetCurrentTime)
+                if (diffTime > allowDiff / 1000) {
+                    target.currentTime = targetExpectTime
+                }
+            } else {
+                if (!target.paused) {
+                    target.pause()
+                }
+            }
+        })
     }
 
     private pauseAudio() {
         if (this.audioNode) {
             this.audioNode.pause()
+        }
+    }
+
+    private pauseVideos() {
+        if (this.videos && this.videos.length) {
+            this.videos.forEach(video => {
+                const target = nodeStore.getNode(video.id) as HTMLVideoElement | undefined
+                if (target) {
+                    target.pause()
+                }
+            })
         }
     }
 
@@ -476,6 +551,7 @@ export class PlayerComponent implements IComponent {
             }
         })
         this.pauseAudio()
+        this.pauseVideos()
         if (emit) {
             observer.emit(PlayerEventTypes.PAUSE)
         }
@@ -579,62 +655,7 @@ export class PlayerComponent implements IComponent {
         this.progress.drawHeatPoints(this.calcHeatPointsData())
     }
 
-    // TODO should support multiple video
-    private mergeRecords(records: RecordData[]) {
-        let max = records.length - 1
-        let i = 0
-        const dataMap = new Map<string, VideoRecord>()
-        const dataStrMap = new Map<string, string[]>()
-        const idxMap = new Map<string, number>()
-        const mergedRecords = records.slice()
-        while (i <= max) {
-            const record = mergedRecords[i]
-            const { type, data } = record
-
-            switch (type) {
-                case RecordType.VIDEO:
-                    const { uid, dataStr } = data as VideoRecordData
-                    const array = dataStrMap.get(uid)
-                    if (array) {
-                        array.push(dataStr!)
-                        mergedRecords.splice(i, 1)
-                        i--
-                        max--
-                    } else {
-                        dataStrMap.set(uid, [dataStr!])
-                        dataMap.set(uid, record as VideoRecord)
-                        idxMap.set(uid, i)
-                    }
-
-                    break
-            }
-            i++
-        }
-
-        dataStrMap.forEach((array, uid) => {
-            const chunks = array.map(str => {
-                const buffer = base64ToBufferArray(str)
-                const blob = new Blob([buffer], { type: 'video/webm;codecs=vp9' })
-                return blob
-            })
-
-            const steam = new Blob(chunks, { type: 'video/webm' })
-            const blobUrl = window.URL.createObjectURL(steam)
-            const obj = dataMap.get(uid)!
-
-            obj.data.blobUrl = blobUrl
-            obj.data.dataStr = ''
-
-            const idx = idxMap.get(uid)!
-            mergedRecords[idx] = obj
-        })
-
-        return mergedRecords
-    }
-
     private processing(records: RecordData[]) {
-        records = this.orderRecords(records)
-        records = this.mergeRecords(records)
-        return records
+        return this.orderRecords(records)
     }
 }
