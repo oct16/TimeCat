@@ -67,60 +67,61 @@ export function transToReplayData(records: RecordData[]): ReplayData {
 
     records.forEach((record, index) => {
         const next = records[index + 1]
-        switch (record.type) {
-            case RecordType.HEAD:
-                if (next && !(next.data as SnapshotRecord['data']).frameId) {
-                    replayData.head = record
-                }
-                break
-            case RecordType.SNAPSHOT:
-                if (!record.data.frameId) {
-                    if (replayData) {
-                        replayData.snapshot = record
-                    }
-                } else {
-                    replayData.records.push(record)
-                }
-                break
-            case RecordType.AUDIO:
-                const { data: audioData } = record as AudioRecord
-                if ((audioData as AudioData).src) {
-                    const data = audioData as AudioData
-                    replayData.audio.src = data.src
-                    replayData.audio.subtitles = data.subtitles
-                } else if (isAudioBufferStr(audioData as AudioStrList)) {
-                    replayData.audio.bufferStrList.push(...(audioData as AudioStrList).data)
-                } else {
-                    replayData.audio.opts = (audioData as AudioOptions).data
-                }
-                break
-            case RecordType.VIDEO:
-                const { data, time } = record as VideoRecord
-                const { id, dataStr } = data
 
-                if (!dataStr) {
-                    break
-                }
-
-                const videoData = videosMap.get(id)
-                if (videoData) {
-                    videoData.bufferStrList.push(dataStr)
-                    videoData.endTime = time
-                } else {
-                    const newVideoData = {
-                        id,
-                        startTime: time,
-                        endTime: time,
-                        bufferStrList: [dataStr]
-                    } as VideoData & { bufferStrList: string[] }
-                    videosMap.set(id, newVideoData)
-                }
-                break
-            default:
+        if (record.type === RecordType.HEAD) {
+            if (next && !(next.data as SnapshotRecord['data']).frameId) {
+                replayData.head = record
+            }
+        } else if (record.type === RecordType.SNAPSHOT) {
+            if (!record.data.frameId) {
                 if (replayData) {
-                    replayData.records.push(record as RecordData)
+                    replayData.snapshot = record
                 }
-                break
+            } else {
+                replayData.records.push(record)
+            }
+        } else {
+            switch (record.type) {
+                case RecordType.AUDIO:
+                    const { data: audioData } = record as AudioRecord
+                    if ((audioData as AudioData).src) {
+                        const data = audioData as AudioData
+                        replayData.audio.src = data.src
+                        replayData.audio.subtitles = data.subtitles
+                    } else if (isAudioBufferStr(audioData as AudioStrList)) {
+                        replayData.audio.bufferStrList.push(...(audioData as AudioStrList).data)
+                    } else {
+                        replayData.audio.opts = (audioData as AudioOptions).data
+                    }
+                    replayData.records.push(record as RecordData)
+                    break
+                case RecordType.VIDEO:
+                    const { data, time } = record as VideoRecord
+                    const { id, dataStr } = data
+
+                    if (!dataStr) {
+                        break
+                    }
+
+                    const videoData = videosMap.get(id)
+                    if (videoData) {
+                        videoData.bufferStrList.push(dataStr)
+                        videoData.endTime = time
+                    } else {
+                        const newVideoData = {
+                            id,
+                            startTime: time,
+                            endTime: time,
+                            bufferStrList: [dataStr]
+                        } as VideoData & { bufferStrList: string[] }
+                        videosMap.set(id, newVideoData)
+                    }
+                    replayData.records.push(record as RecordData)
+                    break
+            }
+            if (replayData) {
+                replayData.records.push(record as RecordData)
+            }
         }
     })
 
