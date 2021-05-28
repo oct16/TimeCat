@@ -236,7 +236,8 @@ export class RecorderModule extends Pluginable {
     private async startRecord(options: RecordInternalOptions) {
         let activeWatchers = [...this.watchers, ...this.pluginWatchers]
 
-        if (options.context === this.options.rootContext) {
+        const isSameCtx = options.context === this.options.rootContext
+        if (isSameCtx) {
             if (!options.keep) {
                 this.db.clear()
             }
@@ -291,7 +292,7 @@ export class RecorderModule extends Pluginable {
 
         options.context.G_RECORD_RELATED_ID = relatedId
 
-        if (options.context === this.options.rootContext) {
+        if (isSameCtx) {
             emit({
                 type: RecordType.HEAD,
                 data: headData,
@@ -312,7 +313,7 @@ export class RecorderModule extends Pluginable {
             this.watchersInstance.set(Watcher.name, watcher)
         })
 
-        if (options.emitLocationImmediate) {
+        if (options.emitLocationImmediate && isSameCtx) {
             const locationInstance = this.watchersInstance.get(LocationWatcher.name) as InstanceType<
                 typeof LocationWatcher
             >
