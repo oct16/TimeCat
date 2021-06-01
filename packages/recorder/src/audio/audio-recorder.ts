@@ -13,7 +13,7 @@ import { float32ArrayToBase64 } from '@timecat/utils'
 export class AudioRecorder {
     static defaultRecordOptions = {
         sampleBits: 8,
-        sampleRate: 8000,
+        sampleRate: 48000,
         channelCount: 1
     } as AudioOptionsData
 
@@ -75,9 +75,9 @@ export class AudioRecorder {
                         sampleRate: this.opts.sampleRate,
                         channelCount: this.opts.channelCount,
 
-                        echoCancellation: true,
-                        autoGainControl: true,
-                        noiseSuppression: true,
+                        echoCancellation: false,
+                        autoGainControl: false,
+                        noiseSuppression: false,
                         latency: 0
                     }
                 })
