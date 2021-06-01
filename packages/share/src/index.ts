@@ -32,6 +32,8 @@ type Extra = {
         scroll?: { top: number; left: number }
         autoplay: boolean
         controls: boolean
+        loop: boolean
+        muted: boolean
     }
     isSVG: boolean
 }

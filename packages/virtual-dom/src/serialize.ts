@@ -74,6 +74,8 @@ function getExtra(node: Element, isSVG?: boolean) {
     } else if (tagName === 'VIDEO') {
         props.autoplay = false
         props.controls = false
+        props.loop = false
+        props.muted = true
     }
 
     // find the scrolled elements
