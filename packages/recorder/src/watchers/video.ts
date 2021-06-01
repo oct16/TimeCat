@@ -50,7 +50,7 @@ export class VideoWatcher extends Watcher<VideoRecord> {
 
         const recorder = new MediaRecorder(canvas.captureStream(60), {
             mimeType: 'video/webm;codecs=vp9',
-            bitsPerSecond: 600_000
+            bitsPerSecond: 1_000_000
         })
         recorder.ondataavailable = async e => {
             const blob = e.data
