@@ -136,3 +136,29 @@ export function base64ToBufferArray(str: string) {
 
     return arrayBuffer
 }
+
+export function uint8ArrayToAscii(array: Uint8Array) {
+    let outputStr = ''
+    const carry = 1 << 8
+    for (let i = 0; i < array.length; i++) {
+        let num = array[i]
+
+        if (~[13, 34, 39, 44, 60, 62, 92, 96, 10, 0].indexOf(num)) {
+            num += carry
+        }
+
+        outputStr += String.fromCharCode(num)
+    }
+    return outputStr
+}
+
+export function asciiToUint8Array(str: string) {
+    const carry = 1 << 8
+    const strArray = str.split('')
+    const byteArray = new Uint8Array(strArray.length)
+    for (let i = 0; i < strArray.length; i++) {
+        const num = strArray[i].charCodeAt(0)
+        byteArray[i] = num >= carry ? num - carry : num
+    }
+    return byteArray
+}

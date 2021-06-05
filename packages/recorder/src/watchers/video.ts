@@ -8,7 +8,7 @@
  */
 
 import { RecordType, VideoRecord, VideoRecordData } from '@timecat/share'
-import { bufferArrayToBase64, nodeStore, debounce, AnimationFrame } from '@timecat/utils'
+import { nodeStore, debounce, AnimationFrame, bufferArrayToBase64 } from '@timecat/utils'
 import { Watcher } from '../watcher'
 
 export class VideoWatcher extends Watcher<VideoRecord> {

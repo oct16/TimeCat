@@ -23,7 +23,7 @@ import {
     VideoRecord
 } from '@timecat/share'
 import { decompressWithGzipByte } from 'brick.json/gzip/esm'
-import { base64ToBufferArray, delay, idb } from '@timecat/utils'
+import { delay, idb, asciiToUint8Array, base64ToBufferArray } from '@timecat/utils'
 import { Store } from './redux'
 import mobile from 'is-mobile'
 import { ContainerComponent } from '../components/container'
@@ -157,13 +157,7 @@ export function getGZipData(): RecordData[] | null {
         return null
     }
 
-    const carry = 1 << 8
-    const strArray = str.split('')
-    const byteArray = new Uint8Array(strArray.length)
-    for (let i = 0; i < strArray.length; i++) {
-        const num = strArray[i].charCodeAt(0)
-        byteArray[i] = num >= carry ? num - carry : num
-    }
+    const byteArray = asciiToUint8Array(str)
 
     return decompressWithGzipByte(byteArray) as RecordData[]
 }

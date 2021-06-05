@@ -8,7 +8,15 @@
  */
 
 import { emptyTemplate, loadingScriptContent } from './tpl'
-import { base64ToFloat32Array, encodeWAV, isDev, getRandomCode, getScript, logError } from '@timecat/utils'
+import {
+    base64ToFloat32Array,
+    encodeWAV,
+    isDev,
+    getRandomCode,
+    getScript,
+    logError,
+    uint8ArrayToAscii
+} from '@timecat/utils'
 import { compressWithGzipByte } from 'brick.json/gzip/esm'
 import { AudioData, AudioOptionsData, RecordData } from '@timecat/share'
 import { download, transToReplayData, getGZipData, getRecordsFromDB, getRecordsFromStore } from './common'
@@ -169,17 +177,7 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
 
     const zipArray = compressWithGzipByte(records)
 
-    let outputStr = ''
-    const carry = 1 << 8
-    for (let i = 0; i < zipArray.length; i++) {
-        let num = zipArray[i]
-
-        if (~[13, 34, 39, 44, 60, 62, 92, 96, 10, 0].indexOf(num)) {
-            num += carry
-        }
-
-        outputStr += String.fromCharCode(num)
-    }
+    const outputStr = uint8ArrayToAscii(zipArray)
 
     const replayData = `var G_REPLAY_STR_RECORDS =  '${outputStr}'`
 
