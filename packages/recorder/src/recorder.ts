@@ -17,6 +17,12 @@ import { LocationWatcher } from './watchers/location'
 import { Pluginable, RecorderPlugin } from './pluginable'
 export { RecordData } from '@timecat/share'
 
+export type RewriteResource = (RewriteItem<'rewrite'> | RewriteItem<'preFetch'>)[]
+export interface RecordOptions extends RecordOptionsBase {
+    plugins?: RecorderPlugin[]
+    rewriteResource?: RewriteResource
+}
+
 interface RecordOptionsBase {
     context?: Window
     audio?: boolean
@@ -31,16 +37,21 @@ interface RecordInternalOptions extends RecordOptions {
     context: Window
 }
 
-export interface RecordOptions extends RecordOptionsBase {
-    plugins?: RecorderPlugin[]
-    rewriteResource?: RewriteResource
+export type RewriteItem<Type extends 'rewrite' | 'preFetch'> = {
+    matches: (string | RegExp)[]
+    type?: Type
+    rewrite: Type extends 'preFetch' ? PreFetchRewriteConfig : RewriteConfig
 }
 
-interface RewriteResource {
-    matches: string[]
-    replaceOrigin: string
+interface RewriteConfig {
+    replaceOrigin?: string
     folderPath?: string
-    fn?: (oldUrl: string, nextUrl: string) => void
+    fn?: (pre: string, next: string) => string | void
+}
+
+interface PreFetchRewriteConfig extends RewriteConfig {
+    matches?: (string | RegExp)[]
+    crossUrl?: string
 }
 
 export class Recorder {
@@ -136,7 +147,7 @@ export class RecorderModule extends Pluginable {
     private record(options: RecordOptions): void
     private record(options: RecordInternalOptions): void
 
-    private record(options: RecordOptions): void {
+    private record(options: RecordOptions | RecordInternalOptions): void {
         const opts = { ...RecorderModule.defaultRecordOpts, ...options } as RecordInternalOptions
         this.startRecord((opts.context.G_RECORD_OPTIONS = opts))
     }

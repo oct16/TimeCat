@@ -278,7 +278,15 @@ export class DOMWatcher extends Watcher<DOMRecord> {
     }
 
     rewriteAddedSource(addedNodes: UpdateNodeData<number | VSNode | VNode>[]) {
+        const { G_RECORD_OPTIONS: options } = window
+        const configs = options?.rewriteResource || []
+        if (!configs?.length) {
+            return
+        }
+
         const vNodes = addedNodes.map(item => item.node).filter(node => isVNode(node as VNode) && node) as VNode[]
-        rewriteNodes(vNodes)
+        rewriteNodes(vNodes, configs, data => {
+            this.emitData(RecordType.PATCH, data)
+        })
     }
 }

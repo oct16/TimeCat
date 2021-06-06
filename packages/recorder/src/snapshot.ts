@@ -8,7 +8,7 @@
  */
 
 import { Watcher } from './watcher'
-import { SnapshotRecord, WatcherOptions, RecordType, InfoData, VNode, VSNode } from '@timecat/share'
+import { SnapshotRecord, WatcherOptions, RecordType, InfoData, VNode, VSNode, PreFetchRecordData } from '@timecat/share'
 import { createElement } from '@timecat/virtual-dom'
 import { nodeStore, isVNode } from '@timecat/utils'
 import { rewriteNodes } from './common'
@@ -60,7 +60,8 @@ export class Snapshot extends Watcher<SnapshotRecord> {
 
     checkNodesData({ vNode }: { vNode: VNode }) {
         const { G_RECORD_OPTIONS: options } = window
-        if (!options.rewriteResource) {
+        const configs = options?.rewriteResource || []
+        if (!configs?.length) {
             return
         }
 
@@ -75,6 +76,8 @@ export class Snapshot extends Watcher<SnapshotRecord> {
             return vNodes
         }
 
-        rewriteNodes(deepLoopChildNodes(vNode.children))
+        rewriteNodes(deepLoopChildNodes(vNode.children), configs, data => {
+            this.emitData(RecordType.PATCH, data as PreFetchRecordData)
+        })
     }
 }

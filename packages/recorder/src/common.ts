@@ -7,44 +7,141 @@
  *
  */
 
-import { VNode } from '@timecat/share'
-import { logError, createURL } from '@timecat/utils'
+import { PreFetchRecordData, VNode } from '@timecat/share'
+import { logError, createURL, getTime, completeCssHref } from '@timecat/utils'
+import { RewriteItem, RewriteResource } from './recorder'
 
-export function rewriteNodes(vNodes: VNode[]) {
-    const { G_RECORD_OPTIONS: options } = window
-    const { rewriteResource } = options
-
-    if (!rewriteResource) {
+export function rewriteNodes(
+    vNodes: VNode[],
+    configs: RewriteResource,
+    preFetchCallback: (data: PreFetchRecordData) => void
+) {
+    if (!configs) {
         return
     }
-    const { replaceOrigin, folderPath, fn, matches } = rewriteResource
 
-    if (!replaceOrigin || !matches) {
+    const { rewriteConfigs, preFetchConfigs } = configs.reduce(
+        (collect, config) => {
+            if (config.type === 'preFetch') {
+                collect.preFetchConfigs.push(config as RewriteItem<'preFetch'>)
+            } else {
+                collect.rewriteConfigs.push(config as RewriteItem<'rewrite'>)
+            }
+            return collect
+        },
+        { rewriteConfigs: [], preFetchConfigs: [] } as {
+            rewriteConfigs: RewriteItem<'rewrite'>[]
+            preFetchConfigs: RewriteItem<'preFetch'>[]
+        }
+    )
+
+    if (
+        rewriteConfigs.some(config => {
+            const { matches, rewrite } = config
+            const { replaceOrigin } = rewrite
+            return !replaceOrigin || !matches
+        })
+    ) {
         return logError('The params replaceOrigin and matches is required for using rewriteResource')
     }
 
-    const [base] = document.getElementsByTagName('base')
-    const href = window.location.href
-
-    const rewriteNodeSrc = (node: VNode) => {
-        const { href, src } = node.attrs
-        Object.entries({ href, src })
-            .filter(([, source]) => source && (matches as string[]).some(item => source.endsWith('.' + item)))
-            .forEach(item => rewrite(node.attrs, item))
+    function matchNodeSource(node: VNode, matches: (string | RegExp)[]) {
+        return (func: (node: VNode, key: string, val: string) => void) => {
+            const { href, src } = node.attrs
+            Object.entries({ href, src })
+                .filter(([, source]) => {
+                    if (!source) {
+                        return
+                    }
+                    return matches.some(item => {
+                        if (typeof item === 'string') {
+                            return source.endsWith(item)
+                        }
+                        return (item as RegExp).test(source)
+                    })
+                })
+                .forEach(item => func(node, ...item))
+        }
     }
 
-    const rewrite = (target: { [key: string]: string }, [key, source]: [string, string]) => {
-        const url = createURL(source, base?.href || href)
-        const oldUrl = url.href
+    rewriteConfigs.forEach(config => {
+        const { rewrite, matches } = config
+        const { replaceOrigin, folderPath, fn } = rewrite
+        const [base] = document.getElementsByTagName('base')
+        const href = window.location.href
 
-        target[key] = createURL(url.pathname, replaceOrigin).href
-        target[key] = pathJoin(replaceOrigin, folderPath || '', url.pathname)
-        const nextUrl = target[key]
+        const rewriteNode = (node: VNode) => matchNodeSource(node, matches)(rewriteAttr)
 
-        fn && fn(oldUrl, nextUrl)
-    }
+        const rewriteAttr = (vNode: VNode, key: string, source: string) => {
+            const target = vNode.attrs
+            const url = createURL(source, base?.href || href)
+            const oldUrl = url.href
 
-    vNodes.forEach(rewriteNodeSrc)
+            const nextUrl = pathJoin(replaceOrigin!, folderPath || '', url.pathname)
+            const targetUrl = (fn && fn(oldUrl, nextUrl)) || nextUrl
+            target[key] = targetUrl
+        }
+
+        vNodes.forEach(rewriteNode)
+    })
+
+    preFetchConfigs.forEach(config => {
+        const { rewrite, matches } = config
+        const { replaceOrigin, folderPath, crossUrl, fn, matches: subMatches } = rewrite
+        const [base] = document.getElementsByTagName('base')
+        const href = window.location.href
+
+        const rewriteNode = (node: VNode) => matchNodeSource(node, matches)(preFetchSource)
+
+        const preFetchSource = async (vNode: VNode, key: string, source: string) => {
+            const url = createURL(source, base?.href || href)
+            const resText = await fetch(crossOriginUrl(url.href)).then(res => res.text())
+            const fetchTime = getTime()
+
+            const text = completeCssHref(resText, undefined, preUrl => {
+                if (!subMatches) {
+                    return preUrl
+                }
+
+                const anyMatched = subMatches.some(item => {
+                    if (typeof item === 'string') {
+                        return preUrl.endsWith(item)
+                    }
+                    return (item as RegExp).test(preUrl)
+                })
+
+                if (!anyMatched) {
+                    return preUrl
+                }
+
+                let nextUrl: string
+                if (replaceOrigin && folderPath) {
+                    const url = createURL(preUrl, base?.href || href)
+                    nextUrl = pathJoin(replaceOrigin, folderPath || '', url.pathname)
+                } else {
+                    if (typeof crossUrl === 'string') {
+                        nextUrl = crossUrl + preUrl
+                    } else {
+                        nextUrl = crossOriginUrl(preUrl)
+                    }
+                }
+                return (fn && fn(preUrl, nextUrl)) || nextUrl
+            })
+
+            const data: PreFetchRecordData = {
+                id: vNode.id,
+                tag: vNode.tag,
+                key,
+                time: fetchTime,
+                url: url.href,
+                text
+            }
+
+            preFetchCallback(data)
+        }
+
+        vNodes.forEach(rewriteNode)
+    })
 }
 
 function pathJoin(...urls: string[]) {
@@ -72,4 +169,8 @@ function pathJoin(...urls: string[]) {
         }
         return url + (path ? '/' + pureStart(pureEnd(path)) : '')
     }, '')
+}
+
+function crossOriginUrl(url: string) {
+    return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
 }

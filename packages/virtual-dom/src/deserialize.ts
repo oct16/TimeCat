@@ -21,7 +21,8 @@ export function convertVNode(vNode: VNode | VSNode | null, parent?: VNode): Elem
     }
     if (vNode.type === Node.TEXT_NODE) {
         if (parent && parent.tag === 'style') {
-            vs.value = completeCssHref(vs.value, parent)
+            const baseUrl = parent?.attrs['css-url']
+            vs.value = completeCssHref(vs.value, baseUrl)
         }
         return createText(vs) as Element
     }

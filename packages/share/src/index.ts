@@ -65,7 +65,8 @@ export enum RecordType {
     'AUDIO',
     'CANVAS',
     'TERMINATE',
-    'FONT'
+    'FONT',
+    'PATCH'
 }
 
 export enum FormElementEvent {
@@ -220,6 +221,7 @@ export type RecordData =
     | CanvasRecord
     | TerminateRecord
     | FontRecord
+    | PreFetchRecord
 
 export interface AudioData {
     src: string
@@ -318,3 +320,14 @@ export interface FontRecordData {
 }
 
 export type FontRecord = BaseRecord<RecordType.FONT, FontRecordData>
+
+export interface PreFetchRecordData {
+    id: number
+    tag: string
+    key: string
+    time: number
+    url: string
+    text: string
+}
+
+export type PreFetchRecord = BaseRecord<RecordType.PATCH, PreFetchRecordData>

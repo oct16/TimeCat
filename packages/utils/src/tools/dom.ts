@@ -7,12 +7,11 @@
  *
  */
 
-import { VNode } from '@timecat/share'
 import { logError, createURL } from './common'
 
 const snapshot = () => window.G_REPLAY_DATA && window.G_REPLAY_DATA.snapshot.data
 
-const href = () => snapshot().href
+const href = () => snapshot()?.href || location.href
 
 export function isCommentNode(node: Node) {
     return node.nodeType === Node.COMMENT_NODE
@@ -31,11 +30,13 @@ export function filteringScriptTag(str: string) {
     return str.replace(reg, '<\\/script>')
 }
 
-export function completeCssHref(str: string, parentVNode?: VNode) {
+export function completeCssHref(str: string, baseUrl?: string, setHref?: (url: string) => string) {
     return str.replace(/(url\(['"]?((\/{1,2}|\.\.?\/)?[^'"]*?)['"]?(?=\)))/g, (string, b, url) => {
-        const baseUrl = parentVNode?.attrs['css-url'] || href()
-        const newUrl = createURL(url, baseUrl)
-        return string.replace(url, newUrl.href)
+        const newUrl = createURL(url, baseUrl || href())
+        if (url.startsWith('data:')) {
+            return url
+        }
+        return string.replace(url, setHref ? setHref(newUrl.href) : newUrl.href)
     })
 }
 
