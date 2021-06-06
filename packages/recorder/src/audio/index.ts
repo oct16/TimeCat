@@ -8,7 +8,7 @@
  */
 
 import { AudioRecorder } from './audio-recorder'
-import { AudioRecord, RecordType, WatcherArgs } from '@timecat/share'
+import { AudioRecord, AudioStrList, RecordType, WatcherArgs } from '@timecat/share'
 import { Watcher } from '../watcher'
 
 export class AudioWatcher extends Watcher<AudioRecord> {
@@ -35,10 +35,12 @@ export class AudioWatcher extends Watcher<AudioRecord> {
         })
 
         recorder.onProgress = audioBase64Data => {
-            this.emitData(RecordType.AUDIO, {
-                type: 'base64',
+            const data: AudioStrList = {
+                encode: 'base64',
+                type: 'pcm',
                 data: audioBase64Data
-            })
+            }
+            this.emitData(RecordType.AUDIO, data)
         }
     }
 }

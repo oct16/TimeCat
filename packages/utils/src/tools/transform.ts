@@ -34,14 +34,17 @@ function encodePCM(bufferData: Float32Array, opts: AudioOptionsData) {
 }
 
 export function encodeWAV(data: Float32Array[], opts: AudioOptionsData) {
-    const PMC = encodePCM(mergeArray(data), opts)
-    const arrayBuffer = createWavFile(PMC, opts)
-
-    const blob = new Blob([arrayBuffer], {
+    const dataView = encodeAudioData(data, opts)
+    const blob = new Blob([dataView], {
         type: 'audio/wav'
     })
 
     return blob
+}
+
+export function encodeAudioData(data: Float32Array[], opts: AudioOptionsData) {
+    const PMC = encodePCM(mergeArray(data), opts)
+    return createWavFile(PMC, opts)
 }
 
 function mergeArray(list: Float32Array[]) {
@@ -95,11 +98,9 @@ function createWavFile(audioData: DataView, { channelCount, sampleBits, sampleRa
     // write PCM
     const length = audioData.byteLength
     let offset = 44
-    // let volume = 1
     for (let i = 0; i < length; i++) {
-        view.setUint8(offset, audioData.getUint8(i)) // * (0x7fff * volume)
+        view.setUint8(offset, audioData.getUint8(i))
         offset++
-        // offset += 2
     }
 
     return view
@@ -121,8 +122,13 @@ export function base64ToFloat32Array(str: string) {
 }
 
 export function bufferArrayToBase64(arrayBuffer: ArrayBufferLike) {
-    const uint = new Uint8Array(arrayBuffer)
-    return btoa(String.fromCharCode.apply(null, uint))
+    let binary = ''
+    const bytes = new Uint8Array(arrayBuffer)
+    const len = bytes.byteLength
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i])
+    }
+    return btoa(binary)
 }
 
 export function base64ToBufferArray(str: string) {

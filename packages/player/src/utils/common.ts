@@ -44,13 +44,17 @@ export function download(src: Blob | string, name: string) {
 }
 
 export function transToReplayData(records: RecordData[]): ReplayData {
-    function isAudioBufferStr(record: AudioStrList) {
-        return record.type === 'base64'
+    function isAudioPCMStr(record: AudioStrList) {
+        return record.type === 'pcm' && record.encode === 'base64'
+    }
+    function isAudioWAVStr(record: AudioStrList) {
+        return record.type === 'wav' && record.encode === 'base64'
     }
 
     const audio = {
         src: '',
-        bufferStrList: [],
+        pcmStrList: [],
+        wavStrList: [],
         subtitles: [],
         opts: {} as AudioOptionsData
     }
@@ -88,8 +92,10 @@ export function transToReplayData(records: RecordData[]): ReplayData {
                         const data = audioData as AudioData
                         replayData.audio.src = data.src
                         replayData.audio.subtitles = data.subtitles
-                    } else if (isAudioBufferStr(audioData as AudioStrList)) {
-                        replayData.audio.bufferStrList.push(...(audioData as AudioStrList).data)
+                    } else if (isAudioPCMStr(audioData as AudioStrList)) {
+                        replayData.audio.pcmStrList.push(...(audioData as AudioStrList).data)
+                    } else if (isAudioWAVStr(audioData as AudioStrList)) {
+                        replayData.audio.wavStrList.push(...(audioData as AudioStrList).data)
                     } else {
                         replayData.audio.opts = (audioData as AudioOptions).data
                     }

@@ -14,10 +14,10 @@ import {
     isSnapshot,
     toTimeStamp,
     base64ToFloat32Array,
-    encodeWAV,
     delay,
     AnimationFrame,
-    nodeStore
+    nodeStore,
+    encodeWAV
 } from '@timecat/utils'
 import { ProgressComponent } from './progress'
 import { ContainerComponent } from './container'
@@ -181,18 +181,30 @@ export class PlayerComponent implements IComponent {
         if (this.audioData.src) {
             this.audioBlobUrl = location.href.split('/').slice(0, -1).join('/') + '/' + this.audioData.src
         } else {
-            const bufferStrList = this.audioData.bufferStrList
-            if (!bufferStrList.length) {
+            const { wavStrList, pcmStrList } = this.audioData
+
+            let type: 'wav' | 'pcm' | undefined = undefined
+            const list: string[] = []
+            if (wavStrList.length) {
+                type = 'wav'
+                list.push(...wavStrList)
+            } else if (pcmStrList.length) {
+                type = 'pcm'
+                list.push(...pcmStrList)
+            }
+
+            if (!type) {
                 return
             }
 
             const dataArray: Float32Array[] = []
-            for (let i = 0; i < bufferStrList.length; i++) {
-                const data = base64ToFloat32Array(bufferStrList[i])
+            for (let i = 0; i < list.length; i++) {
+                const data = base64ToFloat32Array(list[i])
                 dataArray.push(data)
             }
 
-            const audioBlob = encodeWAV(dataArray, this.audioData.opts)
+            const audioBlob =
+                type === 'wav' ? new Blob(dataArray, { type: 'audio/wav' }) : encodeWAV(dataArray, this.audioData.opts)
             const audioBlobUrl = URL.createObjectURL(audioBlob)
             this.audioBlobUrl = audioBlobUrl
         }

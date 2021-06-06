@@ -8,20 +8,12 @@
  */
 
 import { emptyTemplate, loadingScriptContent } from './tpl'
-import {
-    base64ToFloat32Array,
-    encodeWAV,
-    isDev,
-    getRandomCode,
-    getScript,
-    logError,
-    uint8ArrayToAscii
-} from '@timecat/utils'
+import { isDev, getRandomCode, getScript, logError, uint8ArrayToAscii, bufferArrayToBase64 } from '@timecat/utils'
 import { compressWithGzipByte } from 'brick.json/gzip/esm'
-import { AudioData, AudioOptionsData, RecordData } from '@timecat/share'
-import { download, transToReplayData, getGZipData, getRecordsFromDB, getRecordsFromStore } from './common'
+import { AudioRecord, AudioStrList, RecordData, RecordType } from '@timecat/share'
+import { download, getGZipData, getRecordsFromDB, getRecordsFromStore } from './common'
 import { recoverNative } from './polyfill/recover-native'
-import { getPacks } from './transform'
+import { convertAudioBuffer, getPacks } from './transform'
 
 type ScriptItem = { name?: string; src: string }
 type ExportOptions = Partial<{
@@ -34,13 +26,6 @@ type ExportOptions = Partial<{
 }>
 
 const EXPORT_NAME_LABEL = 'TimeCat'
-const downloadAudioConfig = {
-    extractAudioDataList: [] as {
-        source: string[]
-        fileName: string
-    }[],
-    opts: {} as AudioOptionsData
-}
 
 export async function exportReplay(exportOptions: ExportOptions) {
     recoveryMethods()
@@ -49,7 +34,7 @@ export async function exportReplay(exportOptions: ExportOptions) {
     const exportName = exportOptions.exportName
     const fileName = `${exportName || EXPORT_NAME_LABEL}-${getRandomCode()}`
     downloadHTML(fileName, htmlStr)
-    downloadAudios()
+    // downloadAudios()
 }
 
 export async function createReplayDocument(exportOptions: ExportOptions): Promise<Document> {
@@ -75,25 +60,6 @@ function recoveryMethods() {
 function downloadHTML(name: string, content: string) {
     const blob = new Blob([content], { type: 'text/html' })
     download(blob, `${name}.html`)
-}
-
-function downloadAudios() {
-    if (window.G_REPLAY_DATA) {
-        const replayData = window.G_REPLAY_DATA
-        const audioSrc = replayData?.audio?.src
-        if (audioSrc) {
-            download(audioSrc, audioSrc)
-            return
-        }
-    }
-
-    downloadAudioConfig.extractAudioDataList.forEach(extractedData => {
-        const floatArray = extractedData.source.map(data => base64ToFloat32Array(data))
-        const audioBlob = encodeWAV(floatArray, downloadAudioConfig.opts)
-        download(audioBlob, extractedData.fileName)
-    })
-
-    downloadAudioConfig.extractAudioDataList.length = 0
 }
 
 async function initOptions(html: Document, exportOptions: ExportOptions) {
@@ -136,30 +102,49 @@ async function injectScripts(html: Document, scripts: ScriptItem[]) {
 }
 
 export function extract(packs: RecordData[][], exportOptions?: ExportOptions) {
-    const replayDataList = packs.map(transToReplayData)
-    return replayDataList.forEach(replayData => {
-        if (exportOptions && exportOptions.audioExternal) {
-            replayData.audio = extractAudio(replayData.audio)
-        }
-        return replayData
-    })
+    return packs.map(extractAudio)
 }
 
-function extractAudio(audio: AudioData) {
-    const source = audio.bufferStrList.slice()
-    if (!source.length) {
-        return audio
+function extractAudio(records: RecordData[]) {
+    const audioPCMRecords: AudioRecord<AudioStrList>[] = []
+    const extractedRecords: RecordData[] = []
+
+    records.forEach(record => {
+        if (record.type === RecordType.AUDIO) {
+            const recordData = record.data as AudioStrList
+            if (recordData.type === 'pcm') {
+                audioPCMRecords.push(record as AudioRecord<AudioStrList>)
+                return
+            }
+        }
+        extractedRecords.push(record)
+    })
+
+    if (audioPCMRecords.length) {
+        const dataView = convertAudioBuffer(audioPCMRecords)
+        const buffer = dataView.buffer
+        const wavBase64Str = bufferArrayToBase64(buffer)
+
+        const insertIndex = extractedRecords.length - 1
+
+        const prevRecord = extractedRecords[insertIndex]
+
+        const data: AudioStrList = {
+            type: 'wav',
+            encode: 'base64',
+            data: [wavBase64Str]
+        }
+        const wavRecord = {
+            ...prevRecord,
+            time: audioPCMRecords.slice(-1)[0].time,
+            type: RecordType.AUDIO,
+            data
+        } as AudioRecord<AudioStrList>
+
+        extractedRecords.splice(insertIndex, 0, wavRecord)
     }
 
-    const fileName = `${EXPORT_NAME_LABEL}-audio-${getRandomCode()}.wav`
-    downloadAudioConfig.extractAudioDataList.push({
-        source,
-        fileName
-    })
-    downloadAudioConfig.opts = audio.opts
-    audio.src = fileName
-    audio.bufferStrList.length = 0
-    return audio
+    return extractedRecords
 }
 
 async function injectLoading(html: Document) {
@@ -173,9 +158,10 @@ async function injectData(html: Document, exportOptions: ExportOptions) {
         return logError('Records not found')
     }
     const packs = getPacks(records)
-    extract(packs, exportOptions)
 
-    const zipArray = compressWithGzipByte(records)
+    const extractedRecords = extract(packs, exportOptions).flat(1)
+
+    const zipArray = compressWithGzipByte(extractedRecords)
 
     const outputStr = uint8ArrayToAscii(zipArray)
 

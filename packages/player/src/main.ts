@@ -96,7 +96,7 @@ export class PlayerModule {
             data: { records, packs, currentData: firstData }
         })
 
-        const hasAudio = audio && (audio.src || audio.bufferStrList.length)
+        const hasAudio = audio && (audio.src || audio.wavStrList.length || audio.pcmStrList.length)
 
         this.c = new ContainerComponent(opts)
         const container = this.c.container

@@ -172,13 +172,14 @@ interface FormElementStrPatches {
     len?: number | undefined
 }
 
-export type AudioRecord = BaseRecord<RecordType.AUDIO, AudioStrList | AudioOptions | AudioData>
+export type AudioRecord<T = AudioStrList | AudioOptions | AudioData> = BaseRecord<RecordType.AUDIO, T>
 export interface AudioOptions {
     type: 'opts'
     data: AudioOptionsData
 }
 export interface AudioStrList {
-    type: 'base64'
+    encode: 'base64'
+    type: 'pcm' | 'wav'
     data: string[]
 }
 
@@ -239,7 +240,8 @@ export type RecordData =
 export interface AudioData {
     src: string
     opts: AudioOptionsData
-    bufferStrList: string[]
+    wavStrList: string[]
+    pcmStrList: string[]
     subtitles: SubtitlesData[]
 }
 
