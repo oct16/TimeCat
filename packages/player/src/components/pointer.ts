@@ -10,7 +10,7 @@
 import { setAttribute } from '@timecat/virtual-dom'
 import { delay } from '@timecat/utils'
 import { ContainerComponent } from './container'
-import { Component, html } from '../utils'
+import { Component, html, IComponent } from '../utils'
 
 @Component(
     'player-pointer',
@@ -22,7 +22,10 @@ import { Component, html } from '../utils'
         <div class="spinner"></div>
     </div>`
 )
-export class PointerComponent {
+export class PointerComponent implements IComponent {
+    parent: HTMLElement
+    target: HTMLElement
+
     x = 0
     y = 0
 

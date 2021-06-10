@@ -8,17 +8,9 @@
  */
 
 import { emptyTemplate, loadingScriptContent } from './tpl'
-import {
-    base64ToFloat32Array,
-    encodeWAV,
-    isDev,
-    getDBOperator,
-    getRandomCode,
-    getScript,
-    logError
-} from '@timecat/utils'
+import { base64ToFloat32Array, encodeWAV, isDev, getRandomCode, getScript, logError } from '@timecat/utils'
 import { compressWithGzipByte } from 'brick.json/gzip/esm'
-import { AudioData, AudioOptionsData, RecordType, RecordData } from '@timecat/share'
+import { AudioData, AudioOptionsData, RecordData } from '@timecat/share'
 import { download, transToReplayData, getGZipData, getRecordsFromDB, getPacks, getRecordsFromStore } from './common'
 import { recoverNative } from './polyfill/recover-native'
 
@@ -63,23 +55,6 @@ function recoveryMethods() {
     ]
 
     methods.forEach(recoverNative.recoverMethod.bind(recoverNative))
-}
-
-async function addNoneFrame() {
-    const DBOperator = await getDBOperator
-
-    const count = await DBOperator.count()
-    const last = await DBOperator.last()
-
-    if (count && last.type !== RecordType.TERMINATE) {
-        const lastTime = last.time
-        DBOperator.add({
-            type: RecordType.TERMINATE,
-            data: null,
-            relatedId: window.G_RECORD_RELATED_ID,
-            time: lastTime + 1
-        })
-    }
 }
 
 function downloadHTML(content: string) {

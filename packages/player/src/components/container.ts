@@ -7,7 +7,7 @@
  *
  */
 
-import { nodeStore, debounce } from '@timecat/utils'
+import { nodeStore, debounce, createURL } from '@timecat/utils'
 import HTML from '../ui.html'
 import CSS from '../ui.scss'
 import { createIframeDOM, injectIframeContent } from '../dom'
@@ -72,7 +72,12 @@ export class ContainerComponent {
 
     setViewState() {
         nodeStore.reset()
-        injectIframeContent(this.sandBoxDoc, this.getSnapshotRecord())
+        const recordData = this.getSnapshotRecord()
+        const { pathname, hash, href } = createURL(recordData.href) as URL
+        const doc = this.sandBoxDoc
+        const context = doc.defaultView as Window
+        context.G_REPLAY_LOCATION = { ...context.G_REPLAY_LOCATION, ...{ path: pathname, hash, href } }
+        injectIframeContent(this.sandBoxDoc, recordData)
     }
 
     initTemplate() {

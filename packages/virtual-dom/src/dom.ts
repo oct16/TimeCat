@@ -37,6 +37,10 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         return
     }
 
+    if (/^\d+/.test(name)) {
+        return
+    }
+
     if (/^on\w+$/.test(name)) {
         return
     }

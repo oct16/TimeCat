@@ -7,7 +7,7 @@
  *
  */
 
-import { Component, html, exportReplay, Store } from '../utils'
+import { Component, html, exportReplay, Store, IComponent } from '../utils'
 import { ContainerComponent } from './container'
 import { getRawScriptContent } from '@timecat/utils'
 
@@ -88,7 +88,8 @@ import { getRawScriptContent } from '@timecat/utils'
         </div>
     </div>`
 )
-export class ToolboxComponent {
+export class ToolboxComponent implements IComponent {
+    parent: HTMLElement
     target: HTMLElement
     c: ContainerComponent
     exportBtn: HTMLElement

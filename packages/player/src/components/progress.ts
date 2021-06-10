@@ -7,7 +7,7 @@
  *
  */
 
-import { secondToTime, delay, getDateTime, stateDebounce } from '@timecat/utils'
+import { secondToTime, getDateTime, stateDebounce } from '@timecat/utils'
 import { ContainerComponent } from './container'
 import { PlayerEventTypes } from '../types'
 import { Pillar, NormalLine, observer, Store, Component, IComponent, html } from '../utils'

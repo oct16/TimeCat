@@ -8,7 +8,7 @@
  */
 
 import { ContainerComponent } from './container'
-import { Component, html } from '../utils'
+import { Component, html, IComponent } from '../utils'
 
 @Component(
     'player-broadcaster',
@@ -18,7 +18,9 @@ import { Component, html } from '../utils'
         </div>
     </div>`
 )
-export class BroadcasterComponent {
+export class BroadcasterComponent implements IComponent {
+    parent: HTMLElement
+    target: HTMLElement
     broadcaster: HTMLElement
     floatLayer: HTMLElement
     subtitle: HTMLElement

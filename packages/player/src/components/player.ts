@@ -27,7 +27,8 @@ import {
     transToReplayData,
     normalLoading,
     parseHtmlStr,
-    isMobile
+    isMobile,
+    IComponent
 } from '../utils'
 
 @Component(
@@ -36,7 +37,9 @@ import {
         <iframe class="player-sandbox" sandbox="allow-same-origin allow-scripts allow-popups"></iframe>
     </div>`
 )
-export class PlayerComponent {
+export class PlayerComponent implements IComponent {
+    target: HTMLElement
+    parent: HTMLElement
     options: ReplayInternalOptions
     c: ContainerComponent
     pointer: PointerComponent

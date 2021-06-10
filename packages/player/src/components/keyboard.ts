@@ -9,7 +9,7 @@
 
 import { ContainerComponent } from './container'
 import { ReplayInternalOptions } from '@timecat/share'
-import { ConnectProps, Component, html, Store, PlayerReducerTypes, parseHtmlStr } from '../utils'
+import { ConnectProps, Component, html, Store, PlayerReducerTypes, parseHtmlStr, IComponent } from '../utils'
 
 @Component(
     'player-keyboard',
@@ -17,7 +17,9 @@ import { ConnectProps, Component, html, Store, PlayerReducerTypes, parseHtmlStr 
         <button class="play-or-pause" type="button" speed="1">▲</button>
     </div>`
 )
-export class KeyboardComponent {
+export class KeyboardComponent implements IComponent {
+    parent: HTMLElement
+    target: HTMLElement
     c: ContainerComponent
     options: ReplayInternalOptions
     controller: HTMLElement
