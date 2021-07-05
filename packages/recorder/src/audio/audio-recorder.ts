@@ -75,8 +75,8 @@ export class AudioRecorder {
                         sampleRate: this.opts.sampleRate,
                         channelCount: this.opts.channelCount,
 
-                        echoCancellation: false,
-                        autoGainControl: false,
+                        echoCancellation: true,
+                        autoGainControl: true,
                         noiseSuppression: false,
                         latency: 0
                     }
