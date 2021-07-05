@@ -431,9 +431,7 @@ export class PlayerComponent implements IComponent {
 
             this.syncAudioTargetNode()
 
-            if (this.speed > 1) {
-                this.audioNode.pause()
-            } else {
+            if (this.speed > 0) {
                 this.audioNode.play()
             }
         }
