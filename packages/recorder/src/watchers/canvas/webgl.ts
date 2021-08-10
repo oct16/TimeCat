@@ -170,7 +170,7 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
             })
 
             this.uninstall(() => {
-                Object.defineProperty(ctx, name, original)
+                Object.defineProperty(ctx, name, descriptor!)
             })
         }
     }

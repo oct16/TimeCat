@@ -130,7 +130,7 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             })
 
             this.uninstall(() => {
-                Object.defineProperty(ctxProto, name, original)
+                Object.defineProperty(ctx, name, descriptor!)
             })
         })
     }
