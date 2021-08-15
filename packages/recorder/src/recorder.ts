@@ -10,18 +10,7 @@
 import { watchers, baseWatchers } from './watchers'
 import { AudioWatcher } from './audio'
 import { RecordData, RecordType, TerminateRecord } from '@timecat/share'
-import {
-    logError,
-    nodeStore,
-    getTime,
-    stateDebounce,
-    throttle,
-    tempEmptyFn,
-    tempEmptyPromise,
-    IDB,
-    idb,
-    delay
-} from '@timecat/utils'
+import { logError, nodeStore, getTime, tempEmptyFn, tempEmptyPromise, IDB, idb, delay } from '@timecat/utils'
 import { Snapshot } from './snapshot'
 import { getHeadData } from './head'
 import { LocationWatcher } from './watchers/location'
@@ -31,9 +20,13 @@ import { VideoWatcher } from './watchers/video'
 import { RecorderMiddleware, RecorderStatus, RecordInternalOptions, RecordOptions } from './types'
 
 export class Recorder {
+    public startTime: number
+    public destroyTime: number
     public status: RecorderStatus = RecorderStatus.PAUSE
     public onData: RecorderModule['onData'] = tempEmptyFn
     public destroy: RecorderModule['destroy'] = tempEmptyPromise
+    public pause: RecorderModule['pause'] = tempEmptyPromise as RecorderModule['pause']
+    public record: RecorderModule['record'] = tempEmptyPromise as RecorderModule['record']
     public use: RecorderModule['use'] = tempEmptyFn
     public clearDB: RecorderModule['clearDB'] = tempEmptyPromise
     constructor(options?: RecordOptions) {
@@ -59,11 +52,8 @@ export class RecorderModule extends Pluginable {
         video: false,
         emitLocationImmediate: true,
         context: window,
-        visibleChange: false,
-        visibleChangeKeepTime: 5000,
         rewriteResource: [],
-        disableWatchers: [],
-        keepAlive: false
+        disableWatchers: []
     } as RecordOptions
     private defaultMiddlewares: RecorderMiddleware[] = []
     private destroyStore: Set<Function> = new Set()
@@ -73,8 +63,8 @@ export class RecorderModule extends Pluginable {
     private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
     private watcherResolve: Function
+    private startTime: number
     private destroyTime: number
-    private destroyWaitTime = 200
 
     public status: RecorderStatus = RecorderStatus.PAUSE
     public db: IDB
@@ -102,22 +92,13 @@ export class RecorderModule extends Pluginable {
     }
 
     private init() {
+        this.startTime = getTime()
         const options = this.options
         this.db = idb
         this.loadPlugins()
         this.hooks.beforeRun.call(this)
         this.record(options)
         this.hooks.run.call(this)
-
-        let refresh: (() => void) | undefined = undefined
-        let clear: (() => void) | undefined = undefined
-        if (options.keepAlive) {
-            const { refresh: r, clear: c } = this.enableKeepAlive(options.keepAlive)
-            ;(refresh = r), (clear = c)
-        }
-        if (options.visibleChange) {
-            this.listenVisibleChange(options, { keepAlive: { refresh, clear } })
-        }
     }
 
     public onData(fn: (data: RecordData, next: () => Promise<void>) => Promise<void>) {
@@ -128,7 +109,6 @@ export class RecorderModule extends Pluginable {
         if (this.status === RecorderStatus.HALT) {
             return
         }
-
         const ret = await this.pause()
         if (ret) {
             this.status = RecorderStatus.HALT
@@ -140,6 +120,11 @@ export class RecorderModule extends Pluginable {
         if (this.status === RecorderStatus.RUNNING) {
             this.status = RecorderStatus.PAUSE
             const last = await this.db.last().catch(() => {})
+
+            await this.cancelListener()
+            this.destroyStore.forEach(un => un())
+            this.destroyStore.clear()
+
             let lastTime: number | null = null
             if (last) {
                 lastTime = last.time + 1
@@ -157,10 +142,6 @@ export class RecorderModule extends Pluginable {
                     this.connectCompose(this.middlewares)(data as RecordData)
                 }
             }
-
-            await this.cancelListener()
-            this.destroyStore.forEach(un => un())
-            this.destroyStore.clear()
             return { lastTime }
         }
     }
@@ -229,12 +210,12 @@ export class RecorderModule extends Pluginable {
                     while (emitTasks.length) {
                         const record = emitTasks.shift()!
                         await delay(0)
-                        await this.connectCompose(this.middlewares)(record)
-                        if (!this.destroyTime || getTime() < this.destroyTime + this.destroyWaitTime) {
-                            this.hooks.emit.call(record)
+                        if (this.status === RecorderStatus.RUNNING) {
                             if (write) {
                                 this.db.add(record)
                             }
+                            await this.connectCompose(this.middlewares)(record)
+                            this.hooks.emit.call(record)
                         }
                     }
                     concurrency--
@@ -372,54 +353,6 @@ export class RecorderModule extends Pluginable {
         this.destroyStore.add(() => frameRecorder.destroy())
     }
 
-    private listenVisibleChange(
-        this: RecorderModule,
-        options: RecordInternalOptions,
-        ref?: { keepAlive?: { refresh?: () => void; clear?: () => void } }
-    ) {
-        if (typeof document.hidden !== 'undefined') {
-            const hidden = 'hidden'
-            const visibilityChange = 'visibilitychange'
-
-            enum ViewChangeState {
-                'show' = 'show',
-                'hide' = 'hide'
-            }
-
-            const { clear, refresh } = ref?.keepAlive || {}
-
-            const viewChangeHandle = (state: keyof typeof ViewChangeState) => {
-                if (state === ViewChangeState.hide) {
-                    this.hooks.end.call()
-                    this.pause()
-                    clear && clear()
-                } else {
-                    this.record({ ...options, keep: true, emitLocationImmediate: false })
-                    refresh && refresh()
-                }
-            }
-
-            stateDebounce<keyof typeof ViewChangeState>(
-                useState => {
-                    const handle = () => {
-                        if (document[hidden]) {
-                            useState(ViewChangeState.hide)
-                            return
-                        }
-                        useState(ViewChangeState.show)
-                    }
-
-                    document.addEventListener(visibilityChange, handle, false)
-                },
-                state =>
-                    state !== ViewChangeState.hide || this.status !== RecorderStatus.RUNNING
-                        ? 0
-                        : options.visibleChangeKeepTime,
-                ViewChangeState.show
-            )(viewChangeHandle)
-        }
-    }
-
     private connectCompose(list: RecorderMiddleware[]) {
         return async (data: RecordData) => {
             return await list.reduce(
@@ -433,37 +366,5 @@ export class RecorderModule extends Pluginable {
 
     private createNext(fn: RecorderMiddleware, data: RecordData, next: () => Promise<void>) {
         return async () => await fn(data, next)
-    }
-
-    private enableKeepAlive(this: RecorderModule, waitTime: number) {
-        const eventNames = ['click', 'mousemove', 'scroll']
-        let timer = 0
-        return (() => {
-            const clear = () => {
-                clearTimeout(timer)
-                timer = 0
-            }
-            const refresh = () => {
-                clear()
-                if (this.status !== RecorderStatus.RUNNING) {
-                    return
-                }
-                timer = window.setTimeout(() => this.pause(), waitTime)
-            }
-            const handle = () => {
-                if (this.status !== RecorderStatus.RUNNING) {
-                    this.record({ ...this.options, keep: true, emitLocationImmediate: false })
-                }
-                refresh()
-            }
-
-            eventNames.forEach(name => document.addEventListener(name, throttle(handle, 500)))
-            handle()
-
-            return {
-                refresh,
-                clear
-            }
-        })()
     }
 }

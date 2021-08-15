@@ -17,8 +17,6 @@ interface RecordOptionsBase {
     keep?: boolean
     emitLocationImmediate?: boolean
     font?: boolean
-    visibleChange?: boolean
-    visibleChangeKeepTime?: number
     disableWatchers?: Array<keyof typeof watchers>
     keepAlive?: number | false
 }

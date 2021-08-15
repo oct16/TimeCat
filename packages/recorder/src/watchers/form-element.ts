@@ -14,7 +14,7 @@ import { Watcher } from '../watcher'
 export class FormElementWatcher extends Watcher<FormElementRecord> {
     protected init() {
         this.listenInputs(this.options)
-        this.kidnapInputs(this.options)
+        this.hijackInputs(this.options)
     }
 
     private listenInputs(options: WatcherArgs<FormElementRecord>) {
@@ -96,17 +96,21 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
         }
     }
 
-    private kidnapInputs(options: WatcherArgs<FormElementRecord>) {
+    private hijackInputs(options: WatcherArgs<FormElementRecord>) {
         const { context } = options
         const self = this
+        function handleEvent(this: HTMLElement, key: string, value: string) {
+            const data = {
+                type: FormElementEvent.PROP,
+                id: self.getNodeId(this)!,
+                key,
+                value
+            }
 
-        new Map<string, HTMLElement>([
-            ['value', context.HTMLInputElement.prototype],
-            ['checked', context.HTMLInputElement.prototype],
-            ['value', context.HTMLSelectElement.prototype],
-            ['value', context.HTMLTextAreaElement.prototype],
-            ['selected', context.HTMLOptionElement.prototype]
-        ]).forEach((target, key) => {
+            self.emitData(RecordType.FORM_EL, data)
+        }
+
+        const hijacking = (key: string, target: HTMLElement) => {
             const original = context.Object.getOwnPropertyDescriptor(target, key)
             context.Object.defineProperty(target, key, {
                 set: function (value: string | boolean) {
@@ -124,17 +128,17 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                     context.Object.defineProperty(target, key, original)
                 }
             })
-        })
-
-        function handleEvent(this: HTMLElement, key: string, value: string) {
-            const data = {
-                type: FormElementEvent.PROP,
-                id: self.getNodeId(this)!,
-                key,
-                value
-            }
-
-            self.emitData(RecordType.FORM_EL, data)
         }
+
+        new Map<HTMLElement, string>([
+            [context.HTMLSelectElement.prototype, 'value'],
+            [context.HTMLTextAreaElement.prototype, 'value'],
+            [context.HTMLOptionElement.prototype, 'selected']
+        ]).forEach(hijacking.bind(this))
+
+        new Map<string, HTMLElement>([
+            ['value', context.HTMLInputElement.prototype],
+            ['checked', context.HTMLInputElement.prototype]
+        ]).forEach((target, key) => hijacking(key, target))
     }
 }
