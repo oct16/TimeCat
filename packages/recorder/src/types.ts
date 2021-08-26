@@ -1,4 +1,5 @@
 import { RecordData } from '@timecat/share'
+import { RecorderModule } from '@timecat/timecat'
 import { RecorderPlugin } from './pluginable'
 import { watchers } from './watchers'
 
@@ -9,6 +10,7 @@ interface RecordVideoOptions {
 }
 
 interface RecordOptionsBase {
+    rootRecorder?: RecorderModule
     context?: Window
     rootContext?: Window
     audio?: boolean

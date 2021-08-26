@@ -55,10 +55,10 @@ export class RecorderModule extends Pluginable {
         rewriteResource: [],
         disableWatchers: []
     } as RecordOptions
-    private defaultMiddlewares: RecorderMiddleware[] = []
+    private defaultMiddleware: RecorderMiddleware[] = []
     private destroyStore: Set<Function> = new Set()
     private listenStore: Set<Function> = new Set()
-    private middlewares: RecorderMiddleware[] = [...this.defaultMiddlewares]
+    private middleware: RecorderMiddleware[] = [...this.defaultMiddleware]
     private watchers: Array<typeof Watcher>
     private watchersInstance = new Map<string, Watcher<RecordData>>()
     private watchesReadyPromise = new Promise(resolve => (this.watcherResolve = resolve))
@@ -102,7 +102,7 @@ export class RecorderModule extends Pluginable {
     }
 
     public onData(fn: (data: RecordData, next: () => Promise<void>) => Promise<void>) {
-        this.middlewares.unshift(fn)
+        this.middleware.unshift(fn)
     }
 
     public async destroy() {
@@ -139,7 +139,7 @@ export class RecorderModule extends Pluginable {
                     if (this.options.write) {
                         this.db.add(data as TerminateRecord)
                     }
-                    this.connectCompose(this.middlewares)(data as RecordData)
+                    this.connectCompose(this.middleware)(data as RecordData)
                 }
             }
             return { lastTime }
@@ -198,7 +198,7 @@ export class RecorderModule extends Pluginable {
         const onEmit = (options: RecordOptions) => {
             const { write } = options
             const emitTasks: Array<RecordData> = []
-
+            const { middleware: rootMiddleware } = this.options.rootRecorder || { middleware: [] }
             const execTasksChain = (() => {
                 let concurrency = 0
                 const MAX_CONCURRENCY = 1
@@ -214,7 +214,8 @@ export class RecorderModule extends Pluginable {
                             if (write) {
                                 this.db.add(record)
                             }
-                            await this.connectCompose(this.middlewares)(record)
+                            const middleware = [...rootMiddleware, ...this.middleware]
+                            await this.connectCompose(middleware)(record)
                             this.hooks.emit.call(record)
                         }
                     }
@@ -347,6 +348,7 @@ export class RecorderModule extends Pluginable {
             ...this.options,
             context: frameWindow,
             keep: true,
+            rootRecorder: this.options.rootRecorder || this,
             rootContext: this.options.rootContext
         })
         const frameElement = frameWindow.frameElement as Element & { frameRecorder: RecorderModule }
