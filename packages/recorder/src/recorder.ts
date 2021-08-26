@@ -182,6 +182,7 @@ export class RecorderModule extends Pluginable {
     }
 
     private async startRecord(options: RecordInternalOptions) {
+        this.status = RecorderStatus.RUNNING
         let activeWatchers = [...this.watchers, ...this.pluginWatchers]
 
         const isSameCtx = options.context === this.options.rootContext
@@ -189,7 +190,6 @@ export class RecorderModule extends Pluginable {
             if (!options.keep) {
                 this.db.clear()
             }
-            this.status = RecorderStatus.RUNNING
         } else {
             // for iframe watchers
             activeWatchers = [Snapshot, ...Object.values(baseWatchers)] as typeof Watcher[]
