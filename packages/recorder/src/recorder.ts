@@ -232,12 +232,13 @@ export class RecorderModule extends Pluginable {
             }
         }
 
+        const isInRoot = options.context === this.options.rootContext
         const emit = onEmit(options)
         const headData = getHeadData()
-        const relatedId = headData.relatedId
+        const relatedId = isInRoot ? headData.relatedId : options.rootContext.G_RECORD_RELATED_ID
+
         options.context.G_RECORD_RELATED_ID = relatedId
 
-        const isInRoot = options.context === this.options.rootContext
         if (isInRoot) {
             emit({
                 type: RecordType.HEAD,
