@@ -1,6 +1,6 @@
 {
     "name": "@timecat/player",
-    "version": "1.2.0-alpha.21",
+    "version": "1.2.0-alpha.22",
     "description": "@timecat/player",
     "main": "index.js",
     "module": "dist/player.esm.js",
@@ -26,9 +26,9 @@
         ]
     },
     "dependencies": {
-        "@timecat/share": "1.2.0-alpha.21",
-        "@timecat/utils": "1.2.0-alpha.21",
-        "@timecat/virtual-dom": "1.2.0-alpha.21"
+        "@timecat/share": "1.2.0-alpha.22",
+        "@timecat/utils": "1.2.0-alpha.22",
+        "@timecat/virtual-dom": "1.2.0-alpha.22"
     },
     "author": "oct16",
     "license": "GPL-3.0-or-later"

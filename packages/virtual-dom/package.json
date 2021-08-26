@@ -1,7 +1,7 @@
 {
     "private": false,
     "name": "@timecat/virtual-dom",
-    "version": "1.2.0-alpha.21",
+    "version": "1.2.0-alpha.22",
     "description": "@timecat/virtual-dom",
     "main": "index.js",
     "module": "dist/virtual-dom.esm.js",
@@ -10,8 +10,8 @@
     "jsdelivr": "dist/virtual-dom.global.prod.js",
     "scripts": {},
     "dependencies": {
-        "@timecat/utils": "1.2.0-alpha.21",
-        "@timecat/share": "1.2.0-alpha.21"
+        "@timecat/utils": "1.2.0-alpha.22",
+        "@timecat/share": "1.2.0-alpha.22"
     },
     "author": "oct16",
     "license": "GPL-3.0-or-later"
