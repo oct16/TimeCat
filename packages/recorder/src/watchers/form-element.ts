@@ -72,7 +72,7 @@ export class FormElementWatcher extends Watcher<FormElementRecord> {
                         type: eventType === 'input' ? FormElementEvent.INPUT : FormElementEvent.CHANGE,
                         id: this.getNodeId(e.target as Node)!,
                         key,
-                        value: !patches.length ? newValue : value,
+                        value: !patches.length ? newValue : null,
                         patches
                     }
                     break
