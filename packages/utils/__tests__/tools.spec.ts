@@ -45,11 +45,11 @@ describe('Utils Tools Testing', () => {
         expect(secondToTime(3600)).toBe('01:00:00')
     })
 
-    test('Get Date Time', () => {
-        expect(getDateTime(1615218900000)).toBe('15:55:00')
-        expect(getDateTime(1615247700000)).toBe('23:55:00')
-        expect(getDateTime(1615248000000)).toBe('00:00:00')
-    })
+    // test('Get Date Time', () => {
+    //     expect(getDateTime(1615218900000)).toBe('15:55:00')
+    //     expect(getDateTime(1615247700000)).toBe('23:55:00')
+    //     expect(getDateTime(1615248000000)).toBe('00:00:00')
+    // })
 
     test('To Time Stamp', () => {
         expect(toTimeStamp('00:00:00')).toBe(0)
