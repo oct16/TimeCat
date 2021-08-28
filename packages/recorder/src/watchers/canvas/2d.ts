@@ -44,13 +44,14 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
     }
 
     private watchCreatingCanvas() {
-        proxyCreateCanvasElement(canvas => {
+        const callback = (canvas: HTMLCanvasElement) => {
             detectCanvasContextType(canvas, contextId => {
                 if (contextId === '2d') {
                     this.watchCanvas(canvas)
                 }
             })
-        })
+        }
+        proxyCreateCanvasElement.call(this, callback)
         this.uninstall(() => removeProxies())
     }
 
@@ -130,7 +131,7 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             })
 
             this.uninstall(() => {
-                Object.defineProperty(ctx, name, descriptor!)
+                Object.defineProperty(ctx, name, descriptor || original)
             })
         })
     }

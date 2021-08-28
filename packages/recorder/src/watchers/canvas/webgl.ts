@@ -100,13 +100,14 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     }
 
     private watchCreatingCanvas() {
-        proxyCreateCanvasElement(canvas => {
+        const callback = (canvas: HTMLCanvasElement) => {
             detectCanvasContextType(canvas, contextId => {
                 if (contextId === 'webgl' || contextId === 'experimental-webgl') {
                     this.watchCanvas(canvas)
                 }
             })
-        })
+        }
+        proxyCreateCanvasElement.call(this, callback)
 
         this.uninstall(() => removeProxies())
     }

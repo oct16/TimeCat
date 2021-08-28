@@ -1,14 +1,19 @@
 import { isNativeFunction } from '@timecat/utils'
+import { Watcher } from './watcher'
 
 const listeners: Array<(element: HTMLElement) => void> = []
 
-function proxyCreateElement(callback: (element: HTMLElement) => void) {
+function proxyCreateElement(this: Watcher<any>, callback: (element: HTMLElement) => void) {
     listeners.push(callback)
     const originalCreateElement = document.createElement
 
     if (!isNativeFunction(originalCreateElement)) {
         return
     }
+
+    this.uninstall(() => {
+        document.createElement = originalCreateElement
+    })
 
     document.createElement = function (
         this: Document,
@@ -23,12 +28,13 @@ function proxyCreateElement(callback: (element: HTMLElement) => void) {
     } as typeof originalCreateElement
 }
 
-export function proxyCreateCanvasElement(callback: (canvas: HTMLCanvasElement) => void) {
-    proxyCreateElement(element => {
+export function proxyCreateCanvasElement(this: Watcher<any>, callback: (canvas: HTMLCanvasElement) => void) {
+    const fn = (element: HTMLCanvasElement) => {
         if (element.tagName === 'CANVAS') {
             callback(element as HTMLCanvasElement)
         }
-    })
+    }
+    proxyCreateElement.call(this, fn)
 }
 
 export function removeProxies() {
