@@ -67,7 +67,7 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
         }
 
         this.emitData(RecordType.CANVAS, {
-            id: this.getNodeId(ctx.canvas),
+            id: this.getNodeId(ctx.canvas) || nodeStore.addNode(ctx.canvas),
             status: this.getCanvasInitState(ctx)
         })
 
