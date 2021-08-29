@@ -58,7 +58,7 @@ export function renderCanvas2D(canvasRecordData: CanvasRecordData) {
                     const data = args[0].data
                     args[0] = new ImageData(new Uint8ClampedArray(data), args[1], args[2])
                 }
-                setTimeout(() => (ctx[name] as Function).apply(ctx, args))
+                ;(ctx[name] as Function).apply(ctx, args)
             }
         }
     }
