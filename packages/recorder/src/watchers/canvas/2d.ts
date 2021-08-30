@@ -44,13 +44,14 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
     }
 
     private watchCreatingCanvas() {
-        proxyCreateCanvasElement(canvas => {
+        const callback = (canvas: HTMLCanvasElement) => {
             detectCanvasContextType(canvas, contextId => {
                 if (contextId === '2d') {
                     this.watchCanvas(canvas)
                 }
             })
-        })
+        }
+        proxyCreateCanvasElement.call(this, callback)
         this.uninstall(() => removeProxies())
     }
 
@@ -67,7 +68,7 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
         }
 
         this.emitData(RecordType.CANVAS, {
-            id: this.getNodeId(ctx.canvas),
+            id: this.getNodeId(ctx.canvas) || nodeStore.addNode(ctx.canvas),
             status: this.getCanvasInitState(ctx)
         })
 
@@ -130,7 +131,7 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             })
 
             this.uninstall(() => {
-                Object.defineProperty(ctx, name, descriptor!)
+                Object.defineProperty(ctx, name, descriptor || original)
             })
         })
     }
