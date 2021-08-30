@@ -607,7 +607,7 @@ export class PlayerComponent implements IComponent {
 
     private calcHeatPointsData() {
         const frames = this.frames
-        if (!frames.length || !this.options.heatPoints) {
+        if (!frames?.length || !this.options.heatPoints) {
             return []
         }
         const state = Store.getState()
