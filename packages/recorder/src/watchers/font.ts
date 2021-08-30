@@ -31,7 +31,21 @@ export class FontWatcher extends Watcher<FontRecord> {
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays
             // https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
             function ab2str(buffer: ArrayBuffer) {
-                return new TextDecoder().decode(buffer)
+                const buf = new Uint16Array(buffer)
+                const len = buf.byteLength
+
+                let gap = Math.pow(2, 16) - 1
+                let res = ''
+
+                for (let i = 0; i < len; i += gap) {
+                    if (i + gap > len) {
+                        gap = len - i
+                    }
+
+                    res += String.fromCharCode.apply(null, buf.subarray(i, i + gap))
+                }
+
+                return res
             }
 
             const font = new original(family, source)
