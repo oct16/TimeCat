@@ -15,6 +15,8 @@ import { detectCanvasContextType, isCanvasBlank } from './utils'
 
 type CanvasContext2DKeys = typeof canvasContext2DKeys[number]
 
+const canvasBeProxiedWeakMap = new WeakMap()
+
 export class Canvas2DWatcher extends Watcher<CanvasRecord> {
     getCanvasInitState(ctx: CanvasRenderingContext2D) {
         const keys = canvasContext2DAttrs
@@ -67,6 +69,10 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             return
         }
 
+        if (canvasBeProxiedWeakMap.get(canvasElement)) {
+            return
+        }
+
         this.emitData(RecordType.CANVAS, {
             id: this.getNodeId(ctx.canvas),
             status: this.getCanvasInitState(ctx)
@@ -80,9 +86,6 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             ctxTemp[name] = val
 
             const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
-            if (descriptor && (!descriptor.configurable || descriptor.get)) {
-                return
-            }
 
             Object.defineProperty(ctx, name, {
                 get() {
@@ -91,29 +94,29 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
 
                     return typeof method === 'function'
                         ? function () {
-                              const args = [...arguments]
-                              if (name === 'createPattern') {
-                                  args[0] = id
-                              } else if (name === 'drawImage') {
-                                  const elType = args[0]?.constructor.name
-                                  if (elType === 'HTMLCanvasElement') {
-                                      const dataUrl = (args[0] as HTMLCanvasElement).toDataURL()
-                                      args[0] = dataUrl
-                                  } else if (elType === 'HTMLImageElement') {
-                                      const img = args[0] as HTMLImageElement
-                                      img.setAttribute('crossorigin', 'anonymous')
-                                      const imgCanvas = (document.createElement as any)('canvas', false)
-                                      imgCanvas.width = img.width
-                                      imgCanvas.height = img.height
-                                      const ctx = imgCanvas.getContext('2d')!
-                                      ctx.drawImage(img, 0, 0, img.width, img.height)
-                                      args[0] = imgCanvas.toDataURL()
-                                  }
-                              }
+                            const args = [...arguments]
+                            if (name === 'createPattern') {
+                                args[0] = id
+                            } else if (name === 'drawImage') {
+                                const elType = args[0]?.constructor.name
+                                if (elType === 'HTMLCanvasElement') {
+                                    const dataUrl = (args[0] as HTMLCanvasElement).toDataURL()
+                                    args[0] = dataUrl
+                                } else if (elType === 'HTMLImageElement') {
+                                    const img = args[0] as HTMLImageElement
+                                    img.setAttribute('crossorigin', 'anonymous')
+                                    const imgCanvas = (document.createElement as any)('canvas', false)
+                                    imgCanvas.width = img.width
+                                    imgCanvas.height = img.height
+                                    const ctx = imgCanvas.getContext('2d')!
+                                    ctx.drawImage(img, 0, 0, img.width, img.height)
+                                    args[0] = imgCanvas.toDataURL()
+                                }
+                            }
 
-                              self.aggregateDataEmitter(id, name, args)
-                              return method.apply(context, arguments)
-                          }
+                            self.aggregateDataEmitter(id, name, args)
+                            return method.apply(context, arguments)
+                        }
                         : ctxTemp[name]
                 },
                 set: function (value: any) {
@@ -133,6 +136,11 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             this.uninstall(() => {
                 Object.defineProperty(ctx, name, descriptor || original)
             })
+        })
+
+        canvasBeProxiedWeakMap.set(canvasElement, true)
+        this.uninstall(() => {
+            canvasBeProxiedWeakMap.set(canvasElement, false)
         })
     }
 

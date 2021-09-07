@@ -26,6 +26,8 @@ const WebGLConstructors = [
     // WebGLVertexArrayObject
 ]
 
+const canvasBeProxiedWeakMap = new WeakMap()
+
 export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     protected init() {
         // this.watchCreatedCanvas()
@@ -75,12 +77,12 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
             return ret
         }
 
-        ;(patch as any).isPatch = true
-        ;(proto[name] as Function) = patch
+            ; (patch as any).isPatch = true
+            ; (proto[name] as Function) = patch
 
         this.uninstall(() => {
             delete (patch as any).isPatch
-            ;(proto[name] as Function) = original
+                ; (proto[name] as Function) = original
         })
     }
 
@@ -120,6 +122,11 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         if (!ctx) {
             return
         }
+
+        if (canvasBeProxiedWeakMap.get(canvasElement)) {
+            return
+        }
+
         const ctxTemp: { [key: string]: any } = {}
 
         for (const key in ctx) {
@@ -137,9 +144,6 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
             ctxTemp[name] = value
 
             const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
-            if (descriptor && (!descriptor.configurable || descriptor.get)) {
-                return
-            }
 
             Object.defineProperty(ctx, name, {
                 get() {
@@ -147,13 +151,13 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
 
                     return typeof value === 'function'
                         ? function () {
-                              const args = [...arguments]
-                              setTimeout(() => {
-                                  const id = self.getNodeId(context.canvas) || nodeStore.addNode(canvasElement)
-                                  self.emitStroke(id, name, args)
-                              })
-                              return value.apply(context, arguments)
-                          }
+                            const args = [...arguments]
+                            setTimeout(() => {
+                                const id = self.getNodeId(context.canvas) || nodeStore.addNode(canvasElement)
+                                self.emitStroke(id, name, args)
+                            })
+                            return value.apply(context, arguments)
+                        }
                         : ctxTemp[name]
                 },
                 set: function (value: any) {
@@ -174,6 +178,11 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
                 Object.defineProperty(ctx, name, descriptor || original)
             })
         }
+
+        canvasBeProxiedWeakMap.set(canvasElement, true)
+        this.uninstall(() => {
+            canvasBeProxiedWeakMap.set(canvasElement, false)
+        })
     }
 
     private parseArgs(argsList: any[]) {
