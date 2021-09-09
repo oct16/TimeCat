@@ -15,6 +15,8 @@ import { detectCanvasContextType, isCanvasBlank } from './utils'
 
 type CanvasContext2DKeys = typeof canvasContext2DKeys[number]
 
+const ProxiedCanvasCache = new WeakMap()
+
 export class Canvas2DWatcher extends Watcher<CanvasRecord> {
     getCanvasInitState(ctx: CanvasRenderingContext2D) {
         const keys = canvasContext2DAttrs
@@ -67,6 +69,10 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             return
         }
 
+        if (ProxiedCanvasCache.get(canvasElement)) {
+            return
+        }
+
         this.emitData(RecordType.CANVAS, {
             id: this.getNodeId(ctx.canvas),
             status: this.getCanvasInitState(ctx)
@@ -80,9 +86,6 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             ctxTemp[name] = val
 
             const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
-            if (descriptor && (!descriptor.configurable || descriptor.get)) {
-                return
-            }
 
             Object.defineProperty(ctx, name, {
                 get() {
@@ -133,6 +136,11 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
             this.uninstall(() => {
                 Object.defineProperty(ctx, name, descriptor || original)
             })
+        })
+
+        ProxiedCanvasCache.set(canvasElement, true)
+        this.uninstall(() => {
+            ProxiedCanvasCache.set(canvasElement, false)
         })
     }
 

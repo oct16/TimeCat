@@ -26,6 +26,7 @@ const WebGLConstructors = [
     // WebGLVertexArrayObject
 ]
 
+const ProxiedCanvasCache = new WeakMap()
 export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
     protected init() {
         // this.watchCreatedCanvas()
@@ -120,6 +121,11 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
         if (!ctx) {
             return
         }
+
+        if (ProxiedCanvasCache.get(canvasElement)) {
+            return
+        }
+
         const ctxTemp: { [key: string]: any } = {}
 
         for (const key in ctx) {
@@ -137,9 +143,6 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
             ctxTemp[name] = value
 
             const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
-            if (descriptor && (!descriptor.configurable || descriptor.get)) {
-                return
-            }
 
             Object.defineProperty(ctx, name, {
                 get() {
@@ -174,6 +177,11 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
                 Object.defineProperty(ctx, name, descriptor || original)
             })
         }
+
+        ProxiedCanvasCache.set(canvasElement, true)
+        this.uninstall(() => {
+            ProxiedCanvasCache.set(canvasElement, false)
+        })
     }
 
     private parseArgs(argsList: any[]) {
