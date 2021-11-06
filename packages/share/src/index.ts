@@ -300,6 +300,7 @@ export interface ReplayOptions {
 
 export interface ReplayInternalOptions extends ReplayOptions {
     destroyStore: Set<Function>
+    hidePanel: boolean
     fastForward: number[]
     autoplay: boolean
     mode: 'live' | 'default'

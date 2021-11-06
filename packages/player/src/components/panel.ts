@@ -37,6 +37,9 @@ export class PanelComponent implements IComponent {
     constructor(c: ContainerComponent) {
         this.c = c
         this.options = c.options
+        if (this.options.hidePanel) {
+            this.target.style.display = 'none'
+        }
         this.initComponent()
     }
 
