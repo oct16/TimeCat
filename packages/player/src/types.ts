@@ -8,6 +8,7 @@
  */
 
 export enum PlayerEventTypes {
+    INIT = 'init',
     PLAY = 'play',
     PAUSE = 'pause',
     STOP = 'stop',

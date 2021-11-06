@@ -41,6 +41,7 @@ export class ContainerComponent {
         const { resize } = this.makeItResponsive()
         this.resize = resize
         this.initPanel()
+        setTimeout(() => observer.emit(PlayerEventTypes.INIT))
     }
 
     private initPanel() {

@@ -271,7 +271,7 @@ export class PlayerComponent implements IComponent {
         this.mountVideos()
     }
 
-    private async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
+    public async jump(state: { index: number; time: number; percent?: number }, shouldLoading = false) {
         this.isJumping = true
         this.shouldWaitForSync = true
         let loading: HTMLElement | undefined = undefined
@@ -550,7 +550,7 @@ export class PlayerComponent implements IComponent {
         }
     }
 
-    private pause(emit = true) {
+    public pause(emit = true) {
         if (this.RAF) {
             this.RAF.stop()
         }

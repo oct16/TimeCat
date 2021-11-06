@@ -26,7 +26,7 @@ import {
     ReplayInternalOptions,
     HeadRecord
 } from '@timecat/share'
-import { waitStart, removeStartPage, showStartMask } from './utils'
+import { waitStart, removeStartPage, showStartMask, ConnectProps, ReplayDataState } from './utils'
 import { PlayerEventTypes } from './types'
 import {
     FMP,
@@ -40,6 +40,7 @@ import {
     getGZipData
 } from './utils'
 import { getPacks } from './utils/transform'
+import { Ctrl } from './ctrl'
 
 const defaultReplayOptions = {
     autoplay: true,
@@ -55,9 +56,12 @@ export class Player {
     on: (key: PlayerEventTypes, fn: Function) => void = tempEmptyFn
     destroy: () => void = tempEmptyFn
     append: (records: RecordData[]) => void = tempEmptyFn
+    getCtrl: () => typeof Ctrl = tempEmptyFn as any
     constructor(options?: ReplayOptions) {
         const player = new PlayerModule(options)
-        Object.keys(this).forEach((key: keyof Player) => (this[key] = player[key].bind(player)))
+        Object.keys(this).forEach((key: keyof Player) => {
+            this[key] = player[key].bind(player)
+        })
     }
 }
 
@@ -66,15 +70,74 @@ export class PlayerModule {
     fmp: FMP
     destroyStore = new Set<Function>()
     options: ReplayInternalOptions
+    ctrl: any
+    initialized = false
     constructor(options?: ReplayOptions) {
         nodeStore.reset()
         this.init(options)
+        this.watchData()
+        this.ctrl = new Ctrl(this)
     }
 
-    private async init(options?: ReplayOptions) {
+    @ConnectProps(state => ({
+        currentData: state.replayData.currentData,
+        records: state.replayData.records,
+        packs: state.replayData.packs
+    }))
+    private watchData(state?: ReplayDataState) {
+        if (state && !this.initialized) {
+            this.initialized = true
+            const opts = this.options
+            const { records, packs, currentData } = state
+            const { audio } = currentData
+            const hasAudio = audio && (audio.src || audio.wavStrList.length || audio.pcmStrList.length)
+            this.c = new ContainerComponent(opts)
+
+            showStartMask(this.c)
+            ;(this.fmp = new FMP()).ready(async () => {
+                if (hasAudio) {
+                    await waitStart(this.c.container)
+                }
+
+                removeStartPage(this.c.container)
+
+                if (records.length) {
+                    if (opts.autoplay || hasAudio) {
+                        if (opts.autoplay) {
+                            Store.dispatch({
+                                type: PlayerReducerTypes.SPEED,
+                                data: { speed: 1 }
+                            })
+                        }
+                    }
+                }
+            })
+
+            if (packs.length) {
+                this.calcProgress()
+            }
+
+            if (records.length <= 2) {
+                // live mode
+                Store.dispatch({ type: PlayerReducerTypes.OPTIONS, data: { options: { mode: 'live' } } })
+                const panel = this.c.panel.target
+                if (panel) {
+                    panel.setAttribute('style', 'display: none')
+                }
+            }
+        }
+    }
+
+    private init(options?: ReplayOptions) {
         if (!isDev) {
             logInfo()
         }
+
+        this.initOptions(options)
+        this.initData()
+    }
+
+    private async initOptions(options?: ReplayOptions) {
         const opts = {
             destroyStore: this.destroyStore,
             ...defaultReplayOptions,
@@ -84,54 +147,19 @@ export class PlayerModule {
         this.options = opts
         Store.dispatch({ type: PlayerReducerTypes.OPTIONS, data: { options: opts } })
         this.destroyStore.add(() => Store.unsubscribe())
+    }
 
+    private async initData() {
+        const opts = this.options
         const records = await this.getRecords(opts)
         window.G_REPLAY_RECORDS = records
-
         const packs = getPacks(records)
         const firstData = transToReplayData(packs[0])
-        const { audio } = firstData
+
         Store.dispatch({
             type: ReplayDataReducerTypes.UPDATE_DATA,
             data: { records, packs, currentData: firstData }
         })
-
-        const hasAudio = audio && (audio.src || audio.wavStrList.length || audio.pcmStrList.length)
-
-        this.c = new ContainerComponent(opts)
-        const container = this.c.container
-        showStartMask(this.c)
-        ;(this.fmp = new FMP()).ready(async () => {
-            if (hasAudio) {
-                await waitStart(container)
-            }
-
-            removeStartPage(container)
-
-            if (records.length) {
-                if (opts.autoplay || hasAudio) {
-                    if (opts.autoplay) {
-                        Store.dispatch({
-                            type: PlayerReducerTypes.SPEED,
-                            data: { speed: 1 }
-                        })
-                    }
-                }
-            }
-        })
-
-        if (packs.length) {
-            this.calcProgress()
-        }
-
-        if (records.length <= 2) {
-            // live mode
-            Store.dispatch({ type: PlayerReducerTypes.OPTIONS, data: { options: { mode: 'live' } } })
-            const panel = this.c.panel.target
-            if (panel) {
-                panel.setAttribute('style', 'display: none')
-            }
-        }
     }
 
     private async getRecords(options: ReplayInternalOptions) {
@@ -247,4 +275,6 @@ export class PlayerModule {
 
         this.triggerCalcProgress()
     }
+
+    public getCtrl = () => this.ctrl
 }
