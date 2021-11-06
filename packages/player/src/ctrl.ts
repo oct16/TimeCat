@@ -87,11 +87,11 @@ export class Ctrl {
         this.setCurrentTime(time)
     }
 
-    async setCurrentTime(time: number) {
+    public async setCurrentTime(time: number) {
         this.command({ cmd: 'jump', value: time })
     }
 
-    public async getPlayer(): Promise<PlayerComponent> {
+    private async getPlayer(): Promise<PlayerComponent> {
         return await new Promise(r => {
             if (!this.initResolve) {
                 this.initResolve = r
