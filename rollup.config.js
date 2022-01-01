@@ -3,7 +3,7 @@ import ts from 'rollup-plugin-typescript2'
 import json from '@rollup/plugin-json'
 import replace from '@rollup/plugin-replace'
 import { string } from 'rollup-plugin-string'
-import scss from 'rollup-plugin-scss'
+import less from 'rollup-plugin-less'
 
 if (!process.env.TARGET) {
     throw new Error('TARGET package must be specified via --environment flag.')
@@ -114,10 +114,7 @@ function createConfig(format, output, plugins = []) {
     // const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})]
 
     const defaultPlugins = [
-        scss({
-            output: false,
-            failOnError: true
-        }),
+        less({ output: false, failOnError: true }),
         json(),
         string({
             include: ['**/*.html', '**/*.css'],

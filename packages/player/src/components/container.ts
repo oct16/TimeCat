@@ -9,7 +9,7 @@
 
 import { nodeStore, debounce, createURL } from '@timecat/utils'
 import HTML from '../ui.html'
-import CSS from '../ui.scss'
+import CSS from '../ui.less'
 import smoothScroll from 'smoothscroll-polyfill'
 import { ReplayInternalOptions, VNode, InfoData } from '@timecat/share'
 import { observer, Store, disableScrolling, parseHtmlStr, html, createIframeDOM, injectIframeContent } from '../utils'

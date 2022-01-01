@@ -27,7 +27,7 @@ import { delay, idb, asciiToUint8Array, base64ToBufferArray } from '@timecat/uti
 import { Store } from './redux'
 import mobile from 'is-mobile'
 import { ContainerComponent } from '../components/container'
-import FIXED_CSS from '../fixed.scss'
+import FIXED_CSS from '../fixed.less'
 import { convertVNode } from '@timecat/virtual-dom'
 
 export function download(src: Blob | string, name: string) {
