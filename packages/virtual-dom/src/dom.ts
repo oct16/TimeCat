@@ -30,6 +30,12 @@ export function setAttribute(node: HTMLElement, name: string, value: string | bo
         return
     }
 
+    // Compat SVG Namespaces
+    if (name === 'xlink:href' && node.constructor.name === SVGUseElement.name) {
+        node.setAttributeNS('http://www.w3.org/1999/xlink', name, value as any)
+        return
+    }
+
     if (name === 'src' && ~ignoreNodeNames.indexOf(node.tagName)) {
         return
     }
