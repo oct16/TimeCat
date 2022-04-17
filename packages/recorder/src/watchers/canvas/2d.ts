@@ -80,7 +80,10 @@ export class Canvas2DWatcher extends Watcher<CanvasRecord> {
 
         const ctxTemp: { [key: string]: any } = {}
         names.forEach(name => {
-            const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
+            const original = Object.getOwnPropertyDescriptor(ctxProto, name)
+            if (!original) {
+                return
+            }
             const method = original.value
             const val = ctx[name as CanvasContext2DKeys]
             ctxTemp[name] = val

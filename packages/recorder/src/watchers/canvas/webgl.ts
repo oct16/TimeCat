@@ -138,8 +138,11 @@ export class CanvasWebGLWatcher extends Watcher<CanvasRecord> {
                 continue
             }
 
-            const original = Object.getOwnPropertyDescriptor(ctxProto, name)!
-            const value = original.value
+            const original = Object.getOwnPropertyDescriptor(ctxProto, name)
+            if (!original) {
+                return
+            }
+            const value = original?.value
             ctxTemp[name] = value
 
             const descriptor = Object.getOwnPropertyDescriptor(ctx, name)
