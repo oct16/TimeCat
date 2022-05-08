@@ -230,6 +230,7 @@ export function createIframeDOM(contentDocument: Document, snapshotData: Snapsho
         doctype.systemId ? '"' + doctype.systemId + '"' : ''
     }><html><head></head><body></body></html>`
     contentDocument.write(doc)
+    contentDocument.close()
 }
 
 export function injectIframeContent(contentDocument: Document, snapshotData: SnapshotRecord['data']) {
