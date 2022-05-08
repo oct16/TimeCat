@@ -1,3 +1,4 @@
+import { FontRecordData } from '@timecat/share'
 /**
  * Copyright (c) oct16.
  * https://github.com/oct16
@@ -92,7 +93,7 @@ export async function renderAll(
             break
         }
         case RecordType.FONT: {
-            renderFont.call(this, data as CanvasRecordData)
+            renderFont.call(this, data as FontRecordData)
             break
         }
         case RecordType.PATCH: {
