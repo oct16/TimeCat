@@ -37,6 +37,7 @@ export class Watcher<T extends RecordData> {
 
     public getNode = (id: number): Node => nodeStore.getNode.call(nodeStore, id)
     public getNodeId = (n: Node): number => nodeStore.getNodeId.call(nodeStore, n)
+    public addNode = (n: Node): number => nodeStore.addNode.call(nodeStore, n)
 
     public uninstall(fn: Function) {
         this.options.listenStore.add(fn)

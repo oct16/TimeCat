@@ -130,9 +130,11 @@ export class DOMWatcher extends Watcher<DOMRecord> {
                 }
             }
 
+            const ns = node.nextSibling
+            const nextId = ns ? this.getNodeId(ns) || this.addNode(ns) : null
             addedNodes.push({
                 parentId,
-                nextId: this.getNodeId(node.nextSibling!) || null,
+                nextId,
                 node: vn
             })
 
