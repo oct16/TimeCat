@@ -103,7 +103,9 @@ function createConfig(format, output, plugins = []) {
     const nodePlugins = [
         require('@rollup/plugin-commonjs')(),
         require('rollup-plugin-node-polyfills')(),
-        require('@rollup/plugin-node-resolve').nodeResolve()
+        require('@rollup/plugin-node-resolve').nodeResolve({
+            browser: true
+        })
     ]
 
     hasTSChecked = true

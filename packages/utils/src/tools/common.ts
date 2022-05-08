@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-
+import { nanoid } from 'nanoid'
 import * as diff from 'diff'
 import { radix64 } from '../performance/radix64'
 import { VNode, VSNode, SnapshotRecord, RecordData, RecordType } from '@timecat/share'
@@ -40,8 +40,8 @@ export function getRadix64TimeStr() {
     return radix64.btoa(getTime())
 }
 
-export function getRandomCode(len: 6 | 7 | 8 = 8) {
-    const code = (Math.random() * 20 + 16).toString(36).substring(2, len + 2)
+export function getRandomCode() {
+    const code = nanoid()
     return code.toUpperCase()
 }
 

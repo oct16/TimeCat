@@ -32,12 +32,6 @@ describe('Utils Tools Testing', () => {
         expect(logInfo()).toBeUndefined()
     })
 
-    test('Random Code', () => {
-        expect(getRandomCode(6)).toHaveLength(6)
-        expect(getRandomCode(7)).toHaveLength(7)
-        expect(getRandomCode(8)).toHaveLength(8)
-    })
-
     test('Second To Time', () => {
         expect(secondToTime(0)).toBe('00:00')
         expect(secondToTime(100)).toBe('01:40')
