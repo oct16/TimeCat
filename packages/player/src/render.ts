@@ -18,7 +18,8 @@ import {
     SnapshotRecord,
     PreFetchRecordData,
     WebGLRecordData,
-    CanvasSnapshotRecordData
+    CanvasSnapshotRecordData,
+    FontRecordData
 } from '@timecat/share'
 import { PlayerComponent } from './components/player'
 import { delay } from '@timecat/utils'

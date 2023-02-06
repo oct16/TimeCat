@@ -58,7 +58,7 @@ export class Database {
 
         transaction.onabort = transaction.onerror = () => {
             const err = transaction.error
-            logError(err)
+            logError(err!)
         }
 
         return transaction.objectStore(this.storeName)
